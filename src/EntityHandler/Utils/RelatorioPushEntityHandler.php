@@ -2,7 +2,7 @@
 
 namespace App\EntityHandler\Utils;
 
-use App\Entity\Base\CategoriaPessoa;
+use App\Entity\Utils\RelatorioPush;
 use CrosierSource\CrosierLibBaseBundle\EntityHandler\EntityHandler;
 
 /**
@@ -16,6 +16,6 @@ class RelatorioPushEntityHandler extends EntityHandler
 
     public function getEntityClass()
     {
-        return CategoriaPessoa::class;
+        return RelatorioPush::class;
     }
 }

@@ -37,21 +37,6 @@ class DefaultController extends BaseController
 
     }
 
-    /**
-     *
-     * @Route("/push", name="push")
-     */
-    public function __invoke(Publisher $publisher): Response
-    {
-        $update = new Update(
-            'http://example.com/books/1',
-            json_encode(['status' => 'OutOfStock'])
-        );
 
-        // The Publisher service is an invokable object
-        $publisher($update);
-
-        return new Response('published!');
-    }
 
 }
