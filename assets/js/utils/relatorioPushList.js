@@ -19,7 +19,7 @@ function getDatatablesColumns() {
             data: 'e',
             title: 'Arquivo',
             render: function (data, type, row) {
-                return '<a href="https://dev.rdp.crosier/uploads/relatoriospush/' + data.arquivo + '" target="_blank">' + data.descricao + '</a>';
+                return '<a href="/uploads/relatoriospush/' + data.arquivo + '" target="_blank">' + data.descricao + '</a>';
             },
         },
         {
