@@ -86,7 +86,9 @@ class RelatoriosPushAPIController extends BaseController
 
         $params = [
             'subject' => 'relatorioPush',
-            'arquivo' => $relatorioPush->getArquivo()
+            'arquivo' => $relatorioPush->getArquivo(),
+            'url' => '/uploads/relatoriospush/' . $relatorioPush->getArquivo(),
+            'title' => 'Você recebeu um novo arquivo...'
         ];
 
         $update = new Update($topic, json_encode($params));
