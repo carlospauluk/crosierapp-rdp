@@ -114,7 +114,7 @@ class RelatoriosPushController extends FormListController
             $this->getEntityHandler()->save($relatorioPush);
         }
         if ($relatorioPush->getUserDestinatarioId() !== $this->getUser()->getId()) {
-            throw new AccessDeniedException('Acesso negado');
+            throw new AccessDeniedException('Acesso negado [' . $relatorioPush->getUserDestinatarioId() . '>>' . $this->getUser()->getId() . ']');
         }
         return $this->redirect('/uploads/relatoriospush/' . $relatorioPush->getArquivo());
     }
