@@ -8,6 +8,7 @@ use App\EntityHandler\Utils\RelatorioPushEntityHandler;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -96,6 +97,26 @@ class RelatoriosPushController extends FormListController
     public function delete(Request $request, RelatorioPush $relatorioPush): RedirectResponse
     {
         return $this->doDelete($request, $relatorioPush);
+    }
+
+    /**
+     *
+     * @Route("/relatorioPush/abrir/{id}/", name="relatorioPush_abrir", requirements={"id"="\d+"})
+     * @param Request $request
+     * @param RelatorioPush $relatorioPush
+     * @return RedirectResponse
+     * @throws \Exception
+     */
+    public function abrirArquivo(RelatorioPush $relatorioPush): RedirectResponse
+    {
+        if (!$relatorioPush->getAbertoEm()) {
+            $relatorioPush->setAbertoEm(new \DateTime());
+            $this->getEntityHandler()->save($relatorioPush);
+        }
+        if ($relatorioPush->getUserDestinatarioId() !== $this->getUser()->getId()) {
+            throw new AccessDeniedException();
+        }
+        return $this->redirect('/uploads/relatoriospush/' . $relatorioPush->getArquivo());
     }
 
 

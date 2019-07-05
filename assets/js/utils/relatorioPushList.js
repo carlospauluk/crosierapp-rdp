@@ -19,7 +19,9 @@ function getDatatablesColumns() {
             data: 'e',
             title: 'Arquivo',
             render: function (data, type, row) {
-                return '<a href="/uploads/relatoriospush/' + data.arquivo + '" target="_blank">' + data.descricao + '</a>';
+                let style = data.abertoEm == null ? 'font-weight: bold' : '';
+                let url = Routing.generate('relatorioPush_abrir', {'id': data.id});
+                return '<a style="' + style + '" href="' + url + '" onclick="document.location.reload(true);" target="_blank">' + data.descricao + '</a>';
             },
         },
         {
@@ -54,6 +56,19 @@ function getDatatablesColumns() {
     ];
 }
 
+let time = new Date().getTime();
+$(document.body).bind("mousemove keypress", function(e) {
+    time = new Date().getTime();
+});
+
+function refresh() {
+    if(new Date().getTime() - time >= 15000)
+        window.location.reload(true);
+    else
+        setTimeout(refresh, 10000);
+}
+
+setTimeout(refresh, 10000);
 
 DatatablesJs.makeDatatableJs(listId, getDatatablesColumns());
 

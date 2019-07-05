@@ -87,7 +87,7 @@ class RelatoriosPushAPIController extends BaseController
         $params = [
             'subject' => 'relatorioPush',
             'arquivo' => $relatorioPush->getArquivo(),
-            'url' => $_SERVER['CROSIERAPPRDP_URL'] . '/uploads/relatoriospush/' . $relatorioPush->getArquivo(),
+            'url' => $_SERVER['CROSIERAPPRDP_URL'] . '/relatorioPush/abrir/' . $relatorioPush->getId(),
             'title' => 'Você recebeu um novo arquivo...'
         ];
 
