@@ -40,7 +40,7 @@ class RelatoriosPushController extends FormListController
             'list_PROGRAM_UUID' => null,
             'listJS' => 'utils/relatorioPushList.js',
 
-            'role_access' => 'ROLE_ANY',
+            'role_access' => 'ROLE_RELATORIOSPUSH',
             'role_delete' => 'ROLE_ADMIN',
 
         ];
