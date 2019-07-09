@@ -4,7 +4,6 @@ namespace App\Controller\Utils\API;
 
 use App\Entity\Utils\RelatorioPush;
 use App\EntityHandler\Utils\RelatorioPushEntityHandler;
-use CrosierSource\CrosierLibBaseBundle\APIClient\Config\PushMessageAPIClient;
 use CrosierSource\CrosierLibBaseBundle\APIClient\CrosierEntityIdAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\BaseController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
