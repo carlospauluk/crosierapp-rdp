@@ -77,6 +77,11 @@ class RelatoriosPushAPIController extends BaseController
             $this->relatorioPushEntityHandler->save($relatorioPush);
             $this->push($relatorioPush);
             $output['uploaded'] = true;
+        } else {
+            $this->logger->debug('file ou userDestinatarioId não informados');
+            $this->logger->debug('file: ' . $request->files->get('file'));
+            $this->logger->debug('userDestinatarioId: ' . $request->get('userDestinatarioId'));
+
         }
         return new JsonResponse($output);
 
