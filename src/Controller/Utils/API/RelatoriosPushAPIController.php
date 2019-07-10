@@ -4,13 +4,12 @@ namespace App\Controller\Utils\API;
 
 use App\Entity\Utils\RelatorioPush;
 use App\EntityHandler\Utils\RelatorioPushEntityHandler;
+use CrosierSource\CrosierLibBaseBundle\APIClient\CrosierEntityIdAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\BaseController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mercure\Publisher;
-use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -29,6 +28,10 @@ class RelatoriosPushAPIController extends BaseController
     /** @var RelatorioPushEntityHandler */
     private $relatorioPushEntityHandler;
 
+    /** @var CrosierEntityIdAPIClient */
+    private $crosierEntityIdAPIClient;
+
+
     /**
      * @required
      * @param mixed $logger
@@ -46,6 +49,17 @@ class RelatoriosPushAPIController extends BaseController
     {
         $this->relatorioPushEntityHandler = $relatorioPushEntityHandler;
     }
+
+    /**
+     * @required
+     * @param CrosierEntityIdAPIClient $crosierEntityIdAPIClient
+     */
+    public function setCrosierEntityIdAPIClient(CrosierEntityIdAPIClient $crosierEntityIdAPIClient): void
+    {
+        $this->crosierEntityIdAPIClient = $crosierEntityIdAPIClient;
+    }
+
+
 
     /**
      * @Route("/api/utils/relatoriosPush/upload", name="relatorios_push_upload")
@@ -67,37 +81,25 @@ class RelatoriosPushAPIController extends BaseController
             $this->relatorioPushEntityHandler->save($relatorioPush);
             $this->push($relatorioPush);
             $output['uploaded'] = true;
+        } else {
+            $this->logger->debug('file ou userDestinatarioId não informados');
+            $this->logger->debug('file: ' . $request->files->get('file'));
+            $this->logger->debug('userDestinatarioId: ' . $request->get('userDestinatarioId'));
+
         }
         return new JsonResponse($output);
 
     }
 
-    /** @var Publisher */
-    private $publisher;
-
-    /**
-     * @required
-     * @param Publisher $publisher
-     */
-    public function setPublisher(Publisher $publisher): void
-    {
-        $this->publisher = $publisher;
-    }
-
-
     public function push(RelatorioPush $relatorioPush): void
     {
-        $topic = 'https://mercure.crosier/topics/user/' . $relatorioPush->getUserDestinatarioId();
-
-        $params = [
-            'subject' => 'relatorioPush',
-            'arquivo' => $relatorioPush->getArquivo(),
+        $pushMessage = [
+            'userDestinatarioId' => $relatorioPush->getUserDestinatarioId(),
             'url' => $_SERVER['CROSIERAPPRDP_URL'] . '/relatorioPush/abrir/' . $relatorioPush->getId(),
-            'title' => 'Você recebeu um novo arquivo...'
+            'mensagem' => 'Você recebeu um novo arquivo...'
         ];
-
-        $update = new Update($topic, json_encode($params));
-        $this->publisher->__invoke($update);
+        $this->crosierEntityIdAPIClient->setBaseURI($_SERVER['CROSIERCORE_URL'] . '/api/cfg/pushMessage');
+        $this->crosierEntityIdAPIClient->save($pushMessage);
     }
 
 
