@@ -1,0 +1,25 @@
+{% extends '@CrosierLibBase/list.html.twig' %}
+
+{% block campos_pesquisar %}
+
+    <div class="form-group">
+        <label for="filter_arquivo">Arquivo</label>
+        <input type="text"
+               class="form-control" id="filter_arquivo"
+               name="filter[arquivo]"
+               value="{{ filter.arquivo|default('') }}">
+    </div>
+    <div class="form-group">
+        <label for="filter_tipoArquivo">Tipo</label>
+        <input type="text"
+               class="form-control" id="filter_tipoArquivo"
+               name="filter[tipoArquivo]"
+               value="{{ filter.tipoArquivo|default('') }}">
+    </div>
+
+{% endblock %}
+
+
+{% block down_scripts %}
+    <script src="{{ asset('build/utils/relatorioPushList.js') }}"></script>
+{% endblock %}

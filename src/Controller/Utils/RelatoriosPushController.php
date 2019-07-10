@@ -32,10 +32,10 @@ class RelatoriosPushController extends FormListController
             'formPageTitle' => null,
             'form_PROGRAM_UUID' => null,
 
-            'listView' => '@CrosierLibBase/list.html.twig',
+            'listView' => 'Utils/pushList.html.twig',
             'listRoute' => 'utils_relatorioPush_list',
             'listRouteAjax' => 'utils_relatorioPush_datatablesJsList',
-            'listPageTitle' => 'Relatórios',
+            'listPageTitle' => 'Push',
             'listId' => 'relatorioPushList',
             'list_PROGRAM_UUID' => null,
             'listJS' => 'utils/relatorioPushList.js',
@@ -59,7 +59,7 @@ class RelatoriosPushController extends FormListController
         return [
             new FilterData(['descricao'], 'LIKE', 'descricao', $params),
             new FilterData(['userDestinatarioId'], 'EQ', 'userDestinatarioId', $params),
-            new FilterData(['tipo_arquivo'], 'EQ', 'tipoArquivo', $params)
+            new FilterData(['tipoArquivo'], 'LIKE', 'tipoArquivo', $params)
         ];
     }
 
