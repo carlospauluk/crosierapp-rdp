@@ -8,6 +8,7 @@ use CrosierSource\CrosierLibBaseBundle\APIClient\CrosierEntityIdAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\BaseController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -72,7 +73,10 @@ class RelatoriosPushAPIController extends BaseController
         if ($request->files->get('file') && $request->get('userDestinatarioId')) {
             /** @var RelatorioPush $relatorioPush */
             $relatorioPush = new RelatorioPush();
-            $relatorioPush->setFile($request->files->get('file'));
+            /** @var UploadedFile $file */
+            $file =$request->files->get('file');
+            $relatorioPush->setTipoArquivo($file->getMimeType());
+            $relatorioPush->setFile($file);
             $relatorioPush->setDtEnvio(new \DateTime());
             $relatorioPush->setUserDestinatarioId($request->get('userDestinatarioId'));
             $relatorioPush->setDescricao($relatorioPush->getFile()->getClientOriginalName());
