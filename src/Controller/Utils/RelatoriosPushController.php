@@ -58,13 +58,14 @@ class RelatoriosPushController extends FormListController
     {
         return [
             new FilterData(['descricao'], 'LIKE', 'descricao', $params),
-            new FilterData(['userDestinatarioId'], 'EQ', 'userDestinatarioId', $params)
+            new FilterData(['userDestinatarioId'], 'EQ', 'userDestinatarioId', $params),
+            new FilterData(['tipo_arquivo'], 'EQ', 'tipoArquivo', $params)
         ];
     }
 
     /**
      *
-     * @Route("/utils/push/list/PDF", name="utils_relatorioPush_list")
+     * @Route("/utils/push/list/", name="utils_relatorioPush_list")
      * @param Request $request
      * @return Response
      * @throws \Exception
@@ -76,7 +77,7 @@ class RelatoriosPushController extends FormListController
 
     /**
      *
-     * @Route("/utils/push/datatablesJsList/PDF", name="utils_relatorioPush_datatablesJsList")
+     * @Route("/utils/push/datatablesJsList/", name="utils_relatorioPush_datatablesJsList")
      * @param Request $request
      * @return Response
      * @throws ViewException
@@ -102,10 +103,9 @@ class RelatoriosPushController extends FormListController
     /**
      *
      * @Route("/relatorioPush/abrir/{id}/", name="relatorioPush_abrir", requirements={"id"="\d+"})
-     * @param Request $request
      * @param RelatorioPush $relatorioPush
      * @return RedirectResponse
-     * @throws \Exception
+     * @throws ViewException
      */
     public function abrirArquivo(RelatorioPush $relatorioPush): RedirectResponse
     {
