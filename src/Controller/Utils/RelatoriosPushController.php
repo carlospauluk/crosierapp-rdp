@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * CRUD Controller para RelatoriosPush.
+ * CRUD Controller para Push.
  *
  * @package App\Controller\Utils
  * @author Carlos Eduardo Pauluk

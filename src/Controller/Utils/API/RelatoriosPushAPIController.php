@@ -13,6 +13,11 @@ use Symfony\Component\Mercure\Publisher;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Class RelatoriosPushAPIController
+ *
+ * @package App\Controller\Utils\API
+ */
 class RelatoriosPushAPIController extends BaseController
 {
 
