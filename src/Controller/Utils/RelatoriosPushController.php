@@ -64,7 +64,7 @@ class RelatoriosPushController extends FormListController
 
     /**
      *
-     * @Route("/utils/relatorioPush/list/", name="utils_relatorioPush_list")
+     * @Route("/utils/push/list/PDF", name="utils_relatorioPush_list")
      * @param Request $request
      * @return Response
      * @throws \Exception
@@ -76,7 +76,7 @@ class RelatoriosPushController extends FormListController
 
     /**
      *
-     * @Route("/utils/relatorioPush/datatablesJsList/", name="utils_relatorioPush_datatablesJsList")
+     * @Route("/utils/push/datatablesJsList/PDF", name="utils_relatorioPush_datatablesJsList")
      * @param Request $request
      * @return Response
      * @throws ViewException

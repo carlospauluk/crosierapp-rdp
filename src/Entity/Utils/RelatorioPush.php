@@ -42,6 +42,13 @@ class RelatorioPush implements EntityId
 
     /**
      *
+     * @ORM\Column(name="tipo_arquivo", type="string", nullable=true, length=100)
+     * @Groups("entity")
+     */
+    private $tipoArquivo;
+
+    /**
+     *
      * @ORM\Column(name="user_destinatario_id", type="integer", nullable=false)
      * @Groups("entity")
      */
@@ -106,6 +113,24 @@ class RelatorioPush implements EntityId
     public function setDescricao($descricao)
     {
         $this->descricao = $descricao;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTipoArquivo()
+    {
+        return $this->tipoArquivo;
+    }
+
+    /**
+     * @param mixed $tipoArquivo
+     * @return RelatorioPush
+     */
+    public function setTipoArquivo($tipoArquivo)
+    {
+        $this->tipoArquivo = $tipoArquivo;
         return $this;
     }
 
@@ -189,8 +214,6 @@ class RelatorioPush implements EntityId
         $this->arquivo = $arquivo;
         return $this;
     }
-
-
 
 
 }

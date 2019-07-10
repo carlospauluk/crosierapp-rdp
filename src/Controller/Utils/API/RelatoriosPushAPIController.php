@@ -59,8 +59,6 @@ class RelatoriosPushAPIController extends BaseController
         $this->crosierEntityIdAPIClient = $crosierEntityIdAPIClient;
     }
 
-
-
     /**
      * @Route("/api/utils/relatoriosPush/upload", name="relatorios_push_upload")
      * @param Request $request
