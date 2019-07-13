@@ -8,6 +8,7 @@ CREATE TABLE `rdp_utl_relatoriospush`
     `user_destinatario_id` bigint(20)                           NOT NULL,
     `dt_aberto_em`         datetime                             NULL,
     `arquivo`              varchar(300) COLLATE utf8_swedish_ci NOT NULL,
+    `tipo_arquivo`         varchar(100) COLLATE utf8_swedish_ci NULL,
 
     `id`                   bigint(20) AUTO_INCREMENT            NOT NULL,
     `estabelecimento_id`   bigint(20)                           NOT NULL,
