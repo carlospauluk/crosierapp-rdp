@@ -38,5 +38,11 @@ class DefaultController extends BaseController
     }
 
 
+    public function processarArquivo() {
+        // ANO|MES|COD_FORNEC|NOME_FORNEC|COD_PROD|DESC_PROD|TOTAL_PRECO_VENDA|TOTAL_PRECO_CUSTO|RENTABILIDADE|COD_VENDEDOR|NOME_VENDEDOR
+    }
+
+
+
 
 }

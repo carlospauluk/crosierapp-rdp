@@ -1,1 +1,1 @@
-{"App_Entity_Utils_RelatorioPush":["descricao","tipoArquivo"],"CrosierSource_CrosierLibBaseBundle_Entity_Security_Role":["role","descricao"],"CrosierSource_CrosierLibBaseBundle_Entity_Security_User":["nome"],"CrosierSource_CrosierLibBaseBundle_Entity_Security_Group":["groupname"]}
+{"App_Entity_Utils_RelatorioPush":["descricao","tipoArquivo"],"CrosierSource_CrosierLibBaseBundle_Entity_Security_Group":["groupname"],"CrosierSource_CrosierLibBaseBundle_Entity_Security_Role":["role","descricao"],"CrosierSource_CrosierLibBaseBundle_Entity_Security_User":["nome"]}
