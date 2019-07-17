@@ -31,7 +31,7 @@ class RelVendas01 implements EntityId
 
     /**
      *
-     * @ORM\Column(name="ano", type="char", length=4, nullable=false)
+     * @ORM\Column(name="mes", type="char", length=4, nullable=false)
      * @Groups("entity")
      *
      * @var string|null
