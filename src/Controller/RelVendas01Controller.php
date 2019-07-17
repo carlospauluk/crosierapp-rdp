@@ -4,14 +4,11 @@ namespace App\Controller;
 
 
 use App\Entity\RelVendas01;
-use App\Entity\Utils\RelatorioPush;
 use App\EntityHandler\RelVendas01EntityHandler;
-use App\EntityHandler\Utils\RelatorioPushEntityHandler;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
-use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -95,40 +92,60 @@ class RelVendas01Controller extends FormListController
      * @return Response
      * @throws \Exception
      */
-    public function import(Request $request): Response
+    public function import(Request $request, ParameterBagInterface $params): Response
     {
-        $this->entityHandler->getDoctrine()->getEntityManager()->beginTransaction();
+        $conn = $this->entityHandler->getDoctrine()->getEntityManager()->getConnection();
 
+        file_put_contents('/home/carlos/dev/a/teste.sql', 'bla');
 
+        $time_start = microtime(true);
+
+        $str = '';
         try {
-            $linhas = file(getenv('kernel.project_dir') . '/sql/vendasfor.gra.txt');
-            $this->entityHandler->getDoctrine()->getEntityManager()->createNativeQuery('TRUNCATE TABLE rdp_rel_vendas01')->execute();
-            foreach ($linhas as $linha) {
+            $linhas = file($params->get('kernel.project_dir') . '/sql/rdp_rel_vendas01.txt');
+            $totalRegistros = count($linhas);
+            $conn->query('DELETE FROM rdp_rel_vendas01');
+
+            for ($i = 1; $i < $totalRegistros; $i++) {
+            // for ($i = 1350; $i < 1450; $i++) {
+                $linha = $linhas[$i];
                 $campos = explode('|', $linha);
-                if (count($campos) !== 10) {
-                    throw new ViewException('Qtde de campos difere de 10 para a linha "$linha"');
+                if (count($campos) !== 11) {
+                    throw new ViewException('Qtde de campos difere de 11 para a linha "$linha"');
                 }
 
-                $e = new RelVendas01();
-                $e->setAno($campos[0]);
-                $e->setMes($campos[1]);
-                $e->setCodFornecedor($campos[2]);
-                $e->setNomeFornecedor($campos[3]);
-                $e->setCodProduto($campos[4]);
-                $e->setDescProduto($campos[5]);
-                $e->setNomeVendedor($campos[6]);
-                $e->setRentabilidade($campos[7]);
-                $e->setTotalPrecoCusto($campos[8]);
-                $e->setTotalPrecoVenda($campos[9]);
-                $this->entityHandler->save($e);
+                for ($c=0 ; $c<count($campos) ; $c++) {
+                    $campos[$c] = str_replace("'", "''", $campos[$c]);
+                }
+
+                $str .= sprintf(
+                        "INSERT INTO rdp_rel_vendas01 VALUES(null,'%s','%s', %d, '%s', %d, '%s', %f, %f, %f, %d, '%s', 1, now(), now(), 1, 1)",
+                        trim($campos[0]),
+                        trim($campos[1]),
+                        intval(trim($campos[2])),
+                        trim($campos[3]),
+                        trim($campos[4]),
+                        trim($campos[5]),
+                        floatval(trim($campos[6])),
+                        floatval(trim($campos[7])),
+                        floatval(trim($campos[8])),
+                        intval(trim($campos[9])),
+                        trim($campos[10])) . ';' . PHP_EOL;
+
+                $time_now = microtime(true);
+                $exec_time = ($time_now - $time_start);
+
+                $med = ($totalRegistros - $i) * $exec_time / $i;
+
+                $this->logger->info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ' . $i . " ($med)");
             }
-            $this->entityHandler->getDoctrine()->getEntityManager()->commit();
+            file_put_contents('/home/carlos/dev/a/rdp_rel_vendas01.sql', $str);
         } catch (ViewException $e) {
             $this->addFlash('error', 'Erro ao importar');
             $this->addFlash('error', $e->getMessage());
         }
 
-        return new Response('Fim');
+        return new Response('OK');
     }
 
 }

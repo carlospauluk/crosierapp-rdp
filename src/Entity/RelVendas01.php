@@ -22,7 +22,7 @@ class RelVendas01 implements EntityId
 
     /**
      *
-     * @ORM\Column(name="ano", type="char", length=4, nullable=false)
+     * @ORM\Column(name="ano", type="string", length=4, nullable=false)
      * @Groups("entity")
      *
      * @var string|null
@@ -31,7 +31,7 @@ class RelVendas01 implements EntityId
 
     /**
      *
-     * @ORM\Column(name="mes", type="char", length=4, nullable=false)
+     * @ORM\Column(name="mes", type="string", length=2, nullable=false)
      * @Groups("entity")
      *
      * @var string|null
@@ -49,7 +49,7 @@ class RelVendas01 implements EntityId
 
     /**
      *
-     * @ORM\Column(name="nome_fornec", type="varchar", length=200, nullable=false)
+     * @ORM\Column(name="nome_fornec", type="string", length=200, nullable=false)
      * @Groups("entity")
      *
      * @var string|null
@@ -67,7 +67,7 @@ class RelVendas01 implements EntityId
 
     /**
      *
-     * @ORM\Column(name="desc_produto", type="varchar", length=200, nullable=false)
+     * @ORM\Column(name="desc_prod", type="string", length=200, nullable=false)
      * @Groups("entity")
      *
      * @var string|null
@@ -113,7 +113,7 @@ class RelVendas01 implements EntityId
 
     /**
      *
-     * @ORM\Column(name="nome_vendedor", type="varchar", length=200, nullable=false)
+     * @ORM\Column(name="nome_vendedor", type="string", length=200, nullable=false)
      * @Groups("entity")
      *
      * @var string|null
