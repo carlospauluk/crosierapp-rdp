@@ -5,10 +5,12 @@ namespace App\Controller;
 
 use App\Entity\RelVendas01;
 use App\EntityHandler\RelVendas01EntityHandler;
+use App\Repository\RelVendas01Repository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -87,12 +89,12 @@ class RelVendas01Controller extends FormListController
 
     /**
      *
-     * @Route("/relVendas01/import/", name="relVendas01_list")
+     * @Route("/relVendas01/gerarSql/", name="relVendas01_gerarSql")
      * @param Request $request
      * @return Response
      * @throws \Exception
      */
-    public function import(Request $request, ParameterBagInterface $params): Response
+    public function gerarSql(Request $request, ParameterBagInterface $params): Response
     {
         $conn = $this->entityHandler->getDoctrine()->getEntityManager()->getConnection();
 
@@ -107,14 +109,14 @@ class RelVendas01Controller extends FormListController
             $conn->query('DELETE FROM rdp_rel_vendas01');
 
             for ($i = 1; $i < $totalRegistros; $i++) {
-            // for ($i = 1350; $i < 1450; $i++) {
+                // for ($i = 1350; $i < 1450; $i++) {
                 $linha = $linhas[$i];
                 $campos = explode('|', $linha);
                 if (count($campos) !== 11) {
                     throw new ViewException('Qtde de campos difere de 11 para a linha "$linha"');
                 }
-
-                for ($c=0 ; $c<count($campos) ; $c++) {
+                $cMax = count($campos);
+                for ($c = 0; $c < $cMax; $c++) {
                     $campos[$c] = str_replace("'", "''", $campos[$c]);
                 }
 
@@ -122,14 +124,14 @@ class RelVendas01Controller extends FormListController
                         "INSERT INTO rdp_rel_vendas01 VALUES(null,'%s','%s', %d, '%s', %d, '%s', %f, %f, %f, %d, '%s', 1, now(), now(), 1, 1)",
                         trim($campos[0]),
                         trim($campos[1]),
-                        intval(trim($campos[2])),
+                        (int)trim($campos[2]),
                         trim($campos[3]),
                         trim($campos[4]),
                         trim($campos[5]),
-                        floatval(trim($campos[6])),
-                        floatval(trim($campos[7])),
-                        floatval(trim($campos[8])),
-                        intval(trim($campos[9])),
+                        (float)trim($campos[6]),
+                        (float)trim($campos[7]),
+                        (float)trim($campos[8]),
+                        (int)trim($campos[9]),
                         trim($campos[10])) . ';' . PHP_EOL;
 
                 $time_now = microtime(true);
@@ -141,11 +143,40 @@ class RelVendas01Controller extends FormListController
             }
             file_put_contents('/home/carlos/dev/a/rdp_rel_vendas01.sql', $str);
         } catch (ViewException $e) {
-            $this->addFlash('error', 'Erro ao importar');
+            $this->addFlash('error', 'Erro ao gerar sql');
             $this->addFlash('error', $e->getMessage());
         }
 
         return new Response('OK');
     }
+
+
+    /**
+     *
+     * @Route("/relVendas01/totalPorFornecedor/", name="relVendas01_totalPorFornecedor")
+     * @return JsonResponse
+     */
+    public function totalPorFornecedor(): JsonResponse
+    {
+        /** @var RelVendas01Repository $repoRelVendas01 */
+        $repoRelVendas01 = $this->getDoctrine()->getRepository(RelVendas01::class);
+        $r = $repoRelVendas01->totalVendasPorFornecedor();
+        return new JsonResponse($r);
+    }
+
+
+    /**
+     *
+     * @Route("/relVendas01/totalPorVendedor/", name="relVendas01_totalPorVendedor")
+     * @return JsonResponse
+     */
+    public function totalPorVendedor(): JsonResponse
+    {
+        /** @var RelVendas01Repository $repoRelVendas01 */
+        $repoRelVendas01 = $this->getDoctrine()->getRepository(RelVendas01::class);
+        $r = $repoRelVendas01->totalVendasPorVendedor();
+        return new JsonResponse($r);
+    }
+
 
 }

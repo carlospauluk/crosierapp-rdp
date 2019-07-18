@@ -29,7 +29,9 @@ Encore
      * and one CSS file (e.g. app.css) if you JavaScript imports CSS.
      */
     // .createSharedEntry('bse_layout', './assets/js/bse/layout.js')
+    .addEntry('dashboard', './assets/js/dashboard.js')
     .addEntry('utils/relatorioPushList', './assets/js/utils/relatorioPushList.js')
+
 
 
 
