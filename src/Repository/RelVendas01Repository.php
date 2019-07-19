@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\RelVendas01;
 use CrosierSource\CrosierLibBaseBundle\Repository\FilterRepository;
+use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Doctrine\ORM\Query\ResultSetMapping;
 
 /**
@@ -21,32 +22,54 @@ class RelVendas01Repository extends FilterRepository
     }
 
 
-    public function totalVendasPorFornecedor() {
-        $sql = 'SELECT nome_fornec, sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 GROUP BY nome_fornec';
+    /**
+     * @param \DateTime|null $dtIni
+     * @param \DateTime|null $dtFim
+     * @return mixed
+     */
+    public function totalVendasPorFornecedor(\DateTime $dtIni = null, \DateTime $dtFim = null)
+    {
+        $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
+        $dtIni->setTime(0,0,0,0);
+        $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
+        $dtFim->setTime(23,59,59,99999);
+
+        $sql = 'SELECT nome_fornec, sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE mesano BETWEEN :dtIni and :dtFim GROUP BY nome_fornec ORDER BY total_venda';
 
         $rsm = new ResultSetMapping();
         $rsm->addScalarResult('nome_fornec', 'nome_fornec');
         $rsm->addScalarResult('total_venda', 'total_venda');
 
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
-        $rs = $query->getResult();
+        $query->setParameter('dtIni', $dtIni);
+        $query->setParameter('dtFim', $dtFim);
 
-        return $rs;
+        return $query->getResult();
 
     }
 
-
-    public function totalVendasPorVendedor() {
-        $sql = 'SELECT nome_vendedor, sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 GROUP BY nome_vendedor';
+    /**
+     * @param \DateTime|null $dtIni
+     * @param \DateTime|null $dtFim
+     * @return mixed
+     */
+    public function totalVendasPorVendedor(\DateTime $dtIni = null, \DateTime $dtFim = null)
+    {
+        $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
+        $dtIni->setTime(0,0,0,0);
+        $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
+        $dtFim->setTime(23,59,59,99999);
+        $sql = 'SELECT nome_vendedor, sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE mesano BETWEEN :dtIni and :dtFim GROUP BY nome_vendedor ORDER BY total_venda';
 
         $rsm = new ResultSetMapping();
         $rsm->addScalarResult('nome_vendedor', 'nome_vendedor');
         $rsm->addScalarResult('total_venda', 'total_venda');
 
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
-        $rs = $query->getResult();
+        $query->setParameter('dtIni', $dtIni);
+        $query->setParameter('dtFim', $dtFim);
 
-        return $rs;
+        return $query->getResult();
 
     }
 

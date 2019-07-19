@@ -19,6 +19,8 @@ CREATE TABLE `rdp_rel_vendas01`
     `cod_vendedor`       BIGINT(20)     NOT NULL,
     `nome_vendedor`      VARCHAR(200)   NOT NULL,
 
+    `mesano`             DATE           NULL,
+
     -- campos de controle do crosier
     PRIMARY KEY (`id`),
     `estabelecimento_id` BIGINT(20)     NOT NULL,
@@ -35,3 +37,6 @@ CREATE TABLE `rdp_rel_vendas01`
 ) ENGINE = INNODB
   DEFAULT charset = latin1
   pack_keys = 0;
+
+-- ALTER TABLE rdp_rel_vendas01 ADD mesano DATE;
+-- UPDATE rdp_rel_vendas01 SET mesano = DATE(CONCAT(ano,'-',mes,'-',01));

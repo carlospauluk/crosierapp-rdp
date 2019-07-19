@@ -8,6 +8,7 @@ use App\EntityHandler\RelVendas01EntityHandler;
 use App\Repository\RelVendas01Repository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
+use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -154,13 +155,18 @@ class RelVendas01Controller extends FormListController
     /**
      *
      * @Route("/relVendas01/totalPorFornecedor/", name="relVendas01_totalPorFornecedor")
+     * @param Request $request
      * @return JsonResponse
      */
-    public function totalPorFornecedor(): JsonResponse
+    public function totalPorFornecedor(Request $request): JsonResponse
     {
+        $dts = $request->get('filterDts') ?? '';
+        $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
+        $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
+
         /** @var RelVendas01Repository $repoRelVendas01 */
         $repoRelVendas01 = $this->getDoctrine()->getRepository(RelVendas01::class);
-        $r = $repoRelVendas01->totalVendasPorFornecedor();
+        $r = $repoRelVendas01->totalVendasPorFornecedor($dtIni, $dtFim);
         return new JsonResponse($r);
     }
 
@@ -168,13 +174,18 @@ class RelVendas01Controller extends FormListController
     /**
      *
      * @Route("/relVendas01/totalPorVendedor/", name="relVendas01_totalPorVendedor")
+     * @param Request $request
      * @return JsonResponse
      */
-    public function totalPorVendedor(): JsonResponse
+    public function totalPorVendedor(Request $request): JsonResponse
     {
+        $dts = $request->get('filterDts') ?? '';
+        $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
+        $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
+
         /** @var RelVendas01Repository $repoRelVendas01 */
         $repoRelVendas01 = $this->getDoctrine()->getRepository(RelVendas01::class);
-        $r = $repoRelVendas01->totalVendasPorVendedor();
+        $r = $repoRelVendas01->totalVendasPorVendedor($dtIni, $dtFim);
         return new JsonResponse($r);
     }
 
