@@ -102,7 +102,7 @@ $(document).ready(function () {
 
                     var options = {
                         is3D: false,
-                        sliceVisibilityThreshold: .009,
+                        sliceVisibilityThreshold: .014,
                         animation: {
                             startup: true,
                             duration: 1000,

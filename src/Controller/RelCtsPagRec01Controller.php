@@ -3,9 +3,9 @@
 namespace App\Controller;
 
 
-use App\Entity\RelVendas01;
-use App\EntityHandler\RelVendas01EntityHandler;
-use App\Repository\RelVendas01Repository;
+use App\Entity\RelCtsPagRec01;
+use App\EntityHandler\RelCtsPagRec01EntityHandler;
+use App\Repository\RelCtsPagRec01Repository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * @package App\Controller\Utils
  * @author Carlos Eduardo Pauluk
  */
-class RelVendas01Controller extends FormListController
+class RelCtsPagRec01Controller extends FormListController
 {
     /** @var SessionInterface */
     private $session;
@@ -37,11 +37,11 @@ class RelVendas01Controller extends FormListController
             'formPageTitle' => null,
             'form_PROGRAM_UUID' => null,
 
-            'listView' => 'relVendas01_list.html.twig',
-            'listRoute' => 'relVendas01_list',
-            'listRouteAjax' => 'relVendas01_datatablesJsList',
-            'listPageTitle' => 'Vendas',
-            'listId' => 'relVendas01List',
+            'listView' => 'relCtsPagRec01_list.html.twig',
+            'listRoute' => 'relCtsPagRec01_list',
+            'listRouteAjax' => 'relCtsPagRec01_datatablesJsList',
+            'listPageTitle' => 'CtsPagRec',
+            'listId' => 'relCtsPagRec01List',
             'list_PROGRAM_UUID' => null,
             'listJS' => '',
 
@@ -52,9 +52,9 @@ class RelVendas01Controller extends FormListController
 
     /**
      * @required
-     * @param RelVendas01EntityHandler $entityHandler
+     * @param RelCtsPagRec01EntityHandler $entityHandler
      */
-    public function setEntityHandler(RelVendas01EntityHandler $entityHandler): void
+    public function setEntityHandler(RelCtsPagRec01EntityHandler $entityHandler): void
     {
         $this->entityHandler = $entityHandler;
     }
@@ -69,7 +69,6 @@ class RelVendas01Controller extends FormListController
     }
 
 
-
     public function getFilterDatas(array $params): array
     {
         return [
@@ -80,7 +79,7 @@ class RelVendas01Controller extends FormListController
 
     /**
      *
-     * @Route("/relVendas01/list/", name="relVendas01_list")
+     * @Route("/relCtsPagRec01/list/", name="relCtsPagRec01_list")
      * @param Request $request
      * @return Response
      * @throws \Exception
@@ -92,7 +91,7 @@ class RelVendas01Controller extends FormListController
 
     /**
      *
-     * @Route("/relVendas01/datatablesJsList/", name="relVendas01_datatablesJsList")
+     * @Route("/relCtsPagRec01/datatablesJsList/", name="relCtsPagRec01_datatablesJsList")
      * @param Request $request
      * @return Response
      * @throws ViewException
@@ -104,50 +103,60 @@ class RelVendas01Controller extends FormListController
 
     /**
      *
-     * @Route("/relVendas01/gerarSql/", name="relVendas01_gerarSql")
+     * @Route("/relCtsPagRec01/gerarSql/", name="relCtsPagRec01_gerarSql")
      * @param Request $request
+     * @param ParameterBagInterface $params
      * @return Response
-     * @throws \Exception
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function gerarSql(Request $request, ParameterBagInterface $params): Response
     {
         $conn = $this->entityHandler->getDoctrine()->getEntityManager()->getConnection();
 
-        file_put_contents('/home/carlos/dev/a/teste.sql', 'bla');
-
         $time_start = microtime(true);
 
-        $str = '';
+        $str = 'TRUNCATE TABLE rdp_rel_ctspagrec01;' . PHP_EOL . PHP_EOL;
         try {
-            $linhas = file($params->get('kernel.project_dir') . '/sql/rdp_rel_vendas01.txt');
+            $linhas = file($params->get('kernel.project_dir') . '/sql/rdp_rel_ctspagrec01.txt');
             $totalRegistros = count($linhas);
-            $conn->query('DELETE FROM rdp_rel_vendas01');
 
             for ($i = 1; $i < $totalRegistros; $i++) {
-                // for ($i = 1350; $i < 1450; $i++) {
                 $linha = $linhas[$i];
                 $campos = explode('|', $linha);
-                if (count($campos) !== 11) {
-                    throw new ViewException('Qtde de campos difere de 11 para a linha "$linha"');
-                }
-                $cMax = count($campos);
-                for ($c = 0; $c < $cMax; $c++) {
-                    $campos[$c] = str_replace("'", "''", $campos[$c]);
+                if (count($campos) !== 15) {
+                    throw new ViewException('Qtde de campos difere de 15 para a linha "$linha"');
                 }
 
+                $campos[2] = DateTimeUtils::parseDateStr($campos[2])->format('Y-m-d');
+                $campos[3] = DateTimeUtils::parseDateStr($campos[3])->format('Y-m-d');
+                $campos[4] = trim($campos[4]) ? DateTimeUtils::parseDateStr($campos[4])->format('Y-m-d') : '';
+                $campos[14] = trim($campos[14]) ? DateTimeUtils::parseDateStr($campos[14])->format('Y-m-d') : '';
+
+
+                $cMax = count($campos);
+                for ($c = 0; $c < $cMax; $c++) {
+                    $campos[$c] = $campos[$c] ? "'" . trim(str_replace("'", "''", $campos[$c])) . "'" : 'null';
+                }
+
+
                 $str .= sprintf(
-                        "INSERT INTO rdp_rel_vendas01 VALUES(null,'%s','%s', %d, '%s', %d, '%s', %f, %f, %f, %d, '%s', 1, now(), now(), 1, 1)",
-                        trim($campos[0]),
-                        trim($campos[1]),
-                        (int)trim($campos[2]),
-                        trim($campos[3]),
-                        trim($campos[4]),
-                        trim($campos[5]),
-                        (float)trim($campos[6]),
-                        (float)trim($campos[7]),
-                        (float)trim($campos[8]),
-                        (int)trim($campos[9]),
-                        trim($campos[10])) . ';' . PHP_EOL;
+                        "INSERT INTO rdp_rel_ctspagrec01 VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)",
+                        ($campos[0]),
+                        ($campos[1]),
+                        ($campos[2]),
+                        ($campos[3]),
+                        ($campos[4]),
+                        ($campos[5]),
+                        ($campos[6]),
+                        ($campos[7]),
+                        ($campos[8]),
+                        ($campos[9]),
+                        ($campos[10]),
+                        ($campos[11]),
+                        ($campos[12]),
+                        ($campos[13]),
+                        ($campos[14])
+                    ) . ';' . PHP_EOL;
 
                 $time_now = microtime(true);
                 $exec_time = ($time_now - $time_start);
@@ -156,7 +165,7 @@ class RelVendas01Controller extends FormListController
 
                 $this->logger->info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ' . $i . " ($med)");
             }
-            file_put_contents('/home/carlos/dev/a/rdp_rel_vendas01.sql', $str);
+            file_put_contents($params->get('kernel.project_dir') . '/sql/inserts/rdp_rel_ctspagrec01.sql', $str);
         } catch (ViewException $e) {
             $this->addFlash('error', 'Erro ao gerar sql');
             $this->addFlash('error', $e->getMessage());
@@ -168,27 +177,27 @@ class RelVendas01Controller extends FormListController
 
     /**
      *
-     * @Route("/relVendas01/totalPorFornecedor/", name="relVendas01_totalPorFornecedor")
+     * @Route("/relCtsPagRec01/rel01/", name="relCtsPagRec01_rel01")
      * @param Request $request
      * @return JsonResponse
      */
-    public function totalPorFornecedor(Request $request): JsonResponse
+    public function rel01(Request $request): JsonResponse
     {
         $dts = $request->get('filterDts') ?? '';
         $this->session->set('dashboard.filter.dts', $dts);
         $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
         $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
 
-        /** @var RelVendas01Repository $repoRelVendas01 */
-        $repoRelVendas01 = $this->getDoctrine()->getRepository(RelVendas01::class);
-        $r = $repoRelVendas01->totalVendasPorFornecedor($dtIni, $dtFim);
+        /** @var RelCtsPagRec01Repository $repoRelCtsPagRec01 */
+        $repoRelCtsPagRec01 = $this->getDoctrine()->getRepository(RelCtsPagRec01::class);
+        $r = $repoRelCtsPagRec01->totalCtsPagRecPorFornecedor($dtIni, $dtFim);
         return new JsonResponse($r);
     }
 
 
     /**
      *
-     * @Route("/relVendas01/totalPorVendedor/", name="relVendas01_totalPorVendedor")
+     * @Route("/relCtsPagRec01/totalPorVendedor/", name="relCtsPagRec01_totalPorVendedor")
      * @param Request $request
      * @return JsonResponse
      */
@@ -198,9 +207,9 @@ class RelVendas01Controller extends FormListController
         $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
         $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
 
-        /** @var RelVendas01Repository $repoRelVendas01 */
-        $repoRelVendas01 = $this->getDoctrine()->getRepository(RelVendas01::class);
-        $r = $repoRelVendas01->totalVendasPorVendedor($dtIni, $dtFim);
+        /** @var RelCtsPagRec01Repository $repoRelCtsPagRec01 */
+        $repoRelCtsPagRec01 = $this->getDoctrine()->getRepository(RelCtsPagRec01::class);
+        $r = $repoRelCtsPagRec01->totalCtsPagRecPorVendedor($dtIni, $dtFim);
         return new JsonResponse($r);
     }
 

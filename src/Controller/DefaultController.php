@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use CrosierSource\CrosierLibBaseBundle\Controller\BaseController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Mercure\Publisher;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,9 +22,10 @@ class DefaultController extends BaseController
      *
      * @Route("/", name="index")
      */
-    public function index()
+    public function index(SessionInterface $session)
     {
-        return $this->doRender('dashboard.html.twig');
+        $params['filter']['dts'] = $session->get('dashboard.filter.dts') ?? null;
+        return $this->doRender('dashboard.html.twig', $params);
     }
 
 

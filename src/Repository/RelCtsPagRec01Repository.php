@@ -1,0 +1,51 @@
+<?php
+
+namespace App\Repository;
+
+use App\Entity\RelCtsPagRec01;
+use CrosierSource\CrosierLibBaseBundle\Repository\FilterRepository;
+
+/**
+ *
+ * @author Carlos Eduardo Pauluk
+ *
+ */
+class RelCtsPagRec01Repository extends FilterRepository
+{
+
+    public function getEntityClass(): string
+    {
+        return RelCtsPagRec01::class;
+    }
+
+
+
+    /**
+     * @param \DateTime|null $dtIni
+     * @param \DateTime|null $dtFim
+     * @return mixed
+     */
+    public function rel01(\DateTime $dtIni = null, \DateTime $dtFim = null)
+    {
+        $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
+        $dtIni->setTime(0,0,0,0);
+        $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
+        $dtFim->setTime(23,59,59,99999);
+
+        $sql = 'SELECT nome_fornec, sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE mesano BETWEEN :dtIni and :dtFim GROUP BY nome_fornec ORDER BY total_venda';
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('nome_fornec', 'nome_fornec');
+        $rsm->addScalarResult('total_venda', 'total_venda');
+
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('dtIni', $dtIni);
+        $query->setParameter('dtFim', $dtFim);
+
+        return $query->getResult();
+
+    }
+
+
+}
+

@@ -38,5 +38,43 @@ CREATE TABLE `rdp_rel_vendas01`
   DEFAULT charset = latin1
   pack_keys = 0;
 
--- ALTER TABLE rdp_rel_vendas01 ADD mesano DATE;
--- UPDATE rdp_rel_vendas01 SET mesano = DATE(CONCAT(ano,'-',mes,'-',01));
+
+
+DROP TABLE IF EXISTS `rdp_rel_ctspagrec01`;
+CREATE TABLE `rdp_rel_ctspagrec01`
+(
+    `id`                 BIGINT(20)     NOT NULL AUTO_INCREMENT,
+
+    `lancto`             BIGINT(20)     NOT NULL,
+    `docto`              VARCHAR(50)    NOT NULL,
+    `dt_movto`           DATE           NOT NULL,
+    `dt_vencto`          DATE           NOT NULL,
+    `dt_pagto`           DATE           NULL,
+    `cod_cliente`        BIGINT(20)     NOT NULL,
+    `nome_cli_for`       VARCHAR(200)   NOT NULL,
+    `localizador`        BIGINT(20)     NULL,
+    `filial`             BIGINT(20)     NOT NULL,
+    `valor_titulo`       DECIMAL(15, 2) NOT NULL,
+    `valor_baixa`        DECIMAL(15, 2) NULL,
+    `situacao`           VARCHAR(1)     NOT NULL,
+    `tipo_pag_rec`       VARCHAR(1)     NOT NULL,
+    `numero_nf`          BIGINT(20)     NULL,
+    `dt_emissao_nf`      DATE           NULL,
+
+
+    -- campos de controle do crosier
+    PRIMARY KEY (`id`),
+    `estabelecimento_id` BIGINT(20)     NOT NULL,
+    `inserted`           DATETIME       NOT NULL,
+    `updated`            DATETIME       NOT NULL,
+    `user_inserted_id`   BIGINT(20)     NOT NULL,
+    `user_updated_id`    BIGINT(20)     NOT NULL,
+    KEY `k_rdp_rel_ctspagrec01_estabelecimento` (`estabelecimento_id`),
+    KEY `k_rdp_rel_ctspagrec01_user_inserted` (`user_inserted_id`),
+    KEY `k_rdp_rel_ctspagrec01_user_updated` (`user_updated_id`),
+    CONSTRAINT `fk_rdp_rel_ctspagrec01_user_updated` FOREIGN KEY (`user_updated_id`) references `sec_user` (`id`),
+    CONSTRAINT `fk_rdp_rel_ctspagrec01_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
+    CONSTRAINT `fk_rdp_rel_ctspagrec01_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
+) ENGINE = INNODB
+  DEFAULT charset = latin1
+  pack_keys = 0;
