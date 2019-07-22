@@ -111,8 +111,6 @@ class RelCtsPagRec01Controller extends FormListController
      */
     public function gerarSql(Request $request, ParameterBagInterface $params): Response
     {
-        $conn = $this->entityHandler->getDoctrine()->getEntityManager()->getConnection();
-
         $time_start = microtime(true);
 
         $str = 'TRUNCATE TABLE rdp_rel_ctspagrec01;' . PHP_EOL . PHP_EOL;
@@ -140,22 +138,22 @@ class RelCtsPagRec01Controller extends FormListController
 
 
                 $str .= sprintf(
-                        "INSERT INTO rdp_rel_ctspagrec01 VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)",
-                        ($campos[0]),
-                        ($campos[1]),
-                        ($campos[2]),
-                        ($campos[3]),
-                        ($campos[4]),
-                        ($campos[5]),
-                        ($campos[6]),
-                        ($campos[7]),
-                        ($campos[8]),
-                        ($campos[9]),
-                        ($campos[10]),
-                        ($campos[11]),
-                        ($campos[12]),
-                        ($campos[13]),
-                        ($campos[14])
+                        'INSERT INTO rdp_rel_ctspagrec01 VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
+                        $campos[0],
+                        $campos[1],
+                        $campos[2],
+                        $campos[3],
+                        $campos[4],
+                        $campos[5],
+                        $campos[6],
+                        $campos[7],
+                        $campos[8],
+                        $campos[9],
+                        $campos[10],
+                        $campos[11],
+                        $campos[12],
+                        $campos[13],
+                        $campos[14]
                     ) . ';' . PHP_EOL;
 
                 $time_now = microtime(true);
@@ -184,32 +182,15 @@ class RelCtsPagRec01Controller extends FormListController
     public function rel01(Request $request): JsonResponse
     {
         $dts = $request->get('filterDts') ?? '';
-        $this->session->set('dashboard.filter.dts', $dts);
+
+        $this->session->set('dashboard.filter.contasPagRec.dts', $dts);
+
         $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
         $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
 
         /** @var RelCtsPagRec01Repository $repoRelCtsPagRec01 */
         $repoRelCtsPagRec01 = $this->getDoctrine()->getRepository(RelCtsPagRec01::class);
-        $r = $repoRelCtsPagRec01->totalCtsPagRecPorFornecedor($dtIni, $dtFim);
-        return new JsonResponse($r);
-    }
-
-
-    /**
-     *
-     * @Route("/relCtsPagRec01/totalPorVendedor/", name="relCtsPagRec01_totalPorVendedor")
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function totalPorVendedor(Request $request): JsonResponse
-    {
-        $dts = $request->get('filterDts') ?? '';
-        $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
-        $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
-
-        /** @var RelCtsPagRec01Repository $repoRelCtsPagRec01 */
-        $repoRelCtsPagRec01 = $this->getDoctrine()->getRepository(RelCtsPagRec01::class);
-        $r = $repoRelCtsPagRec01->totalCtsPagRecPorVendedor($dtIni, $dtFim);
+        $r = $repoRelCtsPagRec01->relCtsPagRec01($dtIni, $dtFim);
         return new JsonResponse($r);
     }
 

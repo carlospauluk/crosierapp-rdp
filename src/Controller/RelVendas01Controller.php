@@ -175,7 +175,7 @@ class RelVendas01Controller extends FormListController
     public function totalPorFornecedor(Request $request): JsonResponse
     {
         $dts = $request->get('filterDts') ?? '';
-        $this->session->set('dashboard.filter.dts', $dts);
+        $this->session->set('dashboard.filter.vendas.dts', $dts);
         $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
         $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
 

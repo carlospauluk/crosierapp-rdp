@@ -9,7 +9,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  *
- * @ORM\Entity(repositoryClass="App\Repository\RelVendas01Repository")
+ * @ORM\Entity(repositoryClass="App\Repository\RelCtsPagRec01Repository")
  * @ORM\Table(name="rdp_rel_ctspagrec01")
  *
  * @author Carlos Eduardo Pauluk

@@ -24,7 +24,8 @@ class DefaultController extends BaseController
      */
     public function index(SessionInterface $session)
     {
-        $params['filter']['dts'] = $session->get('dashboard.filter.dts') ?? null;
+        $params['filter']['vendas']['dts'] = $session->get('dashboard.filter.vendas.dts') ?? null;
+        $params['filter']['contasPagRec']['dts'] = $session->get('dashboard.filter.contasPagRec.dts') ?? null;
         return $this->doRender('dashboard.html.twig', $params);
     }
 
