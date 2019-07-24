@@ -11,7 +11,7 @@ CREATE TABLE `rdp_rel_vendas01`
     `mes`                CHAR(2)        NOT NULL,
     `cod_fornec`         BIGINT(20)     NOT NULL,
     `nome_fornec`        VARCHAR(200)   NOT NULL,
-    `cod_prod`           BIGINT(20)     NOT NULL,
+    `cod_prod`           VARCHAR(50)    NOT NULL,
     `desc_prod`          VARCHAR(200)   NOT NULL,
     `total_preco_venda`  DECIMAL(15, 2) NOT NULL,
     `total_preco_custo`  DECIMAL(15, 2) NOT NULL,
@@ -20,6 +20,7 @@ CREATE TABLE `rdp_rel_vendas01`
     `nome_vendedor`      VARCHAR(200)   NOT NULL,
 
     `mesano`             DATE           NULL,
+
 
     -- campos de controle do crosier
     PRIMARY KEY (`id`),
@@ -35,8 +36,13 @@ CREATE TABLE `rdp_rel_vendas01`
     CONSTRAINT `fk_rdp_rel_vendas01_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_rel_vendas01_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1
-  pack_keys = 0;
+  DEFAULT charset = latin1;
+
+# ALTER TABLE `rdp_rel_vendas01` UNIQUE KEY `uk_rdp_rel_vendas01` (`ano`,`mes`,`cod_fornec`,`nome_fornec`,`cod_prod`,`desc_prod`,`total_preco_venda`,`total_preco_custo`,`rentabilidade`,`cod_vendedor`,`nome_vendedor`);
+
+
+
+
 
 
 
@@ -61,6 +67,8 @@ CREATE TABLE `rdp_rel_ctspagrec01`
     `numero_nf`          BIGINT(20)     NULL,
     `dt_emissao_nf`      DATE           NULL,
 
+    UNIQUE KEY `UK_rdp_rel_ctspagrec01` (`lancto`, `docto`, `dt_movto`, `dt_vencto`, `cod_cliente`, `nome_cli_for`,
+                                         `filial`, `valor_titulo`, `situacao`, `tipo_pag_rec`),
 
     -- campos de controle do crosier
     PRIMARY KEY (`id`),
@@ -76,5 +84,49 @@ CREATE TABLE `rdp_rel_ctspagrec01`
     CONSTRAINT `fk_rdp_rel_ctspagrec01_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_rel_ctspagrec01_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1
-  pack_keys = 0;
+  DEFAULT charset = latin1;
+
+# ALTER TABLE rdp_rel_ctspagrec01 ADD UNIQUE KEY `UK_rdp_rel_ctspagrec01` (`lancto`,`docto`,`dt_movto`,`dt_vencto`,`cod_cliente`,`nome_cli_for`,`filial`,`valor_titulo`,`situacao`,`tipo_pag_rec`);
+
+
+
+
+
+
+
+
+DROP TABLE IF EXISTS `rdp_rel_compfor01`;
+CREATE TABLE `rdp_rel_compfor01`
+(
+    `id`                 BIGINT(20)     NOT NULL AUTO_INCREMENT,
+
+    `lancto`             BIGINT(20)     NOT NULL,
+    `docto`              VARCHAR(50)    NOT NULL,
+    `dt_movto`           DATE           NOT NULL,
+    `produto_cod`        VARCHAR(50)    NOT NULL,
+    `produto_desc`       VARCHAR(200)   NOT NULL,
+    `qtde`               DECIMAL(15, 2) NOT NULL,
+    `preco_custo`        DECIMAL(15, 2) NULL,
+    `total`              DECIMAL(15, 2) NULL,
+    `cod_fornec`         BIGINT(20)     NOT NULL,
+    `nome_fornec`        VARCHAR(200)   NOT NULL,
+    `obs`                VARCHAR(2000)  NULL,
+
+    UNIQUE KEY `UK_rdp_rel_compfor01` (`lancto`, `docto`, `dt_movto`, `produto_cod`, `produto_desc`, `qtde`,
+                                       `cod_fornec`, `nome_fornec`),
+
+    -- campos de controle do crosier
+    PRIMARY KEY (`id`),
+    `estabelecimento_id` BIGINT(20)     NOT NULL,
+    `inserted`           DATETIME       NOT NULL,
+    `updated`            DATETIME       NOT NULL,
+    `user_inserted_id`   BIGINT(20)     NOT NULL,
+    `user_updated_id`    BIGINT(20)     NOT NULL,
+    KEY `k_rdp_rel_compfor01_estabelecimento` (`estabelecimento_id`),
+    KEY `k_rdp_rel_compfor01_user_inserted` (`user_inserted_id`),
+    KEY `k_rdp_rel_compfor01_user_updated` (`user_updated_id`),
+    CONSTRAINT `fk_rdp_rel_compfor01_user_updated` FOREIGN KEY (`user_updated_id`) references `sec_user` (`id`),
+    CONSTRAINT `fk_rdp_rel_compfor01_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
+    CONSTRAINT `fk_rdp_rel_compfor01_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
+) ENGINE = INNODB
+  DEFAULT charset = latin1;

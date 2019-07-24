@@ -16,7 +16,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  *
  * @package App\Business\Relatorios
  */
-class RelCtsPagRec01Business
+class RelCompFor01Business
 {
 
     /** @var RegistryInterface */
@@ -41,24 +41,22 @@ class RelCtsPagRec01Business
      */
     public function processarArquivosNaFila(): void
     {
-        $pastaFila = $_SERVER['PASTA_UPLOAD_RELCTSPAGREC01'] . 'fila/';
+        $pastaFila = $_SERVER['PASTA_UPLOAD_RELCOMPFOR01'] . 'fila/';
         $files = scandir($pastaFila, 0);
-        $q = 0;
         foreach ($files as $file) {
             if (!in_array($file, array('.', '..'))) {
+
                 try {
                     $this->processarArquivo($file);
                     $this->logger->info('Arquivo processado com sucesso.');
-                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCTSPAGREC01'] . 'ok/' . $file);
+                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCOMPFOR01'] . 'ok/' . $file);
                     $this->logger->info('Arquivo movido para pasta "ok".');
-                    $q++;
                 } catch (\Exception $e) {
-                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCTSPAGREC01'] . 'falha/' . $file);
+                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCOMPFOR01'] . 'falha/' . $file);
                     $this->logger->info('Arquivo movido para pasta "falha".');
                 }
             }
         }
-        $this->logger->info($q . ' arquivo(s) processado(s).');
     }
 
     /**
@@ -68,7 +66,7 @@ class RelCtsPagRec01Business
      */
     public function processarArquivo(string $arquivo): int
     {
-        $pastaFila = $_SERVER['PASTA_UPLOAD_RELCTSPAGREC01'] . 'fila/';
+        $pastaFila = $_SERVER['PASTA_UPLOAD_RELCOMPFOR01'] . 'fila/';
         $conteudo = file_get_contents($pastaFila . $arquivo);
         $linhas = explode(PHP_EOL, $conteudo);
         $totalRegistros = count($linhas);
@@ -86,15 +84,11 @@ class RelCtsPagRec01Business
                     continue;
                 }
                 $campos = explode('|', $linha);
-                if (count($campos) !== 15) {
-                    throw new ViewException('Qtde de campos difere de 15 para a linha "' . $linha . '"');
+                if (count($campos) !== 11) {
+                    throw new ViewException('Qtde de campos difere de 11 para a linha "' . $linha . '"');
                 }
 
                 $campos[2] = DateTimeUtils::parseDateStr($campos[2])->format('Y-m-d');
-                $campos[3] = DateTimeUtils::parseDateStr($campos[3])->format('Y-m-d');
-                $campos[4] = trim($campos[4]) ? DateTimeUtils::parseDateStr($campos[4])->format('Y-m-d') : '';
-                $campos[14] = trim($campos[14]) ? DateTimeUtils::parseDateStr($campos[14])->format('Y-m-d') : '';
-
 
                 $cMax = count($campos);
                 for ($c = 0; $c < $cMax; $c++) {
@@ -102,41 +96,33 @@ class RelCtsPagRec01Business
                 }
 
                 $sql = sprintf(
-                    'INSERT INTO rdp_rel_ctspagrec01 (
+                    'INSERT INTO rdp_rel_compfor01 (
                             id,
                             lancto,
                             docto,
                             dt_movto,
-                            dt_vencto,
-                            dt_pagto,
-                            cod_cliente,
-                            nome_cli_for,
-                            localizador,
-                            filial,
-                            valor_titulo,
-                            valor_baixa,
-                            situacao,
-                            tipo_pag_rec,
-                            numero_nf,
-                            dt_emissao_nf,
+                            produto_cod,
+                            produto_desc,
+                            qtde,
+                            preco_custo,
+                            total,
+                            cod_fornec,
+                            nome_fornec,
+                            obs,
                             estabelecimento_id,inserted,updated,user_inserted_id,user_updated_id
                         )
-                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
-                    $campos[0], // `lancto`
-                    $campos[1], //  `docto`
-                    $campos[2], //  `dt_movto`
-                    $campos[3], //  `dt_vencto`
-                    $campos[4], //  `dt_pagto`
-                    $campos[5], //  `cod_cliente`
-                    $campos[6], //  `nome_cli_for`
-                    $campos[7], //  `localizador`
-                    $campos[8], //  `filial`
-                    $campos[9], //  `valor_titulo`
-                    $campos[10], // `valor_baixa`
-                    $campos[11], // `situacao`
-                    $campos[12], // `tipo_pag_rec`
-                    $campos[13], // `numero_nf`
-                    $campos[14] // `dt_emissao_nf`
+                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
+                    $campos[0], // lancto,
+                    $campos[1], // docto,
+                    $campos[2], // dt_movto,
+                    $campos[3], // produto_cod,
+                    $campos[4], // produto_desc,
+                    $campos[5], // qtde,
+                    $campos[6], // preco_custo,
+                    $campos[7], // total,
+                    $campos[8], // cod_fornec,
+                    $campos[9], // nome_fornec,
+                    $campos[10]// obs
                 );
 
                 try {

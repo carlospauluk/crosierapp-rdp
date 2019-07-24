@@ -21,6 +21,8 @@ import 'daterangepicker';
 
 $(document).ready(function () {
 
+    let chart_totalPorFornecedor;
+    let chart_totalPorVendedor;
 
     let $filter_vendas_dts = $('#filter_vendas_dts').daterangepicker(
         {
@@ -166,8 +168,35 @@ $(document).ready(function () {
                     };
 
 
-                    var chart = new google.visualization.PieChart(document.getElementById('chart_totalPorFornecedor'));
-                    chart.draw(data, options);
+                    chart_totalPorFornecedor = new google.visualization.PieChart(document.getElementById('chart_totalPorFornecedor'));
+                    chart_totalPorFornecedor.draw(data, options);
+
+                    google.visualization.events.addListener(chart_totalPorFornecedor, 'select', selectHandler);
+
+// The selection handler.
+// Loop through all items in the selection and concatenate
+// a single message from all of them.
+                    function selectHandler() {
+                        var selection = chart_totalPorFornecedor.getSelection();
+                        var message = '';
+                        for (var i = 0; i < selection.length; i++) {
+                            var item = selection[i];
+                            if (item.row != null && item.column != null) {
+                                var str = data.getFormattedValue(item.row, item.column);
+                                message += '{row:' + item.row + ',column:' + item.column + '} = ' + str + '\n';
+                            } else if (item.row != null) {
+                                var str = data.getFormattedValue(item.row, 0);
+                                message += '{row:' + item.row + ', column:none}; value (col 0) = ' + str + '\n';
+                            } else if (item.column != null) {
+                                var str = data.getFormattedValue(0, item.column);
+                                message += '{row:none, column:' + item.column + '}; value (row 0) = ' + str + '\n';
+                            }
+                        }
+                        if (message == '') {
+                            message = 'nothing';
+                        }
+                        console.log('You selected ' + message);
+                    }
 
                 }
             );
@@ -197,14 +226,15 @@ $(document).ready(function () {
                     };
 
 
-                    var chart = new google.visualization.ColumnChart(document.getElementById('chart_totalPorVendedor'));
-                    chart.draw(data, options);
+                    chart_totalPorVendedor = new google.visualization.ColumnChart(document.getElementById('chart_totalPorVendedor'));
+                    chart_totalPorVendedor.draw(data, options);
 
                 }
             );
 
         });
     }
+
 
 
 

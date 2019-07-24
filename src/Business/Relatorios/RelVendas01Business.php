@@ -16,7 +16,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  *
  * @package App\Business\Relatorios
  */
-class RelCtsPagRec01Business
+class RelVendas01Business
 {
 
     /** @var RegistryInterface */
@@ -41,24 +41,22 @@ class RelCtsPagRec01Business
      */
     public function processarArquivosNaFila(): void
     {
-        $pastaFila = $_SERVER['PASTA_UPLOAD_RELCTSPAGREC01'] . 'fila/';
+        $pastaFila = $_SERVER['PASTA_UPLOAD_RELVENDAS01'] . 'fila/';
         $files = scandir($pastaFila, 0);
-        $q = 0;
         foreach ($files as $file) {
             if (!in_array($file, array('.', '..'))) {
+
                 try {
                     $this->processarArquivo($file);
                     $this->logger->info('Arquivo processado com sucesso.');
-                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCTSPAGREC01'] . 'ok/' . $file);
+                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELVENDAS01'] . 'ok/' . $file);
                     $this->logger->info('Arquivo movido para pasta "ok".');
-                    $q++;
                 } catch (\Exception $e) {
-                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCTSPAGREC01'] . 'falha/' . $file);
+                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELVENDAS01'] . 'falha/' . $file);
                     $this->logger->info('Arquivo movido para pasta "falha".');
                 }
             }
         }
-        $this->logger->info($q . ' arquivo(s) processado(s).');
     }
 
     /**
@@ -68,7 +66,7 @@ class RelCtsPagRec01Business
      */
     public function processarArquivo(string $arquivo): int
     {
-        $pastaFila = $_SERVER['PASTA_UPLOAD_RELCTSPAGREC01'] . 'fila/';
+        $pastaFila = $_SERVER['PASTA_UPLOAD_RELVENDAS01'] . 'fila/';
         $conteudo = file_get_contents($pastaFila . $arquivo);
         $linhas = explode(PHP_EOL, $conteudo);
         $totalRegistros = count($linhas);
@@ -86,57 +84,47 @@ class RelCtsPagRec01Business
                     continue;
                 }
                 $campos = explode('|', $linha);
-                if (count($campos) !== 15) {
-                    throw new ViewException('Qtde de campos difere de 15 para a linha "' . $linha . '"');
+                if (count($campos) !== 11) {
+                    throw new ViewException('Qtde de campos difere de 11 para a linha "' . $linha . '"');
                 }
 
-                $campos[2] = DateTimeUtils::parseDateStr($campos[2])->format('Y-m-d');
-                $campos[3] = DateTimeUtils::parseDateStr($campos[3])->format('Y-m-d');
-                $campos[4] = trim($campos[4]) ? DateTimeUtils::parseDateStr($campos[4])->format('Y-m-d') : '';
-                $campos[14] = trim($campos[14]) ? DateTimeUtils::parseDateStr($campos[14])->format('Y-m-d') : '';
-
+                $campos[11] = DateTimeUtils::parseDateStr($campos[0] . '-' . $campos[1] . '-01')->format('Y-m-d');
 
                 $cMax = count($campos);
                 for ($c = 0; $c < $cMax; $c++) {
-                    $campos[$c] = $campos[$c] ? "'" . trim(str_replace("'", "''", $campos[$c])) . "'" : 'null';
+                    $campos[$c] = trim($campos[$c]) !== '' ? "'" . trim(str_replace("'", "''", $campos[$c])) . "'" : 'null';
                 }
 
                 $sql = sprintf(
-                    'INSERT INTO rdp_rel_ctspagrec01 (
+                    'INSERT INTO rdp_rel_vendas01 (
                             id,
-                            lancto,
-                            docto,
-                            dt_movto,
-                            dt_vencto,
-                            dt_pagto,
-                            cod_cliente,
-                            nome_cli_for,
-                            localizador,
-                            filial,
-                            valor_titulo,
-                            valor_baixa,
-                            situacao,
-                            tipo_pag_rec,
-                            numero_nf,
-                            dt_emissao_nf,
+                            ano,
+                            mes,
+                            cod_fornec,
+                            nome_fornec,
+                            cod_prod,
+                            desc_prod,
+                            total_preco_venda,
+                            total_preco_custo,
+                            rentabilidade,
+                            cod_vendedor,
+                            nome_vendedor,
+                            mesano,
                             estabelecimento_id,inserted,updated,user_inserted_id,user_updated_id
                         )
-                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
-                    $campos[0], // `lancto`
-                    $campos[1], //  `docto`
-                    $campos[2], //  `dt_movto`
-                    $campos[3], //  `dt_vencto`
-                    $campos[4], //  `dt_pagto`
-                    $campos[5], //  `cod_cliente`
-                    $campos[6], //  `nome_cli_for`
-                    $campos[7], //  `localizador`
-                    $campos[8], //  `filial`
-                    $campos[9], //  `valor_titulo`
-                    $campos[10], // `valor_baixa`
-                    $campos[11], // `situacao`
-                    $campos[12], // `tipo_pag_rec`
-                    $campos[13], // `numero_nf`
-                    $campos[14] // `dt_emissao_nf`
+                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
+                    $campos[0], // `ano`
+                    $campos[1], // `mes`
+                    $campos[2], // `cod_fornec`
+                    $campos[3], // `nome_fornec`
+                    $campos[4], // `cod_prod`
+                    $campos[5], // `desc_prod`
+                    $campos[6], // `total_preco_venda`
+                    $campos[7], // `total_preco_custo`
+                    $campos[8], // `rentabilidade`
+                    $campos[9], // `cod_vendedor`
+                    $campos[10], // `nome_vendedor`
+                    $campos[11] // `mesano`
                 );
 
                 try {

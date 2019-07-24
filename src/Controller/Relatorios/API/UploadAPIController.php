@@ -4,8 +4,10 @@ namespace App\Controller\Relatorios\API;
 
 use App\Business\Relatorios\RelCtsPagRec01Business;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
+use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,45 +19,54 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * @author Carlos Eduardo Pauluk
  */
-class RelCtsPagReg01APIController extends AbstractController
+class UploadAPIController extends AbstractController
 {
 
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var RelCtsPagRec01Business */
-    private $relCtsPagRec01Business;
-
     /**
      * RelCtsPagReg01APIController constructor.
      * @param LoggerInterface $logger
-     * @param RelCtsPagRec01Business $relCtsPagRec01Business
      */
-    public function __construct(LoggerInterface $logger, RelCtsPagRec01Business $relCtsPagRec01Business)
+    public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
-        $this->relCtsPagRec01Business = $relCtsPagRec01Business;
     }
 
     /**
-     * @Route("/api/relatorios/relCtsPagRec01/upload", name="api_relatorios_relCtsPagRec01_upload")
+     * @Route("/api/relatorios/upload", name="api_relatorios_upload")
      * @param Request $request
      * @return JsonResponse
-     * @throws ViewException
      */
     public function upload(Request $request): JsonResponse
     {
         $this->logger->debug('Iniciando o upload...');
         $output = ['uploaded' => false];
 
+        $tipoRelatorio = $request->get('tipoRelatorio');
+        if (!$tipoRelatorio || !in_array($tipoRelatorio, ['RELCTSPAGREC01', 'RELVENDAS01', 'RELCOMPFOR01'])) {
+            $output['msg'] = 'tipoRelatorio inexistente: "' . $tipoRelatorio . '"';
+            return new JsonResponse($output);
+        }
+        $dir = $_SERVER['PASTA_UPLOAD_' . $tipoRelatorio] . 'fila/';
+
         if ($request->files->get('file')) {
             $file = $request->files->get('file');
-            if ($file instanceof UploadedFile) {
+            if ($file->getError() !== 0) {
+                $output['msg'] = $file->getErrorMessage();
+            } else if ($file instanceof UploadedFile) {
                 /** @var UploadedFile $file */
-                $contents = file_get_contents($file->getPathname());
+                $uuid = StringUtils::guidv4();
+                $extensao = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
+                $novoNome = $uuid . '.' . $extensao;
+                $nomeArquivo = $dir . $novoNome;
+                copy($file->getPathname(), $nomeArquivo);
                 $output['uploaded'] = true;
+                $output['nomeArquivo'] = $novoNome;
             }
         } else {
+            $output['msg'] = 'file não informado';
             $this->logger->debug('"file" não informado');
             $this->logger->debug('file: ' . $request->files->get('file'));
         }
