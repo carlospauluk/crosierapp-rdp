@@ -31,4 +31,4 @@ yarn-error.log
 
 /public/uploads*
 
-curl_relatoriospush.php
+curl_*.php
