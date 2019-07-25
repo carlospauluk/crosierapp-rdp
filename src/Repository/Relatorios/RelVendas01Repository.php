@@ -2,9 +2,8 @@
 
 namespace App\Repository\Relatorios;
 
-use App\Entity\RelVendas01;
+use App\Entity\Relatorios\RelVendas01;
 use CrosierSource\CrosierLibBaseBundle\Repository\FilterRepository;
-use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Doctrine\ORM\Query\ResultSetMapping;
 
 /**
@@ -30,9 +29,9 @@ class RelVendas01Repository extends FilterRepository
     public function totalVendasPorFornecedor(\DateTime $dtIni = null, \DateTime $dtFim = null)
     {
         $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
-        $dtIni->setTime(0,0,0,0);
+        $dtIni->setTime(0, 0, 0, 0);
         $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
-        $dtFim->setTime(23,59,59,99999);
+        $dtFim->setTime(23, 59, 59, 99999);
 
         $sql = 'SELECT nome_fornec, sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE dt_emissao BETWEEN :dtIni and :dtFim GROUP BY nome_fornec ORDER BY total_venda';
 
@@ -56,9 +55,9 @@ class RelVendas01Repository extends FilterRepository
     public function totalVendasPorVendedor(\DateTime $dtIni = null, \DateTime $dtFim = null)
     {
         $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
-        $dtIni->setTime(0,0,0,0);
+        $dtIni->setTime(0, 0, 0, 0);
         $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
-        $dtFim->setTime(23,59,59,99999);
+        $dtFim->setTime(23, 59, 59, 99999);
         $sql = 'SELECT nome_vendedor, sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE dt_emissao BETWEEN :dtIni and :dtFim GROUP BY nome_vendedor ORDER BY total_venda';
 
         $rsm = new ResultSetMapping();

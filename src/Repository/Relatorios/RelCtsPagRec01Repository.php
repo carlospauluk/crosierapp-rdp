@@ -2,7 +2,7 @@
 
 namespace App\Repository\Relatorios;
 
-use App\Entity\RelCtsPagRec01;
+use App\Entity\Relatorios\RelCtsPagRec01;
 use CrosierSource\CrosierLibBaseBundle\Repository\FilterRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Doctrine\ORM\Query\ResultSetMapping;
