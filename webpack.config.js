@@ -31,6 +31,7 @@ Encore
     // .createSharedEntry('bse_layout', './assets/js/bse/layout.js')
     .addEntry('dashboard', './assets/js/dashboard.js')
     .addEntry('utils/relatorioPushList', './assets/js/utils/relatorioPushList.js')
+    .addEntry('Relatorios/relCtsPagRec01_list', './assets/js/Relatorios/relCtsPagRec01_list.js')
 
 
 

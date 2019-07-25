@@ -285,6 +285,19 @@ $(document).ready(function () {
                     var chart = new google.visualization.ColumnChart(document.getElementById('chart_contasPagarReceber'));
                     chart.draw(data, options);
 
+                    google.visualization.events.addListener(chart, 'select', selectHandler);
+
+                    function selectHandler() {
+                        let selection = chart.getSelection();
+                        let dt = data.getFormattedValue(selection[0].row, 0);
+                        if (dt) {
+                            window.location = Routing.generate('relCtsPagRec01_list', {filter: {dts: dt + ' - ' + dt}});
+                        }
+                        
+
+                    }
+
+
                 }
             );
         });

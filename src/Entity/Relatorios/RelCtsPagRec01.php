@@ -22,7 +22,7 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      *
-     * @ORM\Column(name="lancto", type="int", nullable=false)
+     * @ORM\Column(name="lancto", type="integer", nullable=false)
      * @Groups("entity")
      *
      * @var int|null
@@ -140,7 +140,7 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      *
-     * @ORM\Column(name="numero_nf", type="int", nullable=false)
+     * @ORM\Column(name="numero_nf", type="integer", nullable=false)
      * @Groups("entity")
      *
      * @var int|null
@@ -166,9 +166,9 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      * @param int|null $lancto
-     * @return RelVendas01
+     * @return RelCtsPagRec01
      */
-    public function setLancto(?int $lancto): RelVendas01
+    public function setLancto(?int $lancto): RelCtsPagRec01
     {
         $this->lancto = $lancto;
         return $this;
@@ -184,9 +184,9 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      * @param string|null $docto
-     * @return RelVendas01
+     * @return RelCtsPagRec01
      */
-    public function setDocto(?string $docto): RelVendas01
+    public function setDocto(?string $docto): RelCtsPagRec01
     {
         $this->docto = $docto;
         return $this;
@@ -202,9 +202,9 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      * @param \DateTime|null $dtMovto
-     * @return RelVendas01
+     * @return RelCtsPagRec01
      */
-    public function setDtMovto(?\DateTime $dtMovto): RelVendas01
+    public function setDtMovto(?\DateTime $dtMovto): RelCtsPagRec01
     {
         $this->dtMovto = $dtMovto;
         return $this;
@@ -220,9 +220,9 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      * @param \DateTime|null $dtVencto
-     * @return RelVendas01
+     * @return RelCtsPagRec01
      */
-    public function setDtVencto(?\DateTime $dtVencto): RelVendas01
+    public function setDtVencto(?\DateTime $dtVencto): RelCtsPagRec01
     {
         $this->dtVencto = $dtVencto;
         return $this;
@@ -238,9 +238,9 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      * @param \DateTime|null $dtPagto
-     * @return RelVendas01
+     * @return RelCtsPagRec01
      */
-    public function setDtPagto(?\DateTime $dtPagto): RelVendas01
+    public function setDtPagto(?\DateTime $dtPagto): RelCtsPagRec01
     {
         $this->dtPagto = $dtPagto;
         return $this;
@@ -249,16 +249,20 @@ class RelCtsPagRec01 implements EntityId
     /**
      * @return int|null
      */
-    public function getCodCliente(): ?int
+    public function getCodCliente(bool $format = false)
     {
+        if ($format) {
+            return str_pad($this->codCliente, 6, '0', STR_PAD_LEFT);
+        }
+
         return $this->codCliente;
     }
 
     /**
      * @param int|null $codCliente
-     * @return RelVendas01
+     * @return RelCtsPagRec01
      */
-    public function setCodCliente(?int $codCliente): RelVendas01
+    public function setCodCliente(?int $codCliente): RelCtsPagRec01
     {
         $this->codCliente = $codCliente;
         return $this;
@@ -274,12 +278,21 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      * @param string|null $nomeCliFor
-     * @return RelVendas01
+     * @return RelCtsPagRec01
      */
-    public function setNomeCliFor(?string $nomeCliFor): RelVendas01
+    public function setNomeCliFor(?string $nomeCliFor): RelCtsPagRec01
     {
         $this->nomeCliFor = $nomeCliFor;
         return $this;
+    }
+
+    /**
+     * @return string
+     * @Groups("entity")
+     */
+    public function getNomeCliForMontado(): string
+    {
+        return $this->getCodCliente(true) . ' - ' . $this->getNomeCliFor();
     }
 
     /**
@@ -292,9 +305,9 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      * @param int|null $localizador
-     * @return RelVendas01
+     * @return RelCtsPagRec01
      */
-    public function setLocalizador(?int $localizador): RelVendas01
+    public function setLocalizador(?int $localizador): RelCtsPagRec01
     {
         $this->localizador = $localizador;
         return $this;
@@ -310,9 +323,9 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      * @param int|null $filial
-     * @return RelVendas01
+     * @return RelCtsPagRec01
      */
-    public function setFilial(?int $filial): RelVendas01
+    public function setFilial(?int $filial): RelCtsPagRec01
     {
         $this->filial = $filial;
         return $this;
@@ -328,9 +341,9 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      * @param float|null $valorTitulo
-     * @return RelVendas01
+     * @return RelCtsPagRec01
      */
-    public function setValorTitulo(?float $valorTitulo): RelVendas01
+    public function setValorTitulo(?float $valorTitulo): RelCtsPagRec01
     {
         $this->valorTitulo = $valorTitulo;
         return $this;
@@ -346,9 +359,9 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      * @param float|null $valorBaixa
-     * @return RelVendas01
+     * @return RelCtsPagRec01
      */
-    public function setValorBaixa(?float $valorBaixa): RelVendas01
+    public function setValorBaixa(?float $valorBaixa): RelCtsPagRec01
     {
         $this->valorBaixa = $valorBaixa;
         return $this;
@@ -364,9 +377,9 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      * @param string|null $situacao
-     * @return RelVendas01
+     * @return RelCtsPagRec01
      */
-    public function setSituacao(?string $situacao): RelVendas01
+    public function setSituacao(?string $situacao): RelCtsPagRec01
     {
         $this->situacao = $situacao;
         return $this;
@@ -382,9 +395,9 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      * @param string|null $tipoPagRec
-     * @return RelVendas01
+     * @return RelCtsPagRec01
      */
-    public function setTipoPagRec(?string $tipoPagRec): RelVendas01
+    public function setTipoPagRec(?string $tipoPagRec): RelCtsPagRec01
     {
         $this->tipoPagRec = $tipoPagRec;
         return $this;
@@ -400,9 +413,9 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      * @param int|null $numeroNF
-     * @return RelVendas01
+     * @return RelCtsPagRec01
      */
-    public function setNumeroNF(?int $numeroNF): RelVendas01
+    public function setNumeroNF(?int $numeroNF): RelCtsPagRec01
     {
         $this->numeroNF = $numeroNF;
         return $this;
@@ -418,9 +431,9 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      * @param \DateTime|null $dtEmissaoNF
-     * @return RelVendas01
+     * @return RelCtsPagRec01
      */
-    public function setDtEmissaoNF(?\DateTime $dtEmissaoNF): RelVendas01
+    public function setDtEmissaoNF(?\DateTime $dtEmissaoNF): RelCtsPagRec01
     {
         $this->dtEmissaoNF = $dtEmissaoNF;
         return $this;

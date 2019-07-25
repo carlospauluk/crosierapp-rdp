@@ -1,0 +1,220 @@
+{% extends '@CrosierLibBase/index.html.twig' %}
+
+
+
+
+{% block page_content %}
+
+    <form action="{{ url('relCtsPagRec01_list') }}" method="get" id="formPesquisar">
+
+        <div class="card">
+            <div class="card-header">
+
+
+                <div class="d-flex flex-wrap align-items-center">
+
+                    <div class="d-sm-flex text-nowrap mr-1">
+                        <h3>Contas a Pagar/Receber</h3>
+                    </div>
+                    <div class="d-sm-flex flex-nowrap ml-auto">
+
+
+                        <input type="text" class="form-control" id="filterDts"
+                               name="filter[dts]" data-mask="00/00/0000 - 00/00/0000"
+                               style="width: 180px; text-align: center"
+                               value="{{ filter.dts|default('') }}">
+
+                        <button class="btn btn-outline-success ml-1"
+                                type="button" id="btnAnterior" title="Anterior"
+                                data-ante-periodoi="{{ antePeriodoI }}"
+                                data-ante-periodof="{{ antePeriodoF }}">
+                            <i class="fas fa-chevron-left"></i></button>
+                        <button class="btn btn-outline-success ml-1"
+                                type="button" id="btnProximo" title="Próximo"
+                                data-prox-periodoi="{{ proxPeriodoI }}"
+                                data-prox-periodof="{{ proxPeriodoF }}">
+                            <i class="fas fa-chevron-right"></i></button>
+
+                        <button class="btn btn-outline-dark ml-1" type="button"
+                                id="btnHoje" name="btnHoje" title="Hoje">
+                            <i class="fas fa-calendar-day"></i></button>
+
+                        <button type="button" class="btn btn-info ml-1"
+                                title="Recarregar"
+                                onclick="window.location.href='{{ url('relCtsPagRec01_list',{'r':'1'}) }}'">
+                            <i class="fas fa-sync" aria-hidden="true"></i>
+                        </button>
+
+                        <button type="button" class="btn btn-success ml-1" title="Selecionar Carteiras"
+                                data-target="#pesquisarModal" data-toggle="modal">
+                            <i class="fas fa-search" aria-hidden="true"></i>
+                        </button>
+
+                        <button type="button" data-url="{{ url('relCtsPagRec01_list') }}"
+                                class="btn btn-dark ml-1" value="Imprimir"
+                                id="btnImprimir" name="btnImprimir">
+                            <i class="fas fa-print"></i>
+                        </button>
+
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="table-responsive-sm">
+
+
+                    <table class="table table-sm table-striped table-hover crsr-datatable">
+
+                        <thead>
+                        <tr>
+                            <th scope="col">Id</th>
+                            <th scope="col">Lancto<br/>Docto</th>
+                            <th scope="col">Cedente</th>
+                            <th scope="col">Dt Movto</th>
+                            <th scope="col">Dt Vencto<br/>Dt Pagto</th>
+                            <th scope="col">Valor Título</th>
+                            <th scope="col">Valor Baixa</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% set i=0 %}
+                        {% for dia in dias %}
+                            {% for item in dia.movs %}
+                                {% set i=i+1 %}
+                                <tr>
+                                    <td>
+                                        {{ item.id }}
+                                        <br/>
+                                        <span class="badge badge-pill badge-light">{{ i }}</span>
+                                    </td>
+                                    <td>
+                                        {{ item.lancto }}<br/>
+                                        {{ item.docto }}
+                                    </td>
+                                    <td>
+                                        <div style="float: left">
+                                            {{ item.nomeCliForMontado }}
+                                        </div>
+                                        <div class="text-right">
+                                            {% if item.tipoPagRec == 'R' %}
+                                                <span class="badge badge-info"><i class="fas fa-sign-in-alt"></i> A Receber</span>
+                                            {% else %}
+                                                <span class="badge badge-danger"><i class="fas fa-sign-out-alt"></i>A Pagar</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {{ item.dtMovto|date('d/m/Y') }}
+                                    </td>
+                                    <td>
+                                        {{ item.dtVencto|date('d/m/Y') }}<br/>
+                                        {{ item.dtPagto|date('d/m/Y') }}<br/>
+                                    </td>
+                                    <td class="text-right"
+                                        style="color: white; background-color: {{ item.tipoPagRec == 'R' ? 'dodgerblue' : 'indianred' }}">
+                                        {{ item.valorTitulo|number_format(2,',','.') }}
+                                    </td>
+                                    <td class="text-right"
+                                        style="color: white; background-color: {{ item.tipoPagRec == 'R' ? 'dodgerblue' : 'indianred' }}">
+                                        {{ item.valorBaixa|number_format(2,',','.') }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+<!--
+                            <tr style="background-color: indianred">
+                                <th scope="row" colspan="5" class="text-right">
+                                    Total A Pagar / Pago em {{ dia.dtVencto|date('d/m/Y') }}:
+                                </th>
+                                <td class="text-right">
+                                    R$ {{ dia.totalAPagar|number_format(2,',','.') }}
+                                </td>
+                                <td class="text-right">
+                                    R$ {{ dia.totalPago|number_format(2,',','.') }}
+                                </td>
+                            </tr>
+                            <tr style="background-color: dodgerblue">
+                                <th scope="row" colspan="5" class="text-right">
+                                    Total A Receber / Recebido {{ dia.dtVencto|date('d/m/Y') }}:
+                                </th>
+                                <td class="text-right">
+                                    R$ {{ dia.totalAReceber|number_format(2,',','.') }}
+                                </td>
+                                <td class="text-right">
+                                    R$ {{ dia.totalRecebido|number_format(2,',','.') }}
+                                </td>
+                            </tr>
+
+                            <tr style="background-color: lightgrey; height: 20px">
+                                <th scope="row" colspan="5" class="text-right">
+                                    Total em {{ dia.dtVencto|date('d/m/Y') }}:
+                                </th>
+                                <td class="text-right" colspan="2">
+                                    R$ {{ dia.total|number_format(2,',','.') }}
+                                </td>
+                            </tr>
+-->
+                        {% endfor %}
+<!--
+                        <tr style="background-color: antiquewhite">
+                            <th scope="row" colspan="5" class="text-right">
+                                Total Final:
+                            </th>
+                            <td class="text-right" colspan="2">
+                                R$ {{ totalGeral|number_format(2,',','.') }}<br/>
+                            </td>
+                        </tr>
+-->
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="pesquisarModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+
+                        <h5 class="modal-header">Pesquisar por...</h5>
+
+                        <div class="card">
+                            <div class="card-body">
+
+                                <div class="form-group">
+
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default"
+                                id="btnCancelarPesquisa" data-dismiss="modal">
+                            <i class="fa fa-ban" aria-hidden="true"></i> Cancelar
+                        </button>
+                        <button type="button" class="btn btn-danger" id="btnCarteirasPesquisar">
+                            <i class="fa fa-trash" aria-hidden="true"></i> Pesquisar
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </form>
+{% endblock %}
+
+
+{% block down_scripts %}
+    <script src="{{ asset('build/Relatorios/relCtsPagRec01_list.js') }}"></script>
+{% endblock %}
