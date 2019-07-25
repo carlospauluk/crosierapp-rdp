@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Relatorios;
 
 use CrosierSource\CrosierLibBaseBundle\Entity\EntityId;
 use CrosierSource\CrosierLibBaseBundle\Entity\EntityIdTrait;
@@ -9,7 +9,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  *
- * @ORM\Entity(repositoryClass="App\Repository\RelVendas01Repository")
+ * @ORM\Entity(repositoryClass="App\Repository\Relatorios\RelVendas01Repository")
  * @ORM\Table(name="rdp_rel_vendas01")
  *
  * @author Carlos Eduardo Pauluk

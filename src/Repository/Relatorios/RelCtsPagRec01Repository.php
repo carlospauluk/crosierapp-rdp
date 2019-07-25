@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Relatorios;
 
 use App\Entity\RelCtsPagRec01;
 use CrosierSource\CrosierLibBaseBundle\Repository\FilterRepository;
