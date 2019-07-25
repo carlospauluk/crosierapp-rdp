@@ -84,11 +84,11 @@ class RelVendas01Business
                     continue;
                 }
                 $campos = explode('|', $linha);
-                if (count($campos) !== 13) {
-                    throw new ViewException('Qtde de campos difere de 13 para a linha "' . $linha . '"');
+                if (count($campos) !== 14) {
+                    throw new ViewException('Qtde de campos difere de 14 para a linha "' . $linha . '"');
                 }
 
-                $campos[1] = DateTimeUtils::parseDateStr($campos[1])->format('Y-m-d');
+                $campos[2] = DateTimeUtils::parseDateStr($campos[2])->format('Y-m-d');
 
                 $cMax = count($campos);
                 for ($c = 0; $c < $cMax; $c++) {
@@ -97,8 +97,9 @@ class RelVendas01Business
 
                 $sql = sprintf(
                     'INSERT INTO rdp_rel_vendas01 (
-                            id,
+                            id,                            
                             prevenda,
+                            num_item,
                             dt_emissao,
                             ano,
                             mes,
@@ -113,20 +114,21 @@ class RelVendas01Business
                             nome_vendedor,
                             estabelecimento_id,inserted,updated,user_inserted_id,user_updated_id
                         )
-                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
+                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
                     $campos[0], // `prevenda`,
-                    $campos[1], // `dt_emissao`,
-                    $campos[2], // `ano`,
-                    $campos[3], // `mes`
-                    $campos[4], // `cod_fornec`
-                    $campos[5], // `nome_fornec`
-                    $campos[6], // `cod_prod`
-                    $campos[7], // `desc_prod`
-                    $campos[8], // `total_preco_venda`
-                    $campos[9], // `total_preco_custo`
-                    $campos[10],// `rentabilidade`
-                    $campos[11],// `cod_vendedor`
-                    $campos[12]  // `nome_vendedor`
+                    $campos[1], // `num_item`,
+                    $campos[2], // `dt_emissao`,
+                    $campos[3], // `ano`,
+                    $campos[4], // `mes`
+                    $campos[5], // `cod_fornec`
+                    $campos[6], // `nome_fornec`
+                    $campos[7], // `cod_prod`
+                    $campos[8], // `desc_prod`
+                    $campos[9], // `total_preco_venda`
+                    $campos[10],// `total_preco_custo`
+                    $campos[11],// `rentabilidade`
+                    $campos[12],// `cod_vendedor`
+                    $campos[13] // `nome_vendedor`
                 );
 
                 try {
