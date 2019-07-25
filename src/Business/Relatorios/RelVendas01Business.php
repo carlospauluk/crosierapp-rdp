@@ -84,11 +84,11 @@ class RelVendas01Business
                     continue;
                 }
                 $campos = explode('|', $linha);
-                if (count($campos) !== 11) {
-                    throw new ViewException('Qtde de campos difere de 11 para a linha "' . $linha . '"');
+                if (count($campos) !== 13) {
+                    throw new ViewException('Qtde de campos difere de 13 para a linha "' . $linha . '"');
                 }
 
-                $campos[11] = DateTimeUtils::parseDateStr($campos[0] . '-' . $campos[1] . '-01')->format('Y-m-d');
+                $campos[1] = DateTimeUtils::parseDateStr($campos[1])->format('Y-m-d');
 
                 $cMax = count($campos);
                 for ($c = 0; $c < $cMax; $c++) {
@@ -98,6 +98,8 @@ class RelVendas01Business
                 $sql = sprintf(
                     'INSERT INTO rdp_rel_vendas01 (
                             id,
+                            prevenda,
+                            dt_emissao,
                             ano,
                             mes,
                             cod_fornec,
@@ -109,22 +111,22 @@ class RelVendas01Business
                             rentabilidade,
                             cod_vendedor,
                             nome_vendedor,
-                            mesano,
                             estabelecimento_id,inserted,updated,user_inserted_id,user_updated_id
                         )
-                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
-                    $campos[0], // `ano`
-                    $campos[1], // `mes`
-                    $campos[2], // `cod_fornec`
-                    $campos[3], // `nome_fornec`
-                    $campos[4], // `cod_prod`
-                    $campos[5], // `desc_prod`
-                    $campos[6], // `total_preco_venda`
-                    $campos[7], // `total_preco_custo`
-                    $campos[8], // `rentabilidade`
-                    $campos[9], // `cod_vendedor`
-                    $campos[10], // `nome_vendedor`
-                    $campos[11] // `mesano`
+                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
+                    $campos[0], // `prevenda`,
+                    $campos[1], // `dt_emissao`,
+                    $campos[2], // `ano`,
+                    $campos[3], // `mes`
+                    $campos[4], // `cod_fornec`
+                    $campos[5], // `nome_fornec`
+                    $campos[6], // `cod_prod`
+                    $campos[7], // `desc_prod`
+                    $campos[8], // `total_preco_venda`
+                    $campos[9], // `total_preco_custo`
+                    $campos[10],// `rentabilidade`
+                    $campos[11],// `cod_vendedor`
+                    $campos[12]  // `nome_vendedor`
                 );
 
                 try {

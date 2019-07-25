@@ -6,7 +6,8 @@ CREATE TABLE `rdp_rel_vendas01`
 (
     `id`                 BIGINT(20)     NOT NULL AUTO_INCREMENT,
 
-
+    `prevenda`           BIGINT(20)     NOT NULL,
+    `dt_emissao`         DATETIME       NOT NULL,
     `ano`                CHAR(4)        NOT NULL,
     `mes`                CHAR(2)        NOT NULL,
     `cod_fornec`         BIGINT(20)     NOT NULL,
@@ -19,8 +20,7 @@ CREATE TABLE `rdp_rel_vendas01`
     `cod_vendedor`       BIGINT(20)     NOT NULL,
     `nome_vendedor`      VARCHAR(200)   NOT NULL,
 
-    `mesano`             DATE           NULL,
-
+    -- UNIQUE KEY `uk_rdp_rel_vendas01` (`prevenda`,`dt_emissao`,`ano`,`mes`,`cod_fornec`,`nome_fornec`,`cod_prod`,`desc_prod`,`total_preco_venda`,`total_preco_custo`,`rentabilidade`,`cod_vendedor`,`nome_vendedor`),
 
     -- campos de controle do crosier
     PRIMARY KEY (`id`),
@@ -37,12 +37,6 @@ CREATE TABLE `rdp_rel_vendas01`
     CONSTRAINT `fk_rdp_rel_vendas01_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   DEFAULT charset = latin1;
-
-# ALTER TABLE `rdp_rel_vendas01` UNIQUE KEY `uk_rdp_rel_vendas01` (`ano`,`mes`,`cod_fornec`,`nome_fornec`,`cod_prod`,`desc_prod`,`total_preco_venda`,`total_preco_custo`,`rentabilidade`,`cod_vendedor`,`nome_vendedor`);
-
-
-
-
 
 
 
@@ -87,12 +81,6 @@ CREATE TABLE `rdp_rel_ctspagrec01`
   DEFAULT charset = latin1;
 
 # ALTER TABLE rdp_rel_ctspagrec01 ADD UNIQUE KEY `UK_rdp_rel_ctspagrec01` (`lancto`,`docto`,`dt_movto`,`dt_vencto`,`cod_cliente`,`nome_cli_for`,`filial`,`valor_titulo`,`situacao`,`tipo_pag_rec`);
-
-
-
-
-
-
 
 
 DROP TABLE IF EXISTS `rdp_rel_compfor01`;

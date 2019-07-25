@@ -60,7 +60,6 @@ class ProcessarRelatoriosCommand extends Command
     }
 
     /**
-     * Cria os option e option_value na base do OC e vincula com as grades e tamanhos.
      *
      * @param InputInterface $input
      * @param OutputInterface $output
