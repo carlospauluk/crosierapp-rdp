@@ -4,7 +4,7 @@ namespace App\Controller\Relatorios;
 
 
 use App\Entity\Relatorios\RelCtsPagRec01;
-use App\EntityHandler\RelCtsPagRec01EntityHandler;
+use App\EntityHandler\Relatorios\RelCtsPagRec01EntityHandler;
 use App\Repository\Relatorios\RelCtsPagRec01Repository;
 use CrosierSource\CrosierLibBaseBundle\APIClient\Base\DiaUtilAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
@@ -18,9 +18,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * CRUD Controller para Push.
  *
- * @package App\Controller\Utils
  * @author Carlos Eduardo Pauluk
  */
 class RelCtsPagRec01Controller extends FormListController
@@ -72,7 +70,6 @@ class RelCtsPagRec01Controller extends FormListController
     }
 
 
-
     /**
      * @required
      * @param SessionInterface $session
@@ -80,15 +77,6 @@ class RelCtsPagRec01Controller extends FormListController
     public function setSession(SessionInterface $session): void
     {
         $this->session = $session;
-    }
-
-
-    public function getFilterDatas(array $params): array
-    {
-        return [
-            new FilterData(['dtVencto'], 'BETWEEN', 'dtVencto', $params),
-            new FilterData(['tipoPagRec'], 'EQ', 'tipoPagRec', $params)
-        ];
     }
 
     /**
@@ -102,18 +90,6 @@ class RelCtsPagRec01Controller extends FormListController
     {
         $parameters = $this->buildListData($request);
         return $this->doList($request, $parameters);
-    }
-
-    /**
-     *
-     * @Route("/relCtsPagRec01/datatablesJsList/", name="relCtsPagRec01_datatablesJsList")
-     * @param Request $request
-     * @return Response
-     * @throws ViewException
-     */
-    public function datatablesJsList(Request $request): Response
-    {
-        return $this->doDatatablesJsList($request);
     }
 
     /**
@@ -217,6 +193,14 @@ class RelCtsPagRec01Controller extends FormListController
         return $parameters;
     }
 
+    public function getFilterDatas(array $params): array
+    {
+        return [
+            new FilterData(['dtVencto'], 'BETWEEN', 'dtVencto', $params),
+            new FilterData(['tipoPagRec'], 'EQ', 'tipoPagRec', $params)
+        ];
+    }
+
     /**
      * @param $movs
      * @return float|null
@@ -231,7 +215,17 @@ class RelCtsPagRec01Controller extends FormListController
         return $total;
     }
 
-
+    /**
+     *
+     * @Route("/relCtsPagRec01/datatablesJsList/", name="relCtsPagRec01_datatablesJsList")
+     * @param Request $request
+     * @return Response
+     * @throws ViewException
+     */
+    public function datatablesJsList(Request $request): Response
+    {
+        return $this->doDatatablesJsList($request);
+    }
 
     /**
      *

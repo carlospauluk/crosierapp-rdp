@@ -1,0 +1,125 @@
+{% extends '@CrosierLibBase/index.html.twig' %}
+
+
+
+
+{% block page_content %}
+
+    <form action="{{ url('relVendas01_itensVendidosPorFornecedor') }}" method="get" id="formPesquisar">
+
+        <div class="card">
+            <div class="card-header">
+
+
+                <div class="d-flex flex-wrap align-items-center">
+
+                    <div class="d-sm-flex text-nowrap mr-1">
+                        <h3>Itens Vendidos por Fornecedor</h3>
+                    </div>
+                    <div class="d-sm-flex flex-nowrap ml-auto">
+
+                        <select id="filter_nomeFornec" name="filter[nomeFornec]"
+                                data-options="{{ fornecedores }}" data-val="{{ filter.nomeFornec }}"></select>
+
+                        <input type="text" class="form-control" id="filterDts"
+                               name="filter[dts]" data-mask="00/00/0000 - 00/00/0000"
+                               style="width: 180px; text-align: center"
+                               value="{{ filter.dts|default('') }}">
+
+                        <button class="btn btn-outline-success ml-1"
+                                type="button" id="btnAnterior" title="Anterior"
+                                data-ante-periodoi="{{ antePeriodoI }}"
+                                data-ante-periodof="{{ antePeriodoF }}">
+                            <i class="fas fa-chevron-left"></i></button>
+                        <button class="btn btn-outline-success ml-1"
+                                type="button" id="btnProximo" title="Próximo"
+                                data-prox-periodoi="{{ proxPeriodoI }}"
+                                data-prox-periodof="{{ proxPeriodoF }}">
+                            <i class="fas fa-chevron-right"></i></button>
+
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="table-responsive-sm">
+
+
+                    <table class="table table-sm table-striped table-hover crsr-datatable" id="datatableItens">
+
+                        <thead>
+                        <tr>
+                            <th scope="col" title="">#</th>
+                            <th scope="col">Produto</th>
+                            <th scope="col">Qtde</th>
+                            <th scope="col">Total Custo</th>
+                            <th scope="col">Total Venda</th>
+                            <th scope="col">Total Rentabilidade</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for item in dados %}
+                            <tr>
+                                <td>
+                                    <span class="badge badge-pill badge-light">{{ loop.index }}</span>
+                                </td>
+                                <td>
+                                    {{ "%09d"|format(item.cod_prod) }} - {{ item.desc_prod }}
+                                </td>
+                                <td class="text-right">
+                                    {{ item.qtde_total }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.tpc }}">
+                                    {{ item.tpc|number_format(2,',','.') }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.tpv }}">
+                                    {{ item.tpv|number_format(2,',','.') }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.rent }}">
+                                    {{ item.rent|number_format(2,',','.') }}%
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+
+
+                        </tbody>
+
+                        <tfoot>
+
+                        <tr style="background-color: antiquewhite; font-weight: bold">
+                            <td  colspan="2" class="text-right">
+
+                            </td>
+                            <td class="text-right">
+                                {{ total.qtde_total }}
+                            </td>
+                            <td class="text-right">
+                                {{ total.tpc|number_format(2,',','.') }}
+                            </td>
+                            <td class="text-right">
+                                {{ total.tpv|number_format(2,',','.') }}
+                            </td>
+                            <td class="text-right">
+                                {{ total.rent|number_format(2,',','.') }}%
+                            </td>
+                        </tr>
+
+                        </tfoot>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </form>
+{% endblock %}
+
+
+{% block down_scripts %}
+    <script src="{{ asset('build/Relatorios/relVendas01_itensVendidosPorFornecedor.js') }}"></script>
+{% endblock %}

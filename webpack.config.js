@@ -32,6 +32,7 @@ Encore
     .addEntry('dashboard', './assets/js/dashboard.js')
     .addEntry('utils/relatorioPushList', './assets/js/utils/relatorioPushList.js')
     .addEntry('Relatorios/relCtsPagRec01_list', './assets/js/Relatorios/relCtsPagRec01_list.js')
+    .addEntry('Relatorios/relVendas01_itensVendidosPorFornecedor', './assets/js/Relatorios/relVendas01_itensVendidosPorFornecedor.js')
 
 
 

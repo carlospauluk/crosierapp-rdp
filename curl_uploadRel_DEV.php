@@ -17,7 +17,7 @@ $arquivo = $argv[2];
 
 $ch = curl_init();
 
-// curl_setopt($ch, CURLOPT_CAINFO, '/home/carlos/Downloads/_.dev.crosier');
+curl_setopt($ch, CURLOPT_CAINFO, '/home/carlos/Downloads/_.dev.crosier');
 
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_URL, $endpoint);
@@ -44,7 +44,7 @@ $postData = array(
 curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
 
 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-    'X-Authorization: Bearer 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999',
+    'X-Authorization: Bearer 1',
     'Content-Type: multipart/form-data'
 ));
 

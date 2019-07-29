@@ -19,6 +19,42 @@ class RelVendas01 implements EntityId
 
     use EntityIdTrait;
 
+    /**
+     *
+     * @ORM\Column(name="prevenda", type="bigint", nullable=false)
+     * @Groups("entity")
+     *
+     * @var int|null
+     */
+    private $preVenda;
+
+    /**
+     *
+     * @ORM\Column(name="num_item", type="integer", nullable=false)
+     * @Groups("entity")
+     *
+     * @var int|null
+     */
+    private $numItem;
+
+    /**
+     *
+     * @ORM\Column(name="qtde", type="integer", nullable=false)
+     * @Groups("entity")
+     *
+     * @var int|null
+     */
+    private $qtde;
+
+    /**
+     *
+     * @ORM\Column(name="dt_emissao", type="date", nullable=false)
+     * @Groups("entity")
+     *
+     * @var \DateTime|null
+     */
+    private $dtEmissao;
+
 
     /**
      *
@@ -119,6 +155,78 @@ class RelVendas01 implements EntityId
      * @var string|null
      */
     private $nomeVendedor;
+
+    /**
+     * @return int|null
+     */
+    public function getPreVenda(): ?int
+    {
+        return $this->preVenda;
+    }
+
+    /**
+     * @param int|null $preVenda
+     * @return RelVendas01
+     */
+    public function setPreVenda(?int $preVenda): RelVendas01
+    {
+        $this->preVenda = $preVenda;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getNumItem(): ?int
+    {
+        return $this->numItem;
+    }
+
+    /**
+     * @param int|null $numItem
+     * @return RelVendas01
+     */
+    public function setNumItem(?int $numItem): RelVendas01
+    {
+        $this->numItem = $numItem;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getQtde(): ?int
+    {
+        return $this->qtde;
+    }
+
+    /**
+     * @param int|null $qtde
+     * @return RelVendas01
+     */
+    public function setQtde(?int $qtde): RelVendas01
+    {
+        $this->qtde = $qtde;
+        return $this;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getDtEmissao(): ?\DateTime
+    {
+        return $this->dtEmissao;
+    }
+
+    /**
+     * @param \DateTime|null $dtEmissao
+     * @return RelVendas01
+     */
+    public function setDtEmissao(?\DateTime $dtEmissao): RelVendas01
+    {
+        $this->dtEmissao = $dtEmissao;
+        return $this;
+    }
 
     /**
      * @return string|null
@@ -318,6 +426,6 @@ class RelVendas01 implements EntityId
         return $this;
     }
 
-
+    
 }
 

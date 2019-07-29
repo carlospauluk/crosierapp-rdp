@@ -1,21 +1,20 @@
 <?php
 
-namespace App\EntityHandler;
+namespace App\EntityHandler\Relatorios;
 
-use App\Entity\RelVendas01;
+use App\Entity\Relatorios\RelCompFor01;
 use CrosierSource\CrosierLibBaseBundle\EntityHandler\EntityHandler;
 
 /**
  * EntityHandler para RelVendas01.
  *
- * @package App\EntityHandler\Utils
  * @author Carlos Eduardo Pauluk
  */
-class RelVendas01EntityHandler extends EntityHandler
+class RelCompFor01EntityHandler extends EntityHandler
 {
 
     public function getEntityClass()
     {
-        return RelVendas01::class;
+        return RelCompFor01::class;
     }
 }

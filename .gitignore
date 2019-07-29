@@ -35,3 +35,7 @@ yarn-error.log
 
 
 files/*
+
+
+curl_uploadRel_HOM.php
+curl_uploadRel_PROD.php

@@ -76,7 +76,123 @@ $(document).ready(function () {
         }
     ).on('apply.daterangepicker', function (ev, picker) {
         drawChart_vendas();
+    }).on('blur', function (ev, picker) {
+        drawChart_vendas();
     });
+
+
+
+    GoogleCharts.load(drawChart_vendas);
+
+    function drawChart_vendas() {
+
+        Pace.ignore(function () {
+
+            $.getJSON(
+                Routing.generate('relVendas01_totalPorFornecedor') + '/?filterDts=' + $filter_vendas_dts.val(),
+                function (results) {
+
+                    const data = new google.visualization.DataTable();
+                    data.addColumn('string', 'Fornecedor');
+                    data.addColumn('number', 'Total');
+
+                    $.each(results, function (index, value) {
+                        let v = parseFloat(value.total_venda);
+                        let f = Numeral(v).format('$ 0.0,[00]');
+                        data.addRow([value.nome_fornec, {'v': v, 'f': f}]);
+                    });
+
+                    var options = {
+                        is3D: true,
+                        sliceVisibilityThreshold: .014,
+                        animation: {
+                            startup: true,
+                            duration: 2000,
+                            easing: 'out',
+                        },
+                    };
+
+
+                    chart_totalPorFornecedor = new google.visualization.PieChart(document.getElementById('chart_totalPorFornecedor'));
+                    chart_totalPorFornecedor.draw(data, options);
+
+                    google.visualization.events.addListener(chart_totalPorFornecedor, 'select', selectHandler);
+
+                    function selectHandler() {
+                        let selection = chart_totalPorFornecedor.getSelection();
+                        let nomeFornec = data.getFormattedValue(selection[0].row, 0);
+                        if (nomeFornec) {
+                            window.location = Routing.generate('relVendas01_itensVendidosPorFornecedor', {'filter': { 'dts': $filter_vendas_dts.val(), 'nomeFornec': nomeFornec}});
+                        }
+                    }
+
+                }
+            );
+
+
+            $.getJSON(
+                Routing.generate('relVendas01_totalPorVendedor') + '/?filterDts=' + $filter_vendas_dts.val(),
+                function (results) {
+
+                    const data = new google.visualization.DataTable();
+                    data.addColumn('string', 'Vendedor');
+                    data.addColumn('number', 'Total');
+
+                    $.each(results, function (index, value) {
+                        let v = parseFloat(value.total_venda);
+                        let f = Numeral(v).format('$ 0.0,[00]');
+                        data.addRow([value.nome_vendedor, {'v': v, 'f': f}]);
+                    });
+
+                    var options = {
+                        is3D: true,
+                        animation: {
+                            startup: true,
+                            duration: 1000,
+                            easing: 'out',
+                        },
+                    };
+
+
+                    chart_totalPorVendedor = new google.visualization.ColumnChart(document.getElementById('chart_totalPorVendedor'));
+                    chart_totalPorVendedor.draw(data, options);
+
+                    google.visualization.events.addListener(chart_totalPorVendedor, 'select', selectHandler);
+
+                    function selectHandler() {
+                        let selection = chart.getSelection();
+                        let dt = data.getFormattedValue(selection[0].row, 0);
+                        if (dt) {
+                            window.location = Routing.generate('relCtsPagRec01_list', {filter: {dts: dt + ' - ' + dt}});
+                        }
+                    }
+
+                }
+            );
+
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     let $filter_contasPagRec_dts = $('#filter_contasPagRec_dts').daterangepicker(
@@ -134,106 +250,15 @@ $(document).ready(function () {
     });
 
 
-    // -- chart
 
 
-    GoogleCharts.load(drawChart_vendas);
-
-    function drawChart_vendas() {
-
-        Pace.ignore(function () {
-
-            $.getJSON(
-                Routing.generate('relVendas01_totalPorFornecedor') + '/?filterDts=' + $filter_vendas_dts.val(),
-                function (results) {
-
-                    const data = new google.visualization.DataTable();
-                    data.addColumn('string', 'Fornecedor');
-                    data.addColumn('number', 'Total');
-
-                    $.each(results, function (index, value) {
-                        let v = parseFloat(value.total_venda);
-                        let f = Numeral(v).format('$ 0.0,[00]');
-                        data.addRow([value.nome_fornec, {'v': v, 'f': f}]);
-                    });
-
-                    var options = {
-                        is3D: false,
-                        sliceVisibilityThreshold: .014,
-                        animation: {
-                            startup: true,
-                            duration: 1000,
-                            easing: 'out',
-                        },
-                    };
 
 
-                    chart_totalPorFornecedor = new google.visualization.PieChart(document.getElementById('chart_totalPorFornecedor'));
-                    chart_totalPorFornecedor.draw(data, options);
-
-                    google.visualization.events.addListener(chart_totalPorFornecedor, 'select', selectHandler);
-
-// The selection handler.
-// Loop through all items in the selection and concatenate
-// a single message from all of them.
-                    function selectHandler() {
-                        var selection = chart_totalPorFornecedor.getSelection();
-                        var message = '';
-                        for (var i = 0; i < selection.length; i++) {
-                            var item = selection[i];
-                            if (item.row != null && item.column != null) {
-                                var str = data.getFormattedValue(item.row, item.column);
-                                message += '.{row:' + item.row + ',column:' + item.column + '} = ' + str + '\n';
-                            } else if (item.row != null) {
-                                var str = data.getFormattedValue(item.row, 0);
-                                message += '..{row:' + item.row + ', column:none}; value (col 0) = ' + str + '\n';
-                            } else if (item.column != null) {
-                                var str = data.getFormattedValue(0, item.column);
-                                message += '...{row:none, column:' + item.column + '}; value (row 0) = ' + str + '\n';
-                            }
-                        }
-                        if (message == '') {
-                            message = 'nothing';
-                        }
-                        console.log('You selected ' + message);
-                    }
-
-                }
-            );
 
 
-            $.getJSON(
-                Routing.generate('relVendas01_totalPorVendedor') + '/?filterDts=' + $filter_vendas_dts.val(),
-                function (results) {
-
-                    const data = new google.visualization.DataTable();
-                    data.addColumn('string', 'Vendedor');
-                    data.addColumn('number', 'Total');
-
-                    $.each(results, function (index, value) {
-                        let v = parseFloat(value.total_venda);
-                        let f = Numeral(v).format('$ 0.0,[00]');
-                        data.addRow([value.nome_vendedor, {'v': v, 'f': f}]);
-                    });
-
-                    var options = {
-                        is3D: true,
-                        animation: {
-                            startup: true,
-                            duration: 1000,
-                            easing: 'out',
-                        },
-                    };
 
 
-                    chart_totalPorVendedor = new google.visualization.ColumnChart(document.getElementById('chart_totalPorVendedor'));
-                    chart_totalPorVendedor.draw(data, options);
 
-                }
-            );
-
-        });
-    }
 
 
 
@@ -266,8 +291,8 @@ $(document).ready(function () {
                             [
                                 value.dtVencto,
                                 {'v': aReceberV, 'f': aReceberF},
-                                {'v': aPagarV , 'f': aPagarF},
-                                ]);
+                                {'v': aPagarV, 'f': aPagarF},
+                            ]);
 
                     });
 
@@ -293,18 +318,127 @@ $(document).ready(function () {
                         if (dt) {
                             window.location = Routing.generate('relCtsPagRec01_list', {filter: {dts: dt + ' - ' + dt}});
                         }
-                        
-
                     }
-
-
                 }
             );
         });
-
-
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    let $filter_relCompFor01_dts = $('#filter_relCompFor01_dts').daterangepicker(
+        {
+            opens: 'left',
+            autoApply: true,
+            locale: {
+                "format": "DD/MM/YYYY",
+                "separator": " - ",
+                "applyLabel": "Aplicar",
+                "cancelLabel": "Cancelar",
+                "fromLabel": "De",
+                "toLabel": "Até",
+                "customRangeLabel": "Custom",
+                "daysOfWeek": [
+                    "Dom",
+                    "Seg",
+                    "Ter",
+                    "Qua",
+                    "Qui",
+                    "Sex",
+                    "Sáb"
+                ],
+                "monthNames": [
+                    "Janeiro",
+                    "Fevereiro",
+                    "Março",
+                    "Abril",
+                    "Maio",
+                    "Junho",
+                    "Julho",
+                    "Agosto",
+                    "Setembro",
+                    "Outubro",
+                    "Novembro",
+                    "Dezembro"
+                ],
+                "firstDay": 0
+            },
+            ranges: {
+                'Hoje': [Moment(), Moment()],
+                'Ontem': [Moment().subtract(1, 'days'), Moment().subtract(1, 'days')],
+                'Últimos 7 dias': [Moment().subtract(6, 'days'), Moment()],
+                'Últimos 30 dias': [Moment().subtract(29, 'days'), Moment()],
+                'Este mês': [Moment().startOf('month'), Moment().endOf('month')],
+                'Mês passado': [Moment().subtract(1, 'month').startOf('month'), Moment().subtract(1, 'month').endOf('month')]
+            },
+            "alwaysShowCalendars": true
+        },
+        function (start, end, label) {
+
+        }
+    ).on('apply.daterangepicker', function (ev, picker) {
+        drawChart_relCompFor01();
+    });
+
+
+    GoogleCharts.load(drawChart_relCompFor01);
+
+    function drawChart_relCompFor01() {
+
+        Pace.ignore(function () {
+
+            $.getJSON(
+                Routing.generate('relCompFor01_totalPorFornecedor') + '/?filterDts=' + $filter_relCompFor01_dts.val(),
+                function (results) {
+
+                    const data = new google.visualization.DataTable();
+                    data.addColumn('string', 'Fornecedor');
+                    data.addColumn('number', 'Total');
+
+                    $.each(results, function (index, value) {
+                        let v = parseFloat(value.total_compras);
+                        let f = Numeral(v).format('$ 0.0,[00]');
+                        data.addRow([value.nome_fornec, {'v': v, 'f': f}]);
+                    });
+
+                    var options = {
+                        is3D: true,
+                        sliceVisibilityThreshold: .014,
+                        animation: {
+                            startup: true,
+                            duration: 2000,
+                            easing: 'out',
+                        },
+                    };
+
+
+                    let chart_relCompFor01 = new google.visualization.PieChart(document.getElementById('chart_relCompFor01'));
+                    chart_relCompFor01.draw(data, options);
+
+                    google.visualization.events.addListener(chart_relCompFor01, 'select', selectHandler);
+
+                    function selectHandler() {
+
+                    }
+
+                }
+            );
+
+
+        });
+    }
 
 
 });

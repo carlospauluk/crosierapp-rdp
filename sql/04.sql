@@ -8,6 +8,7 @@ CREATE TABLE `rdp_rel_vendas01`
 
     `prevenda`           BIGINT(20)     NOT NULL,
     `num_item`           INT(11)        NOT NULL,
+    `qtde`               INT(11)        NOT NULL,
     `dt_emissao`         DATETIME       NOT NULL,
     `ano`                CHAR(4)        NOT NULL,
     `mes`                CHAR(2)        NOT NULL,
@@ -21,7 +22,9 @@ CREATE TABLE `rdp_rel_vendas01`
     `cod_vendedor`       BIGINT(20)     NOT NULL,
     `nome_vendedor`      VARCHAR(200)   NOT NULL,
 
-    UNIQUE KEY `uk_rdp_rel_vendas01` (`prevenda`,`num_item`,`dt_emissao`,`ano`,`mes`,`cod_fornec`,`nome_fornec`,`cod_prod`,`desc_prod`,`total_preco_venda`,`total_preco_custo`,`rentabilidade`,`cod_vendedor`,`nome_vendedor`),
+    UNIQUE KEY `uk_rdp_rel_vendas01` (`prevenda`, `num_item`, `qtde`, `dt_emissao`, `ano`, `mes`, `cod_fornec`,
+                                      `nome_fornec`, `cod_prod`, `desc_prod`, `total_preco_venda`, `total_preco_custo`,
+                                      `rentabilidade`, `cod_vendedor`, `nome_vendedor`),
 
     -- campos de controle do crosier
     PRIMARY KEY (`id`),
@@ -92,8 +95,8 @@ CREATE TABLE `rdp_rel_compfor01`
     `lancto`             BIGINT(20)     NOT NULL,
     `docto`              VARCHAR(50)    NOT NULL,
     `dt_movto`           DATE           NOT NULL,
-    `produto_cod`        VARCHAR(50)    NOT NULL,
-    `produto_desc`       VARCHAR(200)   NOT NULL,
+    `cod_prod`           VARCHAR(50)    NOT NULL,
+    `desc_prod`          VARCHAR(200)   NOT NULL,
     `qtde`               DECIMAL(15, 2) NOT NULL,
     `preco_custo`        DECIMAL(15, 2) NULL,
     `total`              DECIMAL(15, 2) NULL,
@@ -101,7 +104,7 @@ CREATE TABLE `rdp_rel_compfor01`
     `nome_fornec`        VARCHAR(200)   NOT NULL,
     `obs`                VARCHAR(2000)  NULL,
 
-    UNIQUE KEY `UK_rdp_rel_compfor01` (`lancto`, `docto`, `dt_movto`, `produto_cod`, `produto_desc`, `qtde`,
+    UNIQUE KEY `UK_rdp_rel_compfor01` (`lancto`, `docto`, `dt_movto`, `cod_prod`, `desc_prod`, `qtde`,
                                        `cod_fornec`, `nome_fornec`),
 
     -- campos de controle do crosier

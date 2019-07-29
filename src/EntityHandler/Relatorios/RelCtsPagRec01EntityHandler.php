@@ -1,14 +1,13 @@
 <?php
 
-namespace App\EntityHandler;
+namespace App\EntityHandler\Relatorios;
 
-use App\Entity\RelCtsPagRec01;
+use App\Entity\Relatorios\RelCtsPagRec01;
 use CrosierSource\CrosierLibBaseBundle\EntityHandler\EntityHandler;
 
 /**
  * EntityHandler para RelCtsPagRec01.
  *
- * @package App\EntityHandler\Utils
  * @author Carlos Eduardo Pauluk
  */
 class RelCtsPagRec01EntityHandler extends EntityHandler
