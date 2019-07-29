@@ -16,6 +16,23 @@ $(document).ready(function () {
 
     let $formPesquisar = $('#formPesquisar');
 
+    let $btnAnterior = $('#btnAnterior');
+    let $btnProximo = $('#btnProximo');
+
+    $btnAnterior.on('click', function () {
+        let dtIni = Moment($(this).data('ante-periodoi')).format('DD/MM/YYYY');
+        let dtFim = Moment($(this).data('ante-periodof')).format('DD/MM/YYYY');
+        $filterDts.val(dtIni + ' - ' + dtFim);
+        $formPesquisar.submit();
+    });
+
+    $btnProximo.on('click', function () {
+        let dtIni = Moment($(this).data('prox-periodoi')).format('DD/MM/YYYY');
+        let dtFim = Moment($(this).data('prox-periodof')).format('DD/MM/YYYY');
+        $filterDts.val(dtIni + ' - ' + dtFim);
+        $formPesquisar.submit();
+    });
+
     let $datatableItens = $('#datatableItens');
 
     let $filterDts = $('#filterDts').daterangepicker(

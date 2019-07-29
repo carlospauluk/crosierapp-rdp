@@ -21,7 +21,7 @@
                         <select id="filter_nomeFornec" name="filter[nomeFornec]"
                                 data-options="{{ fornecedores }}" data-val="{{ filter.nomeFornec }}"></select>
 
-                        <input type="text" class="form-control" id="filterDts"
+                        <input type="text" class="form-control ml-2" id="filterDts"
                                name="filter[dts]" data-mask="00/00/0000 - 00/00/0000"
                                style="width: 180px; text-align: center"
                                value="{{ filter.dts|default('') }}">
@@ -53,6 +53,7 @@
                         <thead>
                         <tr>
                             <th scope="col" title="">#</th>
+                            <th scope="col">Código</th>
                             <th scope="col">Produto</th>
                             <th scope="col">Qtde</th>
                             <th scope="col">Total Custo</th>
@@ -68,7 +69,9 @@
                                     <span class="badge badge-pill badge-light">{{ loop.index }}</span>
                                 </td>
                                 <td>
-                                    {{ item.cod_prod }} - {{ item.desc_prod }}
+                                    {{ item.cod_prod }}
+                                </td><td>
+                                    {{ item.desc_prod }}
                                 </td>
                                 <td class="text-right">
                                     {{ item.qtde_total }}
@@ -92,7 +95,7 @@
                         <tfoot>
 
                         <tr style="background-color: antiquewhite; font-weight: bold">
-                            <td  colspan="2" class="text-right">
+                            <td  colspan="3" class="text-right">
 
                             </td>
                             <td class="text-right">
