@@ -53,7 +53,7 @@ class RelVendas01Controller extends FormListController
      * @return Response
      * @throws \Exception
      */
-    public function list(Request $request): Response
+    public function itensVendidosPorFornecedor(Request $request): Response
     {
         $vParams = $request->query->all();
         /** @var RelVendas01Repository $repo */
@@ -83,7 +83,6 @@ class RelVendas01Controller extends FormListController
         $total = $total[0] ?? null;
 
 
-
         $dtAnterior = clone $dtIni;
         $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');
 
@@ -95,7 +94,7 @@ class RelVendas01Controller extends FormListController
         $vParams['proxPeriodoF'] = $prox['dtFim'];
 
         $vParams['fornecedores'] = json_encode($repo->getFornecedores());
-        
+
         $vParams['dados'] = $r;
         $vParams['total'] = $total;
 
@@ -143,6 +142,158 @@ class RelVendas01Controller extends FormListController
         $repoRelVendas01 = $this->getDoctrine()->getRepository(RelVendas01::class);
         $r = $repoRelVendas01->totalVendasPorVendedor($dtIni, $dtFim);
         return new JsonResponse($r);
+    }
+
+
+    /**
+     *
+     * @Route("/relVendas01/listPreVendasPorVendedor/", name="relVendas01_listPreVendasPorVendedor")
+     * @param Request $request
+     * @return Response
+     * @throws \Exception
+     */
+    public function listPreVendasPorVendedor(Request $request): Response
+    {
+        $vParams = $request->query->all();
+        /** @var RelVendas01Repository $repo */
+        $repo = $this->getDoctrine()->getRepository(RelVendas01::class);
+        if (!array_key_exists('filter', $vParams)) {
+
+            if ($vParams['r'] ?? null) {
+                $this->storedViewInfoBusiness->clear($this->crudParams['listRoute']);
+            }
+            $svi = $this->storedViewInfoBusiness->retrieve('relVendas01_listPreVendasPorVendedor');
+            if (isset($svi['filter'])) {
+                $vParams['filter'] = $svi['filter'];
+            } else {
+                $vParams['filter'] = [];
+                $vParams['filter']['dts'] = '01/' . date('m/Y') . ' - ' . date('t/m/Y');
+            }
+        }
+
+        $dtIni = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 0, 10)) ?: new \DateTime();
+        $dtFim = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 13, 10)) ?: new \DateTime();
+
+        $codVendedor = explode(' - ', $vParams['filter']['vendedor'])[0] ?? 0;
+
+
+        $r = $repo->preVendasPorPeriodoEVendedor($dtIni, $dtFim, $codVendedor);
+
+        $vParams['total'] = 0.0;
+        foreach ($r as $pv) {
+            $vParams['total'] += $pv['total_pv'];
+        }
+
+        $dtAnterior = clone $dtIni;
+        $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');
+
+        $prox = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, true);
+        $ante = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, false);
+        $vParams['antePeriodoI'] = $ante['dtIni'];
+        $vParams['antePeriodoF'] = $ante['dtFim'];
+        $vParams['proxPeriodoI'] = $prox['dtIni'];
+        $vParams['proxPeriodoF'] = $prox['dtFim'];
+
+        $vParams['vendedores'] = json_encode($repo->getVendedores());
+
+        $vParams['dados'] = $r;
+
+        $viewInfo = [];
+        $viewInfo['filter'] = $vParams['filter'];
+        $this->storedViewInfoBusiness->store('relVendas01_listPreVendasPorVendedor', $viewInfo);
+
+        return $this->doRender('Relatorios/relVendas01_preVendasPorVendedor.html.twig', $vParams);
+    }
+
+
+    /**
+     *
+     * @Route("/relVendas01/listPreVendasPorProduto/", name="relVendas01_listPreVendasPorProduto")
+     * @param Request $request
+     * @return Response
+     * @throws \Exception
+     */
+    public function listPreVendasPorProduto(Request $request): Response
+    {
+        $vParams = $request->query->all();
+        /** @var RelVendas01Repository $repo */
+        $repo = $this->getDoctrine()->getRepository(RelVendas01::class);
+        if (!array_key_exists('filter', $vParams)) {
+
+            if ($vParams['r'] ?? null) {
+                $this->storedViewInfoBusiness->clear($this->crudParams['listRoute']);
+            }
+            $svi = $this->storedViewInfoBusiness->retrieve('relVendas01_listPreVendasPorVendedor');
+            if (isset($svi['filter'])) {
+                $vParams['filter'] = $svi['filter'];
+            } else {
+                $vParams['filter'] = [];
+                $vParams['filter']['dts'] = '01/' . date('m/Y') . ' - ' . date('t/m/Y');
+            }
+        }
+
+        $dtIni = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 0, 10)) ?: new \DateTime();
+        $dtFim = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 13, 10)) ?: new \DateTime();
+
+        $codProduto = $vParams['filter']['codProduto'];
+
+        $r = $repo->preVendasPorPeriodoEProduto($dtIni, $dtFim, $codProduto);
+
+        $vParams['total'] = 0.0;
+        foreach ($r as $pv) {
+            $vParams['total'] += $pv['total_pv'];
+        }
+
+        $dtAnterior = clone $dtIni;
+        $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');
+
+        $prox = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, true);
+        $ante = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, false);
+        $vParams['antePeriodoI'] = $ante['dtIni'];
+        $vParams['antePeriodoF'] = $ante['dtFim'];
+        $vParams['proxPeriodoI'] = $prox['dtIni'];
+        $vParams['proxPeriodoF'] = $prox['dtFim'];
+
+        $vParams['dados'] = $r;
+
+        $viewInfo = [];
+        $viewInfo['filter'] = $vParams['filter'];
+        $this->storedViewInfoBusiness->store('relVendas01_listPreVendasPorVendedor', $viewInfo);
+
+        return $this->doRender('Relatorios/relVendas01_preVendasPorVendedor.html.twig', $vParams);
+    }
+
+
+    /**
+     *
+     * @Route("/relVendas01/preVendaItens/{pv}/", name="relVendas01_preVendaItens")
+     * @param int $pv
+     * @return Response
+     * @throws \Exception
+     */
+    public function preVendaItens(int $pv): Response
+    {
+        /** @var RelVendas01Repository $repo */
+        $repo = $this->getDoctrine()->getRepository(RelVendas01::class);
+
+        $r = $repo->itensDoPreVenda($pv);
+
+
+        $vParams['dados'] = $r;
+        $vParams['pv'] = $pv;
+
+        $vParams['total']['qtde'] = 0.0;
+        $vParams['total']['tpc'] = 0.0;
+        $vParams['total']['tpv'] = 0.0;
+        $vParams['total']['rent'] = 0.0;
+        foreach ($r as $prevenda) {
+            $vParams['total']['qtde'] += $prevenda['qtde'];
+            $vParams['total']['tpc'] += $prevenda['total_preco_custo'];
+            $vParams['total']['tpv'] += $prevenda['total_preco_venda'];
+            $vParams['total']['rent'] += $prevenda['rent'];
+        }
+
+        return $this->doRender('Relatorios/relVendas01_itensDoPreVenda.html.twig', $vParams);
     }
 
 

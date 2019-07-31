@@ -160,10 +160,10 @@ $(document).ready(function () {
                     google.visualization.events.addListener(chart_totalPorVendedor, 'select', selectHandler);
 
                     function selectHandler() {
-                        let selection = chart.getSelection();
-                        let dt = data.getFormattedValue(selection[0].row, 0);
-                        if (dt) {
-                            window.location = Routing.generate('relCtsPagRec01_list', {filter: {dts: dt + ' - ' + dt}});
+                        let selection = chart_totalPorVendedor.getSelection();
+                        let vendedor = data.getFormattedValue(selection[0].row, 0);
+                        if (vendedor) {
+                            window.location = Routing.generate('relVendas01_listPreVendasPorVendedor', {filter: {dts: $filter_vendas_dts.val(), 'vendedor': vendedor}});
                         }
                     }
 

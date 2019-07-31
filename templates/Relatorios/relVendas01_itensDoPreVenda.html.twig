@@ -1,0 +1,109 @@
+{% extends '@CrosierLibBase/index.html.twig' %}
+
+
+
+
+{% block page_content %}
+
+    <form action="{{ url('relVendas01_listPreVendasPorVendedor') }}" method="get" id="formPesquisar">
+
+        <div class="card">
+            <div class="card-header">
+
+
+                <div class="d-flex flex-wrap align-items-center">
+
+                    <div class="d-sm-flex text-nowrap mr-1">
+                        <h3>Itens do PV {{ pv }}</h3>
+                    </div>
+                    <div class="d-sm-flex flex-nowrap ml-auto">
+
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="table-responsive-sm">
+
+
+                    <table class="table table-sm table-striped table-hover crsr-datatable" id="datatableItens">
+
+                        <thead>
+                        <tr>
+                            <th scope="col" title="">#</th>
+                            <th scope="col">Código</th>
+                            <th scope="col">Produto</th>
+                            <th scope="col">Qtde</th>
+                            <th scope="col">Preço Custo</th>
+                            <th scope="col">Preço Venda</th>
+                            <th scope="col">Rentabilidade</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for item in dados %}
+                            <tr>
+                                <td>
+                                    <span class="badge badge-pill badge-light">{{ loop.index }}</span>
+                                </td>
+                                <td>
+                                    {{ item.cod_prod }}
+                                </td><td>
+                                    {{ item.desc_prod }}
+                                </td>
+                                <td class="text-right">
+                                    {{ item.qtde }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.total_preco_custo }}">
+                                    {{ item.total_preco_custo|number_format(2,',','.') }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.total_preco_venda }}">
+                                    {{ item.total_preco_venda|number_format(2,',','.') }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.rent }}">
+                                    {{ item.rent|number_format(2,',','.') }}%
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+
+
+                        </tbody>
+
+                        <tfoot>
+
+                        <tr style="background-color: antiquewhite; font-weight: bold">
+                            <td  colspan="3" class="text-right">
+
+                            </td>
+                            <td class="text-right" style="padding: 10px">
+                                {{ total.qtde }}
+                            </td>
+                            <td class="text-right" style="padding: 10px">
+                                {{ total.tpc|number_format(2,',','.') }}
+                            </td>
+                            <td class="text-right" style="padding: 10px">
+                                {{ total.tpv|number_format(2,',','.') }}
+                            </td>
+                            <td class="text-right" style="padding: 10px">
+                                {{ total.rent|number_format(2,',','.') }}%
+                            </td>
+                        </tr>
+
+                        </tfoot>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </form>
+{% endblock %}
+
+
+{% block down_scripts %}
+    <script src="{{ asset('build/Relatorios/relVendas01_preVendasPorVendedor.js') }}"></script>
+{% endblock %}
