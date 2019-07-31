@@ -86,14 +86,14 @@ class RelCtsPagRec01Business
                     continue;
                 }
                 $campos = explode('|', $linha);
-                if (count($campos) !== 15) {
-                    throw new ViewException('Qtde de campos difere de 15 para a linha "' . $linha . '"');
+                if (count($campos) !== 16) {
+                    throw new ViewException('Qtde de campos difere de 16 para a linha "' . $linha . '"');
                 }
 
                 $campos[2] = DateTimeUtils::parseDateStr($campos[2])->format('Y-m-d');
                 $campos[3] = DateTimeUtils::parseDateStr($campos[3])->format('Y-m-d');
                 $campos[4] = trim($campos[4]) ? DateTimeUtils::parseDateStr($campos[4])->format('Y-m-d') : '';
-                $campos[14] = trim($campos[14]) ? DateTimeUtils::parseDateStr($campos[14])->format('Y-m-d') : '';
+                $campos[15] = trim($campos[15]) ? DateTimeUtils::parseDateStr($campos[15])->format('Y-m-d') : '';
 
 
                 $cMax = count($campos);
@@ -113,6 +113,7 @@ class RelCtsPagRec01Business
                             nome_cli_for,
                             localizador,
                             filial,
+                            desc_filial,
                             valor_titulo,
                             valor_baixa,
                             situacao,
@@ -121,7 +122,7 @@ class RelCtsPagRec01Business
                             dt_emissao_nf,
                             estabelecimento_id,inserted,updated,user_inserted_id,user_updated_id
                         )
-                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
+                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
                     $campos[0], // `lancto`
                     $campos[1], //  `docto`
                     $campos[2], //  `dt_movto`
@@ -131,12 +132,13 @@ class RelCtsPagRec01Business
                     $campos[6], //  `nome_cli_for`
                     $campos[7], //  `localizador`
                     $campos[8], //  `filial`
-                    $campos[9], //  `valor_titulo`
-                    $campos[10], // `valor_baixa`
-                    $campos[11], // `situacao`
-                    $campos[12], // `tipo_pag_rec`
-                    $campos[13], // `numero_nf`
-                    $campos[14] // `dt_emissao_nf`
+                    $campos[9], // `desc_filial`
+                    $campos[10],//  `valor_titulo`
+                    $campos[11], // `valor_baixa`
+                    $campos[12], // `situacao`
+                    $campos[13], // `tipo_pag_rec`
+                    $campos[14], // `numero_nf`
+                    $campos[15] // `dt_emissao_nf`
                 );
 
                 try {

@@ -99,6 +99,9 @@ class RelCtsPagRec01Controller extends FormListController
      */
     private function buildListData(Request $request): array
     {
+        /** @var RelCtsPagRec01Repository $repo */
+        $repo = $this->getDoctrine()->getRepository(RelCtsPagRec01::class);
+
         $parameters = $request->query->all();
         if (!array_key_exists('filter', $parameters)) {
 
@@ -111,6 +114,7 @@ class RelCtsPagRec01Controller extends FormListController
             } else {
                 $parameters['filter'] = [];
                 $parameters['filter']['dts'] = date('d/m/Y') . ' - ' . date('d/m/Y');
+                $parameters['filter']['filial'] = $repo->getFiliais()[0]['id'];
             }
 
         }
@@ -123,8 +127,7 @@ class RelCtsPagRec01Controller extends FormListController
 
         $filterDatas = $this->getFilterDatas($parameters);
 
-        /** @var RelCtsPagRec01Repository $repo */
-        $repo = $this->getDoctrine()->getRepository(RelCtsPagRec01::class);
+
         $orders = [
             'e.dtVencto' => 'asc',
             'e.tipoPagRec' => 'asc',
@@ -183,6 +186,9 @@ class RelCtsPagRec01Controller extends FormListController
         $parameters['proxPeriodoI'] = $prox['dtIni'];
         $parameters['proxPeriodoF'] = $prox['dtFim'];
 
+        $filiais = $repo->getFiliais();
+        $parameters['filiais'] = json_encode($filiais);
+
         $parameters['page_title'] = 'Contas a Pagar/Receber';
         $parameters['PROGRAM_UUID'] = $this->crudParams['list_PROGRAM_UUID'];
 
@@ -197,7 +203,8 @@ class RelCtsPagRec01Controller extends FormListController
     {
         return [
             new FilterData(['dtVencto'], 'BETWEEN', 'dtVencto', $params),
-            new FilterData(['tipoPagRec'], 'EQ', 'tipoPagRec', $params)
+            new FilterData(['tipoPagRec'], 'EQ', 'tipoPagRec', $params),
+            new FilterData(['filial'], 'EQ', 'filial', $params)
         ];
     }
 
@@ -232,19 +239,23 @@ class RelCtsPagRec01Controller extends FormListController
      * @Route("/relCtsPagRec01/rel01/", name="relCtsPagRec01_rel01")
      * @param Request $request
      * @return JsonResponse
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function rel01(Request $request): JsonResponse
     {
-        $dts = $request->get('filterDts') ?? '';
+        $dts = $request->get('filterDts') ?? null;
+        $filial = $request->get('filial') ?? null;
 
         $this->session->set('dashboard.filter.contasPagRec.dts', $dts);
+        $this->session->set('dashboard.filter.contasPagRec.filial', $filial);
 
         $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
         $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
 
         /** @var RelCtsPagRec01Repository $repoRelCtsPagRec01 */
         $repoRelCtsPagRec01 = $this->getDoctrine()->getRepository(RelCtsPagRec01::class);
-        $r = $repoRelCtsPagRec01->relCtsPagRec01($dtIni, $dtFim);
+        $r = $repoRelCtsPagRec01->relCtsPagRec01($dtIni, $dtFim, $filial);
         return new JsonResponse($r);
     }
 

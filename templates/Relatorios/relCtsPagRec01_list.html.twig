@@ -18,7 +18,10 @@
                     </div>
                     <div class="d-sm-flex flex-nowrap ml-auto">
 
+                        <select id="filter_filial" style="width: 450px" name="filter[filial]"
+                                data-options="{{ filiais }}" data-val="{{ filter.filial }}"></select>
 
+                        <label for="filterDts" class="my-auto ml-3">Período: </label>
                         <input type="text" class="form-control" id="filterDts"
                                name="filter[dts]" data-mask="00/00/0000 - 00/00/0000"
                                style="width: 180px; text-align: center"

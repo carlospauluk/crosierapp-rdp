@@ -18,6 +18,7 @@ Moment.locale('pt-BR');
 
 
 import 'daterangepicker';
+import $ from "jquery";
 
 $(document).ready(function () {
 
@@ -185,16 +186,25 @@ $(document).ready(function () {
 
 
 
+    // Gráfico de Contas a Pagar/Receber
+
+    // filtro por filial
+    let $filter_contasPagRec_filial = $('#filter_contasPagRec_filial');
+
+    $filter_contasPagRec_filial.select2({
+        placeholder: '...',
+        allowClear: true,
+        data: $filter_contasPagRec_filial.data('options')
+    });
+    if ($filter_contasPagRec_filial.data('val')) {
+        $filter_contasPagRec_filial.val($filter_contasPagRec_filial.data('val')).trigger('change');
+    }
+    $filter_contasPagRec_filial.on('select2:select', function () {
+        drawChart_contasPagRec();
+    });
 
 
-
-
-
-
-
-
-
-
+    // filtro por período
     let $filter_contasPagRec_dts = $('#filter_contasPagRec_dts').daterangepicker(
         {
             opens: 'left',
@@ -272,7 +282,7 @@ $(document).ready(function () {
 
 
             $.getJSON(
-                Routing.generate('relCtsPagRec01_rel01') + '/?filterDts=' + $filter_contasPagRec_dts.val(),
+                Routing.generate('relCtsPagRec01_rel01') + '/?filterDts=' + $filter_contasPagRec_dts.val() + '&filial=' + $filter_contasPagRec_filial.val(),
                 function (results) {
 
                     const data = new google.visualization.DataTable();
@@ -316,7 +326,7 @@ $(document).ready(function () {
                         let selection = chart.getSelection();
                         let dt = data.getFormattedValue(selection[0].row, 0);
                         if (dt) {
-                            window.location = Routing.generate('relCtsPagRec01_list', {filter: {dts: dt + ' - ' + dt}});
+                            window.location = Routing.generate('relCtsPagRec01_list', {filter: {'dts': dt + ' - ' + dt, 'filial': $filter_contasPagRec_filial.val()}});
                         }
                     }
                 }

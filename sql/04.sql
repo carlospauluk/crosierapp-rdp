@@ -58,6 +58,7 @@ CREATE TABLE `rdp_rel_ctspagrec01`
     `nome_cli_for`       VARCHAR(200)   NOT NULL,
     `localizador`        BIGINT(20)     NULL,
     `filial`             BIGINT(20)     NOT NULL,
+    `desc_filial`        VARCHAR(200)   NOT NULL,
     `valor_titulo`       DECIMAL(15, 2) NOT NULL,
     `valor_baixa`        DECIMAL(15, 2) NULL,
     `situacao`           VARCHAR(1)     NOT NULL,
@@ -66,7 +67,7 @@ CREATE TABLE `rdp_rel_ctspagrec01`
     `dt_emissao_nf`      DATE           NULL,
 
     UNIQUE KEY `UK_rdp_rel_ctspagrec01` (`lancto`, `docto`, `dt_movto`, `dt_vencto`, `cod_cliente`, `nome_cli_for`,
-                                         `filial`, `valor_titulo`, `situacao`, `tipo_pag_rec`),
+                                         `filial`, `desc_filial`, `valor_titulo`, `situacao`, `tipo_pag_rec`),
 
     -- campos de controle do crosier
     PRIMARY KEY (`id`),

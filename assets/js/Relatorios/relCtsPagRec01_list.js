@@ -127,4 +127,21 @@ $(document).ready(function () {
         $(form).appendTo('body').submit();
     });
 
+
+
+    // filtro por filial
+    let $filter_filial = $('#filter_filial');
+
+    $filter_filial.select2({
+        placeholder: '...',
+        allowClear: true,
+        data: $filter_filial.data('options')
+    });
+    if ($filter_filial.data('val')) {
+        $filter_filial.val($filter_filial.data('val')).trigger('change');
+    }
+    $filter_filial.on('select2:select', function () {
+        $formPesquisar.submit();
+    });
+
 });
