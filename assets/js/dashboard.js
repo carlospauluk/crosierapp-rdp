@@ -251,15 +251,13 @@ $(document).ready(function () {
     let $filter_contasPagRec_filial = $('#filter_contasPagRec_filial');
 
     $filter_contasPagRec_filial.select2({
-        placeholder: '<< TODAS >>',
-        allowClear: true,
         data: $filter_contasPagRec_filial.data('options')
     });
     if ($filter_contasPagRec_filial.data('val')) {
         $filter_contasPagRec_filial.val($filter_contasPagRec_filial.data('val')).trigger('change');
     }
     $filter_contasPagRec_filial.on('select2:select', function () {
-        handleLocalizadorPorFilial();
+        // handleLocalizadorPorFilial();
         drawChart_contasPagRec();
     });
 
@@ -268,8 +266,6 @@ $(document).ready(function () {
     let $filter_contasPagRec_localizador = $('#filter_contasPagRec_localizador');
 
     $filter_contasPagRec_localizador.select2({
-        placeholder: '<< TODOS >>',
-        allowClear: true,
         data: $filter_contasPagRec_localizador.data('options')
     });
     if ($filter_contasPagRec_localizador.data('val')) {
@@ -286,36 +282,36 @@ $(document).ready(function () {
      * Se a filial selecionada for de TELÊMACO BORBA, só pode selecionar o localizador 91.
      * Se a filial selecionada for a ACESSÓRIOS, só pode selecionar o localizador 92
      */
-    function handleLocalizadorPorFilial() {
-        $filter_contasPagRec_localizador.find('option').each(function (i, e) {
-            $(e).removeAttr('disabled');
-        });
-        
-        if ($filter_contasPagRec_filial.val()) {
-            if ($filter_contasPagRec_filial.val().startsWith('96')) {
+    // function handleLocalizadorPorFilial() {
+    //     $filter_contasPagRec_localizador.find('option').each(function (i, e) {
+    //         $(e).removeAttr('disabled');
+    //     });
+    //
+    //     if ($filter_contasPagRec_filial.val()) {
+    //         if ($filter_contasPagRec_filial.val().startsWith('96')) {
+    //
+    //             $filter_contasPagRec_localizador.find('option').each(function (i, e) {
+    //                 $(e).attr('disabled', 'true')
+    //             });
+    //             $filter_contasPagRec_localizador.find('option[value^="91"]').removeAttr('disabled');
+    //             $filter_contasPagRec_localizador.find('option[value^="91"]').attr('selected', 'true');
+    //             $filter_contasPagRec_localizador.trigger('change');
+    //         } else if ($filter_contasPagRec_filial.val().startsWith('94')) {
+    //
+    //             $filter_contasPagRec_localizador.find('option').each(function (i, e) {
+    //                 $(e).attr('disabled', 'true')
+    //             });
+    //             $filter_contasPagRec_localizador.find('option[value^="92"]').removeAttr('disabled');
+    //             $filter_contasPagRec_localizador.find('option[value^="92"]').attr('selected', 'true');
+    //             $filter_contasPagRec_localizador.trigger('change');
+    //         }
+    //     }
+    //
+    //     $filter_contasPagRec_localizador.select2();
+    // }
 
-                $filter_contasPagRec_localizador.find('option').each(function (i, e) {
-                    $(e).attr('disabled', 'true')
-                });
-                $filter_contasPagRec_localizador.find('option[value^="91"]').removeAttr('disabled');
-                $filter_contasPagRec_localizador.find('option[value^="91"]').attr('selected', 'true');
-                $filter_contasPagRec_localizador.trigger('change');
-            } else if ($filter_contasPagRec_filial.val().startsWith('94')) {
 
-                $filter_contasPagRec_localizador.find('option').each(function (i, e) {
-                    $(e).attr('disabled', 'true')
-                });
-                $filter_contasPagRec_localizador.find('option[value^="92"]').removeAttr('disabled');
-                $filter_contasPagRec_localizador.find('option[value^="92"]').attr('selected', 'true');
-                $filter_contasPagRec_localizador.trigger('change');
-            }
-        }
-
-        $filter_contasPagRec_localizador.select2();
-    }
-
-
-    handleLocalizadorPorFilial();
+    // handleLocalizadorPorFilial();
 
 
     // filtro por período

@@ -35,13 +35,19 @@ class DefaultController extends BaseController
 
         $filiais = $this->getDoctrine()->getRepository(RelCtsPagRec01::class)->getFiliais();
         array_unshift($filiais, ['id' => '', 'text' => 'TODAS']);
+        $params['filiais'] = json_encode($filiais);
+
         $localizadores = $this->getDoctrine()->getRepository(RelCtsPagRec01::class)->getLocalizadores();
-        // array_unshift($localizadores, ['id' => '', 'text' => 'TODOS']);
+        array_unshift($localizadores, ['id' => '', 'text' => 'TODOS']);
+        $params['localizadores'] = json_encode($localizadores);
 
         $lojas = $this->getDoctrine()->getRepository(RelVendas01::class)->getLojas();
         array_unshift($lojas, ['id' => '', 'text' => 'TODAS']);
+        $params['lojas'] = json_encode($lojas);
+
         $grupos = $this->getDoctrine()->getRepository(RelVendas01::class)->getGrupos();
         array_unshift($grupos, ['id' => '', 'text' => 'TODOS']);
+        $params['grupos'] = json_encode($grupos);
 
         $params['filter']['vendas']['dts'] = $session->get('dashboard.filter.vendas.dts') ?? ($primeiroDia . ' - ' . $ultimoDia);
         $params['filter']['vendas']['loja'] = $session->get('dashboard.filter.vendas.loja') ?? '';
@@ -53,12 +59,6 @@ class DefaultController extends BaseController
 
         $params['filter']['relCompFor01']['dts'] = $session->get('dashboard.filter.relCompFor01.dts') ?? ($primeiroDia_mesPassado . ' - ' . $ultimoDia_mesPassado);
 
-        $params['filiais'] = json_encode($filiais);
-
-        $params['lojas'] = json_encode($lojas);
-        $params['grupos'] = json_encode($grupos);
-
-        $params['localizadores'] = json_encode($localizadores);
 
         return $this->doRender('dashboard.html.twig', $params);
     }
