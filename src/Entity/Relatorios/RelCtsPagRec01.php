@@ -94,6 +94,15 @@ class RelCtsPagRec01 implements EntityId
 
     /**
      *
+     * @ORM\Column(name="localizador_desc", type="string", length=200, nullable=false)
+     * @Groups("entity")
+     *
+     * @var string|null
+     */
+    private $localizadorDesc;
+
+    /**
+     *
      * @ORM\Column(name="filial", type="integer", nullable=false)
      * @Groups("entity")
      *
@@ -310,6 +319,24 @@ class RelCtsPagRec01 implements EntityId
     public function setLocalizador(?int $localizador): RelCtsPagRec01
     {
         $this->localizador = $localizador;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLocalizadorDesc(): ?string
+    {
+        return $this->localizadorDesc;
+    }
+
+    /**
+     * @param string|null $localizadorDesc
+     * @return RelCtsPagRec01
+     */
+    public function setLocalizadorDesc(?string $localizadorDesc): RelCtsPagRec01
+    {
+        $this->localizadorDesc = $localizadorDesc;
         return $this;
     }
 

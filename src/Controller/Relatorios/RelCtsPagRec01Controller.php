@@ -246,6 +246,7 @@ class RelCtsPagRec01Controller extends FormListController
     {
         $dts = $request->get('filterDts') ?? null;
         $filial = $request->get('filial') ?? null;
+        $localizador = $request->get('localizador') ?? null;
 
         $this->session->set('dashboard.filter.contasPagRec.dts', $dts);
         $this->session->set('dashboard.filter.contasPagRec.filial', $filial);
@@ -255,7 +256,7 @@ class RelCtsPagRec01Controller extends FormListController
 
         /** @var RelCtsPagRec01Repository $repoRelCtsPagRec01 */
         $repoRelCtsPagRec01 = $this->getDoctrine()->getRepository(RelCtsPagRec01::class);
-        $r = $repoRelCtsPagRec01->relCtsPagRec01($dtIni, $dtFim, $filial);
+        $r = $repoRelCtsPagRec01->relCtsPagRec01($dtIni, $dtFim, $filial, $localizador);
         return new JsonResponse($r);
     }
 

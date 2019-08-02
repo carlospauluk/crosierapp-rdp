@@ -247,6 +247,22 @@ $(document).ready(function () {
     });
 
 
+
+    let $filter_contasPagRec_localizador = $('#filter_contasPagRec_localizador');
+
+    $filter_contasPagRec_localizador.select2({
+        placeholder: '...',
+        allowClear: true,
+        data: $filter_contasPagRec_localizador.data('options')
+    });
+    if ($filter_contasPagRec_localizador.data('val')) {
+        $filter_contasPagRec_localizador.val($filter_contasPagRec_localizador.data('val')).trigger('change');
+    }
+    $filter_contasPagRec_localizador.on('select2:select', function () {
+        drawChart_contasPagRec();
+    });
+
+
     // filtro por período
     let $filter_contasPagRec_dts = $('#filter_contasPagRec_dts').daterangepicker(
         {
@@ -303,20 +319,6 @@ $(document).ready(function () {
     });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     GoogleCharts.load(drawChart_contasPagRec);
 
     function drawChart_contasPagRec() {
@@ -325,7 +327,7 @@ $(document).ready(function () {
 
 
             $.getJSON(
-                Routing.generate('relCtsPagRec01_rel01') + '/?filterDts=' + $filter_contasPagRec_dts.val() + '&filial=' + $filter_contasPagRec_filial.val(),
+                Routing.generate('relCtsPagRec01_rel01') + '/?filterDts=' + $filter_contasPagRec_dts.val() + '&filial=' + $filter_contasPagRec_filial.val() + '&localizador=' + $filter_contasPagRec_localizador.val(),
                 function (results) {
 
                     const data = new google.visualization.DataTable();
@@ -369,7 +371,13 @@ $(document).ready(function () {
                         let selection = chart.getSelection();
                         let dt = data.getFormattedValue(selection[0].row, 0);
                         if (dt) {
-                            window.location = Routing.generate('relCtsPagRec01_list', {filter: {'dts': dt + ' - ' + dt, 'filial': $filter_contasPagRec_filial.val()}});
+                            window.location = Routing.generate('relCtsPagRec01_list', {
+                                filter: {
+                                    'dts': dt + ' - ' + dt,
+                                    'filial': $filter_contasPagRec_filial.val(),
+                                    'localizador': $filter_contasPagRec_localizador.val()
+                                }
+                            });
                         }
                     }
                 }

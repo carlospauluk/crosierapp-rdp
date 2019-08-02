@@ -83,6 +83,7 @@ CREATE TABLE `rdp_rel_ctspagrec01`
     `cod_cliente`        BIGINT(20)     NOT NULL,
     `nome_cli_for`       VARCHAR(200)   NOT NULL,
     `localizador`        BIGINT(20)     NULL,
+    `localizador_desc`   BIGINT(200)    NULL,
     `filial`             BIGINT(20)     NOT NULL,
     `desc_filial`        VARCHAR(200)   NOT NULL,
     `valor_titulo`       DECIMAL(15, 2) NOT NULL,
@@ -94,6 +95,11 @@ CREATE TABLE `rdp_rel_ctspagrec01`
 
     UNIQUE KEY `UK_rdp_rel_ctspagrec01` (`lancto`, `docto`, `dt_movto`, `dt_vencto`, `cod_cliente`, `nome_cli_for`,
                                          `filial`, `desc_filial`, `valor_titulo`, `situacao`, `tipo_pag_rec`),
+
+    KEY K_rdp_rel_ctspagrec01_dt_vencto (`dt_vencto`),
+    KEY K_rdp_rel_ctspagrec01_localizador (`localizador`),
+    KEY K_rdp_rel_ctspagrec01_filial (`filial`),
+    KEY K_rdp_rel_ctspagrec01_tipo_pag_rec (`tipo_pag_rec`),
 
     -- campos de controle do crosier
     PRIMARY KEY (`id`),
@@ -112,6 +118,8 @@ CREATE TABLE `rdp_rel_ctspagrec01`
   DEFAULT charset = latin1;
 
 # ALTER TABLE rdp_rel_ctspagrec01 ADD UNIQUE KEY `UK_rdp_rel_ctspagrec01` (`lancto`,`docto`,`dt_movto`,`dt_vencto`,`cod_cliente`,`nome_cli_for`,`filial`,`valor_titulo`,`situacao`,`tipo_pag_rec`);
+
+
 
 
 DROP TABLE IF EXISTS `rdp_rel_compfor01`;
@@ -133,6 +141,9 @@ CREATE TABLE `rdp_rel_compfor01`
 
     UNIQUE KEY `UK_rdp_rel_compfor01` (`lancto`, `docto`, `dt_movto`, `cod_prod`, `desc_prod`, `qtde`,
                                        `cod_fornec`, `nome_fornec`),
+
+    KEY K_rdp_rel_compfor01_dt_movto (`dt_movto`),
+    KEY K_rdp_rel_compfor01_cod_fornec (`cod_fornec`),
 
     -- campos de controle do crosier
     PRIMARY KEY (`id`),

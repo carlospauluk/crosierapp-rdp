@@ -46,12 +46,18 @@ class DefaultController extends BaseController
 
         $params['filter']['contasPagRec']['dts'] = $session->get('dashboard.filter.contasPagRec.dts') ?? ($hoje . ' - ' . $mais60dias);
         $params['filter']['contasPagRec']['filial'] = $session->get('dashboard.filter.contasPagRec.filial') ?? $filiais[0]['id'];
+        $params['filter']['contasPagRec']['localizador'] = $session->get('dashboard.filter.contasPagRec.localizador') ?? $filiais[0]['id'];
+
         $params['filter']['relCompFor01']['dts'] = $session->get('dashboard.filter.relCompFor01.dts') ?? ($primeiroDia_mesPassado . ' - ' . $ultimoDia_mesPassado);
 
         $params['filiais'] = json_encode($filiais);
 
         $params['lojas'] = json_encode($lojas);
         $params['grupos'] = json_encode($grupos);
+
+
+        $localizadores = $this->getDoctrine()->getRepository(RelCtsPagRec01::class)->getLocalizadores();
+        $params['localizadores'] = json_encode($localizadores);
 
         return $this->doRender('dashboard.html.twig', $params);
     }
