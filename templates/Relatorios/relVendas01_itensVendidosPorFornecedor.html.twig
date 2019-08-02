@@ -97,7 +97,7 @@
                                     {{ item.rent|number_format(2,',','.') }}%
                                 </td>
                                 <td class="text-right">
-                                    <a class="btn btn-outline-primary" href="{{ url('relVendas01_listPreVendasPorProduto', {'filter' : {'dts': filter.dts, 'codProduto': item.cod_prod}} ) }}"
+                                    <a class="btn btn-outline-primary" href="{{ url('relVendas01_listPreVendasPorProduto', {'filter' : {'dts': filter.dts, 'produto': (item.cod_prod ~ ' - ' ~ item.desc_prod), 'loja': filter.loja, 'grupo': filter.grupo}} ) }}"
                                        role="button" title="Listar PVs que contém este produto">
                                         <i class="far fa-list-alt"></i> PVs
                                     </a>

@@ -280,6 +280,24 @@ class RelVendas01Repository extends FilterRepository
 
     /**
      * @return null|string
+     */
+    public function getProdutoByCodigo(string $codigo): ?string
+    {
+        $sql = 'SELECT desc_prod FROM rdp_rel_vendas01 WHERE cod_prod = :codigo GROUP BY cod_prod, desc_prod';
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('desc_prod', 'desc_prod');
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('codigo', $codigo);
+        try {
+            return $query->getOneOrNullResult()['desc_prod'] ?? null;
+        } catch (NonUniqueResultException $e) {
+            return null;
+        }
+    }
+
+
+    /**
+     * @return null|string
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getCodigoFornecedorByNome(string $nomeFornecedor): ?string
@@ -334,16 +352,25 @@ class RelVendas01Repository extends FilterRepository
      * @param string $codProduto
      * @return mixed
      */
-    public function preVendasPorPeriodoEProduto(\DateTime $dtIni, \DateTime $dtFim, string $codProduto)
+    public function preVendasPorPeriodoEProduto(\DateTime $dtIni, \DateTime $dtFim, string $produto, string $loja = null, string $grupo = null)
     {
         $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
         $dtIni->setTime(0, 0, 0, 0);
         $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
         $dtFim->setTime(23, 59, 59, 99999);
 
-        $sql = 'SELECT prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv
+        $sql = 'SELECT prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv, cliente_pv
                     FROM rdp_rel_vendas01
-                     WHERE cod_prod = :codProduto AND dt_emissao BETWEEN :dtIni AND :dtFim GROUP BY prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv ORDER BY dt_emissao, total_venda_pv';
+                     WHERE CONCAT(cod_prod, \' - \', desc_prod) = :produto AND dt_emissao BETWEEN :dtIni AND :dtFim ';
+
+        if ($grupo) {
+            $sql .= 'AND grupo = :grupo ';
+        }
+        if ($loja) {
+            $sql .= 'AND loja = :loja ';
+        }
+
+        $sql .= 'GROUP BY prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv, cliente_pv ORDER BY dt_emissao, total_venda_pv';
 
         $rsm = new ResultSetMapping();
         $rsm->addScalarResult('prevenda', 'prevenda');
@@ -351,11 +378,18 @@ class RelVendas01Repository extends FilterRepository
         $rsm->addScalarResult('cod_vendedor', 'cod_vendedor');
         $rsm->addScalarResult('nome_vendedor', 'nome_vendedor');
         $rsm->addScalarResult('total_venda_pv', 'total_venda_pv');
+        $rsm->addScalarResult('cliente_pv', 'cliente_pv');
 
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
         $query->setParameter('dtIni', $dtIni);
         $query->setParameter('dtFim', $dtFim);
-        $query->setParameter('codProduto', $codProduto);
+        $query->setParameter('produto', $produto);
+        if ($grupo) {
+            $query->setParameter('grupo', $grupo);
+        }
+        if ($loja) {
+            $query->setParameter('loja', $loja);
+        }
 
         return $query->getResult();
     }

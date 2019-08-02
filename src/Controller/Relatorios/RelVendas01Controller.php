@@ -243,21 +243,23 @@ class RelVendas01Controller extends FormListController
             if ($vParams['r'] ?? null) {
                 $this->storedViewInfoBusiness->clear($this->crudParams['listRoute']);
             }
-            $svi = $this->storedViewInfoBusiness->retrieve('relVendas01_listPreVendasPorVendedor');
+            $svi = $this->storedViewInfoBusiness->retrieve('relVendas01_listPreVendasPorProduto');
             if (isset($svi['filter'])) {
                 $vParams['filter'] = $svi['filter'];
             } else {
                 $vParams['filter'] = [];
                 $vParams['filter']['dts'] = '01/' . date('m/Y') . ' - ' . date('t/m/Y');
+                $vParams['filter']['loja'] = null;
+                $vParams['filter']['grupo'] = null;
             }
         }
 
         $dtIni = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 0, 10)) ?: new \DateTime();
         $dtFim = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 13, 10)) ?: new \DateTime();
 
-        $codProduto = $vParams['filter']['codProduto'];
+        $vParams['produto'] = $vParams['filter']['produto'];
 
-        $r = $repo->preVendasPorPeriodoEProduto($dtIni, $dtFim, $codProduto);
+        $r = $repo->preVendasPorPeriodoEProduto($dtIni, $dtFim, $vParams['produto'], $vParams['filter']['loja'], $vParams['filter']['grupo']);
 
         $vParams['total'] = 0.0;
         foreach ($r as $pv) {
@@ -278,9 +280,9 @@ class RelVendas01Controller extends FormListController
 
         $viewInfo = [];
         $viewInfo['filter'] = $vParams['filter'];
-        $this->storedViewInfoBusiness->store('relVendas01_listPreVendasPorVendedor', $viewInfo);
+        $this->storedViewInfoBusiness->store('relVendas01_listPreVendasPorProduto', $viewInfo);
 
-        return $this->doRender('Relatorios/relVendas01_preVendasPorVendedor.html.twig', $vParams);
+        return $this->doRender('Relatorios/relVendas01_preVendasPorProduto.html.twig', $vParams);
     }
 
 

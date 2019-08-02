@@ -5,7 +5,7 @@
 
 {% block page_content %}
 
-    <form action="{{ url('relVendas01_listPreVendasPorVendedor') }}" method="get" id="formPesquisar">
+    <form action="{{ url('relVendas01_listPreVendasPorProduto') }}" method="get" id="formPesquisar">
 
         <div class="card">
             <div class="card-header">
@@ -13,29 +13,17 @@
 
                 <div class="d-flex flex-wrap align-items-center">
 
-                    <div class="d-sm-flex mr-1">
-                        <h3>PVs por Vendedor ({{ filter.vendedor }})</h3>
+                    <div class="mr-1">
+                        <h3>PVs por Produto ({{ produto }})</h3>
+                        {% if filter.loja %}
+                            <h6>Loja: {{ filter.loja }}</h6>
+                        {% endif %}
+                        {% if filter.grupo %}
+                            <h6>Grupo: {{ filter.grupo }}</h6>
+                        {% endif %}
                     </div>
                     <div class="d-sm-flex flex-nowrap ml-auto">
 
-                        <select id="filter_vendedor" name="filter[vendedor]"
-                                data-options="{{ vendedores }}" data-val="{{ filter.vendedor }}"></select>
-
-                        <input type="text" class="form-control ml-2" id="filterDts"
-                               name="filter[dts]" data-mask="00/00/0000 - 00/00/0000"
-                               style="width: 180px; text-align: center"
-                               value="{{ filter.dts|default('') }}">
-
-                        <button class="btn btn-outline-success ml-1"
-                                type="button" id="btnAnterior" title="Anterior"
-                                data-ante-periodoi="{{ antePeriodoI }}"
-                                data-ante-periodof="{{ antePeriodoF }}">
-                            <i class="fas fa-chevron-left"></i></button>
-                        <button class="btn btn-outline-success ml-1"
-                                type="button" id="btnProximo" title="Próximo"
-                                data-prox-periodoi="{{ proxPeriodoI }}"
-                                data-prox-periodof="{{ proxPeriodoF }}">
-                            <i class="fas fa-chevron-right"></i></button>
 
                     </div>
                 </div>
@@ -54,8 +42,9 @@
                         <tr>
                             <th scope="col" title="">#</th>
                             <th scope="col">PV</th>
+                            <th scope="col">Cliente</th>
                             <th scope="col">Dt Emissão</th>
-                            <th scope="col">Vendedor</th>
+                            <th scope="col">Produto</th>
                             <th scope="col">Total Venda</th>
                             <th scope="col"></th>
                         </tr>
@@ -69,6 +58,9 @@
                                 </td>
                                 <td>
                                     {{ item.prevenda }}
+                                </td>
+                                <td>
+                                    {{ item.cliente_pv }}
                                 </td>
                                 <td class="text-center">
                                     {{ item.dt_emissao|date('d/m/Y') }}
@@ -95,7 +87,7 @@
                         <tfoot>
 
                         <tr style="background-color: antiquewhite; font-weight: bold">
-                            <td colspan="4" class="text-right">
+                            <td colspan="5" class="text-right">
                                 Total:
                             </td>
                             <td class="text-right" style="padding: 10px">
@@ -118,5 +110,5 @@
 
 
 {% block down_scripts %}
-    <script src="{{ asset('build/Relatorios/relVendas01_preVendasPorVendedor.js') }}"></script>
+    <script src="{{ asset('build/Relatorios/relVendas01_preVendasPorProduto.js') }}"></script>
 {% endblock %}
