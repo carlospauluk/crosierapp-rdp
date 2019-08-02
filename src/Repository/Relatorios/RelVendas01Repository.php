@@ -125,7 +125,7 @@ class RelVendas01Repository extends FilterRepository
             $sql .= 'cod_prod, desc_prod, ';
         }
 
-        $sql .= 'sum(qtde) as qtde_total, sum(total_preco_custo) as tpc, sum(total_venda_pv) as tpv, (((sum(total_venda_pv) / sum(total_preco_custo)) - 1) * 100.0) as rent 
+        $sql .= 'sum(qtde) as qtde_total, sum(total_custo_pv) as tpc, sum(total_venda_pv) as tpv, (((sum(total_venda_pv) / sum(total_custo_pv)) - 1) * 100.0) as rent 
                     FROM rdp_rel_vendas01
                      WHERE nome_fornec = :nomeFornec AND dt_emissao BETWEEN :dtIni AND :dtFim ';
 
@@ -359,7 +359,7 @@ class RelVendas01Repository extends FilterRepository
         $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
         $dtFim->setTime(23, 59, 59, 99999);
 
-        $sql = 'SELECT prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv, cliente_pv
+        $sql = 'SELECT prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv, total_custo_pv, (((total_venda_pv / total_custo_pv) - 1) * 100.0) as rent, cliente_pv
                     FROM rdp_rel_vendas01
                      WHERE CONCAT(cod_prod, \' - \', desc_prod) = :produto AND dt_emissao BETWEEN :dtIni AND :dtFim ';
 
@@ -370,14 +370,16 @@ class RelVendas01Repository extends FilterRepository
             $sql .= 'AND loja = :loja ';
         }
 
-        $sql .= 'GROUP BY prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv, cliente_pv ORDER BY dt_emissao, total_venda_pv';
+        $sql .= 'GROUP BY prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv, total_custo_pv, cliente_pv ORDER BY dt_emissao, total_venda_pv';
 
         $rsm = new ResultSetMapping();
         $rsm->addScalarResult('prevenda', 'prevenda');
         $rsm->addScalarResult('dt_emissao', 'dt_emissao');
         $rsm->addScalarResult('cod_vendedor', 'cod_vendedor');
         $rsm->addScalarResult('nome_vendedor', 'nome_vendedor');
+        $rsm->addScalarResult('total_custo_pv', 'total_custo_pv');
         $rsm->addScalarResult('total_venda_pv', 'total_venda_pv');
+        $rsm->addScalarResult('rent', 'rent');
         $rsm->addScalarResult('cliente_pv', 'cliente_pv');
 
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);

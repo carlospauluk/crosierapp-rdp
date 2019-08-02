@@ -45,7 +45,9 @@
                             <th scope="col">Cliente</th>
                             <th scope="col">Dt Emissão</th>
                             <th scope="col">Produto</th>
+                            <th scope="col">Total Custo</th>
                             <th scope="col">Total Venda</th>
+                            <th scope="col">Rentabilidade</th>
                             <th scope="col"></th>
                         </tr>
                         </thead>
@@ -68,8 +70,14 @@
                                 <td>
                                     {{ item.cod_vendedor }} - {{ item.nome_vendedor }}
                                 </td>
+                                <td class="text-right" data-order="{{ item.total_custo_pv }}">
+                                    {{ item.total_custo_pv|number_format(2,',','.') }}
+                                </td>
                                 <td class="text-right" data-order="{{ item.total_venda_pv }}">
                                     {{ item.total_venda_pv|number_format(2,',','.') }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.rent }}">
+                                    {{ item.rent|number_format(2,',','.') }}%
                                 </td>
                                 <td class="text-right">
                                     <a class="btn btn-outline-secondary"
@@ -87,13 +95,14 @@
                         <tfoot>
 
                         <tr style="background-color: antiquewhite; font-weight: bold">
-                            <td colspan="5" class="text-right">
+                            <td colspan="6" class="text-right" style="padding: 10px">
                                 Total:
                             </td>
                             <td class="text-right" style="padding: 10px">
                                 {{ total|number_format(2,',','.') }}
                             </td>
                             <td class="text-right">
+                            </td><td class="text-right">
                             </td>
 
                         </tr>

@@ -68,7 +68,6 @@
                             <th scope="col">Qtde</th>
                             <th scope="col">Total Custo</th>
                             <th scope="col">Total Venda</th>
-                            <th scope="col">Total Rentabilidade</th>
                             <th scope="col"></th>
                         </tr>
                         </thead>
@@ -92,9 +91,6 @@
                                 </td>
                                 <td class="text-right" data-order="{{ item.tpv }}">
                                     {{ item.tpv|number_format(2,',','.') }}
-                                </td>
-                                <td class="text-right" data-order="{{ item.rent }}">
-                                    {{ item.rent|number_format(2,',','.') }}%
                                 </td>
                                 <td class="text-right">
                                     <a class="btn btn-outline-primary" href="{{ url('relVendas01_listPreVendasPorProduto', {'filter' : {'dts': filter.dts, 'produto': (item.cod_prod ~ ' - ' ~ item.desc_prod), 'loja': filter.loja, 'grupo': filter.grupo}} ) }}"
@@ -123,9 +119,6 @@
                             </td>
                             <td class="text-right">
                                 {{ total.tpv|number_format(2,',','.') }}
-                            </td>
-                            <td class="text-right">
-                                {{ total.rent|number_format(2,',','.') }}%
                             </td>
                             <td class="text-right">
                             </td>
