@@ -285,26 +285,28 @@ $(document).ready(function () {
      * Se a filial selecionada for a ACESSÓRIOS, só pode selecionar o localizador 92
      */
     function handleLocalizadorPorFilial() {
-        if ($filter_contasPagRec_filial.val().startsWith('96')) {
+        $filter_contasPagRec_localizador.find('option').each(function (i, e) {
+            $(e).removeAttr('disabled');
+        });
+        
+        if ($filter_contasPagRec_filial.val()) {
+            if ($filter_contasPagRec_filial.val().startsWith('96')) {
 
-            $filter_contasPagRec_localizador.find('option').each(function (i, e) {
-                $(e).attr('disabled', 'true')
-            });
-            $filter_contasPagRec_localizador.find('option[value^="91"]').removeAttr('disabled');
-            $filter_contasPagRec_localizador.find('option[value^="91"]').attr('selected', 'true');
-            $filter_contasPagRec_localizador.trigger('change');
-        } else if ($filter_contasPagRec_filial.val().startsWith('94')) {
+                $filter_contasPagRec_localizador.find('option').each(function (i, e) {
+                    $(e).attr('disabled', 'true')
+                });
+                $filter_contasPagRec_localizador.find('option[value^="91"]').removeAttr('disabled');
+                $filter_contasPagRec_localizador.find('option[value^="91"]').attr('selected', 'true');
+                $filter_contasPagRec_localizador.trigger('change');
+            } else if ($filter_contasPagRec_filial.val().startsWith('94')) {
 
-            $filter_contasPagRec_localizador.find('option').each(function (i, e) {
-                $(e).attr('disabled', 'true')
-            });
-            $filter_contasPagRec_localizador.find('option[value^="92"]').removeAttr('disabled');
-            $filter_contasPagRec_localizador.find('option[value^="92"]').attr('selected', 'true');
-            $filter_contasPagRec_localizador.trigger('change');
-        } else {
-            $filter_contasPagRec_localizador.find('option').each(function (i, e) {
-                $(e).removeAttr('disabled');
-            });
+                $filter_contasPagRec_localizador.find('option').each(function (i, e) {
+                    $(e).attr('disabled', 'true')
+                });
+                $filter_contasPagRec_localizador.find('option[value^="92"]').removeAttr('disabled');
+                $filter_contasPagRec_localizador.find('option[value^="92"]').attr('selected', 'true');
+                $filter_contasPagRec_localizador.trigger('change');
+            }
         }
 
         $filter_contasPagRec_localizador.select2();
