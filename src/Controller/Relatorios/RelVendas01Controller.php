@@ -70,6 +70,8 @@ class RelVendas01Controller extends FormListController
             } else {
                 $vParams['filter'] = [];
                 $vParams['filter']['dts'] = '01/' . date('m/Y') . ' - ' . date('t/m/Y');
+                $vParams['filter']['loja'] = null;
+                $vParams['filter']['grupo'] = null;
             }
         }
 
@@ -79,10 +81,9 @@ class RelVendas01Controller extends FormListController
         $nomeFornec = $vParams['filter']['nomeFornec'] ?? $repo->getNomeFornecedorMaisVendido($dtIni, $dtFim);
         $vParams['filter']['nomeFornec'] = $nomeFornec;
 
-        $r = $repo->itensVendidosPorFornecedor($dtIni, $dtFim, $nomeFornec);
-        $total = $repo->itensVendidosPorFornecedor($dtIni, $dtFim, $nomeFornec, true);
-        $total = $total[0] ?? null;
+        $r = $repo->itensVendidos($dtIni, $dtFim, $nomeFornec, $vParams['filter']['loja'], $vParams['filter']['grupo']);
 
+        $total = $repo->itensVendidos($dtIni, $dtFim, $nomeFornec, $vParams['filter']['loja'], $vParams['filter']['grupo'], true)[0];
 
         $dtAnterior = clone $dtIni;
         $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');
@@ -93,6 +94,14 @@ class RelVendas01Controller extends FormListController
         $vParams['antePeriodoF'] = $ante['dtFim'];
         $vParams['proxPeriodoI'] = $prox['dtIni'];
         $vParams['proxPeriodoF'] = $prox['dtFim'];
+
+
+        $lojas = $repo->getLojas();
+        array_unshift($lojas, ['id' => '', 'text' => 'TODAS']);
+        $vParams['lojas'] = json_encode($lojas);
+        $grupos = $repo->getGrupos();
+        array_unshift($grupos, ['id' => '', 'text' => 'TODOS']);
+        $vParams['grupos'] = json_encode($grupos);
 
         $vParams['fornecedores'] = json_encode($repo->getFornecedores());
 

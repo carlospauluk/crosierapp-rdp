@@ -150,7 +150,15 @@ $(document).ready(function () {
                         let selection = chart_totalPorFornecedor.getSelection();
                         let nomeFornec = data.getFormattedValue(selection[0].row, 0);
                         if (nomeFornec) {
-                            window.location = Routing.generate('relVendas01_itensVendidosPorFornecedor', {'filter': { 'dts': $filter_vendas_dts.val(), 'nomeFornec': nomeFornec}});
+                            window.location = Routing.generate('relVendas01_itensVendidosPorFornecedor',
+                                {'filter':
+                                        {
+                                            'dts': $filter_vendas_dts.val(),
+                                            'nomeFornec': nomeFornec,
+                                            'grupo': $filter_vendas_grupo.val(),
+                                            'loja': $filter_vendas_loja.val()
+                                        }
+                                });
                         }
                     }
 
@@ -191,7 +199,15 @@ $(document).ready(function () {
                         let selection = chart_totalPorVendedor.getSelection();
                         let vendedor = data.getFormattedValue(selection[0].row, 0);
                         if (vendedor) {
-                            window.location = Routing.generate('relVendas01_listPreVendasPorVendedor', {filter: {dts: $filter_vendas_dts.val(), 'vendedor': vendedor}});
+                            window.location = Routing.generate('relVendas01_listPreVendasPorVendedor',
+                                {
+                                    filter: {
+                                        'dts': $filter_vendas_dts.val(),
+                                        'vendedor': vendedor,
+                                        'grupo': $filter_vendas_grupo.val(),
+                                        'loja': $filter_vendas_loja.val()
+                                    }
+                                });
                         }
                     }
 

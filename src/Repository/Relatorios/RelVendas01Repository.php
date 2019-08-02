@@ -34,13 +34,13 @@ class RelVendas01Repository extends FilterRepository
         $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
         $dtFim->setTime(23, 59, 59, 99999);
 
-        $sql = 'SELECT nome_fornec, sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE dt_emissao BETWEEN :dtIni and :dtFim ';
+        $sql = 'SELECT nome_fornec, sum(total_venda_pv) as total_venda FROM rdp_rel_vendas01 WHERE dt_emissao BETWEEN :dtIni and :dtFim ';
 
         if ($grupo) {
-            $sql .= 'AND grupo = :grupo';
+            $sql .= 'AND grupo = :grupo ';
         }
         if ($loja) {
-            $sql .= 'AND loja = :loja';
+            $sql .= 'AND loja = :loja ';
         }
 
         $sql .= ' GROUP BY nome_fornec ORDER BY total_venda';
@@ -52,8 +52,12 @@ class RelVendas01Repository extends FilterRepository
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
         $query->setParameter('dtIni', $dtIni);
         $query->setParameter('dtFim', $dtFim);
-        $query->setParameter('grupo', $grupo);
-        $query->setParameter('loja', $loja);
+        if ($grupo) {
+            $query->setParameter('grupo', $grupo);
+        }
+        if ($loja) {
+            $query->setParameter('loja', $loja);
+        }
 
         return $query->getResult();
     }
@@ -71,7 +75,7 @@ class RelVendas01Repository extends FilterRepository
         $dtIni->setTime(0, 0, 0, 0);
         $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
         $dtFim->setTime(23, 59, 59, 99999);
-        $sql = 'SELECT CONCAT(cod_vendedor, \' - \', nome_vendedor) as nome_vendedor, sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE dt_emissao BETWEEN :dtIni and :dtFim ';
+        $sql = 'SELECT CONCAT(cod_vendedor, \' - \', nome_vendedor) as nome_vendedor, sum(total_venda_pv) as total_venda FROM rdp_rel_vendas01 WHERE dt_emissao BETWEEN :dtIni and :dtFim ';
 
         if ($grupo) {
             $sql .= 'AND grupo = :grupo';
@@ -89,8 +93,12 @@ class RelVendas01Repository extends FilterRepository
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
         $query->setParameter('dtIni', $dtIni);
         $query->setParameter('dtFim', $dtFim);
-        $query->setParameter('grupo', $grupo);
-        $query->setParameter('loja', $loja);
+        if ($grupo) {
+            $query->setParameter('grupo', $grupo);
+        }
+        if ($loja) {
+            $query->setParameter('loja', $loja);
+        }
 
         return $query->getResult();
     }
@@ -99,9 +107,12 @@ class RelVendas01Repository extends FilterRepository
     /**
      * @param \DateTime|null $dtIni
      * @param \DateTime|null $dtFim
+     * @param string $nomeFornec
+     * @param string|null $loja
+     * @param string|null $grupo
      * @return mixed
      */
-    public function itensVendidosPorFornecedor(\DateTime $dtIni, \DateTime $dtFim, string $nomeFornec, bool $totalGeral = false)
+    public function itensVendidos(\DateTime $dtIni, \DateTime $dtFim, string $nomeFornec, string $loja = null, string $grupo = null, bool $totalGeral = false)
     {
         $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
         $dtIni->setTime(0, 0, 0, 0);
@@ -110,18 +121,25 @@ class RelVendas01Repository extends FilterRepository
 
         $sql = 'SELECT ';
 
-
         if (!$totalGeral) {
             $sql .= 'cod_prod, desc_prod, ';
         }
 
-        $sql .= 'sum(qtde) as qtde_total, sum(total_preco_custo) as tpc, sum(total_preco_venda) as tpv, (((sum(total_preco_venda) / sum(total_preco_custo)) - 1) * 100.0) as rent 
+        $sql .= 'sum(qtde) as qtde_total, sum(total_preco_custo) as tpc, sum(total_venda_pv) as tpv, (((sum(total_venda_pv) / sum(total_preco_custo)) - 1) * 100.0) as rent 
                     FROM rdp_rel_vendas01
                      WHERE nome_fornec = :nomeFornec AND dt_emissao BETWEEN :dtIni AND :dtFim ';
 
-        if (!$totalGeral) {
-            $sql .= 'GROUP BY cod_prod, desc_prod';
+        if ($grupo) {
+            $sql .= ' AND grupo = :grupo';
         }
+        if ($loja) {
+            $sql .= ' AND loja = :loja';
+        }
+
+        if (!$totalGeral) {
+            $sql .= ' GROUP BY cod_prod, desc_prod ';
+        }
+
         $sql .= ' ORDER BY rent';
 
         $rsm = new ResultSetMapping();
@@ -136,6 +154,12 @@ class RelVendas01Repository extends FilterRepository
         $query->setParameter('dtIni', $dtIni);
         $query->setParameter('dtFim', $dtFim);
         $query->setParameter('nomeFornec', $nomeFornec);
+        if ($grupo) {
+            $query->setParameter('grupo', $grupo);
+        }
+        if ($loja) {
+            $query->setParameter('loja', $loja);
+        }
 
         return $query->getResult();
 
@@ -155,7 +179,7 @@ class RelVendas01Repository extends FilterRepository
         $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
         $dtFim->setTime(23, 59, 59, 99999);
 
-        $sql = 'SELECT nome_fornec, sum(total_preco_venda) as tpv
+        $sql = 'SELECT nome_fornec, sum(total_venda_pv) as tpv
                     FROM rdp_rel_vendas01
                      WHERE dt_emissao BETWEEN :dtIni AND :dtFim GROUP BY nome_fornec ORDER BY tpv LIMIT 1';
 
