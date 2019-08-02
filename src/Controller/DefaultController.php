@@ -34,6 +34,7 @@ class DefaultController extends BaseController
 
 
         $filiais = $this->getDoctrine()->getRepository(RelCtsPagRec01::class)->getFiliais();
+        array_unshift($filiais, ['id' => '', 'text' => 'TODAS']);
         $localizadores = $this->getDoctrine()->getRepository(RelCtsPagRec01::class)->getLocalizadores();
         array_unshift($localizadores, ['id' => '', 'text' => 'TODOS']);
 
@@ -57,8 +58,6 @@ class DefaultController extends BaseController
         $params['lojas'] = json_encode($lojas);
         $params['grupos'] = json_encode($grupos);
 
-
-        $localizadores = $this->getDoctrine()->getRepository(RelCtsPagRec01::class)->getLocalizadores();
         $params['localizadores'] = json_encode($localizadores);
 
         return $this->doRender('dashboard.html.twig', $params);
