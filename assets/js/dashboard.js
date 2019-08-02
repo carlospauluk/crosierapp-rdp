@@ -22,6 +22,33 @@ import $ from "jquery";
 
 $(document).ready(function () {
 
+
+    let $filter_vendas_loja = $('#filter_vendas_loja');
+    let $filter_vendas_grupo = $('#filter_vendas_grupo');
+
+
+    $filter_vendas_loja.select2({
+        data: $filter_vendas_loja.data('options')
+    });
+    if ($filter_vendas_loja.data('val')) {
+        $filter_vendas_loja.val($filter_vendas_loja.data('val')).trigger('change');
+    }
+    $filter_vendas_loja.on('select2:select', function () {
+        drawChart_vendas();
+    });
+
+
+    $filter_vendas_grupo.select2({
+        data: $filter_vendas_grupo.data('options')
+    });
+    if ($filter_vendas_grupo.data('val')) {
+        $filter_vendas_grupo.val($filter_vendas_grupo.data('val')).trigger('change');
+    }
+    $filter_vendas_grupo.on('select2:select', function () {
+        drawChart_vendas();
+    });
+
+
     let chart_totalPorFornecedor;
     let chart_totalPorVendedor;
 
@@ -90,7 +117,7 @@ $(document).ready(function () {
         Pace.ignore(function () {
 
             $.getJSON(
-                Routing.generate('relVendas01_totalPorFornecedor') + '/?filterDts=' + $filter_vendas_dts.val(),
+                Routing.generate('relVendas01_totalPorFornecedor') + '/?filterDts=' + $filter_vendas_dts.val() + '&loja=' + $filter_vendas_loja.val() + '&grupo=' + $filter_vendas_grupo.val(),
                 function (results) {
 
                     const data = new google.visualization.DataTable();
@@ -132,7 +159,7 @@ $(document).ready(function () {
 
 
             $.getJSON(
-                Routing.generate('relVendas01_totalPorVendedor') + '/?filterDts=' + $filter_vendas_dts.val(),
+                Routing.generate('relVendas01_totalPorVendedor') + '/?filterDts=' + $filter_vendas_dts.val() + '&loja=' + $filter_vendas_loja.val() + '&grupo=' + $filter_vendas_grupo.val(),
                 function (results) {
 
                     const data = new google.visualization.DataTable();

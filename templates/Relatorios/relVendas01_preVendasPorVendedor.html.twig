@@ -82,8 +82,8 @@
                                 <td>
                                     {{ item.cod_vendedor }} - {{ item.nome_vendedor }}
                                 </td>
-                                <td class="text-right" data-order="{{ item.total_pv }}">
-                                    {{ item.total_pv|number_format(2,',','.') }}
+                                <td class="text-right" data-order="{{ item.total_venda_pv }}">
+                                    {{ item.total_venda_pv|number_format(2,',','.') }}
                                 </td>
                                 <td class="text-right">
                                     <a class="btn btn-outline-secondary" href="{{ url('relVendas01_preVendaItens', {'pv': item.prevenda}) }}" role="button">

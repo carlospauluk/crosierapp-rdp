@@ -84,8 +84,8 @@ class RelVendas01Business
                     continue;
                 }
                 $campos = explode('|', $linha);
-                if (count($campos) !== 15) {
-                    throw new ViewException('Qtde de campos difere de 15 para a linha "' . $linha . '"');
+                if (count($campos) !== 21) {
+                    throw new ViewException('Qtde de campos difere de 21 para a linha "' . $linha . '"');
                 }
 
                 $campos[3] = DateTimeUtils::parseDateStr($campos[3])->format('Y-m-d');
@@ -113,9 +113,15 @@ class RelVendas01Business
                             rentabilidade,
                             cod_vendedor,
                             nome_vendedor,
+                            loja,            
+                            total_custo_pv,
+                            total_venda_pv,
+                            rentabilidade_pv,
+                            cliente_pv,
+                            grupo,
                             estabelecimento_id,inserted,updated,user_inserted_id,user_updated_id
                         )
-                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
+                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
                     $campos[0], // `prevenda`,
                     $campos[1], // `num_item`,
                     $campos[2], // `qtde`,
@@ -130,14 +136,20 @@ class RelVendas01Business
                     $campos[11],// `total_preco_custo`
                     $campos[12],// `rentabilidade`
                     $campos[13],// `cod_vendedor`
-                    $campos[14]  // `nome_vendedor`
+                    $campos[14],// `nome_vendedor`
+                    $campos[15],// `loja`
+                    $campos[16],// `total_custo_pv`
+                    $campos[17],// `total_venda_pv`
+                    $campos[18],// `rentabilidade_pv`
+                    $campos[19],// `cliente_pv`
+                    $campos[20] // `grupo`
                 );
 
                 try {
                     $t += $conn->executeUpdate($sql);
                     $this->logger->info($t . ' inseridos');
-                } catch (UniqueConstraintViolationException $e) {
-                    $this->logger->info('Registro já existente para a linha "' . $linha . '"');
+                } catch (\Exception $e) {
+                    $this->logger->info('Erro ao inserir a linha "' . $linha . '"');
                     $this->logger->info('Continuando.');
                 }
             }

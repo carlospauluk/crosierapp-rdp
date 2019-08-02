@@ -19,8 +19,17 @@
                                         <h3>Vendas</h3>
                                     </div>
                                     <div class="d-sm-flex flex-nowrap ml-auto">
-                                        <label for="filterDts" class="my-auto">Período: </label>
-                                        <input type="text" class="form-control" id="filter_vendas_dts"
+
+                                        <label for="filter_vendas_grupo" class="my-auto">Grupo: </label>
+                                        <select id="filter_vendas_grupo" style="width: 150px" name="filter[vendas][grupo]" class="ml-2"
+                                                data-options="{{ grupos }}" data-val="{{ filter.vendas.grupo }}"></select>
+
+                                        <label for="filter_vendas_loja" class="my-auto ml-2">Loja: </label>
+                                        <select id="filter_vendas_loja" name="filter[vendas][loja]" class="ml-2"
+                                                data-options="{{ lojas }}" data-val="{{ filter.vendas.loja }}"></select>
+
+                                        <label for="filterDts" class="my-auto ml-2">Período: </label>
+                                        <input type="text" class="form-control" id="filter_vendas_dts" class="ml-2"
                                                name="filter[vendas][dts]" data-mask="00/00/0000 - 00/00/0000"
                                                style="width: 180px; text-align: center"
                                                value="{{ filter.vendas.dts|default('') }}">

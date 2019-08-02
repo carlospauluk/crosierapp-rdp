@@ -4,6 +4,7 @@ namespace App\Controller;
 
 
 use App\Entity\Relatorios\RelCtsPagRec01;
+use App\Entity\Relatorios\RelVendas01;
 use CrosierSource\CrosierLibBaseBundle\Controller\BaseController;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -34,12 +35,23 @@ class DefaultController extends BaseController
 
         $filiais = $this->getDoctrine()->getRepository(RelCtsPagRec01::class)->getFiliais();
 
+        $lojas = $this->getDoctrine()->getRepository(RelVendas01::class)->getLojas();
+        array_unshift($lojas, ['id' => '', 'text' => 'TODAS']);
+        $grupos = $this->getDoctrine()->getRepository(RelVendas01::class)->getGrupos();
+        array_unshift($grupos, ['id' => '', 'text' => 'TODOS']);
+
         $params['filter']['vendas']['dts'] = $session->get('dashboard.filter.vendas.dts') ?? ($primeiroDia . ' - ' . $ultimoDia);
+        $params['filter']['vendas']['loja'] = $session->get('dashboard.filter.vendas.loja') ?? '';
+        $params['filter']['vendas']['grupo'] = $session->get('dashboard.filter.vendas.grupo') ?? '';
+
         $params['filter']['contasPagRec']['dts'] = $session->get('dashboard.filter.contasPagRec.dts') ?? ($hoje . ' - ' . $mais60dias);
         $params['filter']['contasPagRec']['filial'] = $session->get('dashboard.filter.contasPagRec.filial') ?? $filiais[0]['id'];
         $params['filter']['relCompFor01']['dts'] = $session->get('dashboard.filter.relCompFor01.dts') ?? ($primeiroDia_mesPassado . ' - ' . $ultimoDia_mesPassado);
 
         $params['filiais'] = json_encode($filiais);
+
+        $params['lojas'] = json_encode($lojas);
+        $params['grupos'] = json_encode($grupos);
 
         return $this->doRender('dashboard.html.twig', $params);
     }

@@ -7,6 +7,7 @@ use App\Entity\Relatorios\RelVendas01;
 use App\Repository\Relatorios\RelVendas01Repository;
 use CrosierSource\CrosierLibBaseBundle\APIClient\Base\DiaUtilAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
+use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -115,13 +116,20 @@ class RelVendas01Controller extends FormListController
     public function totalPorFornecedor(Request $request): JsonResponse
     {
         $dts = $request->get('filterDts') ?? '';
+
+        $loja = $request->get('loja');
+        $grupo = $request->get('grupo');
+
         $this->session->set('dashboard.filter.vendas.dts', $dts);
+        $this->session->set('dashboard.filter.vendas.loja', $loja);
+        $this->session->set('dashboard.filter.vendas.grupo', $grupo);
+
         $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
         $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
 
         /** @var RelVendas01Repository $repoRelVendas01 */
         $repoRelVendas01 = $this->getDoctrine()->getRepository(RelVendas01::class);
-        $r = $repoRelVendas01->totalVendasPorFornecedor($dtIni, $dtFim);
+        $r = $repoRelVendas01->totalVendasPorFornecedor($dtIni, $dtFim, $loja, $grupo);
         return new JsonResponse($r);
     }
 
@@ -135,12 +143,15 @@ class RelVendas01Controller extends FormListController
     public function totalPorVendedor(Request $request): JsonResponse
     {
         $dts = $request->get('filterDts') ?? '';
+        $loja = $request->get('loja');
+        $grupo = $request->get('grupo');
+
         $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
         $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
 
         /** @var RelVendas01Repository $repoRelVendas01 */
         $repoRelVendas01 = $this->getDoctrine()->getRepository(RelVendas01::class);
-        $r = $repoRelVendas01->totalVendasPorVendedor($dtIni, $dtFim);
+        $r = $repoRelVendas01->totalVendasPorVendedor($dtIni, $dtFim, $loja, $grupo);
         return new JsonResponse($r);
     }
 
@@ -181,7 +192,7 @@ class RelVendas01Controller extends FormListController
 
         $vParams['total'] = 0.0;
         foreach ($r as $pv) {
-            $vParams['total'] += $pv['total_pv'];
+            $vParams['total'] += $pv['total_venda_pv'];
         }
 
         $dtAnterior = clone $dtIni;
@@ -241,7 +252,7 @@ class RelVendas01Controller extends FormListController
 
         $vParams['total'] = 0.0;
         foreach ($r as $pv) {
-            $vParams['total'] += $pv['total_pv'];
+            $vParams['total'] += $pv['total_venda_pv'];
         }
 
         $dtAnterior = clone $dtIni;
@@ -282,15 +293,11 @@ class RelVendas01Controller extends FormListController
         $vParams['dados'] = $r;
         $vParams['pv'] = $pv;
 
-        $vParams['total']['qtde'] = 0.0;
-        $vParams['total']['tpc'] = 0.0;
-        $vParams['total']['tpv'] = 0.0;
-        $vParams['total']['rent'] = 0.0;
-        foreach ($r as $prevenda) {
-            $vParams['total']['qtde'] += $prevenda['qtde'];
-            $vParams['total']['tpc'] += $prevenda['total_preco_custo'];
-            $vParams['total']['tpv'] += $prevenda['total_preco_venda'];
-            $vParams['total']['rent'] += $prevenda['rent'];
+        try {
+            $vParams['total'] = $repo->totaisPreVenda($pv);
+            $vParams['total']['dt_emissao'] = DateTimeUtils::parseDateStr($vParams['total']['dt_emissao']);
+        } catch (ViewException $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->doRender('Relatorios/relVendas01_itensDoPreVenda.html.twig', $vParams);
