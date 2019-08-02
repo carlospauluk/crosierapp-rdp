@@ -36,7 +36,7 @@ class DefaultController extends BaseController
         $filiais = $this->getDoctrine()->getRepository(RelCtsPagRec01::class)->getFiliais();
         array_unshift($filiais, ['id' => '', 'text' => 'TODAS']);
         $localizadores = $this->getDoctrine()->getRepository(RelCtsPagRec01::class)->getLocalizadores();
-        array_unshift($localizadores, ['id' => '', 'text' => 'TODOS']);
+        // array_unshift($localizadores, ['id' => '', 'text' => 'TODOS']);
 
         $lojas = $this->getDoctrine()->getRepository(RelVendas01::class)->getLojas();
         array_unshift($lojas, ['id' => '', 'text' => 'TODAS']);

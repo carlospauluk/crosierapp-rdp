@@ -251,7 +251,7 @@ $(document).ready(function () {
     let $filter_contasPagRec_filial = $('#filter_contasPagRec_filial');
 
     $filter_contasPagRec_filial.select2({
-        placeholder: '...',
+        placeholder: '<< TODAS >>',
         allowClear: true,
         data: $filter_contasPagRec_filial.data('options')
     });
@@ -268,6 +268,8 @@ $(document).ready(function () {
     let $filter_contasPagRec_localizador = $('#filter_contasPagRec_localizador');
 
     $filter_contasPagRec_localizador.select2({
+        placeholder: '<< TODOS >>',
+        allowClear: true,
         data: $filter_contasPagRec_localizador.data('options')
     });
     if ($filter_contasPagRec_localizador.data('val')) {
