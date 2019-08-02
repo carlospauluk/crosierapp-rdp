@@ -18,16 +18,21 @@
                     </div>
                     <div class="d-sm-flex flex-nowrap ml-auto">
 
-                        <select id="filter_filial" style="width: 450px" name="filter[filial]"
+                        <label for="filter_filial" class="my-auto ml-2">Filial: </label>
+                        <select id="filter_filial" style="width: 450px" name="filter[filial]" class="ml-2"
                                 data-options="{{ filiais }}" data-val="{{ filter.filial }}"></select>
 
-                        <label for="filterDts" class="my-auto ml-3">Período: </label>
+                        <label for="filter_localizador" class="my-auto ml-2">Localizador: </label>
+                        <select id="filter_localizador" style="width: 250px" name="filter[localizador]" class="ml-2"
+                                data-options="{{ localizadores }}" data-val="{{ filter.localizador }}"></select>
+
+                        <label for="filterDts" class="my-auto ml-2">Período: </label>
                         <input type="text" class="form-control" id="filterDts"
                                name="filter[dts]" data-mask="00/00/0000 - 00/00/0000"
                                style="width: 180px; text-align: center"
                                value="{{ filter.dts|default('') }}">
 
-                        <button class="btn btn-outline-success ml-1"
+                        <button class="btn btn-outline-success ml-2"
                                 type="button" id="btnAnterior" title="Anterior"
                                 data-ante-periodoi="{{ antePeriodoI }}"
                                 data-ante-periodof="{{ antePeriodoF }}">
@@ -77,6 +82,7 @@
                             <th scope="col">Id</th>
                             <th scope="col">Lancto<br/>Docto</th>
                             <th scope="col">Cedente</th>
+                            <th scope="col">Localizador</th>
                             <th scope="col">Dt Movto</th>
                             <th scope="col">Dt Vencto<br/>Dt Pagto</th>
                             <th scope="col">Valor Título</th>
@@ -112,6 +118,9 @@
                                         </div>
                                     </td>
                                     <td>
+                                        {{ item.localizador }} - {{ item.localizadorDesc }}
+                                    </td>
+                                    <td>
                                         {{ item.dtMovto|date('d/m/Y') }}
                                     </td>
                                     <td>
@@ -129,7 +138,7 @@
                                 </tr>
                             {% endfor %}
 
-<!--
+                            <!--
                             <tr style="background-color: indianred">
                                 <th scope="row" colspan="5" class="text-right">
                                     Total A Pagar / Pago em {{ dia.dtVencto|date('d/m/Y') }}:
@@ -163,7 +172,7 @@
                             </tr>
 -->
                         {% endfor %}
-<!--
+                        <!--
                         <tr style="background-color: antiquewhite">
                             <th scope="row" colspan="5" class="text-right">
                                 Total Final:

@@ -115,8 +115,8 @@ class RelCtsPagRec01Controller extends FormListController
                 $parameters['filter'] = [];
                 $parameters['filter']['dts'] = date('d/m/Y') . ' - ' . date('d/m/Y');
                 $parameters['filter']['filial'] = $repo->getFiliais()[0]['id'];
+                $parameters['filter']['localizador'] = $repo->getLocalizadores()[0]['id'];
             }
-
         }
 
         $dtIni = DateTimeUtils::parseDateStr(substr($parameters['filter']['dts'], 0, 10)) ?: new \DateTime();
@@ -124,6 +124,9 @@ class RelCtsPagRec01Controller extends FormListController
 
         $parameters['filter']['dtVencto']['i'] = $dtIni->format('Y-m-d');
         $parameters['filter']['dtVencto']['f'] = $dtFim->format('Y-m-d');
+
+        $localizador = urldecode($parameters['filter']['localizador']);
+        $parameters['filter']['localizador'] = (int)explode(' - ', $localizador)[0];
 
         $filterDatas = $this->getFilterDatas($parameters);
 
@@ -187,10 +190,16 @@ class RelCtsPagRec01Controller extends FormListController
         $parameters['proxPeriodoF'] = $prox['dtFim'];
 
         $filiais = $repo->getFiliais();
+        $localizadores = $repo->getLocalizadores();
+        array_unshift($localizadores, ['id' => '', 'text' => 'TODOS']);
+
         $parameters['filiais'] = json_encode($filiais);
+        $parameters['localizadores'] = json_encode($localizadores);
 
         $parameters['page_title'] = 'Contas a Pagar/Receber';
         $parameters['PROGRAM_UUID'] = $this->crudParams['list_PROGRAM_UUID'];
+
+        $parameters['filter']['localizador'] = urlencode($localizador);
 
         $viewInfo = [];
         $viewInfo['filter'] = $parameters['filter'];
@@ -204,7 +213,8 @@ class RelCtsPagRec01Controller extends FormListController
         return [
             new FilterData(['dtVencto'], 'BETWEEN', 'dtVencto', $params),
             new FilterData(['tipoPagRec'], 'EQ', 'tipoPagRec', $params),
-            new FilterData(['filial'], 'EQ', 'filial', $params)
+            new FilterData(['filial'], 'EQ', 'filial', $params),
+            new FilterData(['localizador'], 'EQ', 'localizador', $params)
         ];
     }
 
@@ -247,9 +257,11 @@ class RelCtsPagRec01Controller extends FormListController
         $dts = $request->get('filterDts') ?? null;
         $filial = $request->get('filial') ?? null;
         $localizador = $request->get('localizador') ?? null;
+        $localizador = strtolower($localizador) === 'null' ? null : $localizador;
 
         $this->session->set('dashboard.filter.contasPagRec.dts', $dts);
         $this->session->set('dashboard.filter.contasPagRec.filial', $filial);
+        $this->session->set('dashboard.filter.contasPagRec.localizador', $localizador);
 
         $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
         $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));

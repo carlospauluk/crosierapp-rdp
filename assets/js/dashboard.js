@@ -22,6 +22,20 @@ import $ from "jquery";
 
 $(document).ready(function () {
 
+    /**
+     *
+     *
+     *
+     * GRÁFICOS DE VENDAS
+     *
+     *
+     *
+     */
+
+    let $btnVendasSearch = $('#btnVendasSearch');
+    $btnVendasSearch.on('click', function () {
+        drawChart_vendas();
+    });
 
     let $filter_vendas_loja = $('#filter_vendas_loja');
     let $filter_vendas_grupo = $('#filter_vendas_grupo');
@@ -109,7 +123,6 @@ $(document).ready(function () {
     });
 
 
-
     GoogleCharts.load(drawChart_vendas);
 
     function drawChart_vendas() {
@@ -151,7 +164,8 @@ $(document).ready(function () {
                         let nomeFornec = data.getFormattedValue(selection[0].row, 0);
                         if (nomeFornec) {
                             window.location = Routing.generate('relVendas01_itensVendidosPorFornecedor',
-                                {'filter':
+                                {
+                                    'filter':
                                         {
                                             'dts': $filter_vendas_dts.val(),
                                             'nomeFornec': nomeFornec,
@@ -218,20 +232,22 @@ $(document).ready(function () {
     }
 
 
+    /**
+     *
+     *
+     *
+     * GRÁFICO DE CONTAS A PAGAR/RECEBER
+     *
+     *
+     *
+     */
+
+    let $btnContasPagRecSearch = $('#btnContasPagRecSearch');
+    $btnContasPagRecSearch.on('click', function () {
+        drawChart_contasPagRec();
+    });
 
 
-
-
-
-
-
-
-
-
-
-    // Gráfico de Contas a Pagar/Receber
-
-    // filtro por filial
     let $filter_contasPagRec_filial = $('#filter_contasPagRec_filial');
 
     $filter_contasPagRec_filial.select2({
@@ -243,6 +259,7 @@ $(document).ready(function () {
         $filter_contasPagRec_filial.val($filter_contasPagRec_filial.data('val')).trigger('change');
     }
     $filter_contasPagRec_filial.on('select2:select', function () {
+        handleLocalizadorPorFilial();
         drawChart_contasPagRec();
     });
 
@@ -251,8 +268,6 @@ $(document).ready(function () {
     let $filter_contasPagRec_localizador = $('#filter_contasPagRec_localizador');
 
     $filter_contasPagRec_localizador.select2({
-        placeholder: '...',
-        allowClear: true,
         data: $filter_contasPagRec_localizador.data('options')
     });
     if ($filter_contasPagRec_localizador.data('val')) {
@@ -261,6 +276,42 @@ $(document).ready(function () {
     $filter_contasPagRec_localizador.on('select2:select', function () {
         drawChart_contasPagRec();
     });
+
+
+    /**
+     * RTA...
+     *
+     * Se a filial selecionada for de TELÊMACO BORBA, só pode selecionar o localizador 91.
+     * Se a filial selecionada for a ACESSÓRIOS, só pode selecionar o localizador 92
+     */
+    function handleLocalizadorPorFilial() {
+        if ($filter_contasPagRec_filial.val().startsWith('96')) {
+
+            $filter_contasPagRec_localizador.find('option').each(function (i, e) {
+                $(e).attr('disabled', 'true')
+            });
+            $filter_contasPagRec_localizador.find('option[value^="91"]').removeAttr('disabled');
+            $filter_contasPagRec_localizador.find('option[value^="91"]').attr('selected', 'true');
+            $filter_contasPagRec_localizador.trigger('change');
+        } else if ($filter_contasPagRec_filial.val().startsWith('94')) {
+
+            $filter_contasPagRec_localizador.find('option').each(function (i, e) {
+                $(e).attr('disabled', 'true')
+            });
+            $filter_contasPagRec_localizador.find('option[value^="92"]').removeAttr('disabled');
+            $filter_contasPagRec_localizador.find('option[value^="92"]').attr('selected', 'true');
+            $filter_contasPagRec_localizador.trigger('change');
+        } else {
+            $filter_contasPagRec_localizador.find('option').each(function (i, e) {
+                $(e).removeAttr('disabled');
+            });
+        }
+
+        $filter_contasPagRec_localizador.select2();
+    }
+
+
+    handleLocalizadorPorFilial();
 
 
     // filtro por período
@@ -386,18 +437,20 @@ $(document).ready(function () {
     }
 
 
+    /**
+     *
+     *
+     *
+     * GRÁFICO DE COMPRAS
+     *
+     *
+     *
+     */
 
-
-
-
-
-
-
-
-
-
-
-
+    let $btnCompForSearch = $('#btnCompForSearch');
+    $btnCompForSearch.on('click', function () {
+        drawChart_relCompFor01();
+    });
 
     let $filter_relCompFor01_dts = $('#filter_relCompFor01_dts').daterangepicker(
         {
@@ -500,6 +553,19 @@ $(document).ready(function () {
 
         });
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 });

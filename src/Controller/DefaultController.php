@@ -34,6 +34,8 @@ class DefaultController extends BaseController
 
 
         $filiais = $this->getDoctrine()->getRepository(RelCtsPagRec01::class)->getFiliais();
+        $localizadores = $this->getDoctrine()->getRepository(RelCtsPagRec01::class)->getLocalizadores();
+        array_unshift($localizadores, ['id' => '', 'text' => 'TODOS']);
 
         $lojas = $this->getDoctrine()->getRepository(RelVendas01::class)->getLojas();
         array_unshift($lojas, ['id' => '', 'text' => 'TODAS']);
@@ -45,8 +47,8 @@ class DefaultController extends BaseController
         $params['filter']['vendas']['grupo'] = $session->get('dashboard.filter.vendas.grupo') ?? '';
 
         $params['filter']['contasPagRec']['dts'] = $session->get('dashboard.filter.contasPagRec.dts') ?? ($hoje . ' - ' . $mais60dias);
-        $params['filter']['contasPagRec']['filial'] = $session->get('dashboard.filter.contasPagRec.filial') ?? $filiais[0]['id'];
-        $params['filter']['contasPagRec']['localizador'] = $session->get('dashboard.filter.contasPagRec.localizador') ?? $filiais[0]['id'];
+        $params['filter']['contasPagRec']['filial'] = urlencode($session->get('dashboard.filter.contasPagRec.filial')) ?? $filiais[0]['id'];
+        $params['filter']['contasPagRec']['localizador'] = urlencode($session->get('dashboard.filter.contasPagRec.localizador')) ?? $localizadores[0]['id'];
 
         $params['filter']['relCompFor01']['dts'] = $session->get('dashboard.filter.relCompFor01.dts') ?? ($primeiroDia_mesPassado . ' - ' . $ultimoDia_mesPassado);
 

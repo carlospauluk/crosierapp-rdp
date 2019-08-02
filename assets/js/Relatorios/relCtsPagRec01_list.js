@@ -129,7 +129,13 @@ $(document).ready(function () {
 
 
 
-    // filtro por filial
+   
+
+
+
+
+
+
     let $filter_filial = $('#filter_filial');
 
     $filter_filial.select2({
@@ -141,7 +147,56 @@ $(document).ready(function () {
         $filter_filial.val($filter_filial.data('val')).trigger('change');
     }
     $filter_filial.on('select2:select', function () {
+        handleLocalizadorPorFilial();
         $formPesquisar.submit();
     });
+
+
+
+    let $filter_localizador = $('#filter_localizador');
+
+    $filter_localizador.select2({
+        data: $filter_localizador.data('options')
+    });
+    if ($filter_localizador.data('val')) {
+        $filter_localizador.val($filter_localizador.data('val')).trigger('change');
+    }
+    $filter_localizador.on('select2:select', function () {
+        $formPesquisar.submit();
+    });
+
+
+    /**
+     * RTA...
+     *
+     * Se a filial selecionada for de TELÊMACO BORBA, só pode selecionar o localizador 91.
+     * Se a filial selecionada for a ACESSÓRIOS, só pode selecionar o localizador 92
+     */
+    function handleLocalizadorPorFilial() {
+        if ($filter_filial.val().startsWith('96')) {
+
+            $filter_localizador.find('option').each(function (i, e) {
+                $(e).attr('disabled', 'true')
+            });
+            $filter_localizador.find('option[value^="91"]').removeAttr('disabled');
+            $filter_localizador.find('option[value^="91"]').attr('selected', 'true');
+            $filter_localizador.trigger('change');
+        } else if ($filter_filial.val().startsWith('94')) {
+
+            $filter_localizador.find('option').each(function (i, e) {
+                $(e).attr('disabled', 'true')
+            });
+            $filter_localizador.find('option[value^="92"]').removeAttr('disabled');
+            $filter_localizador.find('option[value^="92"]').attr('selected', 'true');
+            $filter_localizador.trigger('change');
+        } else {
+            $filter_localizador.find('option').each(function (i, e) {
+                $(e).removeAttr('disabled');
+            });
+        }
+
+        $filter_localizador.select2();
+    }
+
 
 });

@@ -33,7 +33,7 @@ class RelCtsPagRec01Repository extends FilterRepository
         $r = $query->getResult();
         $arr = [];
         foreach ($r as $item) {
-            $e['id'] = $item['filial'];
+            $e['id'] = urlencode($item['filial']);
             $e['text'] = $item['filial'];
             $arr[] = $e;
         }
@@ -53,7 +53,7 @@ class RelCtsPagRec01Repository extends FilterRepository
         $r = $query->getResult();
         $arr = [];
         foreach ($r as $item) {
-            $e['id'] = $item['localizador'];
+            $e['id'] = urlencode($item['localizador']);
             $e['text'] = $item['localizador'];
             $arr[] = $e;
         }
