@@ -23,8 +23,12 @@ class RelVendas01Repository extends FilterRepository
 
 
     /**
+     * Utilizado na exibição do gráfico no dashboard.
+     *
      * @param \DateTime|null $dtIni
      * @param \DateTime|null $dtFim
+     * @param string|null $loja
+     * @param string|null $grupo
      * @return mixed
      */
     public function totalVendasPorFornecedor(\DateTime $dtIni = null, \DateTime $dtFim = null, string $loja = null, string $grupo = null)
@@ -34,7 +38,7 @@ class RelVendas01Repository extends FilterRepository
         $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
         $dtFim->setTime(23, 59, 59, 99999);
 
-        $sql = 'SELECT nome_fornec, sum(total_venda_pv) as total_venda FROM rdp_rel_vendas01 WHERE dt_emissao BETWEEN :dtIni and :dtFim ';
+        $sql = 'SELECT nome_fornec, sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE dt_emissao BETWEEN :dtIni and :dtFim ';
 
         if ($grupo) {
             $sql .= 'AND grupo = :grupo ';
@@ -47,47 +51,6 @@ class RelVendas01Repository extends FilterRepository
 
         $rsm = new ResultSetMapping();
         $rsm->addScalarResult('nome_fornec', 'nome_fornec');
-        $rsm->addScalarResult('total_venda', 'total_venda');
-
-        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
-        $query->setParameter('dtIni', $dtIni);
-        $query->setParameter('dtFim', $dtFim);
-        if ($grupo) {
-            $query->setParameter('grupo', $grupo);
-        }
-        if ($loja) {
-            $query->setParameter('loja', $loja);
-        }
-
-        return $query->getResult();
-    }
-
-    /**
-     * @param \DateTime|null $dtIni
-     * @param \DateTime|null $dtFim
-     * @param string|null $loja
-     * @param string|null $grupo
-     * @return mixed
-     */
-    public function totalVendasPorVendedor(\DateTime $dtIni = null, \DateTime $dtFim = null, string $loja = null, string $grupo = null)
-    {
-        $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
-        $dtIni->setTime(0, 0, 0, 0);
-        $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
-        $dtFim->setTime(23, 59, 59, 99999);
-        $sql = 'SELECT CONCAT(cod_vendedor, \' - \', nome_vendedor) as nome_vendedor, sum(total_venda_pv) as total_venda FROM rdp_rel_vendas01 WHERE dt_emissao BETWEEN :dtIni and :dtFim ';
-
-        if ($grupo) {
-            $sql .= 'AND grupo = :grupo';
-        }
-        if ($loja) {
-            $sql .= 'AND loja = :loja';
-        }
-
-        $sql .= ' GROUP BY cod_vendedor, nome_vendedor ORDER BY total_venda';
-
-        $rsm = new ResultSetMapping();
-        $rsm->addScalarResult('nome_vendedor', 'nome_vendedor');
         $rsm->addScalarResult('total_venda', 'total_venda');
 
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
@@ -126,7 +89,7 @@ class RelVendas01Repository extends FilterRepository
             $sql .= 'cod_prod, desc_prod, ';
         }
 
-        $sql .= 'sum(qtde) as qtde_total, sum(total_custo_pv) as tpc, sum(total_venda_pv) as tpv, (((sum(total_venda_pv) / sum(total_custo_pv)) - 1) * 100.0) as rent 
+        $sql .= 'sum(qtde) as qtde_total, sum(total_preco_custo) as tpc, sum(total_preco_venda) as tpv, (((sum(total_preco_venda) / sum(total_preco_custo)) - 1) * 100.0) as rent 
                     FROM rdp_rel_vendas01
                      WHERE nome_fornec = :nomeFornec AND dt_emissao BETWEEN :dtIni AND :dtFim ';
 
@@ -165,6 +128,117 @@ class RelVendas01Repository extends FilterRepository
         return $query->getResult();
 
     }
+
+    /**
+     * @param \DateTime|null $dtIni
+     * @param \DateTime|null $dtFim
+     * @param string|null $loja
+     * @param string|null $grupo
+     * @return mixed
+     */
+    public function totalVendasPorVendedor(\DateTime $dtIni = null, \DateTime $dtFim = null, string $loja = null, string $grupo = null)
+    {
+        $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
+        $dtIni->setTime(0, 0, 0, 0);
+        $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
+        $dtFim->setTime(23, 59, 59, 99999);
+
+        $sql_AND_grupo = '';
+        if ($grupo) {
+            $sql_AND_grupo .= ' AND grupo = :grupo';
+        }
+        $sql_AND_loja = '';
+        if ($loja) {
+            $sql_AND_loja .= ' AND loja = :loja';
+        }
+
+        $sql = '
+            SELECT 
+                CONCAT(cod_vendedor, \' - \', nome_vendedor) as nome_vendedor, 
+                SUM(total_venda_pv) as total_venda 
+            FROM 
+                (
+                    SELECT cod_vendedor, nome_vendedor, prevenda, total_venda_pv 
+                    FROM rdp_rel_vendas01 
+                    WHERE 
+                        dt_emissao BETWEEN :dtIni AND :dtFim
+                        ' . $sql_AND_grupo . $sql_AND_loja . '
+                    GROUP BY cod_vendedor, nome_vendedor, prevenda, total_venda_pv) a 
+            GROUP BY cod_vendedor, nome_vendedor ORDER BY total_venda';
+
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('nome_vendedor', 'nome_vendedor');
+        $rsm->addScalarResult('total_venda', 'total_venda');
+
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('dtIni', $dtIni);
+        $query->setParameter('dtFim', $dtFim);
+        if ($grupo) {
+            $query->setParameter('grupo', $grupo);
+        }
+        if ($loja) {
+            $query->setParameter('loja', $loja);
+        }
+
+        return $query->getResult();
+    }
+
+
+    /**
+     * @param \DateTime|null $dtIni
+     * @param \DateTime|null $dtFim
+     * @param int $codVendedor
+     * @param string|null $loja
+     * @param string|null $grupo
+     * @return mixed
+     */
+    public function preVendasPorPeriodo(\DateTime $dtIni, \DateTime $dtFim, int $codVendedor, string $loja = null, string $grupo = null)
+    {
+        $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
+        $dtIni->setTime(0, 0, 0, 0);
+        $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
+        $dtFim->setTime(23, 59, 59, 99999);
+
+
+        $sql_AND_grupo = '';
+        if ($grupo) {
+            $sql_AND_grupo .= ' AND grupo = :grupo';
+        }
+        $sql_AND_loja = '';
+        if ($loja) {
+            $sql_AND_loja .= ' AND loja = :loja';
+        }
+
+        $sql = 'SELECT prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv
+                    FROM rdp_rel_vendas01
+                     WHERE cod_vendedor = :codVendedor AND dt_emissao BETWEEN :dtIni AND :dtFim 
+                     ' . $sql_AND_grupo . $sql_AND_loja . '
+                     GROUP BY prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv ORDER BY dt_emissao, total_venda_pv';
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('prevenda', 'prevenda');
+        $rsm->addScalarResult('dt_emissao', 'dt_emissao');
+        $rsm->addScalarResult('cod_vendedor', 'cod_vendedor');
+        $rsm->addScalarResult('nome_vendedor', 'nome_vendedor');
+        $rsm->addScalarResult('total_venda_pv', 'total_venda_pv');
+
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('dtIni', $dtIni);
+        $query->setParameter('dtFim', $dtFim);
+        $query->setParameter('codVendedor', $codVendedor);
+        if ($grupo) {
+            $query->setParameter('grupo', $grupo);
+        }
+        if ($loja) {
+            $query->setParameter('loja', $loja);
+        }
+
+        return $query->getResult();
+    }
+
+
+
 
 
     /**
@@ -314,37 +388,7 @@ class RelVendas01Repository extends FilterRepository
     }
 
 
-    /**
-     * @param \DateTime|null $dtIni
-     * @param \DateTime|null $dtFim
-     * @param int $codVendedor
-     * @return mixed
-     */
-    public function preVendasPorPeriodoEVendedor(\DateTime $dtIni, \DateTime $dtFim, int $codVendedor)
-    {
-        $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
-        $dtIni->setTime(0, 0, 0, 0);
-        $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
-        $dtFim->setTime(23, 59, 59, 99999);
 
-        $sql = 'SELECT prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv
-                    FROM rdp_rel_vendas01
-                     WHERE cod_vendedor = :codVendedor AND dt_emissao BETWEEN :dtIni AND :dtFim GROUP BY prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv ORDER BY dt_emissao, total_venda_pv';
-
-        $rsm = new ResultSetMapping();
-        $rsm->addScalarResult('prevenda', 'prevenda');
-        $rsm->addScalarResult('dt_emissao', 'dt_emissao');
-        $rsm->addScalarResult('cod_vendedor', 'cod_vendedor');
-        $rsm->addScalarResult('nome_vendedor', 'nome_vendedor');
-        $rsm->addScalarResult('total_venda_pv', 'total_venda_pv');
-
-        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
-        $query->setParameter('dtIni', $dtIni);
-        $query->setParameter('dtFim', $dtFim);
-        $query->setParameter('codVendedor', $codVendedor);
-
-        return $query->getResult();
-    }
 
 
     /**

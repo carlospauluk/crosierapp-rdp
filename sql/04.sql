@@ -83,7 +83,7 @@ CREATE TABLE `rdp_rel_ctspagrec01`
     `cod_cliente`        BIGINT(20)     NOT NULL,
     `nome_cli_for`       VARCHAR(200)   NOT NULL,
     `localizador`        BIGINT(20)     NULL,
-    `localizador_desc`   BIGINT(200)    NULL,
+    `localizador_desc`   VARCHAR(200)    NULL,
     `filial`             BIGINT(20)     NOT NULL,
     `desc_filial`        VARCHAR(200)   NOT NULL,
     `valor_titulo`       DECIMAL(15, 2) NOT NULL,
@@ -144,6 +144,7 @@ CREATE TABLE `rdp_rel_compfor01`
 
     KEY K_rdp_rel_compfor01_dt_movto (`dt_movto`),
     KEY K_rdp_rel_compfor01_cod_fornec (`cod_fornec`),
+    KEY K_rdp_rel_compfor01_cod_prod (`cod_prod`),
 
     -- campos de controle do crosier
     PRIMARY KEY (`id`),

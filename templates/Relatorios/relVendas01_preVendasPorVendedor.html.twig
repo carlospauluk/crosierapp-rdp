@@ -18,6 +18,16 @@
                     </div>
                     <div class="d-sm-flex flex-nowrap ml-auto">
 
+                        <label for="filter_grupo" class="my-auto">Grupo: </label>
+                        <select id="filter_grupo" style="width: 150px" name="filter[grupo]" class="ml-2"
+                                data-options="{{ grupos }}" data-val="{{ filter.grupo }}"></select>
+
+                        <label for="filter_loja" class="my-auto ml-2">Loja: </label>
+                        <select id="filter_loja" name="filter[loja]" class="ml-2"
+                                data-options="{{ lojas }}" data-val="{{ filter.loja }}"></select>
+
+                        <div class="mr-3"></div>
+
                         <select id="filter_vendedor" name="filter[vendedor]"
                                 data-options="{{ vendedores }}" data-val="{{ filter.vendedor }}"></select>
 

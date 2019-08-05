@@ -156,6 +156,7 @@ class RelCtsPagRec01Business
             $this->logger->info('commit');
         } catch (\Exception $e) {
             $this->logger->error('processarArquivo() - erro ');
+            $this->logger->error('Linha: |' . $linha . '|');
             $this->logger->error($e->getMessage());
             try {
                 $conn->rollBack();

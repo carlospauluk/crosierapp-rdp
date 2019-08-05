@@ -188,6 +188,8 @@ class RelVendas01Controller extends FormListController
             } else {
                 $vParams['filter'] = [];
                 $vParams['filter']['dts'] = '01/' . date('m/Y') . ' - ' . date('t/m/Y');
+                $vParams['filter']['loja'] = null;
+                $vParams['filter']['grupo'] = null;
             }
         }
 
@@ -197,7 +199,7 @@ class RelVendas01Controller extends FormListController
         $codVendedor = explode(' - ', $vParams['filter']['vendedor'])[0] ?? 0;
 
 
-        $r = $repo->preVendasPorPeriodoEVendedor($dtIni, $dtFim, $codVendedor);
+        $r = $repo->preVendasPorPeriodo($dtIni, $dtFim, $codVendedor, $vParams['filter']['loja'], $vParams['filter']['grupo']);
 
         $vParams['total'] = 0.0;
         foreach ($r as $pv) {
@@ -217,6 +219,13 @@ class RelVendas01Controller extends FormListController
         $vParams['vendedores'] = json_encode($repo->getVendedores());
 
         $vParams['dados'] = $r;
+
+        $lojas = $repo->getLojas();
+        array_unshift($lojas, ['id' => '', 'text' => 'TODAS']);
+        $vParams['lojas'] = json_encode($lojas);
+        $grupos = $repo->getGrupos();
+        array_unshift($grupos, ['id' => '', 'text' => 'TODOS']);
+        $vParams['grupos'] = json_encode($grupos);
 
         $viewInfo = [];
         $viewInfo['filter'] = $vParams['filter'];

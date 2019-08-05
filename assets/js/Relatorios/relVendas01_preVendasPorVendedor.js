@@ -113,6 +113,32 @@ $(document).ready(function () {
 
 
 
+    let $filter_loja = $('#filter_loja');
+    let $filter_grupo = $('#filter_grupo');
+
+
+    $filter_loja.select2({
+        data: $filter_loja.data('options')
+    });
+    if ($filter_loja.data('val')) {
+        $filter_loja.val($filter_loja.data('val')).trigger('change');
+    }
+    $filter_loja.on('select2:select', function () {
+        $formPesquisar.submit();
+    });
+
+
+    $filter_grupo.select2({
+        data: $filter_grupo.data('options')
+    });
+    if ($filter_grupo.data('val')) {
+        $filter_grupo.val($filter_grupo.data('val')).trigger('change');
+    }
+    $filter_grupo.on('select2:select', function () {
+        $formPesquisar.submit();
+    });
+
+
 
 
 
