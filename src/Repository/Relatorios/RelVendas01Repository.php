@@ -110,6 +110,7 @@ class RelVendas01Repository extends FilterRepository
      * @param string $nomeFornec
      * @param string|null $loja
      * @param string|null $grupo
+     * @param bool $totalGeral
      * @return mixed
      */
     public function itensVendidos(\DateTime $dtIni, \DateTime $dtFim, string $nomeFornec, string $loja = null, string $grupo = null, bool $totalGeral = false)

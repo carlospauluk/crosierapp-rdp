@@ -544,7 +544,19 @@ $(document).ready(function () {
                     google.visualization.events.addListener(chart_relCompFor01, 'select', selectHandler);
 
                     function selectHandler() {
-
+                        // relCompFor01_itensCompradosPorFornecedor
+                        let selection = chart_relCompFor01.getSelection();
+                        let nomeFornec = data.getFormattedValue(selection[0].row, 0);
+                        if (nomeFornec) {
+                            window.location = Routing.generate('relCompFor01_itensCompradosPorFornecedor',
+                                {
+                                    'filter':
+                                        {
+                                            'dts': $filter_relCompFor01_dts.val(),
+                                            'nomeFornec': nomeFornec
+                                        }
+                                });
+                        }
                     }
 
                 }

@@ -35,6 +35,7 @@ Encore
     .addEntry('Relatorios/relVendas01_itensVendidosPorFornecedor', './assets/js/Relatorios/relVendas01_itensVendidosPorFornecedor.js')
     .addEntry('Relatorios/relVendas01_preVendasPorVendedor', './assets/js/Relatorios/relVendas01_preVendasPorVendedor.js')
     .addEntry('Relatorios/relVendas01_itensDoPreVenda', './assets/js/Relatorios/relVendas01_itensDoPreVenda.js')
+    .addEntry('Relatorios/relCompFor01_itensCompradosPorFornecedor', './assets/js/Relatorios/relCompFor01_itensCompradosPorFornecedor.js')
 
 
 

@@ -1,0 +1,123 @@
+{% extends '@CrosierLibBase/index.html.twig' %}
+
+
+
+
+{% block page_content %}
+
+    <form action="{{ url('relCompFor01_itensCompradosPorFornecedor') }}" method="get" id="formPesquisar">
+
+        <div class="card">
+            <div class="card-header">
+
+
+                <div class="d-flex flex-wrap align-items-center">
+
+                    <div class="d-sm-flex text-nowrap mr-1">
+                        <h3>Itens Comprados por Fornecedor</h3>
+                    </div>
+                    <div class="d-sm-flex flex-nowrap ml-auto">
+
+                        <select id="filter_nomeFornec" name="filter[nomeFornec]"
+                                data-options="{{ fornecedores }}" data-val="{{ filter.nomeFornec }}"></select>
+
+                        <input type="text" class="form-control ml-2" id="filterDts"
+                               name="filter[dts]" data-mask="00/00/0000 - 00/00/0000"
+                               style="width: 180px; text-align: center"
+                               value="{{ filter.dts|default('') }}">
+
+                        <button class="btn btn-outline-success ml-1"
+                                type="button" id="btnAnterior" title="Anterior"
+                                data-ante-periodoi="{{ antePeriodoI }}"
+                                data-ante-periodof="{{ antePeriodoF }}">
+                            <i class="fas fa-chevron-left"></i></button>
+                        <button class="btn btn-outline-success ml-1"
+                                type="button" id="btnProximo" title="Próximo"
+                                data-prox-periodoi="{{ proxPeriodoI }}"
+                                data-prox-periodof="{{ proxPeriodoF }}">
+                            <i class="fas fa-chevron-right"></i></button>
+
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="table-responsive-sm">
+
+
+                    <table class="table table-sm table-striped table-hover crsr-datatable" id="datatableItens">
+
+                        <thead>
+                        <tr>
+                            <th scope="col" title="">#</th>
+                            <th scope="col">Código</th>
+                            <th scope="col">Produto</th>
+                            <th scope="col">Qtde</th>
+                            <th scope="col">Total Custo</th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for item in dados %}
+                            <tr>
+                                <td>
+                                    <span class="badge badge-pill badge-light">{{ loop.index }}</span>
+                                </td>
+                                <td>
+                                    {{ item.cod_prod }}
+                                </td><td>
+                                    {{ item.desc_prod }}
+                                </td>
+                                <td class="text-right">
+                                    {{ item.qtde_total|number_format(0,',','.') }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.total }}">
+                                    {{ item.total|number_format(2,',','.') }}
+                                </td>
+                                <td class="text-right">
+                                    <a class="btn btn-outline-primary" href="{{ url('relCompFor01_itensCompradosPorFornecedor', {'filter' : {'dts': filter.dts, 'produto': (item.cod_prod ~ ' - ' ~ item.desc_prod)}} ) }}"
+                                       role="button" title="Listar PVs que contém este produto">
+                                        <i class="far fa-list-alt"></i> PVs
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+
+
+                        </tbody>
+
+                        <tfoot>
+
+                        <tr style="background-color: antiquewhite; font-weight: bold">
+                            <td  colspan="3" class="text-right">
+
+                            </td>
+                            <td class="text-right">
+                                {{ total.qtde_total }}
+                            </td>
+                            <td class="text-right">
+                                {{ total.total|number_format(2,',','.') }}
+                            </td>
+                            <td class="text-right">
+                            </td>
+                        </tr>
+
+                        </tfoot>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </form>
+{% endblock %}
+
+
+{% block down_scripts %}
+    <script src="{{ asset('build/Relatorios/relCompFor01_itensCompradosPorFornecedor.js') }}"></script>
+{% endblock %}

@@ -4,8 +4,10 @@ namespace App\Controller\Relatorios;
 
 
 use App\Entity\Relatorios\RelCompFor01;
+use App\Entity\Relatorios\RelVendas01;
 use App\EntityHandler\Relatorios\RelCompFor01EntityHandler;
 use App\Repository\Relatorios\RelCompFor01Repository;
+use CrosierSource\CrosierLibBaseBundle\APIClient\Base\DiaUtilAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
@@ -22,6 +24,10 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class RelCompFor01Controller extends FormListController
 {
+
+    /** @var DiaUtilAPIClient */
+    private $diaUtilAPIClient;
+
     protected $crudParams =
         [
             'typeClass' => null,
@@ -43,8 +49,18 @@ class RelCompFor01Controller extends FormListController
             'role_delete' => 'ROLE_ADMIN',
 
         ];
+
     /** @var SessionInterface */
     private $session;
+
+    /**
+     * @required
+     * @param DiaUtilAPIClient $diaUtilAPIClient
+     */
+    public function setDiaUtilAPIClient(DiaUtilAPIClient $diaUtilAPIClient): void
+    {
+        $this->diaUtilAPIClient = $diaUtilAPIClient;
+    }
 
     /**
      * @required
@@ -115,6 +131,66 @@ class RelCompFor01Controller extends FormListController
         $repoRelCompFor01 = $this->getDoctrine()->getRepository(RelCompFor01::class);
         $r = $repoRelCompFor01->totalComprasPorFornecedor($dtIni, $dtFim);
         return new JsonResponse($r);
+    }
+
+
+    /**
+     *
+     * @Route("/relCompFor01/itensCompradosPorFornecedor/", name="relCompFor01_itensCompradosPorFornecedor")
+     * @param Request $request
+     * @return Response
+     * @throws \Exception
+     */
+    public function itensCompradosPorFornecedor(Request $request): Response
+    {
+        $vParams = $request->query->all();
+        /** @var RelCompFor01Repository $repo */
+        $repo = $this->getDoctrine()->getRepository(RelCompFor01::class);
+        if (!array_key_exists('filter', $vParams)) {
+
+            if ($vParams['r'] ?? null) {
+                $this->storedViewInfoBusiness->clear($this->crudParams['listRoute']);
+            }
+            $svi = $this->storedViewInfoBusiness->retrieve('relCompFor01_itensCompradosPorFornecedor');
+            if (isset($svi['filter'])) {
+                $vParams['filter'] = $svi['filter'];
+            } else {
+                $vParams['filter'] = [];
+                $vParams['filter']['dts'] = '01/' . date('m/Y') . ' - ' . date('t/m/Y');
+            }
+        }
+
+        $dtIni = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 0, 10)) ?: new \DateTime();
+        $dtFim = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 13, 10)) ?: new \DateTime();
+
+        $nomeFornec = $vParams['filter']['nomeFornec'] ?? $this->getDoctrine()->getRepository(RelVendas01::class)->getNomeFornecedorMaisVendido($dtIni, $dtFim);
+        $vParams['filter']['nomeFornec'] = $nomeFornec;
+
+        $r = $repo->itensComprados($dtIni, $dtFim, $nomeFornec);
+
+        $total = $repo->itensComprados($dtIni, $dtFim, $nomeFornec, true)[0];
+
+        $dtAnterior = clone $dtIni;
+        $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');
+
+        $prox = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, true);
+        $ante = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, false);
+        $vParams['antePeriodoI'] = $ante['dtIni'];
+        $vParams['antePeriodoF'] = $ante['dtFim'];
+        $vParams['proxPeriodoI'] = $prox['dtIni'];
+        $vParams['proxPeriodoF'] = $prox['dtFim'];
+
+
+        $vParams['fornecedores'] = json_encode($this->getDoctrine()->getRepository(RelVendas01::class)->getFornecedores());
+
+        $vParams['dados'] = $r;
+        $vParams['total'] = $total;
+
+        $viewInfo = [];
+        $viewInfo['filter'] = $vParams['filter'];
+        $this->storedViewInfoBusiness->store('relCompFor01_itensCompradosPorFornecedor', $viewInfo);
+
+        return $this->doRender('Relatorios/relCompFor01_itensCompradosPorFornecedor.html.twig', $vParams);
     }
 
 
