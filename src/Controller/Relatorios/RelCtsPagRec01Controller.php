@@ -246,13 +246,13 @@ class RelCtsPagRec01Controller extends FormListController
 
     /**
      *
-     * @Route("/relCtsPagRec01/rel01/", name="relCtsPagRec01_rel01")
+     * @Route("/relCtsPagRec01/graficoCtsPagRec01/", name="relCtsPagRec01_graficoCtsPagRec01")
      * @param Request $request
      * @return JsonResponse
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function rel01(Request $request): JsonResponse
+    public function graficoCtsPagRec01(Request $request): JsonResponse
     {
         $dts = $request->get('filterDts') ?? null;
         $filial = $request->get('filial') ?? null;

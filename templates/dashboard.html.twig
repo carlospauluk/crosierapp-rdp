@@ -7,7 +7,177 @@
 
         <div class="container-fluid">
             <div class="animated fadeIn">
+
                 <div class="row mt-3">
+                    <div class="col-sm-12">
+
+                        <div class="card">
+
+                            <div class="card-header">
+                                <div class="d-flex flex-wrap align-items-center">
+                                    <div class="d-sm-flex text-nowrap mr-1">
+                                        <h3>Resultado Vendas</h3>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="card-body">
+
+                                <div class="row">
+                                    <div class="col-xl-6">
+
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h4>Total por Fornecedor</h4>
+                                            </div>
+                                            <div class="card-body">
+
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-sm-2"
+                                                           for="filter_chartVendasTotalPorFornecedor_dts">Período</label>
+                                                    <div class="col-sm-10">
+                                                        <div class="input-group">
+                                                            <input type="text"
+                                                                   class="form-control"
+                                                                   id="filter_chartVendasTotalPorFornecedor_dts"
+                                                                   class="ml-2"
+                                                                   name="filter[chartVendasTotalPorFornecedor][dts]"
+                                                                   data-mask="00/00/0000 - 00/00/0000"
+                                                                   style="width: 180px; text-align: center"
+                                                                   value="{{ filter.chartVendasTotalPorFornecedor.dts|default('') }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-sm-2"
+                                                           for="filter_chartVendasTotalPorFornecedor_grupos">Grupos</label>
+                                                    <div class="col-sm-10">
+                                                        <div class="input-group">
+                                                            <select id="filter_chartVendasTotalPorFornecedor_grupos"
+                                                                    name="filter[chartVendasTotalPorFornecedor][grupos]"
+                                                                    class="form-control"
+                                                                    multiple
+                                                                    data-options="{{ grupos }}"
+                                                                    data-val="{{ filter.chartVendasTotalPorFornecedor.grupos }}"></select>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-sm-2"
+                                                           for="filter_chartVendasTotalPorFornecedor_lojas">Lojas</label>
+                                                    <div class="col-sm-8">
+                                                        <div class="input-group">
+                                                            <select id="filter_chartVendasTotalPorFornecedor_lojas"
+                                                                    name="filter[chartVendasTotalPorFornecedor][lojas]"
+                                                                    class="form-control"
+                                                                    multiple
+                                                                    data-options="{{ lojas }}"
+                                                                    data-val="{{ filter.chartVendasTotalPorFornecedor.lojas }}"></select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <button id="btnFiltrar_chartVendasTotalPorFornecedor"
+                                                                class="btn btn-primary ml-2"><i
+                                                                    class="fas fa-search"></i> Filtrar
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div id="chart_vendasTotalPorFornecedor" style="height: 450px"></div>
+
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-xl-6">
+
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h4>Total por Vendedor</h4>
+                                            </div>
+                                            <div class="card-body">
+
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-sm-2"
+                                                           for="filter_chartVendasTotalPorVendedor_dts">Período</label>
+                                                    <div class="col-sm-10">
+                                                        <div class="input-group">
+                                                            <input type="text"
+                                                                   class="form-control"
+                                                                   id="filter_chartVendasTotalPorVendedor_dts"
+                                                                   name="filter[chartVendasTotalPorVendedor][dts]"
+                                                                   data-mask="00/00/0000 - 00/00/0000"
+                                                                   style="width: 180px; text-align: center"
+                                                                   value="{{ filter.chartVendasTotalPorVendedor.dts|default('') }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-sm-2"
+                                                           for="filter_chartVendasTotalPorVendedor_grupos">Grupos</label>
+                                                    <div class="col-sm-10">
+                                                        <div class="input-group">
+                                                            <select id="filter_chartVendasTotalPorVendedor_grupos"
+                                                                    name="filter[chartVendasTotalPorVendedor][grupos]"
+                                                                    class="form-control"
+                                                                    multiple
+                                                                    data-options="{{ grupos }}"
+                                                                    data-val="{{ filter.chartVendasTotalPorVendedor.grupos }}"></select>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-sm-2"
+                                                           for="filter_chartVendasTotalPorVendedor_lojas">Lojas</label>
+                                                    <div class="col-sm-8">
+                                                        <div class="input-group">
+                                                            <select id="filter_chartVendasTotalPorVendedor_lojas"
+                                                                    name="filter[chartVendasTotalPorVendedor][lojas]"
+                                                                    class="form-control"
+                                                                    multiple
+                                                                    data-options="{{ lojas }}"
+                                                                    data-val="{{ filter.chartVendasTotalPorVendedor.lojas }}"></select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <button id="btnFiltrar_chartVendasTotalPorVendedor"
+                                                                class="btn btn-primary ml-2"><i
+                                                                    class="fas fa-search"></i> Filtrar
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div id="chart_vendasTotalPorVendedor" style="height: 450px"></div>
+
+
+                                                <div class="d-flex justify-content-center">
+                                                    Rentabilidade Geral: <span
+                                                            id="chart_totalPorVendedor_rentabilidade"
+                                                            style="font-weight: bold"> </span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <div class="row mt-1">
                     <div class="col-sm-12">
 
                         <div class="card">
@@ -17,25 +187,25 @@
                                 <div class="d-flex flex-wrap align-items-center">
 
                                     <div class="d-sm-flex text-nowrap mr-1">
-                                        <h3>Vendas</h3>
+                                        <h3>Contas a Pagar/Receber</h3>
                                     </div>
                                     <div class="d-sm-flex flex-nowrap ml-auto">
 
-                                        <label for="filter_vendas_grupo" class="my-auto">Grupo: </label>
-                                        <select id="filter_vendas_grupo" style="width: 150px" name="filter[vendas][grupo]" class="ml-2"
-                                                data-options="{{ grupos }}" data-val="{{ filter.vendas.grupo }}"></select>
+                                        <label for="filter_contasPagRec_filial" class="my-auto ml-2">Filial: </label>
+                                        <select id="filter_contasPagRec_filial" style="width: 450px"
+                                                name="filter[contasPagRec][filial]" class="ml-2"
+                                                data-options="{{ filiais }}"
+                                                data-val="{{ filter.contasPagRec.filial }}"></select>
 
-                                        <label for="filter_vendas_loja" class="my-auto ml-2">Loja: </label>
-                                        <select id="filter_vendas_loja" name="filter[vendas][loja]" class="ml-2"
-                                                data-options="{{ lojas }}" data-val="{{ filter.vendas.loja }}"></select>
+                                        <label for="filter_contasPagRec_dts" class="my-auto ml-2">Período: </label>
+                                        <input type="text"
+                                               id="filter_contasPagRec_dts"
+                                               name="filter[contasPagRec][dts]"
+                                               data-mask="00/00/0000 - 00/00/0000"
+                                               style="text-align: center"
+                                               value="{{ filter.contasPagRec.dts|default('') }}">
 
-                                        <label for="filterDts" class="my-auto ml-2">Período: </label>
-                                        <input type="text" class="form-control" id="filter_vendas_dts" class="ml-2"
-                                               name="filter[vendas][dts]" data-mask="00/00/0000 - 00/00/0000"
-                                               style="width: 180px; text-align: center"
-                                               value="{{ filter.vendas.dts|default('') }}">
-
-                                        <button id="btnVendasSearch" class="btn btn-primary ml-2"><i class="fas fa-search"></i></button>
+                                        <button id="btnContasPagRecSearch" class="btn btn-primary ml-2"><i class="fas fa-search"></i></button>
                                     </div>
 
                                 </div>
@@ -44,140 +214,53 @@
 
 
                             <div class="card-body">
-
-                                <div class="row mt-3">
-                                    <div class="col-sm-6">
-
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h6>Total por Fornecedor</h6>
-                                            </div>
-                                            <div class="card-body">
-
-                                                <div id="chart_totalPorFornecedor" style="height: 450px"></div>
-
-
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    <div class="col-sm-6">
-
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h6>Total por Vendedor</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div id="chart_totalPorVendedor" style="height: 450px"></div>
-                                                <div class="d-flex justify-content-center">
-                                                    Rentabilidade Geral: <span id="chart_totalPorVendedor_rentabilidade" style="font-weight: bold"> </span>
-                                                </div>
-
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-
-                                <div class="row mt-3">
-                                    <div class="col-sm-12">
-
-                                        <div class="card">
-
-                                            <div class="card-header">
-                                                <div class="d-flex flex-wrap align-items-center">
-
-                                                    <div class="d-sm-flex text-nowrap mr-1">
-                                                        <h3>Contas a Pagar/Receber</h3>
-                                                    </div>
-                                                    <div class="d-sm-flex flex-nowrap ml-auto">
-
-                                                        <label for="filter_contasPagRec_filial" class="my-auto ml-2">Filial: </label>
-                                                        <select id="filter_contasPagRec_filial" style="width: 450px" name="filter[contasPagRec][filial]" class="ml-2"
-                                                                data-options="{{ filiais }}" data-val="{{ filter.contasPagRec.filial }}"></select>
-
-                                                        <!--
-                                                        <label for="filter_contasPagRec_localizador" class="my-auto ml-2">Localizador: </label>
-                                                        <select id="filter_contasPagRec_localizador" style="width: 250px" name="filter[contasPagRec][localizador]" class="ml-2"
-                                                                data-options="{{ localizadores }}" data-val="{{ filter.contasPagRec.localizador }}"></select>
-                                                        -->
-
-                                                        <label for="filterDts" class="my-auto ml-2">Período: </label>
-                                                        <input type="text" class="form-control" id="filter_contasPagRec_dts"
-                                                               name="filter_contasPagRec[dts]" data-mask="00/00/0000 - 00/00/0000"
-                                                               style="width: 180px; text-align: center"
-                                                               value="{{ filter.contasPagRec.dts|default('') }}">
-
-                                                        <button id="btnContasPagRecSearch" class="btn btn-primary ml-2"><i class="fas fa-search"></i></button>
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
-
-                                            <div class="card-body">
-
-                                                <div id="chart_contasPagarReceber" style="height: 450px"></div>
-
-
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-                                <div class="row mt-3">
-                                    <div class="col-sm-12">
-
-                                        <div class="card">
-
-                                            <div class="card-header">
-                                                <div class="d-flex flex-wrap align-items-center">
-
-                                                    <div class="d-sm-flex text-nowrap mr-1">
-                                                        <h3>Compras</h3>
-                                                    </div>
-                                                    <div class="d-sm-flex flex-nowrap ml-auto">
-                                                        <label for="filterDts" class="my-auto">Período: </label>
-                                                        <input type="text" class="form-control" id="filter_relCompFor01_dts"
-                                                               name="filter_relCompFor01[dts]" data-mask="00/00/0000 - 00/00/0000"
-                                                               style="width: 180px; text-align: center"
-                                                               value="{{ filter.relCompFor01.dts|default('') }}">
-                                                        <button id="btnComprasSearch" class="btn btn-primary ml-2"><i class="fas fa-search"></i></button>
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
-
-                                            <div class="card-body">
-
-                                                <div id="chart_relCompFor01" style="height: 450px"></div>
-
-
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-
+                                <div id="chart_contasPagarReceber" style="height: 450px"></div>
                             </div>
+
                         </div>
                     </div>
 
                 </div>
+            </div>
 
+
+            <div class="card">
+
+                <div class="card-header">
+                    <div class="d-flex flex-wrap align-items-center">
+                        <div class="d-sm-flex text-nowrap mr-1">
+                            <h3>Compras</h3>
+
+                        </div>
+                        <div class="d-sm-flex flex-nowrap ml-auto">
+                            <label for="filter_relCompFor01_dts" class="my-auto">Período: </label>
+                            <input type="text" class="form-control"
+                                   id="filter_relCompFor01_dts"
+                                   name="filter_relCompFor01[dts]"
+                                   data-mask="00/00/0000 - 00/00/0000"
+                                   style="width: 180px; text-align: center"
+                                   value="{{ filter.relCompFor01.dts|default('') }}">
+                            <button id="btnComprasSearch" class="btn btn-primary ml-2"><i
+                                        class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card-body">
+                    <div id="chart_relCompFor01" style="height: 450px"></div>
+                </div>
             </div>
         </div>
+
 
     {% endif %}
 
 {% endblock %}
 
 {% block down_scripts %}
-    <script src="{{ asset('build/dashboard.js') }}"></script>
+    <script src="{{ asset('build/dashboard_chartVendasTotalPorFornecedor.js') }}"></script>
+    <script src="{{ asset('build/dashboard_chartVendasTotalPorVendedor.js') }}"></script>
+    <script src="{{ asset('build/dashboard_chartContasPagarReceber.js') }}"></script>
+    <script src="{{ asset('build/dashboard_chartCompras.js') }}"></script>
 {% endblock %}

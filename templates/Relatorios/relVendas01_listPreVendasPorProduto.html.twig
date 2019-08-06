@@ -5,47 +5,27 @@
 
 {% block page_content %}
 
-    <form action="{{ url('relVendas01_listPreVendasPorVendedor') }}" method="get" id="formPesquisar">
+    <form action="{{ url('relVendas01_listPreVendasPorProduto') }}" method="get" id="formPesquisar">
 
         <div class="card">
             <div class="card-header">
 
 
-                <div class="d-flex flex-wrap align-items-center">
+                <div class="d-flex flex-wrap">
 
-                    <div class="d-sm-flex mr-1">
-                        <h3>PVs por Vendedor ({{ filter.vendedor }})</h3>
+                    <div>
+                        <h3>PVs por Produto</h3>
+                        <h6>{{ produto }}</h6>
                     </div>
-                    <div class="d-sm-flex flex-nowrap ml-auto">
+                    <div class="ml-auto justify-content-end text-right">
 
-                        <label for="filter_grupo" class="my-auto">Grupo: </label>
-                        <select id="filter_grupo" style="width: 150px" name="filter[grupo]" class="ml-2"
-                                data-options="{{ grupos }}" data-val="{{ filter.grupo }}"></select>
 
-                        <label for="filter_loja" class="my-auto ml-2">Loja: </label>
-                        <select id="filter_loja" name="filter[loja]" class="ml-2"
-                                data-options="{{ lojas }}" data-val="{{ filter.loja }}"></select>
-
-                        <div class="mr-3"></div>
-
-                        <select id="filter_vendedor" name="filter[vendedor]"
-                                data-options="{{ vendedores }}" data-val="{{ filter.vendedor }}"></select>
-
-                        <input type="text" class="form-control ml-2" id="filterDts"
-                               name="filter[dts]" data-mask="00/00/0000 - 00/00/0000"
-                               style="width: 180px; text-align: center"
-                               value="{{ filter.dts|default('') }}">
-
-                        <button class="btn btn-outline-success ml-1"
-                                type="button" id="btnAnterior" title="Anterior"
-                                data-ante-periodoi="{{ antePeriodoI }}"
-                                data-ante-periodof="{{ antePeriodoF }}">
-                            <i class="fas fa-chevron-left"></i></button>
-                        <button class="btn btn-outline-success ml-1"
-                                type="button" id="btnProximo" title="Próximo"
-                                data-prox-periodoi="{{ proxPeriodoI }}"
-                                data-prox-periodof="{{ proxPeriodoF }}">
-                            <i class="fas fa-chevron-right"></i></button>
+                        Período: <b>{{ filter.dts }}</b>
+                        <br />
+                        Grupos: <b>{{ filter.grupos|join(',')|default('TODOS') }}</b>
+                        <br />
+                        Lojas: <b>{{ filter.lojas|join(',')|default('TODAS') }}</b>
+                        <br />
 
                     </div>
                 </div>
@@ -64,9 +44,12 @@
                         <tr>
                             <th scope="col" title="">#</th>
                             <th scope="col">PV</th>
+                            <th scope="col">Cliente</th>
                             <th scope="col">Dt Emissão</th>
-                            <th scope="col">Vendedor</th>
+                            <th scope="col">Produto</th>
+                            <th scope="col">Total Custo</th>
                             <th scope="col">Total Venda</th>
+                            <th scope="col">Rentabilidade</th>
                             <th scope="col"></th>
                         </tr>
                         </thead>
@@ -80,18 +63,27 @@
                                 <td>
                                     {{ item.prevenda }}
                                 </td>
+                                <td>
+                                    {{ item.cliente_pv }}
+                                </td>
                                 <td class="text-center">
                                     {{ item.dt_emissao|date('d/m/Y') }}
                                 </td>
                                 <td>
                                     {{ item.cod_vendedor }} - {{ item.nome_vendedor }}
                                 </td>
+                                <td class="text-right" data-order="{{ item.total_custo_pv }}">
+                                    {{ item.total_custo_pv|number_format(2,',','.') }}
+                                </td>
                                 <td class="text-right" data-order="{{ item.total_venda_pv }}">
                                     {{ item.total_venda_pv|number_format(2,',','.') }}
                                 </td>
+                                <td class="text-right" data-order="{{ item.rent }}">
+                                    {{ item.rent|number_format(2,',','.') }}%
+                                </td>
                                 <td class="text-right">
                                     <a class="btn btn-outline-secondary"
-                                       href="{{ url('relVendas01_preVendaItens', {'pv': item.prevenda}) }}"
+                                       href="{{ url('relVendas01_listPreVendaItens', {'pv': item.prevenda}) }}"
                                        role="button">
                                         <i class="far fa-list-alt"></i> Itens
                                     </a>
@@ -105,13 +97,14 @@
                         <tfoot>
 
                         <tr style="background-color: antiquewhite; font-weight: bold">
-                            <td colspan="4" class="text-right">
+                            <td colspan="6" class="text-right" style="padding: 10px">
                                 Total:
                             </td>
                             <td class="text-right" style="padding: 10px">
                                 {{ total|number_format(2,',','.') }}
                             </td>
                             <td class="text-right">
+                            </td><td class="text-right">
                             </td>
 
                         </tr>
@@ -128,5 +121,5 @@
 
 
 {% block down_scripts %}
-    <script src="{{ asset('build/Relatorios/relVendas01_preVendasPorVendedor.js') }}"></script>
+    <script src="{{ asset('build/Relatorios/relVendas01_listPreVendasPorProduto.js') }}"></script>
 {% endblock %}

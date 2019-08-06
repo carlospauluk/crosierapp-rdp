@@ -23,15 +23,15 @@ class RelVendas01Repository extends FilterRepository
 
 
     /**
-     * Utilizado na exibição do gráfico no dashboard.
+     * Utilizado no gráfico de Total de Vendas por Fornecedor.
      *
      * @param \DateTime|null $dtIni
      * @param \DateTime|null $dtFim
-     * @param string|null $loja
-     * @param string|null $grupo
+     * @param string|null $lojas
+     * @param string|null $grupos
      * @return mixed
      */
-    public function totalVendasPorFornecedor(\DateTime $dtIni = null, \DateTime $dtFim = null, string $loja = null, string $grupo = null)
+    public function totalVendasPorFornecedor(\DateTime $dtIni = null, \DateTime $dtFim = null, ?string $lojas = null, ?string $grupos = null)
     {
         $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
         $dtIni->setTime(0, 0, 0, 0);
@@ -40,11 +40,11 @@ class RelVendas01Repository extends FilterRepository
 
         $sql = 'SELECT nome_fornec, sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE dt_emissao BETWEEN :dtIni and :dtFim ';
 
-        if ($grupo) {
-            $sql .= 'AND grupo = :grupo ';
+        if ($grupos) {
+            $sql .= 'AND grupo IN (:grupos) ';
         }
-        if ($loja) {
-            $sql .= 'AND loja = :loja ';
+        if ($lojas) {
+            $sql .= 'AND loja IN (:lojas) ';
         }
 
         $sql .= ' GROUP BY nome_fornec ORDER BY total_venda';
@@ -56,11 +56,13 @@ class RelVendas01Repository extends FilterRepository
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
         $query->setParameter('dtIni', $dtIni);
         $query->setParameter('dtFim', $dtFim);
-        if ($grupo) {
-            $query->setParameter('grupo', $grupo);
+        if ($grupos) {
+            $grupos = explode(',', $grupos);
+            $query->setParameter('grupos', $grupos);
         }
-        if ($loja) {
-            $query->setParameter('loja', $loja);
+        if ($lojas) {
+            $lojas = explode(',', $lojas);
+            $query->setParameter('lojas', $lojas);
         }
 
         return $query->getResult();
@@ -68,15 +70,17 @@ class RelVendas01Repository extends FilterRepository
 
 
     /**
+     * Utilizado na listagem de produtos vendidos por fornecedor.
+     *
      * @param \DateTime|null $dtIni
      * @param \DateTime|null $dtFim
      * @param string $nomeFornec
-     * @param string|null $loja
-     * @param string|null $grupo
+     * @param array|null $lojas
+     * @param array|null $grupos
      * @param bool $totalGeral
      * @return mixed
      */
-    public function itensVendidos(\DateTime $dtIni, \DateTime $dtFim, string $nomeFornec, string $loja = null, string $grupo = null, bool $totalGeral = false)
+    public function itensVendidos(\DateTime $dtIni, \DateTime $dtFim, string $nomeFornec, ?array $lojas = null, ?array $grupos = null, bool $totalGeral = false)
     {
         $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
         $dtIni->setTime(0, 0, 0, 0);
@@ -93,11 +97,11 @@ class RelVendas01Repository extends FilterRepository
                     FROM rdp_rel_vendas01
                      WHERE nome_fornec = :nomeFornec AND dt_emissao BETWEEN :dtIni AND :dtFim ';
 
-        if ($grupo) {
-            $sql .= ' AND grupo = :grupo';
+        if ($grupos) {
+            $sql .= ' AND grupo IN (:grupos)';
         }
-        if ($loja) {
-            $sql .= ' AND loja = :loja';
+        if ($lojas) {
+            $sql .= ' AND loja IN (:lojas)';
         }
 
         if (!$totalGeral) {
@@ -118,11 +122,11 @@ class RelVendas01Repository extends FilterRepository
         $query->setParameter('dtIni', $dtIni);
         $query->setParameter('dtFim', $dtFim);
         $query->setParameter('nomeFornec', $nomeFornec);
-        if ($grupo) {
-            $query->setParameter('grupo', $grupo);
+        if ($grupos) {
+            $query->setParameter('grupos', $grupos);
         }
-        if ($loja) {
-            $query->setParameter('loja', $loja);
+        if ($lojas) {
+            $query->setParameter('lojas', $lojas);
         }
 
         return $query->getResult();
@@ -130,13 +134,16 @@ class RelVendas01Repository extends FilterRepository
     }
 
     /**
+     * Utilizado no gráfico de Total de Vendas por Vendedor.
+     *
      * @param \DateTime|null $dtIni
      * @param \DateTime|null $dtFim
-     * @param string|null $loja
-     * @param string|null $grupo
+     * @param string|null $lojas
+     * @param string|null $grupos
      * @return mixed
+     * @throws NonUniqueResultException
      */
-    public function totalVendasPorVendedor(\DateTime $dtIni = null, \DateTime $dtFim = null, string $loja = null, string $grupo = null)
+    public function totalVendasPorVendedor(\DateTime $dtIni = null, \DateTime $dtFim = null, ?string $lojas = null, ?string $grupos = null)
     {
         $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
         $dtIni->setTime(0, 0, 0, 0);
@@ -144,12 +151,12 @@ class RelVendas01Repository extends FilterRepository
         $dtFim->setTime(23, 59, 59, 99999);
 
         $sql_AND_grupo = '';
-        if ($grupo) {
-            $sql_AND_grupo .= ' AND grupo = :grupo';
+        if ($grupos) {
+            $sql_AND_grupo .= ' AND grupo = :grupos';
         }
         $sql_AND_loja = '';
-        if ($loja) {
-            $sql_AND_loja .= ' AND loja = :loja';
+        if ($lojas) {
+            $sql_AND_loja .= ' AND loja = :lojas';
         }
 
         $sql = '
@@ -177,29 +184,31 @@ class RelVendas01Repository extends FilterRepository
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
         $query->setParameter('dtIni', $dtIni);
         $query->setParameter('dtFim', $dtFim);
-        if ($grupo) {
-            $query->setParameter('grupo', $grupo);
+        if ($grupos) {
+            $query->setParameter('grupos', $grupos);
         }
-        if ($loja) {
-            $query->setParameter('loja', $loja);
+        if ($lojas) {
+            $query->setParameter('lojas', $lojas);
         }
 
         $dados = $query->getResult();
 
-        $rentabilidadeGeral = $this->totalRentabilidade($dtIni, $dtFim, $loja, $grupo)['rent'] ?? 0.0;
+        $rentabilidadeGeral = $this->totalRentabilidade($dtIni, $dtFim, $lojas, $grupos)['rent'] ?? 0.0;
 
         return ['dados' => $dados, 'rentabilidadeGeral' => $rentabilidadeGeral];
     }
 
     /**
+     * Utilizado no gráfico de Total de Vendas por Vendedor.
+     *
      * @param \DateTime|null $dtIni
      * @param \DateTime|null $dtFim
-     * @param string|null $loja
-     * @param string|null $grupo
+     * @param string|null $lojas
+     * @param string|null $grupos
      * @return mixed
      * @throws NonUniqueResultException
      */
-    public function totalRentabilidade(\DateTime $dtIni = null, \DateTime $dtFim = null, string $loja = null, string $grupo = null)
+    public function totalRentabilidade(\DateTime $dtIni = null, \DateTime $dtFim = null, ?string $lojas = null, ?string $grupos = null)
     {
         $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
         $dtIni->setTime(0, 0, 0, 0);
@@ -207,12 +216,12 @@ class RelVendas01Repository extends FilterRepository
         $dtFim->setTime(23, 59, 59, 99999);
 
         $sql_AND_grupo = '';
-        if ($grupo) {
-            $sql_AND_grupo .= ' AND grupo = :grupo';
+        if ($grupos) {
+            $sql_AND_grupo .= ' AND grupo IN (:grupos)';
         }
         $sql_AND_loja = '';
-        if ($loja) {
-            $sql_AND_loja .= ' AND loja = :loja';
+        if ($lojas) {
+            $sql_AND_loja .= ' AND loja IN (:lojas)';
         }
 
         $sql = '
@@ -235,71 +244,15 @@ class RelVendas01Repository extends FilterRepository
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
         $query->setParameter('dtIni', $dtIni);
         $query->setParameter('dtFim', $dtFim);
-        if ($grupo) {
-            $query->setParameter('grupo', $grupo);
+        if ($grupos) {
+            $query->setParameter('grupos', $grupos);
         }
-        if ($loja) {
-            $query->setParameter('loja', $loja);
+        if ($lojas) {
+            $query->setParameter('lojas', $lojas);
         }
 
         return $query->getOneOrNullResult();
     }
-
-
-    /**
-     * @param \DateTime|null $dtIni
-     * @param \DateTime|null $dtFim
-     * @param int $codVendedor
-     * @param string|null $loja
-     * @param string|null $grupo
-     * @return mixed
-     */
-    public function preVendasPorPeriodo(\DateTime $dtIni, \DateTime $dtFim, int $codVendedor, string $loja = null, string $grupo = null)
-    {
-        $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
-        $dtIni->setTime(0, 0, 0, 0);
-        $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
-        $dtFim->setTime(23, 59, 59, 99999);
-
-
-        $sql_AND_grupo = '';
-        if ($grupo) {
-            $sql_AND_grupo .= ' AND grupo = :grupo';
-        }
-        $sql_AND_loja = '';
-        if ($loja) {
-            $sql_AND_loja .= ' AND loja = :loja';
-        }
-
-        $sql = 'SELECT prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv
-                    FROM rdp_rel_vendas01
-                     WHERE cod_vendedor = :codVendedor AND dt_emissao BETWEEN :dtIni AND :dtFim 
-                     ' . $sql_AND_grupo . $sql_AND_loja . '
-                     GROUP BY prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv ORDER BY dt_emissao, total_venda_pv';
-
-        $rsm = new ResultSetMapping();
-        $rsm->addScalarResult('prevenda', 'prevenda');
-        $rsm->addScalarResult('dt_emissao', 'dt_emissao');
-        $rsm->addScalarResult('cod_vendedor', 'cod_vendedor');
-        $rsm->addScalarResult('nome_vendedor', 'nome_vendedor');
-        $rsm->addScalarResult('total_venda_pv', 'total_venda_pv');
-
-        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
-        $query->setParameter('dtIni', $dtIni);
-        $query->setParameter('dtFim', $dtFim);
-        $query->setParameter('codVendedor', $codVendedor);
-        if ($grupo) {
-            $query->setParameter('grupo', $grupo);
-        }
-        if ($loja) {
-            $query->setParameter('loja', $loja);
-        }
-
-        return $query->getResult();
-    }
-
-
-
 
 
     /**
@@ -415,6 +368,7 @@ class RelVendas01Repository extends FilterRepository
 
 
     /**
+     * @param string $codigo
      * @return null|string
      */
     public function getProdutoByCodigo(string $codigo): ?string
@@ -449,16 +403,15 @@ class RelVendas01Repository extends FilterRepository
     }
 
 
-
-
-
     /**
      * @param \DateTime|null $dtIni
      * @param \DateTime|null $dtFim
-     * @param string $codProduto
+     * @param string $produto
+     * @param array|null $lojas
+     * @param array|null $grupos
      * @return mixed
      */
-    public function preVendasPorPeriodoEProduto(\DateTime $dtIni, \DateTime $dtFim, string $produto, string $loja = null, string $grupo = null)
+    public function preVendasPorPeriodoEProduto(\DateTime $dtIni, \DateTime $dtFim, string $produto, ?array $lojas = null, ?array $grupos = null)
     {
         $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
         $dtIni->setTime(0, 0, 0, 0);
@@ -469,11 +422,11 @@ class RelVendas01Repository extends FilterRepository
                     FROM rdp_rel_vendas01
                      WHERE CONCAT(cod_prod, \' - \', desc_prod) = :produto AND dt_emissao BETWEEN :dtIni AND :dtFim ';
 
-        if ($grupo) {
-            $sql .= 'AND grupo = :grupo ';
+        if ($grupos) {
+            $sql .= 'AND grupo IN (:grupos) ';
         }
-        if ($loja) {
-            $sql .= 'AND loja = :loja ';
+        if ($lojas) {
+            $sql .= 'AND loja IN (:lojas) ';
         }
 
         $sql .= 'GROUP BY prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv, total_custo_pv, cliente_pv ORDER BY dt_emissao, total_venda_pv';
@@ -492,11 +445,68 @@ class RelVendas01Repository extends FilterRepository
         $query->setParameter('dtIni', $dtIni);
         $query->setParameter('dtFim', $dtFim);
         $query->setParameter('produto', $produto);
-        if ($grupo) {
-            $query->setParameter('grupo', $grupo);
+        if ($grupos) {
+            $query->setParameter('grupos', $grupos);
         }
-        if ($loja) {
-            $query->setParameter('loja', $loja);
+        if ($lojas) {
+            $query->setParameter('lojas', $lojas);
+        }
+
+        return $query->getResult();
+    }
+
+    /**
+     * Utilizado na listagem de PVs por período e vendedor.
+     *
+     * @param \DateTime|null $dtIni
+     * @param \DateTime|null $dtFim
+     * @param int $codVendedor
+     * @param array|null $lojas
+     * @param array|null $grupos
+     * @return mixed
+     */
+    public function preVendasPorPeriodoEVendedor(\DateTime $dtIni, \DateTime $dtFim, int $codVendedor, ?array $lojas = null, ?array $grupos = null)
+    {
+        $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
+        $dtIni->setTime(0, 0, 0, 0);
+        $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
+        $dtFim->setTime(23, 59, 59, 99999);
+
+
+        $sql_AND_grupo = '';
+        if ($grupos) {
+            $sql_AND_grupo .= ' AND grupo IN (:grupos)';
+        }
+        $sql_AND_loja = '';
+        if ($lojas) {
+            $sql_AND_loja .= ' AND loja IN (:lojas)';
+        }
+
+        $sql = 'SELECT prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv, total_custo_pv, (((total_venda_pv / total_custo_pv) - 1) * 100.0) as rent, cliente_pv
+                    FROM rdp_rel_vendas01
+                     WHERE cod_vendedor = :codVendedor AND dt_emissao BETWEEN :dtIni AND :dtFim 
+                     ' . $sql_AND_grupo . $sql_AND_loja . '
+                     GROUP BY prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv, total_custo_pv, cliente_pv ORDER BY dt_emissao, total_venda_pv';
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('prevenda', 'prevenda');
+        $rsm->addScalarResult('dt_emissao', 'dt_emissao');
+        $rsm->addScalarResult('cod_vendedor', 'cod_vendedor');
+        $rsm->addScalarResult('nome_vendedor', 'nome_vendedor');
+        $rsm->addScalarResult('total_custo_pv', 'total_custo_pv');
+        $rsm->addScalarResult('total_venda_pv', 'total_venda_pv');
+        $rsm->addScalarResult('cliente_pv', 'cliente_pv');
+        $rsm->addScalarResult('rent', 'rent');
+
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('dtIni', $dtIni);
+        $query->setParameter('dtFim', $dtFim);
+        $query->setParameter('codVendedor', $codVendedor);
+        if ($grupos) {
+            $query->setParameter('grupos', $grupos);
+        }
+        if ($lojas) {
+            $query->setParameter('lojas', $lojas);
         }
 
         return $query->getResult();

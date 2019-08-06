@@ -5,7 +5,7 @@
 
 {% block page_content %}
 
-    <form action="{{ url('relCompFor01_itensCompradosPorFornecedor') }}" method="get" id="formPesquisar">
+    <form action="{{ url('relVendas01_listItensVendidosPorFornecedor') }}" method="get" id="formPesquisar">
 
         <div class="card">
             <div class="card-header">
@@ -13,10 +13,30 @@
 
                 <div class="d-flex flex-wrap align-items-center">
 
-                    <div class="d-sm-flex text-nowrap mr-1">
-                        <h3>Itens Comprados por Fornecedor</h3>
+                    <div>
+                        <h3>Itens Vendidos por Fornecedor</h3>
+                        <h6>{{ filter.nomeFornec }}</h6>
                     </div>
-                    <div class="d-sm-flex flex-nowrap ml-auto">
+                    <div class="ml-auto justify-content-end text-right">
+
+                        Período: <b>{{ filter.dts }}</b>
+                        <br />
+                        Grupos: <b>{{ filter.grupos|join(',')|default('TODOS') }}</b>
+                        <br />
+                        Lojas: <b>{{ filter.lojas|join(',')|default('TODAS') }}</b>
+                        <br />
+
+
+<!--
+                        <label for="filter_grupos" class="my-auto">Grupos: </label>
+                        <select id="filter_grupos" style="width: 150px" name="filter[grupos]" class="ml-2" multiple
+                                data-options="{{ grupos }}" data-val="{{ filter.grupos|join(',') }}"></select>
+
+                        <label for="filter_lojas" class="my-auto ml-2">Lojas: </label>
+                        <select id="filter_lojas" name="filter[lojas]" class="ml-2" multiple
+                                data-options="{{ lojas }}" data-val="{{ filter.lojas|join(',') }}"></select>
+
+                        <div class="mr-3"></div>
 
                         <select id="filter_nomeFornec" name="filter[nomeFornec]"
                                 data-options="{{ fornecedores }}" data-val="{{ filter.nomeFornec }}"></select>
@@ -36,7 +56,7 @@
                                 data-prox-periodoi="{{ proxPeriodoI }}"
                                 data-prox-periodof="{{ proxPeriodoF }}">
                             <i class="fas fa-chevron-right"></i></button>
-
+-->
                     </div>
                 </div>
 
@@ -57,6 +77,7 @@
                             <th scope="col">Produto</th>
                             <th scope="col">Qtde</th>
                             <th scope="col">Total Custo</th>
+                            <th scope="col">Total Venda</th>
                             <th scope="col"></th>
                         </tr>
                         </thead>
@@ -73,13 +94,25 @@
                                     {{ item.desc_prod }}
                                 </td>
                                 <td class="text-right">
-                                    {{ item.qtde_total|number_format(0,',','.') }}
+                                    {{ item.qtde_total }}
                                 </td>
-                                <td class="text-right" data-order="{{ item.total }}">
-                                    {{ item.total|number_format(2,',','.') }}
+                                <td class="text-right" data-order="{{ item.tpc }}">
+                                    {{ item.tpc|number_format(2,',','.') }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.tpv }}">
+                                    {{ item.tpv|number_format(2,',','.') }}
                                 </td>
                                 <td class="text-right">
-                                    <a class="btn btn-outline-primary" href="{{ url('relCompFor01_itensCompradosPorFornecedor', {'filter' : {'dts': filter.dts, 'produto': (item.cod_prod ~ ' - ' ~ item.desc_prod)}} ) }}"
+                                    <a class="btn btn-outline-primary"
+                                       href="{{ url('relVendas01_listPreVendasPorProduto',
+                                           {'filter' :
+                                               {
+                                                   'dts': filter.dts,
+                                                   'produto': (item.cod_prod ~ ' - ' ~ item.desc_prod),
+                                                   'lojas': filter.lojas,
+                                                   'grupos': filter.grupos
+                                               }
+                                           }) }}"
                                        role="button" title="Listar PVs que contém este produto">
                                         <i class="far fa-list-alt"></i> PVs
                                     </a>
@@ -101,7 +134,10 @@
                                 {{ total.qtde_total }}
                             </td>
                             <td class="text-right">
-                                {{ total.total|number_format(2,',','.') }}
+                                {{ total.tpc|number_format(2,',','.') }}
+                            </td>
+                            <td class="text-right">
+                                {{ total.tpv|number_format(2,',','.') }}
                             </td>
                             <td class="text-right">
                             </td>
@@ -119,5 +155,5 @@
 
 
 {% block down_scripts %}
-    <script src="{{ asset('build/Relatorios/relCompFor01_itensCompradosPorFornecedor.js') }}"></script>
+    <script src="{{ asset('build/Relatorios/relVendas01_listItensVendidosPorFornecedor.js') }}"></script>
 {% endblock %}

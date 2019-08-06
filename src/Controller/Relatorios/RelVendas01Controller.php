@@ -9,6 +9,9 @@ use CrosierSource\CrosierLibBaseBundle\APIClient\Base\DiaUtilAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
+use DateTime;
+use Doctrine\ORM\NonUniqueResultException;
+use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,12 +52,12 @@ class RelVendas01Controller extends FormListController
 
     /**
      *
-     * @Route("/relVendas01/itensVendidosPorFornecedor/", name="relVendas01_itensVendidosPorFornecedor")
+     * @Route("/relVendas01/listItensVendidosPorFornecedor/", name="relVendas01_listItensVendidosPorFornecedor")
      * @param Request $request
      * @return Response
-     * @throws \Exception
+     * @throws Exception
      */
-    public function itensVendidosPorFornecedor(Request $request): Response
+    public function listItensVendidosPorFornecedor(Request $request): Response
     {
         $vParams = $request->query->all();
         /** @var RelVendas01Repository $repo */
@@ -64,26 +67,29 @@ class RelVendas01Controller extends FormListController
             if ($vParams['r'] ?? null) {
                 $this->storedViewInfoBusiness->clear($this->crudParams['listRoute']);
             }
-            $svi = $this->storedViewInfoBusiness->retrieve('relVendas01_itensVendidosPorFornecedor');
+            $svi = $this->storedViewInfoBusiness->retrieve('relVendas01_listItensVendidosPorFornecedor');
             if (isset($svi['filter'])) {
                 $vParams['filter'] = $svi['filter'];
             } else {
                 $vParams['filter'] = [];
                 $vParams['filter']['dts'] = '01/' . date('m/Y') . ' - ' . date('t/m/Y');
-                $vParams['filter']['loja'] = null;
-                $vParams['filter']['grupo'] = null;
+                $vParams['filter']['lojas'] = null;
+                $vParams['filter']['grupos'] = null;
             }
         }
 
-        $dtIni = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 0, 10)) ?: new \DateTime();
-        $dtFim = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 13, 10)) ?: new \DateTime();
+        $dtIni = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 0, 10)) ?: new DateTime();
+        $dtFim = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 13, 10)) ?: new DateTime();
 
         $nomeFornec = $vParams['filter']['nomeFornec'] ?? $repo->getNomeFornecedorMaisVendido($dtIni, $dtFim);
         $vParams['filter']['nomeFornec'] = $nomeFornec;
 
-        $r = $repo->itensVendidos($dtIni, $dtFim, $nomeFornec, $vParams['filter']['loja'], $vParams['filter']['grupo']);
+        $vParams['filter']['lojas'] = $vParams['filter']['lojas'] ?? null;
+        $vParams['filter']['grupos'] = $vParams['filter']['grupos'] ?? null;
 
-        $total = $repo->itensVendidos($dtIni, $dtFim, $nomeFornec, $vParams['filter']['loja'], $vParams['filter']['grupo'], true)[0];
+        $r = $repo->itensVendidos($dtIni, $dtFim, $nomeFornec, $vParams['filter']['lojas'], $vParams['filter']['grupos']);
+
+        $total = $repo->itensVendidos($dtIni, $dtFim, $nomeFornec, $vParams['filter']['lojas'], $vParams['filter']['grupos'], true)[0];
 
         $dtAnterior = clone $dtIni;
         $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');
@@ -110,57 +116,58 @@ class RelVendas01Controller extends FormListController
 
         $viewInfo = [];
         $viewInfo['filter'] = $vParams['filter'];
-        $this->storedViewInfoBusiness->store('relVendas01_itensVendidosPorFornecedor', $viewInfo);
+        $this->storedViewInfoBusiness->store('relVendas01_listItensVendidosPorFornecedor', $viewInfo);
 
-        return $this->doRender('Relatorios/relVendas01_itensVendidosPorFornecedor.html.twig', $vParams);
+        return $this->doRender('Relatorios/relVendas01_listItensVendidosPorFornecedor.html.twig', $vParams);
     }
 
 
     /**
      *
-     * @Route("/relVendas01/totalPorFornecedor/", name="relVendas01_totalPorFornecedor")
+     * @Route("/relVendas01/graficoTotalPorFornecedor/", name="relVendas01_graficoTotalPorFornecedor")
      * @param Request $request
      * @return JsonResponse
      */
-    public function totalPorFornecedor(Request $request): JsonResponse
+    public function graficoTotalPorFornecedor(Request $request): JsonResponse
     {
         $dts = $request->get('filterDts') ?? '';
 
-        $loja = $request->get('loja');
-        $grupo = $request->get('grupo');
+        $lojas = $request->get('lojas') ?: null;
+        $grupos = $request->get('grupos') ?: null;
 
-        $this->session->set('dashboard.filter.vendas.dts', $dts);
-        $this->session->set('dashboard.filter.vendas.loja', $loja);
-        $this->session->set('dashboard.filter.vendas.grupo', $grupo);
+        $this->session->set('dashboard.filter.chartVendasTotalPorFornecedor.dts', $dts);
+        $this->session->set('dashboard.filter.chartVendasTotalPorFornecedor.lojas', $lojas);
+        $this->session->set('dashboard.filter.chartVendasTotalPorFornecedor.grupos', $grupos);
 
         $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
         $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
 
         /** @var RelVendas01Repository $repoRelVendas01 */
         $repoRelVendas01 = $this->getDoctrine()->getRepository(RelVendas01::class);
-        $r = $repoRelVendas01->totalVendasPorFornecedor($dtIni, $dtFim, $loja, $grupo);
+        $r = $repoRelVendas01->totalVendasPorFornecedor($dtIni, $dtFim, $lojas, $grupos);
         return new JsonResponse($r);
     }
 
 
     /**
      *
-     * @Route("/relVendas01/totalPorVendedor/", name="relVendas01_totalPorVendedor")
+     * @Route("/relVendas01/graficoTotalPorVendedor/", name="relVendas01_graficoTotalPorVendedor")
      * @param Request $request
      * @return JsonResponse
+     * @throws NonUniqueResultException
      */
-    public function totalPorVendedor(Request $request): JsonResponse
+    public function graficoTotalPorVendedor(Request $request): JsonResponse
     {
         $dts = $request->get('filterDts') ?? '';
-        $loja = $request->get('loja');
-        $grupo = $request->get('grupo');
+        $lojas = $request->get('lojas') ?: null;
+        $grupos = $request->get('grupos') ?: null;
 
         $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
         $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
 
         /** @var RelVendas01Repository $repoRelVendas01 */
         $repoRelVendas01 = $this->getDoctrine()->getRepository(RelVendas01::class);
-        $r = $repoRelVendas01->totalVendasPorVendedor($dtIni, $dtFim, $loja, $grupo);
+        $r = $repoRelVendas01->totalVendasPorVendedor($dtIni, $dtFim, $lojas, $grupos);
 
         return new JsonResponse($r);
     }
@@ -171,7 +178,7 @@ class RelVendas01Controller extends FormListController
      * @Route("/relVendas01/listPreVendasPorVendedor/", name="relVendas01_listPreVendasPorVendedor")
      * @param Request $request
      * @return Response
-     * @throws \Exception
+     * @throws Exception
      */
     public function listPreVendasPorVendedor(Request $request): Response
     {
@@ -189,18 +196,20 @@ class RelVendas01Controller extends FormListController
             } else {
                 $vParams['filter'] = [];
                 $vParams['filter']['dts'] = '01/' . date('m/Y') . ' - ' . date('t/m/Y');
-                $vParams['filter']['loja'] = null;
-                $vParams['filter']['grupo'] = null;
+                $vParams['filter']['lojas'] = null;
+                $vParams['filter']['grupos'] = null;
             }
         }
 
-        $dtIni = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 0, 10)) ?: new \DateTime();
-        $dtFim = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 13, 10)) ?: new \DateTime();
+        $dtIni = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 0, 10)) ?: new DateTime();
+        $dtFim = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 13, 10)) ?: new DateTime();
 
         $codVendedor = explode(' - ', $vParams['filter']['vendedor'])[0] ?? 0;
 
+        $vParams['filter']['lojas'] = $vParams['filter']['lojas'] ?: null;
+        $vParams['filter']['grupos'] = $vParams['filter']['grupos'] ?: null;
 
-        $r = $repo->preVendasPorPeriodo($dtIni, $dtFim, $codVendedor, $vParams['filter']['loja'], $vParams['filter']['grupo']);
+        $r = $repo->preVendasPorPeriodoEVendedor($dtIni, $dtFim, $codVendedor, $vParams['filter']['lojas'], $vParams['filter']['grupos']);
 
         $vParams['total'] = 0.0;
         foreach ($r as $pv) {
@@ -232,7 +241,7 @@ class RelVendas01Controller extends FormListController
         $viewInfo['filter'] = $vParams['filter'];
         $this->storedViewInfoBusiness->store('relVendas01_listPreVendasPorVendedor', $viewInfo);
 
-        return $this->doRender('Relatorios/relVendas01_preVendasPorVendedor.html.twig', $vParams);
+        return $this->doRender('Relatorios/relVendas01_listPreVendasPorVendedor.html.twig', $vParams);
     }
 
 
@@ -241,7 +250,7 @@ class RelVendas01Controller extends FormListController
      * @Route("/relVendas01/listPreVendasPorProduto/", name="relVendas01_listPreVendasPorProduto")
      * @param Request $request
      * @return Response
-     * @throws \Exception
+     * @throws Exception
      */
     public function listPreVendasPorProduto(Request $request): Response
     {
@@ -259,17 +268,20 @@ class RelVendas01Controller extends FormListController
             } else {
                 $vParams['filter'] = [];
                 $vParams['filter']['dts'] = '01/' . date('m/Y') . ' - ' . date('t/m/Y');
-                $vParams['filter']['loja'] = null;
-                $vParams['filter']['grupo'] = null;
+                $vParams['filter']['lojas'] = null;
+                $vParams['filter']['grupos'] = null;
             }
         }
 
-        $dtIni = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 0, 10)) ?: new \DateTime();
-        $dtFim = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 13, 10)) ?: new \DateTime();
+        $dtIni = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 0, 10)) ?: new DateTime();
+        $dtFim = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 13, 10)) ?: new DateTime();
 
         $vParams['produto'] = $vParams['filter']['produto'];
 
-        $r = $repo->preVendasPorPeriodoEProduto($dtIni, $dtFim, $vParams['produto'], $vParams['filter']['loja'], $vParams['filter']['grupo']);
+        $vParams['filter']['lojas'] = $vParams['filter']['lojas'] ?? null;
+        $vParams['filter']['grupos'] = $vParams['filter']['grupos'] ?? null;
+
+        $r = $repo->preVendasPorPeriodoEProduto($dtIni, $dtFim, $vParams['produto'], $vParams['filter']['lojas'], $vParams['filter']['grupos']);
 
         $vParams['total'] = 0.0;
         foreach ($r as $pv) {
@@ -288,22 +300,29 @@ class RelVendas01Controller extends FormListController
 
         $vParams['dados'] = $r;
 
+        $lojas = $repo->getLojas();
+        array_unshift($lojas, ['id' => '', 'text' => 'TODAS']);
+        $vParams['lojas'] = json_encode($lojas);
+        $grupos = $repo->getGrupos();
+        array_unshift($grupos, ['id' => '', 'text' => 'TODOS']);
+        $vParams['grupos'] = json_encode($grupos);
+
         $viewInfo = [];
         $viewInfo['filter'] = $vParams['filter'];
         $this->storedViewInfoBusiness->store('relVendas01_listPreVendasPorProduto', $viewInfo);
 
-        return $this->doRender('Relatorios/relVendas01_preVendasPorProduto.html.twig', $vParams);
+        return $this->doRender('Relatorios/relVendas01_listPreVendasPorProduto.html.twig', $vParams);
     }
 
 
     /**
      *
-     * @Route("/relVendas01/preVendaItens/{pv}/", name="relVendas01_preVendaItens")
+     * @Route("/relVendas01/listPreVendaItens/{pv}/", name="relVendas01_listPreVendaItens")
      * @param int $pv
      * @return Response
-     * @throws \Exception
+     * @throws Exception
      */
-    public function preVendaItens(int $pv): Response
+    public function listPreVendaItens(int $pv): Response
     {
         /** @var RelVendas01Repository $repo */
         $repo = $this->getDoctrine()->getRepository(RelVendas01::class);
@@ -321,7 +340,7 @@ class RelVendas01Controller extends FormListController
             $this->addFlash('error', $e->getMessage());
         }
 
-        return $this->doRender('Relatorios/relVendas01_itensDoPreVenda.html.twig', $vParams);
+        return $this->doRender('Relatorios/relVendas01_listItensDoPreVenda.html.twig', $vParams);
     }
 
 

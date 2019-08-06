@@ -49,9 +49,13 @@ class DefaultController extends BaseController
         array_unshift($grupos, ['id' => '', 'text' => 'TODOS']);
         $params['grupos'] = json_encode($grupos);
 
-        $params['filter']['vendas']['dts'] = $session->get('dashboard.filter.vendas.dts') ?? ($primeiroDia . ' - ' . $ultimoDia);
-        $params['filter']['vendas']['loja'] = $session->get('dashboard.filter.vendas.loja') ?? '';
-        $params['filter']['vendas']['grupo'] = $session->get('dashboard.filter.vendas.grupo') ?? '';
+        $params['filter']['chartVendasTotalPorFornecedor']['dts'] = $session->get('dashboard.filter.chartVendasTotalPorFornecedor.dts') ?? ($primeiroDia . ' - ' . $ultimoDia);
+        $params['filter']['chartVendasTotalPorFornecedor']['lojas'] = $session->get('dashboard.filter.chartVendasTotalPorFornecedor.lojas') ?? '';
+        $params['filter']['chartVendasTotalPorFornecedor']['grupos'] = $session->get('dashboard.filter.chartVendasTotalPorFornecedor.grupos') ?? '';
+
+        $params['filter']['chartVendasTotalPorVendedor']['dts'] = $session->get('dashboard.filter.chartVendasTotalPorVendedor.dts') ?? ($primeiroDia . ' - ' . $ultimoDia);
+        $params['filter']['chartVendasTotalPorVendedor']['lojas'] = $session->get('dashboard.filter.chartVendasTotalPorVendedor.lojas') ?? '';
+        $params['filter']['chartVendasTotalPorVendedor']['grupos'] = $session->get('dashboard.filter.chartVendasTotalPorVendedor.grupos') ?? '';
 
         $params['filter']['contasPagRec']['dts'] = $session->get('dashboard.filter.contasPagRec.dts') ?? ($hoje . ' - ' . $mais60dias);
         $params['filter']['contasPagRec']['filial'] = urlencode($session->get('dashboard.filter.contasPagRec.filial')) ?? $filiais[0]['id'];
@@ -59,13 +63,7 @@ class DefaultController extends BaseController
 
         $params['filter']['relCompFor01']['dts'] = $session->get('dashboard.filter.relCompFor01.dts') ?? ($primeiroDia_mesPassado . ' - ' . $ultimoDia_mesPassado);
 
-
-        $response = $this->doRender('dashboard.html.twig', $params);
-        $response->headers->addCacheControlDirective('no-cache', true);
-        $response->headers->addCacheControlDirective('Cache-control', 'private');
-        $response->expire();
-
-        return $response;
+        return $this->doRender('dashboard.html.twig', $params);
     }
 
 

@@ -5,7 +5,7 @@
 
 {% block page_content %}
 
-    <form action="{{ url('relVendas01_listPreVendasPorProduto') }}" method="get" id="formPesquisar">
+    <form action="{{ url('relVendas01_listPreVendasPorVendedor') }}" method="get" id="formPesquisar">
 
         <div class="card">
             <div class="card-header">
@@ -13,17 +13,18 @@
 
                 <div class="d-flex flex-wrap align-items-center">
 
-                    <div class="mr-1">
-                        <h3>PVs por Produto ({{ produto }})</h3>
-                        {% if filter.loja %}
-                            <h6>Loja: {{ filter.loja }}</h6>
-                        {% endif %}
-                        {% if filter.grupo %}
-                            <h6>Grupo: {{ filter.grupo }}</h6>
-                        {% endif %}
+                    <div class="d-sm-flex mr-1">
+                        <h3>PVs por Vendedor ({{ filter.vendedor }})</h3>
                     </div>
-                    <div class="d-sm-flex flex-nowrap ml-auto">
+                    <div class="ml-auto justify-content-end text-right">
 
+
+                        Período: <b>{{ filter.dts }}</b>
+                        <br />
+                        Grupos: <b>{{ filter.grupos|join(',')|default('TODOS') }}</b>
+                        <br />
+                        Lojas: <b>{{ filter.lojas|join(',')|default('TODAS') }}</b>
+                        <br />
 
                     </div>
                 </div>
@@ -44,7 +45,6 @@
                             <th scope="col">PV</th>
                             <th scope="col">Cliente</th>
                             <th scope="col">Dt Emissão</th>
-                            <th scope="col">Produto</th>
                             <th scope="col">Total Custo</th>
                             <th scope="col">Total Venda</th>
                             <th scope="col">Rentabilidade</th>
@@ -67,9 +67,6 @@
                                 <td class="text-center">
                                     {{ item.dt_emissao|date('d/m/Y') }}
                                 </td>
-                                <td>
-                                    {{ item.cod_vendedor }} - {{ item.nome_vendedor }}
-                                </td>
                                 <td class="text-right" data-order="{{ item.total_custo_pv }}">
                                     {{ item.total_custo_pv|number_format(2,',','.') }}
                                 </td>
@@ -81,7 +78,7 @@
                                 </td>
                                 <td class="text-right">
                                     <a class="btn btn-outline-secondary"
-                                       href="{{ url('relVendas01_preVendaItens', {'pv': item.prevenda}) }}"
+                                       href="{{ url('relVendas01_listPreVendaItens', {'pv': item.prevenda}) }}"
                                        role="button">
                                         <i class="far fa-list-alt"></i> Itens
                                     </a>
@@ -95,7 +92,7 @@
                         <tfoot>
 
                         <tr style="background-color: antiquewhite; font-weight: bold">
-                            <td colspan="6" class="text-right" style="padding: 10px">
+                            <td colspan="5" class="text-right" style="padding: 10px">
                                 Total:
                             </td>
                             <td class="text-right" style="padding: 10px">
@@ -111,6 +108,7 @@
 
                     </table>
                 </div>
+
             </div>
         </div>
 
@@ -119,5 +117,5 @@
 
 
 {% block down_scripts %}
-    <script src="{{ asset('build/Relatorios/relVendas01_preVendasPorProduto.js') }}"></script>
+    <script src="{{ asset('build/Relatorios/relVendas01_listPreVendasPorVendedor.js') }}"></script>
 {% endblock %}

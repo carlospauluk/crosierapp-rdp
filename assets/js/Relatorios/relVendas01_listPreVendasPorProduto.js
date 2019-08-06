@@ -33,33 +33,6 @@ $(document).ready(function () {
         $formPesquisar.submit();
     });
 
-
-    let $filter_loja = $('#filter_loja');
-    let $filter_grupo = $('#filter_grupo');
-
-
-    $filter_loja.select2({
-        data: $filter_loja.data('options')
-    });
-    if ($filter_loja.data('val')) {
-        $filter_loja.val($filter_loja.data('val')).trigger('change');
-    }
-    $filter_loja.on('select2:select', function () {
-        $formPesquisar.submit();
-    });
-
-
-    $filter_grupo.select2({
-        data: $filter_grupo.data('options')
-    });
-    if ($filter_grupo.data('val')) {
-        $filter_grupo.val($filter_grupo.data('val')).trigger('change');
-    }
-    $filter_grupo.on('select2:select', function () {
-        $formPesquisar.submit();
-    });
-
-
     let $datatableItens = $('#datatableItens');
 
     let $filterDts = $('#filterDts').daterangepicker(
@@ -120,24 +93,32 @@ $(document).ready(function () {
 
 
 
-    let $filterNomeFornec = $('#filter_nomeFornec');
 
 
-    $filterNomeFornec.select2({
-        placeholder: '...',
-        allowClear: true,
-        data: $filterNomeFornec.data('options')
+    let $filter_loja = $('#filter_loja');
+    let $filter_grupo = $('#filter_grupo');
+
+
+    $filter_loja.select2({
+        data: $filter_loja.data('options')
     });
-    if ($filterNomeFornec.data('val')) {
-        $filterNomeFornec.val($filterNomeFornec.data('val')).trigger('change');
+    if ($filter_loja.data('val')) {
+        $filter_loja.val($filter_loja.data('val')).trigger('change');
     }
-
-    $filterNomeFornec.on('select2:select', function () {
+    $filter_loja.on('select2:select', function () {
         $formPesquisar.submit();
     });
 
 
-
+    $filter_grupo.select2({
+        data: $filter_grupo.data('options')
+    });
+    if ($filter_grupo.data('val')) {
+        $filter_grupo.val($filter_grupo.data('val')).trigger('change');
+    }
+    $filter_grupo.on('select2:select', function () {
+        $formPesquisar.submit();
+    });
 
 
 

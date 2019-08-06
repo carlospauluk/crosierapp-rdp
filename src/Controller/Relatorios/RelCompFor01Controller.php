@@ -116,7 +116,7 @@ class RelCompFor01Controller extends FormListController
 
     /**
      *
-     * @Route("/relCompFor01/totalPorFornecedor/", name="relCompFor01_totalPorFornecedor")
+     * @Route("/relCompFor01/graficoTotalPorFornecedor/", name="relCompFor01_graficoTotalPorFornecedor")
      * @param Request $request
      * @return JsonResponse
      */
@@ -136,12 +136,12 @@ class RelCompFor01Controller extends FormListController
 
     /**
      *
-     * @Route("/relCompFor01/itensCompradosPorFornecedor/", name="relCompFor01_itensCompradosPorFornecedor")
+     * @Route("/relCompFor01/listItensCompradosPorFornecedor/", name="relCompFor01_listItensCompradosPorFornecedor")
      * @param Request $request
      * @return Response
      * @throws \Exception
      */
-    public function itensCompradosPorFornecedor(Request $request): Response
+    public function listItensCompradosPorFornecedor(Request $request): Response
     {
         $vParams = $request->query->all();
         /** @var RelCompFor01Repository $repo */
@@ -151,7 +151,7 @@ class RelCompFor01Controller extends FormListController
             if ($vParams['r'] ?? null) {
                 $this->storedViewInfoBusiness->clear($this->crudParams['listRoute']);
             }
-            $svi = $this->storedViewInfoBusiness->retrieve('relCompFor01_itensCompradosPorFornecedor');
+            $svi = $this->storedViewInfoBusiness->retrieve('relCompFor01_listItensCompradosPorFornecedor');
             if (isset($svi['filter'])) {
                 $vParams['filter'] = $svi['filter'];
             } else {
@@ -188,9 +188,9 @@ class RelCompFor01Controller extends FormListController
 
         $viewInfo = [];
         $viewInfo['filter'] = $vParams['filter'];
-        $this->storedViewInfoBusiness->store('relCompFor01_itensCompradosPorFornecedor', $viewInfo);
+        $this->storedViewInfoBusiness->store('relCompFor01_listItensCompradosPorFornecedor', $viewInfo);
 
-        return $this->doRender('Relatorios/relCompFor01_itensCompradosPorFornecedor.html.twig', $vParams);
+        return $this->doRender('Relatorios/relCompFor01_listItensCompradosPorFornecedor.html.twig', $vParams);
     }
 
 
