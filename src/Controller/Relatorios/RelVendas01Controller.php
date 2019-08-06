@@ -161,6 +161,7 @@ class RelVendas01Controller extends FormListController
         /** @var RelVendas01Repository $repoRelVendas01 */
         $repoRelVendas01 = $this->getDoctrine()->getRepository(RelVendas01::class);
         $r = $repoRelVendas01->totalVendasPorVendedor($dtIni, $dtFim, $loja, $grupo);
+
         return new JsonResponse($r);
     }
 

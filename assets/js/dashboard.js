@@ -20,7 +20,19 @@ Moment.locale('pt-BR');
 import 'daterangepicker';
 import $ from "jquery";
 
+
+
 $(document).ready(function () {
+
+    if (window.history && window.history.pushState) {
+
+        window.history.pushState('forward', null, './#forward');
+
+        $(window).on('popstate', function() {
+            alert('Back button was pressed.');
+        });
+
+    }
 
     /**
      *
@@ -183,15 +195,33 @@ $(document).ready(function () {
             $.getJSON(
                 Routing.generate('relVendas01_totalPorVendedor') + '/?filterDts=' + $filter_vendas_dts.val() + '&loja=' + $filter_vendas_loja.val() + '&grupo=' + $filter_vendas_grupo.val(),
                 function (results) {
+                    let rentabilidadeGeral = Numeral(parseFloat(results.rentabilidadeGeral)).format('0,0.00');
+
+                    $('#chart_totalPorVendedor_rentabilidade').html(' ' + rentabilidadeGeral);
 
                     const data = new google.visualization.DataTable();
                     data.addColumn('string', 'Vendedor');
                     data.addColumn('number', 'Total');
+                    data.addColumn({type: 'string', role: 'tooltip', 'p': {'html': true}});
+                    data.addColumn('number', 'Rentabilidade');
+                    data.addColumn({type: 'string', role: 'tooltip', 'p': {'html': true}});
 
-                    $.each(results, function (index, value) {
-                        let v = parseFloat(value.total_venda);
-                        let f = Numeral(v).format('$ 0.0,[00]');
-                        data.addRow([value.nome_vendedor, {'v': v, 'f': f}]);
+                    $.each(results.dados, function (index, value) {
+                        let totalVenda = parseFloat(value.total_venda);
+                        let totalVendaF = Numeral(totalVenda).format('$ 0,0.00');
+
+                        let rent = parseFloat(value.rent);
+                        let rentF = Numeral(parseFloat(value.rent)).format('0,0.00');
+
+                        let t = '<div style="white-space: nowrap">' + value.nome_vendedor + '<br />' +
+                            'Total vendido: <b>' + totalVendaF + '</b><br />Rentabilidade: ' + rentF + '&#37;</div>';
+
+                        data.addRow([
+                            value.nome_vendedor,
+                            {'v': totalVenda, 'f': totalVendaF},
+                            t,
+                            {'v': rent, 'f': rentF},
+                            t]);
                     });
 
                     var options = {
@@ -201,6 +231,17 @@ $(document).ready(function () {
                             duration: 1000,
                             easing: 'out',
                         },
+                        tooltip: {isHtml: true},
+                        series: {
+                            0: {targetAxisIndex: 0},
+                            1: {targetAxisIndex: 1}
+                        },
+                        vAxes: {
+                            // Adds titles to each axis.
+                            0: {title: 'Total vendido'},
+                            1: {title: 'Rentabilidade'}
+                        }
+
                     };
 
 
@@ -262,7 +303,6 @@ $(document).ready(function () {
     });
 
 
-
     let $filter_contasPagRec_localizador = $('#filter_contasPagRec_localizador');
 
     $filter_contasPagRec_localizador.select2({
@@ -282,39 +322,39 @@ $(document).ready(function () {
      * Se a filial selecionada for de TELÊMACO BORBA, só pode selecionar o localizador 91.
      * Se a filial selecionada for a ACESSÓRIOS, só pode selecionar o localizador 92
      */
-    // function handleLocalizadorPorFilial() {
-    //     $filter_contasPagRec_localizador.find('option').each(function (i, e) {
-    //         $(e).removeAttr('disabled');
-    //     });
-    //
-    //     if ($filter_contasPagRec_filial.val()) {
-    //         if ($filter_contasPagRec_filial.val().startsWith('96')) {
-    //
-    //             $filter_contasPagRec_localizador.find('option').each(function (i, e) {
-    //                 $(e).attr('disabled', 'true')
-    //             });
-    //             $filter_contasPagRec_localizador.find('option[value^="91"]').removeAttr('disabled');
-    //             $filter_contasPagRec_localizador.find('option[value^="91"]').attr('selected', 'true');
-    //             $filter_contasPagRec_localizador.trigger('change');
-    //         } else if ($filter_contasPagRec_filial.val().startsWith('94')) {
-    //
-    //             $filter_contasPagRec_localizador.find('option').each(function (i, e) {
-    //                 $(e).attr('disabled', 'true')
-    //             });
-    //             $filter_contasPagRec_localizador.find('option[value^="92"]').removeAttr('disabled');
-    //             $filter_contasPagRec_localizador.find('option[value^="92"]').attr('selected', 'true');
-    //             $filter_contasPagRec_localizador.trigger('change');
-    //         }
-    //     }
-    //
-    //     $filter_contasPagRec_localizador.select2();
-    // }
+        // function handleLocalizadorPorFilial() {
+        //     $filter_contasPagRec_localizador.find('option').each(function (i, e) {
+        //         $(e).removeAttr('disabled');
+        //     });
+        //
+        //     if ($filter_contasPagRec_filial.val()) {
+        //         if ($filter_contasPagRec_filial.val().startsWith('96')) {
+        //
+        //             $filter_contasPagRec_localizador.find('option').each(function (i, e) {
+        //                 $(e).attr('disabled', 'true')
+        //             });
+        //             $filter_contasPagRec_localizador.find('option[value^="91"]').removeAttr('disabled');
+        //             $filter_contasPagRec_localizador.find('option[value^="91"]').attr('selected', 'true');
+        //             $filter_contasPagRec_localizador.trigger('change');
+        //         } else if ($filter_contasPagRec_filial.val().startsWith('94')) {
+        //
+        //             $filter_contasPagRec_localizador.find('option').each(function (i, e) {
+        //                 $(e).attr('disabled', 'true')
+        //             });
+        //             $filter_contasPagRec_localizador.find('option[value^="92"]').removeAttr('disabled');
+        //             $filter_contasPagRec_localizador.find('option[value^="92"]').attr('selected', 'true');
+        //             $filter_contasPagRec_localizador.trigger('change');
+        //         }
+        //     }
+        //
+        //     $filter_contasPagRec_localizador.select2();
+        // }
 
 
-    // handleLocalizadorPorFilial();
+        // handleLocalizadorPorFilial();
 
 
-    // filtro por período
+        // filtro por período
     let $filter_contasPagRec_dts = $('#filter_contasPagRec_dts').daterangepicker(
         {
             opens: 'left',
@@ -365,9 +405,9 @@ $(document).ready(function () {
         function (start, end, label) {
 
         }
-    ).on('apply.daterangepicker', function (ev, picker) {
-        drawChart_contasPagRec();
-    });
+        ).on('apply.daterangepicker', function (ev, picker) {
+            drawChart_contasPagRec();
+        });
 
 
     GoogleCharts.load(drawChart_contasPagRec);
@@ -570,14 +610,5 @@ $(document).ready(function () {
 
 
 
-
-
-
-
-
-
-
-
-
-
 });
+

@@ -60,7 +60,12 @@ class DefaultController extends BaseController
         $params['filter']['relCompFor01']['dts'] = $session->get('dashboard.filter.relCompFor01.dts') ?? ($primeiroDia_mesPassado . ' - ' . $ultimoDia_mesPassado);
 
 
-        return $this->doRender('dashboard.html.twig', $params);
+        $response = $this->doRender('dashboard.html.twig', $params);
+        $response->headers->addCacheControlDirective('no-cache', true);
+        $response->headers->addCacheControlDirective('Cache-control', 'private');
+        $response->expire();
+
+        return $response;
     }
 
 

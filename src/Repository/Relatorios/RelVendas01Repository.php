@@ -155,21 +155,24 @@ class RelVendas01Repository extends FilterRepository
         $sql = '
             SELECT 
                 CONCAT(cod_vendedor, \' - \', nome_vendedor) as nome_vendedor, 
-                SUM(total_venda_pv) as total_venda 
+                SUM(total_venda_pv) as total_venda,
+                SUM(total_custo_pv) as total_custo,
+                (((SUM(total_venda_pv) / SUM(total_custo_pv)) - 1) * 100.0) as rent
             FROM 
                 (
-                    SELECT cod_vendedor, nome_vendedor, prevenda, total_venda_pv 
+                    SELECT cod_vendedor, nome_vendedor, prevenda, total_venda_pv, total_custo_pv 
                     FROM rdp_rel_vendas01 
                     WHERE 
                         dt_emissao BETWEEN :dtIni AND :dtFim
                         ' . $sql_AND_grupo . $sql_AND_loja . '
-                    GROUP BY cod_vendedor, nome_vendedor, prevenda, total_venda_pv) a 
+                    GROUP BY cod_vendedor, nome_vendedor, prevenda, total_venda_pv, total_custo_pv) a 
             GROUP BY cod_vendedor, nome_vendedor ORDER BY total_venda';
 
 
         $rsm = new ResultSetMapping();
         $rsm->addScalarResult('nome_vendedor', 'nome_vendedor');
         $rsm->addScalarResult('total_venda', 'total_venda');
+        $rsm->addScalarResult('rent', 'rent');
 
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
         $query->setParameter('dtIni', $dtIni);
@@ -181,7 +184,65 @@ class RelVendas01Repository extends FilterRepository
             $query->setParameter('loja', $loja);
         }
 
-        return $query->getResult();
+        $dados = $query->getResult();
+
+        $rentabilidadeGeral = $this->totalRentabilidade($dtIni, $dtFim, $loja, $grupo)['rent'] ?? 0.0;
+
+        return ['dados' => $dados, 'rentabilidadeGeral' => $rentabilidadeGeral];
+    }
+
+    /**
+     * @param \DateTime|null $dtIni
+     * @param \DateTime|null $dtFim
+     * @param string|null $loja
+     * @param string|null $grupo
+     * @return mixed
+     * @throws NonUniqueResultException
+     */
+    public function totalRentabilidade(\DateTime $dtIni = null, \DateTime $dtFim = null, string $loja = null, string $grupo = null)
+    {
+        $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
+        $dtIni->setTime(0, 0, 0, 0);
+        $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
+        $dtFim->setTime(23, 59, 59, 99999);
+
+        $sql_AND_grupo = '';
+        if ($grupo) {
+            $sql_AND_grupo .= ' AND grupo = :grupo';
+        }
+        $sql_AND_loja = '';
+        if ($loja) {
+            $sql_AND_loja .= ' AND loja = :loja';
+        }
+
+        $sql = '
+            SELECT 
+                (((SUM(total_venda_pv) / SUM(total_custo_pv)) - 1) * 100.0) as rent
+            FROM 
+                (
+                    SELECT cod_vendedor, nome_vendedor, prevenda, total_venda_pv, total_custo_pv 
+                    FROM rdp_rel_vendas01 
+                    WHERE 
+                        dt_emissao BETWEEN :dtIni AND :dtFim
+                        ' . $sql_AND_grupo . $sql_AND_loja . '
+                    GROUP BY cod_vendedor, nome_vendedor, prevenda, total_venda_pv, total_custo_pv) a 
+            ';
+
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('rent', 'rent');
+
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('dtIni', $dtIni);
+        $query->setParameter('dtFim', $dtFim);
+        if ($grupo) {
+            $query->setParameter('grupo', $grupo);
+        }
+        if ($loja) {
+            $query->setParameter('loja', $loja);
+        }
+
+        return $query->getOneOrNullResult();
     }
 
 
