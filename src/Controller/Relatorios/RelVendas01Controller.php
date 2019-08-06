@@ -132,8 +132,8 @@ class RelVendas01Controller extends FormListController
     {
         $dts = $request->get('filterDts') ?? '';
 
-        $lojas = $request->get('lojas') ?: null;
-        $grupos = $request->get('grupos') ?: null;
+        $lojas = $request->get('lojas') ?? null;
+        $grupos = $request->get('grupos') ?? null;
 
         $this->session->set('dashboard.filter.chartVendasTotalPorFornecedor.dts', $dts);
         $this->session->set('dashboard.filter.chartVendasTotalPorFornecedor.lojas', $lojas);
@@ -159,9 +159,13 @@ class RelVendas01Controller extends FormListController
     public function graficoTotalPorVendedor(Request $request): JsonResponse
     {
         $dts = $request->get('filterDts') ?? '';
-        $lojas = $request->get('lojas') ?: null;
-        $grupos = $request->get('grupos') ?: null;
+        $lojas = $request->get('lojas') ?? null;
+        $grupos = $request->get('grupos') ?? null;
 
+        $this->session->set('dashboard.filter.chartVendasTotalPorVendedor.dts', $dts);
+        $this->session->set('dashboard.filter.chartVendasTotalPorVendedor.lojas', $lojas);
+        $this->session->set('dashboard.filter.chartVendasTotalPorVendedor.grupos', $grupos);
+        
         $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
         $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
 
@@ -206,8 +210,8 @@ class RelVendas01Controller extends FormListController
 
         $codVendedor = explode(' - ', $vParams['filter']['vendedor'])[0] ?? 0;
 
-        $vParams['filter']['lojas'] = $vParams['filter']['lojas'] ?: null;
-        $vParams['filter']['grupos'] = $vParams['filter']['grupos'] ?: null;
+        $vParams['filter']['lojas'] = $vParams['filter']['lojas'] ?? null;
+        $vParams['filter']['grupos'] = $vParams['filter']['grupos'] ?? null;
 
         $r = $repo->preVendasPorPeriodoEVendedor($dtIni, $dtFim, $codVendedor, $vParams['filter']['lojas'], $vParams['filter']['grupos']);
 
