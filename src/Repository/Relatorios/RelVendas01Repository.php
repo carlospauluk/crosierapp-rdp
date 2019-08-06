@@ -152,11 +152,11 @@ class RelVendas01Repository extends FilterRepository
 
         $sql_AND_grupo = '';
         if ($grupos) {
-            $sql_AND_grupo .= ' AND grupo = :grupos';
+            $sql_AND_grupo .= ' AND grupo IN (:grupos)';
         }
         $sql_AND_loja = '';
         if ($lojas) {
-            $sql_AND_loja .= ' AND loja = :lojas';
+            $sql_AND_loja .= ' AND loja IN (:lojas)';
         }
 
         $sql = '
@@ -185,10 +185,10 @@ class RelVendas01Repository extends FilterRepository
         $query->setParameter('dtIni', $dtIni);
         $query->setParameter('dtFim', $dtFim);
         if ($grupos) {
-            $query->setParameter('grupos', $grupos);
+            $query->setParameter('grupos', explode(',', $grupos));
         }
         if ($lojas) {
-            $query->setParameter('lojas', $lojas);
+            $query->setParameter('lojas', explode(',', $lojas));
         }
 
         $dados = $query->getResult();
