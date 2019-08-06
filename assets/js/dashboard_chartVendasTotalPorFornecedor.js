@@ -55,7 +55,7 @@ $(document).ready(function () {
 
     let chart;
 
-    let $filter_dts = $('#filter_chartVendasTotalPorVendedor_dts').daterangepicker(
+    let $filter_dts = $('#filter_chartVendasTotalPorFornecedor_dts').daterangepicker(
         {
             opens: 'left',
             autoApply: true,
