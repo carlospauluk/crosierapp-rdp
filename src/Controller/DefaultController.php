@@ -21,6 +21,9 @@ class DefaultController extends BaseController
     /**
      *
      * @Route("/", name="index")
+     * @param SessionInterface $session
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Exception
      */
     public function index(SessionInterface $session)
     {

@@ -83,7 +83,7 @@ CREATE TABLE `rdp_rel_ctspagrec01`
     `cod_cliente`        BIGINT(20)     NOT NULL,
     `nome_cli_for`       VARCHAR(200)   NOT NULL,
     `localizador`        BIGINT(20)     NULL,
-    `localizador_desc`   VARCHAR(200)    NULL,
+    `localizador_desc`   VARCHAR(200)   NULL,
     `filial`             BIGINT(20)     NOT NULL,
     `desc_filial`        VARCHAR(200)   NOT NULL,
     `valor_titulo`       DECIMAL(15, 2) NOT NULL,
@@ -118,8 +118,6 @@ CREATE TABLE `rdp_rel_ctspagrec01`
   DEFAULT charset = latin1;
 
 # ALTER TABLE rdp_rel_ctspagrec01 ADD UNIQUE KEY `UK_rdp_rel_ctspagrec01` (`lancto`,`docto`,`dt_movto`,`dt_vencto`,`cod_cliente`,`nome_cli_for`,`filial`,`valor_titulo`,`situacao`,`tipo_pag_rec`);
-
-
 
 
 DROP TABLE IF EXISTS `rdp_rel_compfor01`;
@@ -159,5 +157,56 @@ CREATE TABLE `rdp_rel_compfor01`
     CONSTRAINT `fk_rdp_rel_compfor01_user_updated` FOREIGN KEY (`user_updated_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_rel_compfor01_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_rel_compfor01_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
+) ENGINE = INNODB
+  DEFAULT charset = latin1;
+
+
+# CODIGO|DESCRICAO|CUSTO_MEDIO|PRECO_VENDA|FILIAL|QTDE_MINIMA|QTDE_MAXIMA|QTDE_ATUAL|DATA_ULT_SAIDA|FORNECEDOR
+DROP TABLE IF EXISTS `rdp_rel_estoque01`;
+CREATE TABLE `rdp_rel_estoque01`
+(
+    `id`                 BIGINT(20)     NOT NULL AUTO_INCREMENT,
+
+    `cod_prod`           VARCHAR(50)    NOT NULL,
+    `desc_prod`          VARCHAR(200)   NOT NULL,
+    `custo_medio`        DECIMAL(15, 2) NOT NULL,
+    `preco_venda`        DECIMAL(15, 2) NOT NULL,
+    `desc_filial`        VARCHAR(200)   NOT NULL,
+    `qtde_minima`        DECIMAL(15, 2) NOT NULL,
+    `qtde_maxima`        DECIMAL(15, 2) NOT NULL,
+    `qtde_atual`         DECIMAL(15, 2) NOT NULL,
+    `dt_ult_saida`       DATETIME       NULL,
+    `nome_fornec`        VARCHAR(200)   NOT NULL,
+
+
+    UNIQUE KEY `uk_rdp_rel_estoque01` (`cod_prod`,
+                                       `desc_prod`,
+                                       `custo_medio`,
+                                       `preco_venda`,
+                                       `desc_filial`,
+                                       `qtde_minima`,
+                                       `qtde_maxima`,
+                                       `qtde_atual`,
+                                       `dt_ult_saida`,
+                                       `nome_fornec`),
+
+    KEY rdp_rel_estoque01_cod_prod (`cod_prod`),
+    KEY rdp_rel_estoque01_desc_prod (`desc_prod`),
+    KEY rdp_rel_estoque01_desc_filial (`desc_filial`),
+    KEY rdp_rel_estoque01_fornecedor (`nome_fornec`),
+
+    -- campos de controle do crosier
+    PRIMARY KEY (`id`),
+    `estabelecimento_id` BIGINT(20)     NOT NULL,
+    `inserted`           DATETIME       NOT NULL,
+    `updated`            DATETIME       NOT NULL,
+    `user_inserted_id`   BIGINT(20)     NOT NULL,
+    `user_updated_id`    BIGINT(20)     NOT NULL,
+    KEY `k_rdp_rel_estoque01_estabelecimento` (`estabelecimento_id`),
+    KEY `k_rdp_rel_estoque01_user_inserted` (`user_inserted_id`),
+    KEY `k_rdp_rel_estoque01_user_updated` (`user_updated_id`),
+    CONSTRAINT `fk_rdp_rel_estoque01_user_updated` FOREIGN KEY (`user_updated_id`) references `sec_user` (`id`),
+    CONSTRAINT `fk_rdp_rel_estoque01_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
+    CONSTRAINT `fk_rdp_rel_estoque01_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   DEFAULT charset = latin1;

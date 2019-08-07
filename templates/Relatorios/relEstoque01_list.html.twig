@@ -1,0 +1,22 @@
+{% extends '@CrosierLibBase/list.html.twig' %}
+
+
+{% block campos_pesquisar %}
+
+    <input type="hidden" name="filter[descFilial]" value="{{ filter.descFiliar|default('') }}">
+
+    <div class="form-group">
+        <label for="p_descricao">Produto</label>
+        <input type="text"
+               class="form-control" id="filter[descProduto]"
+               name="filter[descProduto]"
+               value="{{ filter.descProduto|default('') }}">
+    </div>
+
+
+{% endblock %}
+
+
+{% block down_scripts %}
+    <script src="{{ asset('build/Relatorios/relEstoque01_list.js') }}"></script>
+{% endblock %}

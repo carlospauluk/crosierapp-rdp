@@ -32,9 +32,12 @@ Encore
     // .addEntry('dashboard', './assets/js/dashboard.js')
     .addEntry('dashboard_chartVendasTotalPorFornecedor', './assets/js/dashboard_chartVendasTotalPorFornecedor.js')
     .addEntry('dashboard_chartVendasTotalPorVendedor', './assets/js/dashboard_chartVendasTotalPorVendedor.js')
-    .addEntry('dashboard_chartContasPagarReceber', './assets/js/dashboard_chartContasPagarReceber.js')
+    .addEntry('dashboard_chartEstoque', './assets/js/dashboard_chartEstoque.js')
     .addEntry('dashboard_chartCompras', './assets/js/dashboard_chartCompras.js')
+    .addEntry('dashboard_chartContasPagarReceber', './assets/js/dashboard_chartContasPagarReceber.js')
+
     .addEntry('utils/relatorioPushList', './assets/js/utils/relatorioPushList.js')
+
     .addEntry('Relatorios/relCtsPagRec01_list', './assets/js/Relatorios/relCtsPagRec01_list.js')
     .addEntry('Relatorios/relVendas01_listItensVendidosPorFornecedor', './assets/js/Relatorios/relVendas01_listItensVendidosPorFornecedor.js')
     .addEntry('Relatorios/relVendas01_listPreVendasPorVendedor', './assets/js/Relatorios/relVendas01_listPreVendasPorVendedor.js')
@@ -42,6 +45,7 @@ Encore
     .addEntry('Relatorios/relVendas01_listItensDoPreVenda', './assets/js/Relatorios/relVendas01_listItensDoPreVenda.js')
     .addEntry('Relatorios/relCompFor01_listItensCompradosPorFornecedor', './assets/js/Relatorios/relCompFor01_listItensCompradosPorFornecedor.js')
 
+    .addEntry('Relatorios/relEstoque01_list', './assets/js/Relatorios/relEstoque01_list.js')
 
 
 

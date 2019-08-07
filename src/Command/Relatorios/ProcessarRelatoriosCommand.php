@@ -4,6 +4,7 @@ namespace App\Command\Relatorios;
 
 use App\Business\Relatorios\RelCompFor01Business;
 use App\Business\Relatorios\RelCtsPagRec01Business;
+use App\Business\Relatorios\RelEstoque01Business;
 use App\Business\Relatorios\RelVendas01Business;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -25,6 +26,9 @@ class ProcessarRelatoriosCommand extends Command
 
     /** @var RelCompFor01Business */
     private $relCompFor01Business;
+
+    /** @var RelEstoque01Business */
+    private $relEstoque01Business;
 
     /**
      * @required
@@ -53,10 +57,20 @@ class ProcessarRelatoriosCommand extends Command
         $this->relCompFor01Business = $relCompFor01Business;
     }
 
+    /**
+     * @required
+     * @param RelEstoque01Business $relEstoque01Business
+     */
+    public function setRelEstoque01Business(RelEstoque01Business $relEstoque01Business): void
+    {
+        $this->relEstoque01Business = $relEstoque01Business;
+    }
+
+
     protected function configure()
     {
         $this->setName('crosierapprdp:processarRelatorios');
-        $this->addArgument('tipoRelatorio', InputArgument::REQUIRED, 'Tipo de relatório [\'RELCTSPAGREC01\', \'RELVENDAS01\', \'RELCOMPFOR01\']');
+        $this->addArgument('tipoRelatorio', InputArgument::REQUIRED, 'Tipo de relatório [\'RELCTSPAGREC01\', \'RELVENDAS01\', \'RELCOMPFOR01\', \'RELESTOQUE01\']');
     }
 
     /**
@@ -78,6 +92,9 @@ class ProcessarRelatoriosCommand extends Command
                 break;
             case 'RELCOMPFOR01':
                 $this->relCompFor01Business->processarArquivosNaFila();
+                break;
+            case 'RELESTOQUE01':
+                $this->relEstoque01Business->processarArquivosNaFila();
                 break;
             default:
                 throw new \RuntimeException('tipoRelatorio desconhecido');

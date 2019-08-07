@@ -150,7 +150,7 @@ $(document).ready(function () {
                         t]);
                 });
 
-                var options = {
+                let options = {
                     is3D: true,
                     animation: {
                         startup: true,
