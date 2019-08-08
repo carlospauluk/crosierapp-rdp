@@ -96,7 +96,7 @@ class RelCompras01 implements EntityId
      * @ORM\Column(name="cod_prod", type="varchar", length=50, nullable=false)
      * @Groups("entity")
      *
-     * @var int|null
+     * @var string|null
      */
     private $codProduto;
 
@@ -309,18 +309,18 @@ class RelCompras01 implements EntityId
     }
 
     /**
-     * @return int|null
+     * @return string|null
      */
-    public function getCodProduto(): ?int
+    public function getCodProduto(): ?string
     {
         return $this->codProduto;
     }
 
     /**
-     * @param int|null $codProduto
+     * @param string|null $codProduto
      * @return RelCompras01
      */
-    public function setCodProduto(?int $codProduto): RelCompras01
+    public function setCodProduto(?string $codProduto): RelCompras01
     {
         $this->codProduto = $codProduto;
         return $this;

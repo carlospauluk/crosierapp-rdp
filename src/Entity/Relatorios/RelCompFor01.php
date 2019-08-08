@@ -53,7 +53,7 @@ class RelCompFor01 implements EntityId
      * @ORM\Column(name="cod_prod", type="varchar", length=50, nullable=false)
      * @Groups("entity")
      *
-     * @var int|null
+     * @var string|null
      */
     private $codProduto;
 
@@ -177,18 +177,18 @@ class RelCompFor01 implements EntityId
     }
 
     /**
-     * @return int|null
+     * @return string|null
      */
-    public function getCodProduto(): ?int
+    public function getCodProduto(): ?string
     {
         return $this->codProduto;
     }
 
     /**
-     * @param int|null $codProduto
+     * @param string|null $codProduto
      * @return RelCompFor01
      */
-    public function setCodProduto(?int $codProduto): RelCompFor01
+    public function setCodProduto(?string $codProduto): RelCompFor01
     {
         $this->codProduto = $codProduto;
         return $this;
