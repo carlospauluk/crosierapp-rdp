@@ -3,13 +3,11 @@
 namespace App\Controller\Relatorios;
 
 
-use App\Entity\Relatorios\RelCtsPagRec01;
 use App\Entity\Relatorios\RelEstoque01;
 use App\EntityHandler\Relatorios\RelEstoque01EntityHandler;
 use App\Repository\Relatorios\RelEstoque01Repository;
 use CrosierSource\CrosierLibBaseBundle\APIClient\Base\DiaUtilAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
-use CrosierSource\CrosierLibBaseBundle\Repository\FilterRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,6 +77,7 @@ class RelEstoque01Controller extends FormListController
         return [
             new FilterData(['descProduto'], 'LIKE', 'descProduto', $params),
             new FilterData(['descFilial'], 'EQ', 'descFilial', $params),
+            new FilterData(['qtdeAtual'], 'GT', 'qtdeAtual', $params),
         ];
     }
 
@@ -101,7 +100,6 @@ class RelEstoque01Controller extends FormListController
         $totais = $repo->totalEstoquePorFilial($descFilial);
         $params['totais'] = $totais[0] ?? null;
 
-
         return $this->doList($request, $params);
     }
 
@@ -114,7 +112,12 @@ class RelEstoque01Controller extends FormListController
      */
     public function datatablesJsList(Request $request): Response
     {
-        return $this->doDatatablesJsList($request);
+        $defaultFilters = [
+            'filter' => [
+                'qtdeAtual' => 0
+            ]
+        ];
+        return $this->doDatatablesJsList($request, $defaultFilters);
     }
 
 
