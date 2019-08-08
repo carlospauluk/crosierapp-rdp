@@ -8,6 +8,7 @@ use App\EntityHandler\Relatorios\RelEstoque01EntityHandler;
 use App\Repository\Relatorios\RelEstoque01Repository;
 use CrosierSource\CrosierLibBaseBundle\APIClient\Base\DiaUtilAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
+use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -77,7 +78,9 @@ class RelEstoque01Controller extends FormListController
         return [
             new FilterData(['descProduto'], 'LIKE', 'descProduto', $params),
             new FilterData(['descFilial'], 'EQ', 'descFilial', $params),
+            new FilterData(['nomeFornecedor'], 'EQ', 'nomeFornecedor', $params),
             new FilterData(['qtdeAtual'], 'GT', 'qtdeAtual', $params),
+            new FilterData(['dtUltSaida'], 'GT', 'dtUltSaidaApartirDe', $params),
         ];
     }
 
@@ -92,12 +95,20 @@ class RelEstoque01Controller extends FormListController
     {
         /** @var RelEstoque01Repository $repo */
         $repo = $this->getDoctrine()->getRepository(RelEstoque01::class);
+
         $filiais = $repo->getFiliais();
         array_unshift($filiais, ['id' => '', 'text' => 'TODAS']);
         $params['filiais'] = json_encode($filiais);
-
         $descFilial = $request->get('filter')['descFilial'] ?? null;
-        $totais = $repo->totalEstoquePorFilial($descFilial);
+
+        $fornecedores = $repo->getFornecedores();
+        array_unshift($fornecedores, ['id' => '', 'text' => 'TODOS']);
+        $params['fornecedores'] = json_encode($fornecedores);
+        $nomeFornecedor = urldecode($request->get('filter')['nomeFornecedor'] ?? null);
+
+        $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr($request->get('filter')['dtUltSaidaApartirDe'] ?: '1900-01-01');
+
+        $totais = $repo->totalEstoque($dtUltSaidaApartirDe, $descFilial, $nomeFornecedor);
         $params['totais'] = $totais[0] ?? null;
 
         return $this->doList($request, $params);
@@ -117,6 +128,12 @@ class RelEstoque01Controller extends FormListController
                 'qtdeAtual' => 0
             ]
         ];
+        if ($request->get('formPesquisar') ?? null) {
+            parse_str($request->get('formPesquisar'), $formPesquisar);
+            if ($formPesquisar['filter']['nomeFornecedor'] ?? null) {
+                $defaultFilters['filter']['nomeFornecedor'] = urldecode($formPesquisar['filter']['nomeFornecedor']);
+            }
+        }
         return $this->doDatatablesJsList($request, $defaultFilters);
     }
 

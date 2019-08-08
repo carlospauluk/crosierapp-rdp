@@ -23,17 +23,28 @@ class RelEstoque01Repository extends FilterRepository
     /**
      * Utilizado no gráfico de Total de Estoque por Filial
      *
+     * @param \DateTime $dtUltSaidaApartirDe
      * @param string|null $descFilial
+     * @param string|null $nomeFornecedor
      * @return mixed
      */
-    public function totalEstoquePorFilial(string $descFilial = null)
+    public function totalEstoque(\DateTime $dtUltSaidaApartirDe, ?string $descFilial = null, ?string $nomeFornecedor = null)
     {
         $sql_descFilial = '';
         if ($descFilial) {
-            $sql_descFilial = ' WHERE desc_filial = :descFilial';
+            $sql_descFilial = ' AND desc_filial = :descFilial';
         }
 
-        $sql = 'SELECT desc_filial, SUM(qtde_atual) as total_qtde_atual, SUM(qtde_atual * preco_venda) as total_venda, SUM(qtde_atual * custo_medio) as total_custo_medio FROM rdp_rel_estoque01 ' . $sql_descFilial . ' GROUP BY desc_filial;';
+        $sql_nomeFornecedor = '';
+        if ($nomeFornecedor) {
+            $sql_nomeFornecedor = ' AND nome_fornec = :nomeFornecedor';
+        }
+
+        $sql = 'SELECT desc_filial, SUM(qtde_atual) as total_qtde_atual, SUM(qtde_atual * preco_venda) as total_venda, SUM(qtde_atual * custo_medio) as total_custo_medio ' .
+            'FROM rdp_rel_estoque01 WHERE dt_ult_saida >= :dtUltSaidaApartirDe ' .
+            $sql_descFilial .
+            $sql_nomeFornecedor .
+            ' GROUP BY desc_filial;';
 
 
         $rsm = new ResultSetMapping();
@@ -43,8 +54,12 @@ class RelEstoque01Repository extends FilterRepository
         $rsm->addScalarResult('total_custo_medio', 'total_custo_medio');
 
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('dtUltSaidaApartirDe', $dtUltSaidaApartirDe);
         if ($sql_descFilial) {
             $query->setParameter('descFilial', $descFilial);
+        }
+        if ($sql_nomeFornecedor) {
+            $query->setParameter('nomeFornecedor', $nomeFornecedor);
         }
         return $query->getResult();
     }
@@ -140,6 +155,25 @@ class RelEstoque01Repository extends FilterRepository
         foreach ($r as $item) {
             $e['id'] = urlencode($item['desc_filial']);
             $e['text'] = $item['desc_filial'];
+            $arr[] = $e;
+        }
+        return $arr;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFornecedores(): array
+    {
+        $sql = 'SELECT nome_fornec FROM rdp_rel_vendas01 GROUP BY nome_fornec ORDER BY nome_fornec';
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('nome_fornec', 'nome_fornec');
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $r = $query->getResult();
+        $arr = [];
+        foreach ($r as $item) {
+            $e['id'] = urlencode($item['nome_fornec']);
+            $e['text'] = $item['nome_fornec'];
             $arr[] = $e;
         }
         return $arr;

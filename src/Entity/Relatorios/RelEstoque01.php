@@ -48,12 +48,25 @@ class RelEstoque01 implements EntityId
 
     /**
      *
+     * @var float|null
+     */
+    private $totalCustoMedio;
+
+    /**
+     *
      * @ORM\Column(name="preco_venda", type="decimal", nullable=false)
      * @Groups("entity")
      *
      * @var float|null
      */
     private $precoVenda;
+
+
+    /**
+     *
+     * @var float|null
+     */
+    private $totalPrecoVenda;
 
     /**
      *
@@ -90,6 +103,14 @@ class RelEstoque01 implements EntityId
      * @var float|null
      */
     private $qtdeAtual;
+
+    /**
+     *
+     * @Groups("entity")
+     *
+     * @var float|null
+     */
+    private $deficit;
 
     /**
      *
@@ -146,6 +167,17 @@ class RelEstoque01 implements EntityId
     }
 
     /**
+     * @Groups("entity")
+     */
+    public function getTotalCustoMedio()
+    {
+        if (is_numeric($this->getCustoMedio()) && is_numeric($this->getQtdeAtual())) {
+            $this->totalCustoMedio = $this->getCustoMedio() * $this->getQtdeAtual();
+        }
+        return $this->totalCustoMedio;
+    }
+
+    /**
      * @return float|null
      */
     public function getCustoMedio(): ?float
@@ -164,14 +196,44 @@ class RelEstoque01 implements EntityId
     }
 
     /**
-     * @Groups("entity")
+     * @return float|null
      */
-    public function getTotalCustoMedio() {
-        if (is_numeric($this->getCustoMedio()) && is_numeric($this->getQtdeAtual())) {
-            return $this->getCustoMedio() * $this->getQtdeAtual();
-        }
+    public function getQtdeAtual(): ?float
+    {
+        return $this->qtdeAtual;
     }
 
+    /**
+     * @param float|null $qtdeAtual
+     * @return RelEstoque01
+     */
+    public function setQtdeAtual(?float $qtdeAtual): RelEstoque01
+    {
+        $this->qtdeAtual = $qtdeAtual;
+        return $this;
+    }
+
+    /**
+     * @Groups("entity")
+     */
+    public function getDeficit()
+    {
+        if (is_numeric($this->getQtdeMinima()) && is_numeric($this->getQtdeAtual())) {
+            $this->deficit = ($this->getQtdeAtual() < $this->getQtdeMinima()) ? $this->getQtdeMinima() - $this->getQtdeAtual() : 0;
+        }
+        return $this->deficit;
+    }
+
+    /**
+     * @Groups("entity")
+     */
+    public function getTotalPrecoVenda()
+    {
+        if (is_numeric($this->getPrecoVenda()) && is_numeric($this->getQtdeAtual())) {
+            $this->totalPrecoVenda = $this->getPrecoVenda() * $this->getQtdeAtual();
+        }
+        return $this->totalPrecoVenda;
+    }
 
     /**
      * @return float|null
@@ -189,16 +251,6 @@ class RelEstoque01 implements EntityId
     {
         $this->precoVenda = $precoVenda;
         return $this;
-    }
-
-    /**
-     * @Groups("entity")
-     */
-    public function getTotalPrecoVenda() {
-        if (is_numeric($this->getPrecoVenda()) && is_numeric($this->getQtdeAtual())) {
-            return $this->getPrecoVenda() * $this->getQtdeAtual();
-        }
-        return null;
     }
 
     /**
@@ -256,24 +308,6 @@ class RelEstoque01 implements EntityId
     }
 
     /**
-     * @return float|null
-     */
-    public function getQtdeAtual(): ?float
-    {
-        return $this->qtdeAtual;
-    }
-
-    /**
-     * @param float|null $qtdeAtual
-     * @return RelEstoque01
-     */
-    public function setQtdeAtual(?float $qtdeAtual): RelEstoque01
-    {
-        $this->qtdeAtual = $qtdeAtual;
-        return $this;
-    }
-
-    /**
      * @return \DateTime|null
      */
     public function getDtUltSaida(): ?\DateTime
@@ -308,7 +342,6 @@ class RelEstoque01 implements EntityId
         $this->nomeFornecedor = $nomeFornecedor;
         return $this;
     }
-
 
 
 }

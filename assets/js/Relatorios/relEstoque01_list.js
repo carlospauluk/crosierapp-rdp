@@ -15,11 +15,6 @@ let listId = "#relEstoque01List";
 function getDatatablesColumns() {
     return [
         {
-            name: 'e.id',
-            data: 'e.id',
-            title: 'Id'
-        },
-        {
             name: 'e.codProduto',
             data: 'e',
             title: 'Produto',
@@ -57,17 +52,6 @@ function getDatatablesColumns() {
             className: 'text-center'
         },
         {
-            name: 'e.qtdeMaxima',
-            data: 'e.qtdeMaxima',
-            title: 'Qtde Máx',
-            render: function (data, type, row) {
-                // let val = parseFloat(data.valorTotal);
-                // return Numeral(val).format('0.0,[00]');
-                return data;
-            },
-            className: 'text-center'
-        },
-        {
             name: 'e.qtdeAtual',
             data: 'e.qtdeAtual',
             title: 'Qtde Atual',
@@ -77,28 +61,7 @@ function getDatatablesColumns() {
                 return data;
             },
             className: 'text-center'
-        },
-        {
-            name: 'e.custoMedio',
-            data: 'e.custoMedio',
-            title: 'Cto Médio',
-            render: function (data, type, row) {
-                let val = parseFloat(data);
-                return Numeral(val).format('$ 0.0,[00]');
-            },
-            className: 'text-right'
-        },
-        {
-            name: 'e.precoVenda',
-            data: 'e.precoVenda',
-            title: 'Preço Venda',
-            render: function (data, type, row) {
-                let val = parseFloat(data);
-                return Numeral(val).format('$ 0.0,[00]');
-            },
-            className: 'text-right'
-        },
-
+        }
     ];
 }
 
