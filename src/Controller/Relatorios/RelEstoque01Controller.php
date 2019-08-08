@@ -165,7 +165,8 @@ class RelEstoque01Controller extends FormListController
         $limit = ($rParams['length'] ?? null) && $rParams['length'] !== '-1' ? $rParams['length'] : 10;
 
         $dados = $repo->getReposicaoEstoque($start, $limit, $descFilial);
-        return $this->doDatatablesJsList($request, null, $dados);
+        $count = $repo->getReposicaoEstoqueCount($descFilial);
+        return $this->doDatatablesJsList($request, null, $dados, $count);
     }
 
     /**

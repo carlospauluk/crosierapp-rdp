@@ -4,6 +4,7 @@ namespace App\Repository\Relatorios;
 
 use App\Entity\Relatorios\RelEstoque01;
 use CrosierSource\CrosierLibBaseBundle\Repository\FilterRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query\ResultSetMapping;
 
 /**
@@ -18,26 +19,6 @@ class RelEstoque01Repository extends FilterRepository
     {
         return RelEstoque01::class;
     }
-
-    /**
-     * @return array
-     */
-    public function getFiliais(): array
-    {
-        $sql = 'SELECT desc_filial FROM rdp_rel_estoque01 GROUP BY desc_filial ORDER BY desc_filial';
-        $rsm = new ResultSetMapping();
-        $rsm->addScalarResult('desc_filial', 'desc_filial');
-        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
-        $r = $query->getResult();
-        $arr = [];
-        foreach ($r as $item) {
-            $e['id'] = urlencode($item['desc_filial']);
-            $e['text'] = $item['desc_filial'];
-            $arr[] = $e;
-        }
-        return $arr;
-    }
-
 
     /**
      * Utilizado no gráfico de Total de Estoque por Filial
@@ -68,7 +49,6 @@ class RelEstoque01Repository extends FilterRepository
         return $query->getResult();
     }
 
-
     /**
      * @param int|null $start
      * @param int|null $limit
@@ -88,6 +68,27 @@ class RelEstoque01Repository extends FilterRepository
         return $query->getResult();
     }
 
+    /**
+     * @param string|null $descFilial
+     * @return mixed
+     */
+    public function getReposicaoEstoqueCount(?string $descFilial = null)
+    {
+
+        try {
+            $sql = 'SELECT count(*) as counted FROM rdp_rel_estoque01 WHERE qtde_minima > 0 AND qtde_atual < qtde_minima';
+            $sql .= $descFilial ? ' AND desc_filial = :descFilial' : '';
+            $rsm = new ResultSetMapping();
+            $rsm->addScalarResult('counted', 'counted');
+            $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+            if ($descFilial) {
+                $query->setParameter('descFilial', $descFilial);
+            }
+            return $query->getOneOrNullResult()['counted'] ?? null;
+        } catch (NonUniqueResultException $e) {
+            return null;
+        }
+    }
 
     /**
      * @return mixed
@@ -123,6 +124,25 @@ class RelEstoque01Repository extends FilterRepository
         return $ret;
 
 
+    }
+
+    /**
+     * @return array
+     */
+    public function getFiliais(): array
+    {
+        $sql = 'SELECT desc_filial FROM rdp_rel_estoque01 GROUP BY desc_filial ORDER BY desc_filial';
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('desc_filial', 'desc_filial');
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $r = $query->getResult();
+        $arr = [];
+        foreach ($r as $item) {
+            $e['id'] = urlencode($item['desc_filial']);
+            $e['text'] = $item['desc_filial'];
+            $arr[] = $e;
+        }
+        return $arr;
     }
 
 }
