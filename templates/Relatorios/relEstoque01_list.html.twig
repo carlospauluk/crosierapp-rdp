@@ -1,9 +1,58 @@
 {% extends '@CrosierLibBase/list.html.twig' %}
 
 
+
+{% block aposTabela %}
+
+    <hr/>
+
+    <div class="row">
+        <div class="col-sm-8"></div>
+        <div class="col-sm-4">
+
+            <div class="form-group row">
+                <label class="col-form-label col-sm-4" for="subtotal">Total Qtde Atual: </label>
+                <div class="col-sm-8">
+                    <div class="input-group">
+                        <input type="text" disabled="disabled" class="form-control text-right" value="{{ totais.total_qtde_atual|number_format(0,',','.') }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-form-label col-sm-4" for="subtotal">Total Preço Venda: </label>
+                <div class="col-sm-8">
+                    <div class="input-group">
+                        <div class="input-group-prepend"><span class="input-group-text">R$ </span></div>
+                        <input type="text" disabled="disabled" class="crsr-money form-control" value="{{ totais.total_venda|number_format(2,',','.') }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-form-label col-sm-4" for="subtotal">Total Custo Médio: </label>
+                <div class="col-sm-8">
+                    <div class="input-group">
+                        <div class="input-group-prepend"><span class="input-group-text">R$ </span></div>
+                        <input type="text" disabled="disabled" class="crsr-money form-control" value="{{ totais.total_custo_medio|number_format(2,',','.') }}">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
 {% block campos_pesquisar %}
 
-    <input type="hidden" name="filter[descFilial]" value="{{ filter.descFiliar|default('') }}">
+    <div class="form-group">
+        <label for="p_filial">Filial</label>
+
+        <select id="filter_filial"
+                name="filter[descFilial]" class="form-control ml-2 autoSelect2"
+                data-options="{{ filiais }}"
+                data-val="{{ filter.descFilial }}"></select>
+    </div>
 
     <div class="form-group">
         <label for="p_descricao">Produto</label>

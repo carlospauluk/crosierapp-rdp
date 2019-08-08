@@ -1,0 +1,33 @@
+{% extends '@CrosierLibBase/list.html.twig' %}
+
+
+
+
+{% block campos_pesquisar %}
+
+    <input type="hidden" name="filter[descFilial]" value="{{ filter.descFilial|default('') }}">
+
+    <div class="form-group">
+        <label for="p_filial">Filial</label>
+
+        <select id="filter_filial"
+                name="filter[descFilial]" class="form-control ml-2 autoSelect2"
+                data-options="{{ filiais }}"
+                data-val="{{ filter.descFilial|default('') }}"></select>
+    </div>
+
+    <div class="form-group">
+        <label for="p_descricao">Produto</label>
+        <input type="text"
+               class="form-control" id="filter[descProduto]"
+               name="filter[descProduto]"
+               value="{{ filter.descProduto|default('') }}">
+    </div>
+
+
+{% endblock %}
+
+
+{% block down_scripts %}
+    <script src="{{ asset('build/Relatorios/relEstoque01_list_reposicao.js') }}"></script>
+{% endblock %}

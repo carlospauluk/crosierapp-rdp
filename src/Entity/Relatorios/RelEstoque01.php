@@ -164,6 +164,16 @@ class RelEstoque01 implements EntityId
     }
 
     /**
+     * @Groups("entity")
+     */
+    public function getTotalCustoMedio() {
+        if (is_numeric($this->getCustoMedio()) && is_numeric($this->getQtdeAtual())) {
+            return $this->getCustoMedio() * $this->getQtdeAtual();
+        }
+    }
+
+
+    /**
      * @return float|null
      */
     public function getPrecoVenda(): ?float
@@ -179,6 +189,16 @@ class RelEstoque01 implements EntityId
     {
         $this->precoVenda = $precoVenda;
         return $this;
+    }
+
+    /**
+     * @Groups("entity")
+     */
+    public function getTotalPrecoVenda() {
+        if (is_numeric($this->getPrecoVenda()) && is_numeric($this->getQtdeAtual())) {
+            return $this->getPrecoVenda() * $this->getQtdeAtual();
+        }
+        return null;
     }
 
     /**
@@ -288,6 +308,7 @@ class RelEstoque01 implements EntityId
         $this->nomeFornecedor = $nomeFornecedor;
         return $this;
     }
+
 
 
 }

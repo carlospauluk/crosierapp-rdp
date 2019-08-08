@@ -4,7 +4,9 @@ namespace App\Controller;
 
 
 use App\Entity\Relatorios\RelCtsPagRec01;
+use App\Entity\Relatorios\RelEstoque01;
 use App\Entity\Relatorios\RelVendas01;
+use App\Repository\Relatorios\RelEstoque01Repository;
 use CrosierSource\CrosierLibBaseBundle\Controller\BaseController;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -65,6 +67,11 @@ class DefaultController extends BaseController
         $params['filter']['contasPagRec']['localizador'] = urlencode($session->get('dashboard.filter.contasPagRec.localizador')) ?? $localizadores[0]['id'];
 
         $params['filter']['relCompFor01']['dts'] = $session->get('dashboard.filter.relCompFor01.dts') ?? ($primeiroDia_mesPassado . ' - ' . $ultimoDia_mesPassado);
+
+
+        /** @var RelEstoque01Repository $repoEstoque01 */
+        $repoEstoque01 =  $this->getDoctrine()->getRepository(RelEstoque01::class);
+        $params['reposicaoEstoqueTotais'] = $repoEstoque01->getReposicaoEstoqueTotalPorFilial();
 
         return $this->doRender('dashboard.html.twig', $params);
     }
