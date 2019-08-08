@@ -21,7 +21,7 @@ class RelEstoque01 implements EntityId
 
     /**
      *
-     * @ORM\Column(name="cod_prod", type="integer", nullable=false)
+     * @ORM\Column(name="cod_prod", type="varchar", length=50, nullable=false)
      * @Groups("entity")
      *
      * @var int|null
