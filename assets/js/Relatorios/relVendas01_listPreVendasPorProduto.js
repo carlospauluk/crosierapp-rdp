@@ -1,9 +1,5 @@
 'use strict';
 
-/**
- * Script que é utilizado em telas de extratos.
- */
-
 import Moment from 'moment';
 
 import $ from "jquery";

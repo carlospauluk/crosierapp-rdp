@@ -107,7 +107,7 @@ class RelEstoque01 implements EntityId
     /**
      *
      * @Groups("entity")
-     *
+     * @ORM\Column(name="deficit", type="decimal", nullable=true)
      * @var float|null
      */
     private $deficit;
@@ -218,9 +218,6 @@ class RelEstoque01 implements EntityId
      */
     public function getDeficit()
     {
-        if (is_numeric($this->getQtdeMinima()) && is_numeric($this->getQtdeAtual())) {
-            $this->deficit = ($this->getQtdeAtual() < $this->getQtdeMinima()) ? $this->getQtdeMinima() - $this->getQtdeAtual() : 0;
-        }
         return $this->deficit;
     }
 

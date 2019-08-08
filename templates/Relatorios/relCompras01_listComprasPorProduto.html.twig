@@ -1,0 +1,101 @@
+{% extends '@CrosierLibBase/index.html.twig' %}
+
+
+
+
+{% block page_content %}
+
+    <form action="{{ url('relVendas01_listPreVendasPorProduto') }}" method="get" id="formPesquisar">
+
+        <div class="card">
+            <div class="card-header">
+
+
+                <div class="d-flex flex-wrap">
+
+                    <div>
+                        <h3>Compras de Produto</h3>
+                        <h6>{{ produto }}</h6>
+                    </div>
+                    <div class="ml-auto justify-content-end text-right">
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="table-responsive-sm">
+
+
+                    <table class="table table-sm table-striped table-hover crsr-datatable" id="datatableItens">
+
+                        <thead>
+                        <tr>
+                            <th scope="col" title="">#</th>
+                            <th scope="col">PV</th>
+                            <th scope="col">Dt Emissão</th>
+                            <th scope="col">Qtde</th>
+                            <th scope="col">Fornecedor</th>
+                            <th scope="col">Preço Custo</th>
+                            <th scope="col">Preço Venda</th>
+                            <th scope="col">Rentabilidade</th>
+                            <th scope="col">Dt Prev Entrega</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for item in dados %}
+                            <tr>
+                                <td>
+                                    <span class="badge badge-pill badge-light">{{ loop.index }}</span>
+                                </td>
+                                <td>
+                                    <div class="float-left">{{ item.pv_compra }}</div>
+                                    <div class="float-right">
+                                        <a role="button" class="btn btn-outline-primary btn-sm" href="{{ url('relCompras01_listPreVendaItens', {'pv':item.pv_compra}) }}">
+                                             <i class="fas fa-clipboard-list"></i></a>
+                                    </div>
+
+
+                                </td>
+                                <td class="text-center">
+                                    {{ item.dt_emissao|date('d/m/Y') }}
+                                </td>
+                                <td class="text-center" data-order="{{ item.qtde }}">
+                                    {{ item.qtde|number_format(2,',','.') }}
+                                </td>
+                                <td>
+                                    {{ item.cod_fornec }} - {{ item.nome_fornec }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.total_preco_custo }}">
+                                    {{ item.total_preco_custo|number_format(2,',','.') }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.total_preco_venda }}">
+                                    {{ item.total_preco_venda|number_format(2,',','.') }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.rentabilidade }}">
+                                    {{ item.rentabilidade|number_format(2,',','.') }}%
+                                </td>
+                                <td class="text-center">
+                                    {{ item.dt_prev_entrega|date('d/m/Y') }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </form>
+{% endblock %}
+
+
+{% block down_scripts %}
+    <script src="{{ asset('build/Relatorios/relCompras01_listComprasPorProduto.js') }}"></script>
+{% endblock %}

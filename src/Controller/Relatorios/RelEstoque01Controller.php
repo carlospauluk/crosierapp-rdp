@@ -79,7 +79,8 @@ class RelEstoque01Controller extends FormListController
             new FilterData(['descProduto'], 'LIKE', 'descProduto', $params),
             new FilterData(['descFilial'], 'EQ', 'descFilial', $params),
             new FilterData(['nomeFornecedor'], 'EQ', 'nomeFornecedor', $params),
-            new FilterData(['qtdeAtual'], 'GT', 'qtdeAtual', $params),
+            new FilterData(['qtdeMinima'], 'GT', 'qtdeMinima', $params),
+            new FilterData(['deficit'], 'GT', 'deficit', $params),
             new FilterData(['dtUltSaida'], 'GT', 'dtUltSaidaApartirDe', $params),
         ];
     }
@@ -193,39 +194,20 @@ class RelEstoque01Controller extends FormListController
      */
     public function listReposicao_datatablesJsList(Request $request): Response
     {
-        /** @var RelEstoque01Repository $repo */
-        $repo = $this->getDoctrine()->getRepository(RelEstoque01::class);
-
-        $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr('1900-01-01');
-        $nomeFornecedor = null;
-        $descFilial = null;
-
+        $defaultFilters = [
+            'filter' => [
+                'qtdeAtual' => 0,
+                'deficit' => 0
+            ]
+        ];
         // RTA: como o nomeFornecedor é também o id do select2, ele está com urlencode, então...
-        // RTA2: preciso fazer o parse do que vem no formPesquisar pois não farei a busca pela lógica do doDatatablesJsList()
         if ($request->get('formPesquisar') ?? null) {
             parse_str($request->get('formPesquisar'), $formPesquisar);
             if ($formPesquisar['filter']['nomeFornecedor'] ?? null) {
-                $nomeFornecedor = urldecode($formPesquisar['filter']['nomeFornecedor']);
-            }
-
-            if ($formPesquisar['filter']['descFilial'] ?? null) {
-                $descFilial = $formPesquisar['filter']['descFilial'];
-            }
-
-            if ($formPesquisar['filter']['dtUltSaidaApartirDe'] ?? null) {
-                $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr($formPesquisar['filter']['dtUltSaidaApartirDe']);
+                $defaultFilters['filter']['nomeFornecedor'] = urldecode($formPesquisar['filter']['nomeFornecedor']);
             }
         }
-
-
-        $rParams = $request->request->all();
-        $start = $rParams['start'] ?? 0;
-        $limit = ($rParams['length'] ?? null) && $rParams['length'] !== '-1' ? $rParams['length'] : 10;
-
-
-        $dados = $repo->getReposicaoEstoque($dtUltSaidaApartirDe, $descFilial, $nomeFornecedor, $start, $limit);
-        $count = $repo->getReposicaoEstoqueCount($dtUltSaidaApartirDe, $descFilial, $nomeFornecedor);
-        return $this->doDatatablesJsList($request, null, $dados, $count);
+        return $this->doDatatablesJsList($request, $defaultFilters);
     }
 
     /**

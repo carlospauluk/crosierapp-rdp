@@ -574,8 +574,6 @@ class RelVendas01Repository extends FilterRepository
         } catch (NonUniqueResultException $e) {
             throw new ViewException('Erro ao totalizar PV ' . $pv);
         }
-
-
     }
 
 

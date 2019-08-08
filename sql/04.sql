@@ -175,6 +175,7 @@ CREATE TABLE `rdp_rel_estoque01`
     `qtde_minima`        DECIMAL(15, 2) NOT NULL,
     `qtde_maxima`        DECIMAL(15, 2) NOT NULL,
     `qtde_atual`         DECIMAL(15, 2) NOT NULL,
+    `deficit`            DECIMAL(15, 2) AS (qtde_minima - qtde_atual),
     `dt_ult_saida`       DATETIME       NULL,
     `nome_fornec`        VARCHAR(200)   NOT NULL,
 
@@ -208,5 +209,98 @@ CREATE TABLE `rdp_rel_estoque01`
     CONSTRAINT `fk_rdp_rel_estoque01_user_updated` FOREIGN KEY (`user_updated_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_rel_estoque01_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_rel_estoque01_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
+) ENGINE = INNODB
+  DEFAULT charset = latin1;
+
+
+
+# PV_COMPRA
+# ITEM
+# QTDE
+# EMISSAO
+# ANO
+# MES
+# COD_FORNEC
+# NOME_FORNEC
+# COD_PROD
+# DESC_PROD
+# TOTAL_PRECO_VENDA
+# TOTAL_PRECO_CUSTO
+# RENTABILIDADE ITEM
+# COD_VENDEDOR
+# NOME_VENDEDOR
+# LOJA
+# TOTAL_CUSTO_PV
+# TOTAL_VENDA_PV
+# RENTABILIDADE PV
+# CLIENTE PV
+# GRUPO
+
+DROP TABLE IF EXISTS `rdp_rel_compras01`;
+CREATE TABLE `rdp_rel_compras01`
+(
+    `id`                 BIGINT(20)     NOT NULL AUTO_INCREMENT,
+    `pv_compra`          BIGINT(20)     NOT NULL,
+    `num_item`           INT(11)        NOT NULL,
+    `qtde`               INT(11)        NOT NULL,
+    `dt_emissao`         DATETIME       NOT NULL,
+    `ano`                CHAR(4)        NOT NULL,
+    `mes`                CHAR(2)        NOT NULL,
+    `cod_fornec`         BIGINT(20)     NOT NULL,
+    `nome_fornec`        VARCHAR(200)   NOT NULL,
+    `cod_prod`           VARCHAR(50)    NOT NULL,
+    `desc_prod`          VARCHAR(200)   NOT NULL,
+    `total_preco_venda`  DECIMAL(15, 2) NOT NULL,
+    `total_preco_custo`  DECIMAL(15, 2) NOT NULL,
+    `rentabilidade`      DECIMAL(15, 2) NOT NULL,
+    `cod_vendedor`       BIGINT(20)     NOT NULL,
+    `nome_vendedor`      VARCHAR(200)   NOT NULL,
+    `loja`               VARCHAR(200)   NOT NULL,
+    `total_custo_pv`     DECIMAL(15, 2) NOT NULL,
+    `total_venda_pv`     DECIMAL(15, 2) NOT NULL,
+    `rentabilidade_pv`   DECIMAL(15, 2) NOT NULL,
+    `cliente_pv`         VARCHAR(200)   NOT NULL,
+    `grupo`              VARCHAR(200)   NOT NULL,
+    `dt_prev_entrega`    DATETIME       NOT NULL,
+
+
+    UNIQUE KEY `uk_rdp_rel_compras01` (`pv_compra`,
+                                       `num_item`,
+                                       `qtde`,
+                                       `dt_emissao`,
+                                       `cod_fornec`,
+                                       `cod_prod`,
+                                       `total_preco_venda`,
+                                       `total_preco_custo`,
+                                       `cod_vendedor`,
+                                       `loja`,
+                                       `total_custo_pv`,
+                                       `total_venda_pv`,
+                                       `cliente_pv`,
+                                       `grupo`,
+                                       `dt_prev_entrega`),
+
+    KEY rdp_rel_compras01_dt_emissao (`dt_emissao`),
+    KEY rdp_rel_compras01_cod_fornec (`cod_fornec`),
+    KEY rdp_rel_compras01_nome_fornec (`nome_fornec`),
+    KEY rdp_rel_compras01_cod_prod (`cod_prod`),
+    KEY rdp_rel_compras01_desc_prod (`desc_prod`),
+    KEY rdp_rel_compras01_loja (`loja`),
+    KEY rdp_rel_compras01_cliente_pv (`cliente_pv`),
+    KEY rdp_rel_compras01_grupo (`grupo`),
+
+    -- campos de controle do crosier
+    PRIMARY KEY (`id`),
+    `estabelecimento_id` BIGINT(20)     NOT NULL,
+    `inserted`           DATETIME       NOT NULL,
+    `updated`            DATETIME       NOT NULL,
+    `user_inserted_id`   BIGINT(20)     NOT NULL,
+    `user_updated_id`    BIGINT(20)     NOT NULL,
+    KEY `k_rdp_rel_compras01_estabelecimento` (`estabelecimento_id`),
+    KEY `k_rdp_rel_compras01_user_inserted` (`user_inserted_id`),
+    KEY `k_rdp_rel_compras01_user_updated` (`user_updated_id`),
+    CONSTRAINT `fk_rdp_rel_compras01_user_updated` FOREIGN KEY (`user_updated_id`) references `sec_user` (`id`),
+    CONSTRAINT `fk_rdp_rel_compras01_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
+    CONSTRAINT `fk_rdp_rel_compras01_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   DEFAULT charset = latin1;

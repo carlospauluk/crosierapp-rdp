@@ -45,7 +45,7 @@ class UploadAPIController extends AbstractController
         $output = ['uploaded' => false];
 
         $tipoRelatorio = $request->get('tipoRelatorio');
-        if (!$tipoRelatorio || !in_array($tipoRelatorio, ['RELCTSPAGREC01', 'RELVENDAS01', 'RELCOMPFOR01', 'RELESTOQUE01'])) {
+        if (!$tipoRelatorio || !in_array($tipoRelatorio, ['RELCTSPAGREC01', 'RELVENDAS01', 'RELCOMPFOR01', 'RELESTOQUE01', 'RELCOMPRAS01'])) {
             $output['msg'] = 'tipoRelatorio inexistente: "' . $tipoRelatorio . '"';
             return new JsonResponse($output);
         }

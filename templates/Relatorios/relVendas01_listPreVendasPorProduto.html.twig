@@ -46,7 +46,6 @@
                             <th scope="col">PV</th>
                             <th scope="col">Cliente</th>
                             <th scope="col">Dt Emissão</th>
-                            <th scope="col">Produto</th>
                             <th scope="col">Total Custo</th>
                             <th scope="col">Total Venda</th>
                             <th scope="col">Rentabilidade</th>
@@ -68,9 +67,6 @@
                                 </td>
                                 <td class="text-center">
                                     {{ item.dt_emissao|date('d/m/Y') }}
-                                </td>
-                                <td>
-                                    {{ item.cod_vendedor }} - {{ item.nome_vendedor }}
                                 </td>
                                 <td class="text-right" data-order="{{ item.total_custo_pv }}">
                                     {{ item.total_custo_pv|number_format(2,',','.') }}
@@ -97,7 +93,7 @@
                         <tfoot>
 
                         <tr style="background-color: antiquewhite; font-weight: bold">
-                            <td colspan="6" class="text-right" style="padding: 10px">
+                            <td colspan="5" class="text-right" style="padding: 10px">
                                 Total:
                             </td>
                             <td class="text-right" style="padding: 10px">

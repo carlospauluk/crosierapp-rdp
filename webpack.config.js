@@ -48,6 +48,8 @@ Encore
     .addEntry('Relatorios/relEstoque01_list', './assets/js/Relatorios/relEstoque01_list.js')
     .addEntry('Relatorios/relEstoque01_list_reposicao', './assets/js/Relatorios/relEstoque01_list_reposicao.js')
 
+    .addEntry('Relatorios/relCompras01_listComprasPorProduto', './assets/js/Relatorios/relCompras01_listComprasPorProduto.js')
+
 
 
 

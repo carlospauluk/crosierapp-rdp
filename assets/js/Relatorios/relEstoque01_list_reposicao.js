@@ -45,9 +45,8 @@ function getDatatablesColumns() {
             data: 'e.qtdeMinima',
             title: 'Qtde Mín',
             render: function (data, type, row) {
-                // let val = parseFloat(data.valorTotal);
-                // return Numeral(val).format('0.0,[00]');
-                return data;
+                let val = parseFloat(data);
+                return Numeral(val).format('0.0,[00]');
             },
             className: 'text-center'
         },
@@ -56,22 +55,35 @@ function getDatatablesColumns() {
             data: 'e.qtdeAtual',
             title: 'Qtde Atual',
             render: function (data, type, row) {
-                // let val = parseFloat(data.valorTotal);
-                // return Numeral(val).format('0.0,[00]');
-                return data;
+                let val = parseFloat(data);
+                return Numeral(val).format('0.0,[00]');
             },
             className: 'text-center'
         },
         {
-            name: 'e.qtdeAtual',
+            name: 'e.deficit',
             data: 'e.deficit',
-            title: 'Déficit',
+            title: 'Qtde Reposição',
             render: function (data, type, row) {
-                // let val = parseFloat(data.valorTotal);
-                // return Numeral(val).format('0.0,[00]');
-                return data;
+                let val = parseFloat(data);
+                return Numeral(val).format('0.0,[00]');
             },
             className: 'text-center'
+        },
+        {
+            name: 'e.deficit',
+            data: 'e',
+            title: '',
+            render: function (data, type, row) {
+                let colHtml = "";
+
+                let url = Routing.generate('relCompras01_listComprasPorProduto', {'filter': {'codProduto': data.codProduto}});
+                colHtml += '<a role="button" class="btn btn-outline-primary btn-sm" href="' + url + '">' +
+                    '<i class="fas fa-truck"></i> Compras</a> ';
+
+                return colHtml;
+            },
+            className: 'text-right'
         }
 
 

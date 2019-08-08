@@ -6,6 +6,7 @@
 {% block page_content %}
 
 
+
     <div class="card">
         <div class="card-header">
 
@@ -28,7 +29,7 @@
             <div class="form-group">
 
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-8">
                         <label class="col-form-label form-control-label" for="pv">PV</label>
                         <input type="number" disabled="disabled" class="form-control" value="{{ pv }}" id="pv">
 
@@ -38,29 +39,20 @@
                         <input type="text" disabled="disabled" class="form-control" id="dtEmissao"
                                value="{{ total.dt_emissao|date('d/m/Y') }}">
                     </div>
-                    <div class="col-md-5">
-                        <label class="col-form-label form-control-label" for="cliente">Cliente</label>
-                        <input type="text" disabled="disabled" class="form-control" id="cliente"
-                               value="{{ total.cliente_pv }}">
-                    </div>
+
                 </div>
 
                 <div class="row mt-2">
-                    <div class="col-md-5">
-                        <label class="col-form-label form-control-label" for="vendedor">Vendedor</label>
+                    <div class="col-md-4">
+                        <label class="col-form-label form-control-label" for="vendedor">Comprador</label>
                         <input type="text" disabled="disabled" class="form-control"
                                value="{{ total.cod_vendedor }} - {{ total.nome_vendedor }}" id="vendedor">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-8">
                         <label class="col-form-label form-control-label" style="white-space: nowrap"
                                for="dtEmissao">Loja</label>
                         <input type="text" disabled="disabled" class="form-control" id="loja"
                                value="{{ total.loja }}">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="col-form-label form-control-label" for="grupo">Grupo</label>
-                        <input type="text" disabled="disabled" class="form-control" id="grupo"
-                               value="{{ total.grupo }}">
                     </div>
                 </div>
 
@@ -76,8 +68,8 @@
                     <thead>
                     <tr>
                         <th scope="col" title="">#</th>
-                        <th scope="col">Código</th>
                         <th scope="col">Produto</th>
+                        <th scope="col">Fornecedor</th>
                         <th scope="col">Qtde</th>
                         <th scope="col">Rentabilidade</th>
                         <th scope="col">Preço Custo</th>
@@ -92,10 +84,10 @@
                                 <span class="badge badge-pill badge-light">{{ loop.index }}</span>
                             </td>
                             <td>
-                                {{ item.cod_prod }}
+                                {{ item.cod_prod }} - {{ item.desc_prod }}
                             </td>
                             <td>
-                                {{ item.desc_prod }}
+                                {{ item.cod_fornec }} - {{ item.nome_fornec }}
                             </td>
                             <td class="text-right">
                                 {{ item.qtde }}
@@ -172,7 +164,3 @@
 
 {% endblock %}
 
-
-{% block down_scripts %}
-    <script src="{{ asset('build/Relatorios/relVendas01_listItensDoPreVenda.js') }}"></script>
-{% endblock %}

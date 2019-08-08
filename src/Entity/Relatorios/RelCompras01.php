@@ -9,24 +9,24 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  *
- * @ORM\Entity(repositoryClass="App\Repository\Relatorios\RelVendas01Repository")
+ * @ORM\Entity(repositoryClass="App\Repository\Relatorios\RelCompras01Repository")
  * @ORM\Table(name="rdp_rel_vendas01")
  *
  * @author Carlos Eduardo Pauluk
  */
-class RelVendas01 implements EntityId
+class RelCompras01 implements EntityId
 {
 
     use EntityIdTrait;
 
     /**
      *
-     * @ORM\Column(name="prevenda", type="bigint", nullable=false)
+     * @ORM\Column(name="pv_compra", type="bigint", nullable=false)
      * @Groups("entity")
      *
      * @var int|null
      */
-    private $preVenda;
+    private $pvCompra;
 
     /**
      *
@@ -54,7 +54,6 @@ class RelVendas01 implements EntityId
      * @var \DateTime|null
      */
     private $dtEmissao;
-
 
     /**
      *
@@ -158,74 +157,28 @@ class RelVendas01 implements EntityId
 
     /**
      *
-     * @ORM\Column(name="loja", type="string", length=200, nullable=false)
+     * @ORM\Column(name="dt_prev_entrega", type="date", nullable=false)
      * @Groups("entity")
      *
-     * @var string|null
+     * @var \DateTime|null
      */
-    private $loja;
-
-    /**
-     *
-     * @ORM\Column(name="total_custo_pv", type="decimal", nullable=false)
-     * @Groups("entity")
-     *
-     * @var float|null
-     */
-    private $totalCustoPV;
-
-    /**
-     *
-     * @ORM\Column(name="total_venda_pv", type="decimal", nullable=false)
-     * @Groups("entity")
-     *
-     * @var float|null
-     */
-    private $totalVendaPV;
-
-    /**
-     *
-     * @ORM\Column(name="rentabilidade_pv", type="decimal", nullable=false)
-     * @Groups("entity")
-     *
-     * @var float|null
-     */
-    private $rentabilidadePV;
-
-    /**
-     *
-     * @ORM\Column(name="cliente_pv", type="string", length=200, nullable=false)
-     * @Groups("entity")
-     *
-     * @var string|null
-     */
-    private $clientePV;
-
-    /**
-     *
-     * @ORM\Column(name="grupo", type="string", length=200, nullable=false)
-     * @Groups("entity")
-     *
-     * @var string|null
-     */
-    private $grupo;
-
+    private $dtPrevEntrega;
 
     /**
      * @return int|null
      */
-    public function getPreVenda(): ?int
+    public function getPvCompra(): ?int
     {
-        return $this->preVenda;
+        return $this->pvCompra;
     }
 
     /**
-     * @param int|null $preVenda
-     * @return RelVendas01
+     * @param int|null $pvCompra
+     * @return RelCompras01
      */
-    public function setPreVenda(?int $preVenda): RelVendas01
+    public function setPvCompra(?int $pvCompra): RelCompras01
     {
-        $this->preVenda = $preVenda;
+        $this->pvCompra = $pvCompra;
         return $this;
     }
 
@@ -239,9 +192,9 @@ class RelVendas01 implements EntityId
 
     /**
      * @param int|null $numItem
-     * @return RelVendas01
+     * @return RelCompras01
      */
-    public function setNumItem(?int $numItem): RelVendas01
+    public function setNumItem(?int $numItem): RelCompras01
     {
         $this->numItem = $numItem;
         return $this;
@@ -257,9 +210,9 @@ class RelVendas01 implements EntityId
 
     /**
      * @param int|null $qtde
-     * @return RelVendas01
+     * @return RelCompras01
      */
-    public function setQtde(?int $qtde): RelVendas01
+    public function setQtde(?int $qtde): RelCompras01
     {
         $this->qtde = $qtde;
         return $this;
@@ -275,9 +228,9 @@ class RelVendas01 implements EntityId
 
     /**
      * @param \DateTime|null $dtEmissao
-     * @return RelVendas01
+     * @return RelCompras01
      */
-    public function setDtEmissao(?\DateTime $dtEmissao): RelVendas01
+    public function setDtEmissao(?\DateTime $dtEmissao): RelCompras01
     {
         $this->dtEmissao = $dtEmissao;
         return $this;
@@ -293,9 +246,9 @@ class RelVendas01 implements EntityId
 
     /**
      * @param string|null $ano
-     * @return RelVendas01
+     * @return RelCompras01
      */
-    public function setAno(?string $ano): RelVendas01
+    public function setAno(?string $ano): RelCompras01
     {
         $this->ano = $ano;
         return $this;
@@ -311,9 +264,9 @@ class RelVendas01 implements EntityId
 
     /**
      * @param string|null $mes
-     * @return RelVendas01
+     * @return RelCompras01
      */
-    public function setMes(?string $mes): RelVendas01
+    public function setMes(?string $mes): RelCompras01
     {
         $this->mes = $mes;
         return $this;
@@ -329,9 +282,9 @@ class RelVendas01 implements EntityId
 
     /**
      * @param int|null $codFornecedor
-     * @return RelVendas01
+     * @return RelCompras01
      */
-    public function setCodFornecedor(?int $codFornecedor): RelVendas01
+    public function setCodFornecedor(?int $codFornecedor): RelCompras01
     {
         $this->codFornecedor = $codFornecedor;
         return $this;
@@ -347,9 +300,9 @@ class RelVendas01 implements EntityId
 
     /**
      * @param string|null $nomeFornecedor
-     * @return RelVendas01
+     * @return RelCompras01
      */
-    public function setNomeFornecedor(?string $nomeFornecedor): RelVendas01
+    public function setNomeFornecedor(?string $nomeFornecedor): RelCompras01
     {
         $this->nomeFornecedor = $nomeFornecedor;
         return $this;
@@ -365,9 +318,9 @@ class RelVendas01 implements EntityId
 
     /**
      * @param int|null $codProduto
-     * @return RelVendas01
+     * @return RelCompras01
      */
-    public function setCodProduto(?int $codProduto): RelVendas01
+    public function setCodProduto(?int $codProduto): RelCompras01
     {
         $this->codProduto = $codProduto;
         return $this;
@@ -383,9 +336,9 @@ class RelVendas01 implements EntityId
 
     /**
      * @param string|null $descProduto
-     * @return RelVendas01
+     * @return RelCompras01
      */
-    public function setDescProduto(?string $descProduto): RelVendas01
+    public function setDescProduto(?string $descProduto): RelCompras01
     {
         $this->descProduto = $descProduto;
         return $this;
@@ -401,9 +354,9 @@ class RelVendas01 implements EntityId
 
     /**
      * @param float|null $totalPrecoVenda
-     * @return RelVendas01
+     * @return RelCompras01
      */
-    public function setTotalPrecoVenda(?float $totalPrecoVenda): RelVendas01
+    public function setTotalPrecoVenda(?float $totalPrecoVenda): RelCompras01
     {
         $this->totalPrecoVenda = $totalPrecoVenda;
         return $this;
@@ -419,9 +372,9 @@ class RelVendas01 implements EntityId
 
     /**
      * @param float|null $totalPrecoCusto
-     * @return RelVendas01
+     * @return RelCompras01
      */
-    public function setTotalPrecoCusto(?float $totalPrecoCusto): RelVendas01
+    public function setTotalPrecoCusto(?float $totalPrecoCusto): RelCompras01
     {
         $this->totalPrecoCusto = $totalPrecoCusto;
         return $this;
@@ -437,9 +390,9 @@ class RelVendas01 implements EntityId
 
     /**
      * @param float|null $rentabilidade
-     * @return RelVendas01
+     * @return RelCompras01
      */
-    public function setRentabilidade(?float $rentabilidade): RelVendas01
+    public function setRentabilidade(?float $rentabilidade): RelCompras01
     {
         $this->rentabilidade = $rentabilidade;
         return $this;
@@ -455,9 +408,9 @@ class RelVendas01 implements EntityId
 
     /**
      * @param int|null $codVendedor
-     * @return RelVendas01
+     * @return RelCompras01
      */
-    public function setCodVendedor(?int $codVendedor): RelVendas01
+    public function setCodVendedor(?int $codVendedor): RelCompras01
     {
         $this->codVendedor = $codVendedor;
         return $this;
@@ -473,119 +426,29 @@ class RelVendas01 implements EntityId
 
     /**
      * @param string|null $nomeVendedor
-     * @return RelVendas01
+     * @return RelCompras01
      */
-    public function setNomeVendedor(?string $nomeVendedor): RelVendas01
+    public function setNomeVendedor(?string $nomeVendedor): RelCompras01
     {
         $this->nomeVendedor = $nomeVendedor;
         return $this;
     }
 
     /**
-     * @return string|null
+     * @return \DateTime|null
      */
-    public function getLoja(): ?string
+    public function getDtPrevEntrega(): ?\DateTime
     {
-        return $this->loja;
+        return $this->dtPrevEntrega;
     }
 
     /**
-     * @param string|null $loja
-     * @return RelVendas01
+     * @param \DateTime|null $dtPrevEntrega
+     * @return RelCompras01
      */
-    public function setLoja(?string $loja): RelVendas01
+    public function setDtPrevEntrega(?\DateTime $dtPrevEntrega): RelCompras01
     {
-        $this->loja = $loja;
-        return $this;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getTotalCustoPV(): ?float
-    {
-        return $this->totalCustoPV;
-    }
-
-    /**
-     * @param float|null $totalCustoPV
-     * @return RelVendas01
-     */
-    public function setTotalCustoPV(?float $totalCustoPV): RelVendas01
-    {
-        $this->totalCustoPV = $totalCustoPV;
-        return $this;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getTotalVendaPV(): ?float
-    {
-        return $this->totalVendaPV;
-    }
-
-    /**
-     * @param float|null $totalVendaPV
-     * @return RelVendas01
-     */
-    public function setTotalVendaPV(?float $totalVendaPV): RelVendas01
-    {
-        $this->totalVendaPV = $totalVendaPV;
-        return $this;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getRentabilidadePV(): ?float
-    {
-        return $this->rentabilidadePV;
-    }
-
-    /**
-     * @param float|null $rentabilidadePV
-     * @return RelVendas01
-     */
-    public function setRentabilidadePV(?float $rentabilidadePV): RelVendas01
-    {
-        $this->rentabilidadePV = $rentabilidadePV;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getClientePV(): ?string
-    {
-        return $this->clientePV;
-    }
-
-    /**
-     * @param string|null $clientePV
-     * @return RelVendas01
-     */
-    public function setClientePV(?string $clientePV): RelVendas01
-    {
-        $this->clientePV = $clientePV;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getGrupo(): ?string
-    {
-        return $this->grupo;
-    }
-
-    /**
-     * @param string|null $grupo
-     * @return RelVendas01
-     */
-    public function setGrupo(?string $grupo): RelVendas01
-    {
-        $this->grupo = $grupo;
+        $this->dtPrevEntrega = $dtPrevEntrega;
         return $this;
     }
 
