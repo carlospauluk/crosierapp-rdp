@@ -19,15 +19,26 @@ function getDatatablesColumns() {
             data: 'e',
             title: 'Produto',
             render: function (data, type, row) {
-                let r = '<b>' + data.codProduto + ' - ' + data.descProduto + '</b>' +
-                    '<br />' +
-                    '<span style="font-size: smaller">' + data.nomeFornecedor + '</span>';
-                if (data.dtUltSaida) {
-                    r += ' <div class="float-right"><span class="badge badge-pill badge-info">' +
-                        '<i class="far fa-calendar"></i> Últ Saída: ' + Moment(data.dtUltSaida).format('DD/MM/YYYY') + '</span></div>';
-                }
-                return r;
+                return data.codProduto + ' - ' + data.descProduto;
             }
+        },
+        {
+            name: 'e.nomeFornecedor',
+            data: 'e.nomeFornecedor',
+            title: 'Fornecedor',
+            render: function (data, type, row) {
+                return data;
+            }
+        },
+        {
+            name: 'e.dtUltSaida',
+            data: 'e.dtUltSaida',
+            title: 'Dt Últ Saída',
+            render: function (data, type, row) {
+                return data ? Moment(data).format('DD/MM/YYYY') : 'N/A';
+            },
+            className: 'text-center'
+
         },
         {
             name: 'e.qtdeMinima',
@@ -52,45 +63,17 @@ function getDatatablesColumns() {
             className: 'text-center'
         },
         {
-            name: 'e.custoMedio',
-            data: 'e.custoMedio',
-            title: 'Cto Médio',
+            name: 'e.qtdeAtual',
+            data: 'e.deficit',
+            title: 'Déficit',
             render: function (data, type, row) {
-                let val = parseFloat(data);
-                return Numeral(val).format('$ 0.0,[00]');
+                // let val = parseFloat(data.valorTotal);
+                // return Numeral(val).format('0.0,[00]');
+                return data;
             },
-            className: 'text-right'
-        },
-        {
-            name: 'e.totalCustoMedio',
-            data: 'e.totalCustoMedio',
-            title: 'Tot Cto Médio',
-            render: function (data, type, row) {
-                let val = parseFloat(data);
-                return '<b>' + Numeral(val).format('$ 0.0,[00]') + '</b>';
-            },
-            className: 'text-right'
-        },
-        {
-            name: 'e.precoVenda',
-            data: 'e.precoVenda',
-            title: 'Preço Venda',
-            render: function (data, type, row) {
-                let val = parseFloat(data);
-                return Numeral(val).format('$ 0.0,[00]');
-            },
-            className: 'text-right'
-        },
-        {
-            name: 'e.totalPrecoVenda',
-            data: 'e.totalPrecoVenda',
-            title: 'Tot Preço Venda',
-            render: function (data, type, row) {
-                let val = parseFloat(data);
-                return '<b>' + Numeral(val).format('$ 0.0,[00]') + '</b>';
-            },
-            className: 'text-right'
-        },
+            className: 'text-center'
+        }
+
 
     ];
 }

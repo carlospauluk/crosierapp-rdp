@@ -106,7 +106,11 @@ class RelEstoque01Controller extends FormListController
         $params['fornecedores'] = json_encode($fornecedores);
         $nomeFornecedor = urldecode($request->get('filter')['nomeFornecedor'] ?? null);
 
-        $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr($request->get('filter')['dtUltSaidaApartirDe'] ?: '1900-01-01');
+        if ($request->get('filter')['dtUltSaidaApartirDe'] ?? null) {
+            $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr($request->get('filter')['dtUltSaidaApartirDe'] );
+        } else {
+            $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr('1900-01-01');
+        }
 
         $totais = $repo->totalEstoque($dtUltSaidaApartirDe, $descFilial, $nomeFornecedor);
         $params['totais'] = $totais[0] ?? null;
@@ -128,6 +132,7 @@ class RelEstoque01Controller extends FormListController
                 'qtdeAtual' => 0
             ]
         ];
+        // RTA: como o nomeFornecedor é também o id do select2, ele está com urlencode, então...
         if ($request->get('formPesquisar') ?? null) {
             parse_str($request->get('formPesquisar'), $formPesquisar);
             if ($formPesquisar['filter']['nomeFornecedor'] ?? null) {
@@ -152,10 +157,23 @@ class RelEstoque01Controller extends FormListController
         $filiais = $repo->getFiliais();
         array_unshift($filiais, ['id' => '', 'text' => 'TODAS']);
         $params['filiais'] = json_encode($filiais);
-
         $descFilial = $request->get('filter')['descFilial'] ?? null;
-        $totais = $repo->totalEstoquePorFilial($descFilial);
+
+        $fornecedores = $repo->getFornecedores();
+        array_unshift($fornecedores, ['id' => '', 'text' => 'TODOS']);
+        $params['fornecedores'] = json_encode($fornecedores);
+        $nomeFornecedor = urldecode($request->get('filter')['nomeFornecedor'] ?? null);
+
+        if ($request->get('filter')['dtUltSaidaApartirDe'] ?? null) {
+            $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr($request->get('filter')['dtUltSaidaApartirDe'] );
+        } else {
+            $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr('1900-01-01');
+        }
+
+        $totais = $repo->totalEstoque($dtUltSaidaApartirDe, $descFilial, $nomeFornecedor);
+
         $params['totais'] = $totais[0] ?? null;
+
 
         $this->crudParams['listId'] = 'relEstoque01List_reposicao';
         $this->crudParams['listRoute'] = 'relEstoque01_listReposicao';
@@ -178,14 +196,35 @@ class RelEstoque01Controller extends FormListController
         /** @var RelEstoque01Repository $repo */
         $repo = $this->getDoctrine()->getRepository(RelEstoque01::class);
 
-        $descFilial = $request->get('filter')['descFilial'] ?? null;
+        $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr('1900-01-01');
+        $nomeFornecedor = null;
+        $descFilial = null;
+
+        // RTA: como o nomeFornecedor é também o id do select2, ele está com urlencode, então...
+        // RTA2: preciso fazer o parse do que vem no formPesquisar pois não farei a busca pela lógica do doDatatablesJsList()
+        if ($request->get('formPesquisar') ?? null) {
+            parse_str($request->get('formPesquisar'), $formPesquisar);
+            if ($formPesquisar['filter']['nomeFornecedor'] ?? null) {
+                $nomeFornecedor = urldecode($formPesquisar['filter']['nomeFornecedor']);
+            }
+
+            if ($formPesquisar['filter']['descFilial'] ?? null) {
+                $descFilial = $formPesquisar['filter']['descFilial'];
+            }
+
+            if ($formPesquisar['filter']['dtUltSaidaApartirDe'] ?? null) {
+                $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr($formPesquisar['filter']['dtUltSaidaApartirDe']);
+            }
+        }
+
 
         $rParams = $request->request->all();
         $start = $rParams['start'] ?? 0;
         $limit = ($rParams['length'] ?? null) && $rParams['length'] !== '-1' ? $rParams['length'] : 10;
 
-        $dados = $repo->getReposicaoEstoque($start, $limit, $descFilial);
-        $count = $repo->getReposicaoEstoqueCount($descFilial);
+
+        $dados = $repo->getReposicaoEstoque($dtUltSaidaApartirDe, $descFilial, $nomeFornecedor, $start, $limit);
+        $count = $repo->getReposicaoEstoqueCount($dtUltSaidaApartirDe, $descFilial, $nomeFornecedor);
         return $this->doDatatablesJsList($request, null, $dados, $count);
     }
 

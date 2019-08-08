@@ -23,6 +23,26 @@ class RelEstoque01Repository extends FilterRepository
     /**
      * Utilizado no gráfico de Total de Estoque por Filial
      *
+     * @return mixed
+     */
+    public function totalEstoquePorFilial()
+    {
+        $sql = 'SELECT desc_filial, SUM(qtde_atual) as total_qtde_atual, SUM(qtde_atual * preco_venda) as total_venda, SUM(qtde_atual * custo_medio) as total_custo_medio ' .
+            'FROM rdp_rel_estoque01 GROUP BY desc_filial';
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('desc_filial', 'desc_filial');
+        $rsm->addScalarResult('total_qtde_atual', 'total_qtde_atual');
+        $rsm->addScalarResult('total_venda', 'total_venda');
+        $rsm->addScalarResult('total_custo_medio', 'total_custo_medio');
+
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        return $query->getResult();
+    }
+
+
+    /**
+     *
      * @param \DateTime $dtUltSaidaApartirDe
      * @param string|null $descFilial
      * @param string|null $nomeFornecedor
@@ -30,21 +50,14 @@ class RelEstoque01Repository extends FilterRepository
      */
     public function totalEstoque(\DateTime $dtUltSaidaApartirDe, ?string $descFilial = null, ?string $nomeFornecedor = null)
     {
-        $sql_descFilial = '';
-        if ($descFilial) {
-            $sql_descFilial = ' AND desc_filial = :descFilial';
-        }
+        $sql_descFilial = $descFilial ? ' AND desc_filial = :descFilial' : '';
 
-        $sql_nomeFornecedor = '';
-        if ($nomeFornecedor) {
-            $sql_nomeFornecedor = ' AND nome_fornec = :nomeFornecedor';
-        }
+        $sql_nomeFornecedor = $nomeFornecedor ? ' AND nome_fornec = :nomeFornecedor' : '';
 
-        $sql = 'SELECT desc_filial, SUM(qtde_atual) as total_qtde_atual, SUM(qtde_atual * preco_venda) as total_venda, SUM(qtde_atual * custo_medio) as total_custo_medio ' .
+        $sql = 'SELECT SUM(qtde_atual) as total_qtde_atual, SUM(qtde_atual * preco_venda) as total_venda, SUM(qtde_atual * custo_medio) as total_custo_medio ' .
             'FROM rdp_rel_estoque01 WHERE dt_ult_saida >= :dtUltSaidaApartirDe ' .
             $sql_descFilial .
-            $sql_nomeFornecedor .
-            ' GROUP BY desc_filial;';
+            $sql_nomeFornecedor;
 
 
         $rsm = new ResultSetMapping();
@@ -54,7 +67,7 @@ class RelEstoque01Repository extends FilterRepository
         $rsm->addScalarResult('total_custo_medio', 'total_custo_medio');
 
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
-        $query->setParameter('dtUltSaidaApartirDe', $dtUltSaidaApartirDe);
+        $query->setParameter('dtUltSaidaApartirDe', $dtUltSaidaApartirDe->setTime(0,0,0,0));
         if ($sql_descFilial) {
             $query->setParameter('descFilial', $descFilial);
         }
@@ -65,18 +78,25 @@ class RelEstoque01Repository extends FilterRepository
     }
 
     /**
+     * @param \DateTime $dtUltSaidaApartirDe
+     * @param string|null $descFilial
+     * @param string|null $nomeFornecedor
      * @param int|null $start
      * @param int|null $limit
-     * @param string|null $descFilial
      * @return mixed
      */
-    public function getReposicaoEstoque(?int $start = 0, ?int $limit = 10, ?string $descFilial = null)
+    public function getReposicaoEstoque(\DateTime $dtUltSaidaApartirDe, ?string $descFilial = null, ?string $nomeFornecedor = null, ?int $start = 0, ?int $limit = 10)
     {
-        $dql = 'SELECT e FROM App\Entity\Relatorios\RelEstoque01 e WHERE e.qtdeMinima > 0 AND e.qtdeAtual < e.qtdeMinima';
+        $dql = 'SELECT e FROM App\Entity\Relatorios\RelEstoque01 e WHERE e.qtdeMinima > 0 AND e.qtdeAtual < e.qtdeMinima AND e.dtUltSaida >= :dtUltSaidaApartirDe';
         $dql .= $descFilial ? ' AND e.descFilial = :descFilial' : '';
+        $dql .= $nomeFornecedor ? ' AND e.nomeFornecedor = :nomeFornecedor' : '';
         $query = $this->getEntityManager()->createQuery($dql);
+        $query->setParameter('dtUltSaidaApartirDe', $dtUltSaidaApartirDe->setTime(0,0,0,0));
         if ($descFilial) {
             $query->setParameter('descFilial', $descFilial);
+        }
+        if ($nomeFornecedor) {
+            $query->setParameter('nomeFornecedor', $nomeFornecedor);
         }
         $query->setFirstResult($start);
         $query->setMaxResults($limit);
@@ -84,20 +104,26 @@ class RelEstoque01Repository extends FilterRepository
     }
 
     /**
+     * @param \DateTime $dtUltSaidaApartirDe
      * @param string|null $descFilial
+     * @param string|null $nomeFornecedor
      * @return mixed
      */
-    public function getReposicaoEstoqueCount(?string $descFilial = null)
+    public function getReposicaoEstoqueCount(\DateTime $dtUltSaidaApartirDe, ?string $descFilial = null, ?string $nomeFornecedor = null)
     {
-
         try {
-            $sql = 'SELECT count(*) as counted FROM rdp_rel_estoque01 WHERE qtde_minima > 0 AND qtde_atual < qtde_minima';
+            $sql = 'SELECT count(*) as counted FROM rdp_rel_estoque01 WHERE qtde_minima > 0 AND qtde_atual < qtde_minima AND dt_ult_saida >= :dtUltSaidaApartirDe';
             $sql .= $descFilial ? ' AND desc_filial = :descFilial' : '';
+            $sql .= $nomeFornecedor ? ' AND nome_fornec = :nomeFornecedor' : '';
             $rsm = new ResultSetMapping();
             $rsm->addScalarResult('counted', 'counted');
             $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+            $query->setParameter('dtUltSaidaApartirDe', $dtUltSaidaApartirDe->setTime(0,0,0,0));
             if ($descFilial) {
                 $query->setParameter('descFilial', $descFilial);
+            }
+            if ($nomeFornecedor) {
+                $query->setParameter('nomeFornecedor', $nomeFornecedor);
             }
             return $query->getOneOrNullResult()['counted'] ?? null;
         } catch (NonUniqueResultException $e) {
