@@ -94,6 +94,7 @@ class RelEstoque01Repository extends FilterRepository
      */
     public function getReposicaoEstoqueTotalPorFilial()
     {
+
         $sql = 'SELECT desc_filial, SUM(qtde_minima - qtde_atual) as deficit FROM rdp_rel_estoque01 WHERE qtde_minima > 0 AND qtde_atual < qtde_minima GROUP BY desc_filial ORDER BY deficit DESC';
 
         $rsm = new ResultSetMapping();
@@ -101,7 +102,26 @@ class RelEstoque01Repository extends FilterRepository
         $rsm->addScalarResult('deficit', 'deficit');
 
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
-        return $query->getResult();
+        $results = $query->getResult();
+
+        $filiais = $this->getFiliais();
+
+        $ret = [];
+
+        foreach ($filiais as $filial) {
+            $deficit = 0;
+            foreach ($results as $r) {
+                if ($r['desc_filial'] === $filial['text']) {
+                    $deficit = $r['deficit'];
+                    break;
+                }
+            }
+            $ret[] = ['desc_filial' => $filial['text'],
+                'deficit' => $deficit];
+        }
+
+        return $ret;
+
 
     }
 
