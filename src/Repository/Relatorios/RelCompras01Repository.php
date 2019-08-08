@@ -24,11 +24,11 @@ class RelCompras01Repository extends FilterRepository
 
     /**
      *
-     * @param int $codProduto
+     * @param string $codProduto
      * @param string|null $loja
      * @return mixed
      */
-    public function itensDeComprasPorProduto(int $codProduto, ?string $loja = null)
+    public function itensDeComprasPorProduto(string $codProduto, ?string $loja = null)
     {
         $sql_AND_loja = $loja ? ' AND loja = :loja ' : '';
 
