@@ -97,13 +97,14 @@ class RelCompras01Repository extends FilterRepository
      */
     public function totaisPreVenda(int $pv)
     {
-        $sql = 'SELECT dt_emissao, grupo, loja, cod_vendedor, nome_vendedor, total_custo_pv, total_venda_pv, rentabilidade_pv, sum(total_preco_venda) as subtotal
+        $sql = 'SELECT dt_emissao, dt_prev_entrega, grupo, loja, cod_vendedor, nome_vendedor, total_custo_pv, total_venda_pv, rentabilidade_pv, sum(total_preco_venda) as subtotal
                     FROM rdp_rel_compras01
                      WHERE pv_compra = :prevenda
-                     GROUP BY dt_emissao, grupo, loja, cod_vendedor, nome_vendedor, total_custo_pv, total_venda_pv, rentabilidade_pv';
+                     GROUP BY dt_emissao, dt_prev_entrega, grupo, loja, cod_vendedor, nome_vendedor, total_custo_pv, total_venda_pv, rentabilidade_pv';
 
         $rsm = new ResultSetMapping();
         $rsm->addScalarResult('dt_emissao', 'dt_emissao');
+        $rsm->addScalarResult('dt_prev_entrega', 'dt_prev_entrega');
         $rsm->addScalarResult('grupo', 'grupo');
         $rsm->addScalarResult('loja', 'loja');
         $rsm->addScalarResult('cod_vendedor', 'cod_vendedor');
