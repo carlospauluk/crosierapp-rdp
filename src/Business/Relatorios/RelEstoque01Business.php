@@ -3,6 +3,8 @@
 namespace App\Business\Relatorios;
 
 
+use App\Entity\Relatorios\RelEstoque01;
+use App\Repository\Relatorios\RelEstoque01Repository;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Doctrine\DBAL\Connection;
@@ -73,7 +75,6 @@ class RelEstoque01Business
         $conn = $this->doctrine->getEntityManager()->getConnection();
 
         $conn->beginTransaction();
-
 
 
         $t = 0;
@@ -155,6 +156,33 @@ class RelEstoque01Business
         return $t;
 
 
+    }
+
+
+    public function gerarPedidoCompra(array $ids): string
+    {
+        /** @var RelEstoque01Repository $repoEstoque */
+        $repoEstoque = $this->doctrine->getRepository(RelEstoque01::class);
+
+        $linhas = [];
+
+        foreach ($ids as $id) {
+            /** @var RelEstoque01 $e */
+            $e = $repoEstoque->find($id);
+
+            $regs = [
+                $e->getCodProduto(),
+                $e->getDescProduto(),
+                $e->getNomeFornecedor(),
+                $e->getDeficit()
+            ];
+            $linhas[] = implode('|', $regs);
+        }
+        $nomeArquivo = (new \DateTime('now'))->format('Y-m-d_H-i-s-U') . '.txt';
+        $pasta = $_SERVER['PASTA_PEDIDOSCOMPRA'];
+
+        file_put_contents($pasta . $nomeArquivo, implode(PHP_EOL, $linhas));
+        return $nomeArquivo;
     }
 
 }

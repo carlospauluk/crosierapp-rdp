@@ -130,6 +130,13 @@ class RelEstoque01 implements EntityId
      */
     private $nomeFornecedor;
 
+
+    /**
+     * @Groups("entity")
+     * @var bool
+     */
+    private $temCompras = false;
+
     /**
      * @return string|null
      */
@@ -339,6 +346,27 @@ class RelEstoque01 implements EntityId
         $this->nomeFornecedor = $nomeFornecedor;
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function isTemCompras(): bool
+    {
+        return $this->temCompras;
+    }
+
+    /**
+     * @param bool $temCompras
+     * @return RelEstoque01
+     */
+    public function setTemCompras(bool $temCompras): RelEstoque01
+    {
+        $this->temCompras = $temCompras;
+        return $this;
+    }
+
+
+
 
 
 }

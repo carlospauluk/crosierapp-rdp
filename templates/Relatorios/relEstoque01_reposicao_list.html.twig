@@ -1,6 +1,23 @@
 {% extends '@CrosierLibBase/list.html.twig' %}
 
 
+{% block btns %}
+    {{ parent() }}
+
+    <button type="button" data-url="{{ url('relEstoque01_imprimirListaReposicao', {'filter': filter}) }}"
+            class="btn btn-warning ml-1" title="Imprimir Lista de Reposição"
+            id="btnImprimirListaReposicao" name="btnImprimirListaReposicao" value="btnImprimirListaReposicao">
+        <i class="fas fa-print"></i> Imprimir
+    </button>
+
+    <button type="button" data-form="form_relEstoque01List_reposicao"
+            data-target="#confirmationModal" data-toggle="modal"
+            class="btn btn-dark ml-1" title="Gerar Pedido de Compra"
+            id="btnGerarPedidoCompra" name="btnGerarPedidoCompra" value="btnGerarPedidoCompra">
+        <i class="fas fa-truck"></i> Gerar Pedido
+    </button>
+
+{% endblock %}
 
 
 {% block campos_pesquisar %}

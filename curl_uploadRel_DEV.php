@@ -17,7 +17,7 @@ $arquivo = $argv[2];
 
 $ch = curl_init();
 
-curl_setopt($ch, CURLOPT_CAINFO, '/home/carlos/Downloads/_.dev.crosier');
+curl_setopt($ch, CURLOPT_CAINFO, '/home/carlos/_.dev.crosier');
 
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_URL, $endpoint);
@@ -53,8 +53,11 @@ echo 'Executando...' . PHP_EOL;
 // Execute the request
 $response = curl_exec($ch);
 
-
-print_r($response);
+if ($response) {
+    print_r($response);
+} else {
+    echo 'Não enviado.';
+}
 
 echo PHP_EOL;
 

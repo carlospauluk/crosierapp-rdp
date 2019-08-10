@@ -243,14 +243,14 @@
                                                     </thead>
 
                                                     <tbody>
-                                                    {% for item in reposicaoEstoqueTotais %}
+                                                    {% for item in reposicaoEstoqueTotais.filiais %}
                                                         <tr>
                                                             <td>
                                                                 {{ item.desc_filial }}
                                                             </td>
                                                             <td class="text-right">
                                                                 <a class="btn btn-sm btn-outline-info"
-                                                                   href="{{ url('relEstoque01_listReposicao', {'filter':{'descFilial': item.desc_filial}}) }}"
+                                                                   href="{{ url('relEstoque01_listReposicao', {'filter':{'descFilial': item.desc_filial, 'dtUltSaidaApartirDe': reposicaoEstoqueTotais.filter.dtUltSaidaApartirDe|default('')}}) }}"
                                                                    role="button"">
                                                                 <i class="fas fa-external-link-square-alt"></i>
                                                                 </a>

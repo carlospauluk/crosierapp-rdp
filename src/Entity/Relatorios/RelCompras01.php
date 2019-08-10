@@ -155,6 +155,61 @@ class RelCompras01 implements EntityId
      */
     private $nomeVendedor;
 
+
+    /**
+     *
+     * @ORM\Column(name="loja", type="string", length=200, nullable=false)
+     * @Groups("entity")
+     *
+     * @var string|null
+     */
+    private $loja;
+
+    /**
+     *
+     * @ORM\Column(name="total_custo_pv", type="decimal", nullable=false)
+     * @Groups("entity")
+     *
+     * @var float|null
+     */
+    private $totalCustoPV;
+
+    /**
+     *
+     * @ORM\Column(name="total_venda_pv", type="decimal", nullable=false)
+     * @Groups("entity")
+     *
+     * @var float|null
+     */
+    private $totalVendaPV;
+
+    /**
+     *
+     * @ORM\Column(name="rentabilidade_pv", type="decimal", nullable=false)
+     * @Groups("entity")
+     *
+     * @var float|null
+     */
+    private $rentabilidadePV;
+
+    /**
+     *
+     * @ORM\Column(name="cliente_pv", type="string", length=200, nullable=false)
+     * @Groups("entity")
+     *
+     * @var string|null
+     */
+    private $clientePV;
+
+    /**
+     *
+     * @ORM\Column(name="grupo", type="string", length=200, nullable=false)
+     * @Groups("entity")
+     *
+     * @var string|null
+     */
+    private $grupo;
+
     /**
      *
      * @ORM\Column(name="dt_prev_entrega", type="date", nullable=false)
@@ -431,6 +486,114 @@ class RelCompras01 implements EntityId
     public function setNomeVendedor(?string $nomeVendedor): RelCompras01
     {
         $this->nomeVendedor = $nomeVendedor;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLoja(): ?string
+    {
+        return $this->loja;
+    }
+
+    /**
+     * @param string|null $loja
+     * @return RelCompras01
+     */
+    public function setLoja(?string $loja): RelCompras01
+    {
+        $this->loja = $loja;
+        return $this;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getTotalCustoPV(): ?float
+    {
+        return $this->totalCustoPV;
+    }
+
+    /**
+     * @param float|null $totalCustoPV
+     * @return RelCompras01
+     */
+    public function setTotalCustoPV(?float $totalCustoPV): RelCompras01
+    {
+        $this->totalCustoPV = $totalCustoPV;
+        return $this;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getTotalVendaPV(): ?float
+    {
+        return $this->totalVendaPV;
+    }
+
+    /**
+     * @param float|null $totalVendaPV
+     * @return RelCompras01
+     */
+    public function setTotalVendaPV(?float $totalVendaPV): RelCompras01
+    {
+        $this->totalVendaPV = $totalVendaPV;
+        return $this;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getRentabilidadePV(): ?float
+    {
+        return $this->rentabilidadePV;
+    }
+
+    /**
+     * @param float|null $rentabilidadePV
+     * @return RelCompras01
+     */
+    public function setRentabilidadePV(?float $rentabilidadePV): RelCompras01
+    {
+        $this->rentabilidadePV = $rentabilidadePV;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getClientePV(): ?string
+    {
+        return $this->clientePV;
+    }
+
+    /**
+     * @param string|null $clientePV
+     * @return RelCompras01
+     */
+    public function setClientePV(?string $clientePV): RelCompras01
+    {
+        $this->clientePV = $clientePV;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getGrupo(): ?string
+    {
+        return $this->grupo;
+    }
+
+    /**
+     * @param string|null $grupo
+     * @return RelCompras01
+     */
+    public function setGrupo(?string $grupo): RelCompras01
+    {
+        $this->grupo = $grupo;
         return $this;
     }
 

@@ -7,6 +7,7 @@ use App\Entity\Relatorios\RelCtsPagRec01;
 use App\Entity\Relatorios\RelEstoque01;
 use App\Entity\Relatorios\RelVendas01;
 use App\Repository\Relatorios\RelEstoque01Repository;
+use CrosierSource\CrosierLibBaseBundle\Business\Config\StoredViewInfoBusiness;
 use CrosierSource\CrosierLibBaseBundle\Controller\BaseController;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -19,6 +20,20 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class DefaultController extends BaseController
 {
+
+    /** @var StoredViewInfoBusiness */
+    protected $storedViewInfoBusiness;
+
+    /**
+     * @required
+     * @param StoredViewInfoBusiness $storedViewInfoBusiness
+     */
+    public function setStoredViewInfoBusiness(StoredViewInfoBusiness $storedViewInfoBusiness): void
+    {
+        $this->storedViewInfoBusiness = $storedViewInfoBusiness;
+    }
+
+
 
     /**
      *
@@ -69,9 +84,13 @@ class DefaultController extends BaseController
         $params['filter']['relCompFor01']['dts'] = $session->get('dashboard.filter.relCompFor01.dts') ?? ($primeiroDia_mesPassado . ' - ' . $ultimoDia_mesPassado);
 
 
+
+
         /** @var RelEstoque01Repository $repoEstoque01 */
         $repoEstoque01 =  $this->getDoctrine()->getRepository(RelEstoque01::class);
-        $params['reposicaoEstoqueTotais'] = $repoEstoque01->getReposicaoEstoqueTotalPorFilial();
+        $params['reposicaoEstoqueTotais']['filiais'] = $repoEstoque01->getReposicaoEstoqueTotalPorFilial();
+        $svi = $this->storedViewInfoBusiness->retrieve('relEstoque01_listReposicao');
+        $params['reposicaoEstoqueTotais']['filter'] = $svi['formPesquisar']['filter'] ?? null;
 
         return $this->doRender('dashboard.html.twig', $params);
     }
