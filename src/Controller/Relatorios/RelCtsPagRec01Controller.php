@@ -125,8 +125,8 @@ class RelCtsPagRec01Controller extends FormListController
         $parameters['filter']['dtVencto']['i'] = $dtIni->format('Y-m-d');
         $parameters['filter']['dtVencto']['f'] = $dtFim->format('Y-m-d');
 
-        $localizador = urldecode($parameters['filter']['localizador']);
-        $parameters['filter']['localizador'] = (int)explode(' - ', $localizador)[0];
+//        $localizador = urldecode($parameters['filter']['localizador']);
+//        $parameters['filter']['localizador'] = (int)explode(' - ', $localizador)[0];
 
         $filterDatas = $this->getFilterDatas($parameters);
 
@@ -199,7 +199,7 @@ class RelCtsPagRec01Controller extends FormListController
         $parameters['page_title'] = 'Contas a Pagar/Receber';
         $parameters['PROGRAM_UUID'] = $this->crudParams['list_PROGRAM_UUID'];
 
-        $parameters['filter']['localizador'] = urlencode($localizador);
+//        $parameters['filter']['localizador'] = urlencode($localizador);
 
         $viewInfo = [];
         $viewInfo['filter'] = $parameters['filter'];
@@ -214,7 +214,6 @@ class RelCtsPagRec01Controller extends FormListController
             new FilterData(['dtVencto'], 'BETWEEN', 'dtVencto', $params),
             new FilterData(['tipoPagRec'], 'EQ', 'tipoPagRec', $params),
             new FilterData(['filial'], 'EQ', 'filial', $params),
-            new FilterData(['localizador'], 'EQ', 'localizador', $params)
         ];
     }
 
