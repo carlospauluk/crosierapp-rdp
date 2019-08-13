@@ -371,6 +371,9 @@ class RelEstoque01Controller extends FormListController
                     }
                 }
                 if (!$achou) {
+                    if (!($carrinho['fornecedor'] ?? null)) {
+                        $carrinho['fornecedor'] = $produto->getCodFornecedor();
+                    }
                     $carrinho['itens'][] = [
                         'codProduto' => $codProduto,
                         'descProduto' => $produto->getDescProduto(),
@@ -483,7 +486,16 @@ class RelEstoque01Controller extends FormListController
     public function gerarPedidoCompra(Request $request): RedirectResponse
     {
         try {
-            $arquivo = $this->relEstoque01Business->gerarPedidoCompra($this->session->get('carrinho'));
+            $carrinho = $this->session->get('carrinho');
+            if (!($carrinho['fornecedor'] ?? null)) {
+                $this->addFlash('warn', 'É necessário selecionar um fornecedor.');
+                throw new ViewException('É necessário selecionar um fornecedor.');
+            }
+            if (!($carrinho['comprador'] ?? null)) {
+                $this->addFlash('warn', 'É necessário selecionar um comprador.');
+                throw new ViewException('É necessário selecionar um comprador.');
+            }
+            $arquivo = $this->relEstoque01Business->gerarPedidoCompra($carrinho);
             $this->addFlash('info', $arquivo);
             $this->addFlash('success', 'Pedido de compra gerado com sucesso!');
             $this->session->set('carrinho', null);
