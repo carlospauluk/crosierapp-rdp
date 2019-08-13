@@ -170,7 +170,9 @@ class RelEstoque01Business
         /** @var RelEstoque01Repository $repoEstoque */
         $repoEstoque = $this->doctrine->getRepository(RelEstoque01::class);
 
-        $linhas = [];
+        $linhas = [
+            'COD_PRODUTO|DESC_PRODUTO|FILIAL|COD_FORNEC|NOME_FORNEC|CUSTO_MEDIO|PRECO_VENDA|QTDE|TOTAL_CUSTO_MEDIO|COD_COMPRADOR|NOME_COMPRADOR'
+        ];
 
         $nomeFornecedor = $repoEstoque->getNomeFornecedorByCodigo((int)$carrinhoDeCompra['fornecedor']);
 
