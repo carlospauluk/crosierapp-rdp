@@ -486,6 +486,8 @@ class RelEstoque01Controller extends FormListController
             $arquivo = $this->relEstoque01Business->gerarPedidoCompra($this->session->get('carrinho'));
             $this->addFlash('info', $arquivo);
             $this->addFlash('success', 'Pedido de compra gerado com sucesso!');
+            $this->session->set('carrinho', null);
+            return $this->redirectToRoute('index');
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
             $this->logger->error('Erro ao gerar pedido de compra');
