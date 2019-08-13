@@ -50,7 +50,7 @@
 {% block campos_pesquisar %}
 
     <div class="form-group">
-        <label for="p_filial">Filial</label>
+        <label for="filter_filial">Filial</label>
         <select id="filter_filial"
                 name="filter[descFilial]" class="form-control ml-2 autoSelect2"
                 data-options="{{ filiais }}"
@@ -58,26 +58,27 @@
     </div>
 
     <div class="form-group">
-        <label for="p_fornecedor">Fornecedor</label>
-        <select id="filter_fornecedor"
-                name="filter[nomeFornecedor]" class="form-control ml-2 autoSelect2"
+        <label for="filter_codFornecedor">Fornecedor</label>
+        <select id="filter_codFornecedor"
+                name="filter[codFornecedor]" class="form-control ml-2 autoSelect2"
                 data-options="{{ fornecedores }}"
-                data-val="{{ filter.nomeFornecedor|default('') }}"></select>
+                data-val="{{ filter.codFornecedor|default('') }}"></select>
     </div>
 
     <div class="form-group">
-        <label for="p_descricao">Produto</label>
+        <label for="filter_descProduto">Produto</label>
         <input type="text"
-               class="form-control" id="filter[descProduto]"
+               class="form-control" id="filter_descProduto"
                name="filter[descProduto]"
                value="{{ filter.descProduto|default('') }}">
     </div>
 
     <div class="form-group">
-        <label>Dt Últ Venda (a partir de)</label>
+        <label for="filter_dtUltSaidaApartirDe">Dt Últ Venda (a partir de)</label>
         <div class="row">
             <div class="col">
                 <input type="date" size="15" class="form-control" name="filter[dtUltSaidaApartirDe]"
+                       id="filter_dtUltSaidaApartirDe"
                        value="{{ filter.dtUltSaidaApartirDe|default('') }}">
             </div>
         </div>

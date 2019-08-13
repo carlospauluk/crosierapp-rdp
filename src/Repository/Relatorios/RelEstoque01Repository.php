@@ -21,6 +21,23 @@ class RelEstoque01Repository extends FilterRepository
     }
 
     /**
+     * @param int $codFornecedor
+     * @return null|string
+     * @throws NonUniqueResultException
+     */
+    public function getNomeFornecedorByCodigo(int $codFornecedor): ?string
+    {
+        $sql = 'SELECT nome_fornec FROM rdp_rel_estoque01 WHERE cod_fornec = :codFornecedor LIMIT 1';
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('nome_fornec', 'nome_fornec');
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('codFornecedor', $codFornecedor);
+        $r = $query->getOneOrNullResult();
+
+        return $r['nome_fornec'] ?? null;
+    }
+
+    /**
      * Utilizado no gráfico de Total de Estoque por Filial
      *
      * @return mixed
@@ -45,19 +62,19 @@ class RelEstoque01Repository extends FilterRepository
      *
      * @param \DateTime $dtUltSaidaApartirDe
      * @param string|null $descFilial
-     * @param string|null $nomeFornecedor
+     * @param int|null $codFornecedor
      * @return mixed
      */
-    public function totalEstoque(\DateTime $dtUltSaidaApartirDe, ?string $descFilial = null, ?string $nomeFornecedor = null)
+    public function totalEstoque(\DateTime $dtUltSaidaApartirDe, ?string $descFilial = null, ?int $codFornecedor = null)
     {
         $sql_descFilial = $descFilial ? ' AND desc_filial = :descFilial' : '';
 
-        $sql_nomeFornecedor = $nomeFornecedor ? ' AND nome_fornec = :nomeFornecedor' : '';
+        $sql_codFornecedor = $codFornecedor ? ' AND cod_fornec = :codFornecedor' : '';
 
         $sql = 'SELECT SUM(qtde_atual) as total_qtde_atual, SUM(qtde_atual * preco_venda) as total_venda, SUM(qtde_atual * custo_medio) as total_custo_medio ' .
             'FROM rdp_rel_estoque01 WHERE dt_ult_saida >= :dtUltSaidaApartirDe ' .
             $sql_descFilial .
-            $sql_nomeFornecedor;
+            $sql_codFornecedor;
 
 
         $rsm = new ResultSetMapping();
@@ -71,8 +88,8 @@ class RelEstoque01Repository extends FilterRepository
         if ($sql_descFilial) {
             $query->setParameter('descFilial', $descFilial);
         }
-        if ($sql_nomeFornecedor) {
-            $query->setParameter('nomeFornecedor', $nomeFornecedor);
+        if ($sql_codFornecedor) {
+            $query->setParameter('codFornecedor', $codFornecedor);
         }
         return $query->getResult();
     }
@@ -191,19 +208,21 @@ class RelEstoque01Repository extends FilterRepository
      */
     public function getFornecedores(): array
     {
-        $sql = 'SELECT nome_fornec FROM rdp_rel_vendas01 GROUP BY nome_fornec ORDER BY nome_fornec';
+        $sql = 'SELECT cod_fornec, nome_fornec FROM rdp_rel_vendas01 GROUP BY cod_fornec, nome_fornec ORDER BY nome_fornec';
         $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('cod_fornec', 'cod_fornec');
         $rsm->addScalarResult('nome_fornec', 'nome_fornec');
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
         $r = $query->getResult();
         $arr = [];
         foreach ($r as $item) {
-            $e['id'] = urlencode($item['nome_fornec']);
+            $e['id'] = $item['cod_fornec'];
             $e['text'] = $item['nome_fornec'];
             $arr[] = $e;
         }
         return $arr;
     }
+
 
 }
 

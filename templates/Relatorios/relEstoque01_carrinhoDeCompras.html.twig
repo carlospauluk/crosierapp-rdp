@@ -1,0 +1,158 @@
+{% extends '@CrosierLibBase/index.html.twig' %}
+
+
+
+
+{% block page_content %}
+
+    <div class="container">
+
+        <div class="card">
+            <div class="card-header">
+
+
+                <div class="d-flex flex-wrap align-items-center">
+
+                    <div class="d-sm-flex text-nowrap mr-1">
+                        <h3>Carrinho de Compras</h3>
+                    </div>
+                    <div class="d-sm-flex flex-nowrap ml-auto">
+
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="card-body">
+
+                <form action="{{ url('relEstoque01_carrinho_salvar') }}" method="post">
+
+                    <div class="form-group">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="col-form-label form-control-label" for="fornecedor">Fornecedor</label>
+                                <select id="fornecedor" name="fornecedor" class="form-control autoSelect2"
+                                        data-options="{{ fornecedores }}" data-val="{{ carrinho.fornecedor }}"></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="col-form-label form-control-label" for="comprador">Comprador</label>
+                                <select id="comprador" name="comprador" class="form-control autoSelect2"
+                                        data-options="{{ compradores }}" data-val="{{ carrinho.comprador }}"></select>
+                            </div>
+                            <div class="col-md-3 mt-auto">
+                                <div class="ml-auto">
+                                    <button type="submit" id="Cancelar" class="btn btn-primary">
+                                        <i class="fas fa-save" aria-hidden="true"></i> Salvar
+                                    </button>
+
+                                    <button type="button" data-url="{{ url('relEstoque01_gerarPedidoCompra') }}"
+                                            data-target="#confirmationModal" data-toggle="modal"
+                                            class="btn btn-secondary ml-1" title="Gerar Pedido de Compra"
+                                            id="btnGerarPedidoCompra" name="btnGerarPedidoCompra"
+                                            value="btnGerarPedidoCompra">
+                                        <i class="fas fa-truck"></i> Gerar Pedido
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="table-responsive-sm">
+
+
+                        <table class="table table-sm table-striped table-hover crsr-datatable" id="datatableItens">
+
+                            <thead>
+                            <tr>
+                                <th scope="col" title="">#</th>
+                                <th scope="col">Produto</th>
+                                <th scope="col">Qtde</th>
+                                <th scope="col">Preço Venda</th>
+                                <th scope="col">Preço Custo</th>
+                                <th scope="col">Total</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for item in carrinho.itens %}
+                                <tr>
+                                    <td>
+                                        <span class="badge badge-pill badge-light">{{ loop.index }}</span>
+                                    </td>
+                                    <td>
+                                        <input type="hidden" name="itens[{{ loop.index0 }}][codProduto]"
+                                               value="{{ item.codProduto }}">
+                                        <input type="hidden" name="itens[{{ loop.index0 }}][descProduto]"
+                                               value="{{ item.descProduto }}">
+                                        <input type="hidden" name="itens[{{ loop.index0 }}][descFilial]"
+                                               value="{{ item.descFilial }}">
+                                        {{ item.codProduto }} - {{ item.descProduto }}
+                                    </td>
+                                    <td class="text-right">
+                                        <input type="number" name="itens[{{ loop.index0 }}][qtde]" class="form-control"
+                                               value="{{ item.qtde }}">
+                                    </td>
+                                    <td class="text-right" data-order="{{ item.precoVenda }}">
+                                        {{ item.precoVenda|number_format(2,',','.') }}
+                                        <input type="hidden" name="itens[{{ loop.index0 }}][precoVenda]"
+                                               value="{{ item.precoVenda }}">
+                                    </td>
+                                    <td class="text-right" data-order="{{ item.custoMedio }}">
+                                        {{ item.custoMedio|number_format(2,',','.') }}
+                                        <input type="hidden" name="itens[{{ loop.index0 }}][custoMedio]"
+                                               value="{{ item.custoMedio }}">
+                                    </td>
+                                    <td class="text-right" data-order="{{ item.totalCustoMedio }}">
+                                        {{ item.totalCustoMedio|number_format(2,',','.') }}
+                                    </td>
+                                    <td class="text-right">
+                                        <a role="button"
+                                           data-url="{{ url('relEstoque01_carrinho_removerEExibir', {'codProduto': item.codProduto|url_encode}) }}"
+                                           data-target="#confirmationModal" data-toggle="modal"
+                                           class="btn btn-outline-primary btn-sm text-nowrap"
+                                           title="Adicionar ao carrinho">
+                                            <i class="fas fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                    <hr/>
+
+
+                    <div class="row">
+
+                        <div class="col-sm-7"></div>
+                        <div class="col-sm-5">
+                            <div class="form-group row" style="font-weight: bold">
+                                <label class="col-form-label col-sm-3" for="total">Total</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text">R$ </span></div>
+                                        <input type="text" id="total" name="total"
+                                               disabled="disabled" class="crsr-money form-control"
+                                               value="{{ carrinho.total|number_format(2,',','.') }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

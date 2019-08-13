@@ -121,6 +121,16 @@ class RelEstoque01 implements EntityId
      */
     private $dtUltSaida;
 
+
+    /**
+     *
+     * @ORM\Column(name="cod_fornec", type="bigint", length=20, nullable=false)
+     * @Groups("entity")
+     *
+     * @var string|null
+     */
+    private $codFornecedor;
+
     /**
      *
      * @ORM\Column(name="nome_fornec", type="string", length=200, nullable=false)
@@ -332,6 +342,24 @@ class RelEstoque01 implements EntityId
     /**
      * @return string|null
      */
+    public function getCodFornecedor(): ?string
+    {
+        return $this->codFornecedor;
+    }
+
+    /**
+     * @param string|null $codFornecedor
+     * @return RelEstoque01
+     */
+    public function setCodFornecedor(?string $codFornecedor): RelEstoque01
+    {
+        $this->codFornecedor = $codFornecedor;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
     public function getNomeFornecedor(): ?string
     {
         return $this->nomeFornecedor;
@@ -364,9 +392,6 @@ class RelEstoque01 implements EntityId
         $this->temCompras = $temCompras;
         return $this;
     }
-
-
-
 
 
 }

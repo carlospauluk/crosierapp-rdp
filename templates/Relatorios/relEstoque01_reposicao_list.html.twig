@@ -10,12 +10,10 @@
         <i class="fas fa-print"></i> Imprimir
     </button>
 
-    <button type="button" data-form="form_relEstoque01List_reposicao"
-            data-target="#confirmationModal" data-toggle="modal"
-            class="btn btn-dark ml-1" title="Gerar Pedido de Compra"
-            id="btnGerarPedidoCompra" name="btnGerarPedidoCompra" value="btnGerarPedidoCompra">
-        <i class="fas fa-truck"></i> Gerar Pedido
-    </button>
+    <a role="button" href="{{ url('relEstoque01_carrinho_exibir') }}"
+            class="btn btn-dark ml-1">
+        <i class="fas fa-truck"></i> Ver Carrinho
+    </a>
 
 {% endblock %}
 
@@ -23,7 +21,7 @@
 {% block campos_pesquisar %}
 
     <div class="form-group">
-        <label for="p_filial">Filial</label>
+        <label for="filter_filial">Filial</label>
         <select id="filter_filial"
                 name="filter[descFilial]" class="form-control ml-2 autoSelect2"
                 data-options="{{ filiais }}"
@@ -31,19 +29,19 @@
     </div>
 
     <div class="form-group">
-        <label for="p_fornecedor">Fornecedor</label>
-        <select id="filter_fornecedor"
-                name="filter[nomeFornecedor]" class="form-control ml-2 autoSelect2"
+        <label for="filter_codFornecedor">Fornecedor</label>
+        <select id="filter_codFornecedor"
+                name="filter[codFornecedor]" class="form-control ml-2 autoSelect2"
                 data-options="{{ fornecedores }}"
-                data-val="{{ filter.nomeFornecedor|default('') }}"></select>
+                data-val="{{ filter.codFornecedor|default('') }}"></select>
     </div>
 
     <div class="form-group">
-        <label>Dt Últ Venda (a partir de)</label>
+        <label for="filter_dtUltSaidaApartirDe">Dt Últ Venda (a partir de)</label>
         <div class="row">
             <div class="col">
                 <input type="date" size="15" class="form-control" name="filter[dtUltSaidaApartirDe]"
-                       value="{{ filter.dtUltSaidaApartirDe|default('') }}">
+                       value="{{ filter.dtUltSaidaApartirDe|default('') }}" id="filter_dtUltSaidaApartirDe">
             </div>
         </div>
     </div>

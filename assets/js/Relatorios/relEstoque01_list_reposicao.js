@@ -8,9 +8,10 @@ import Moment from 'moment';
 import Numeral from 'numeral';
 import 'numeral/locales/pt-br.js';
 import DatatablesJs from "../crosier/DatatablesJs";
+import $ from "jquery";
+import toastrr from "toastr";
 
 Routing.setRoutingData(routes);
-
 
 Numeral.locale('pt-br');
 
@@ -23,9 +24,11 @@ function getDatatablesColumns() {
             data: 'e',
             title: '#',
             render: function (data, type, row) {
-                let str = '';
-                str += '<input type="checkbox" class="rSel" style="width:17px;height:17px" name="rSel[' + data.id + ']" />';
-                return str;
+                return '<a role="button" href="#" ' +
+                    'data-target="#confirmationModal" data-toggle="modal" data-jsfunction="Carrinho.adicionar" data-jsfunction-args="' + data.codProduto + '|' + data.descFilial + '" ' +
+                    'class="btn btn-outline-primary btn-sm text-nowrap" ' +
+                    'title="Adicionar ao carrinho">' +
+                    '<i class="fas fa-truck"></i> Adicionar</a> ';
             },
             className: 'text-center'
         },
@@ -113,19 +116,7 @@ $(document).ready(function () {
     DatatablesJs.makeDatatableJs(listId, getDatatablesColumns());
 
     let $selTodasMovs = $('#selTodasMovs');
-    let $btnGerarPedidoCompra = $('#btnGerarPedidoCompra');
     let $btnImprimirListaReposicao = $('#btnImprimirListaReposicao');
-
-    $selTodasMovs.click(function () {
-        $('.movSel').not(this).prop('checked', this.checked);
-    });
-
-
-    $btnGerarPedidoCompra.click(function () {
-        let form = $('#form_relEstoque01List_reposicao');
-        let url = Routing.generate('relEstoque01_gerarPedidoCompra');
-        form.attr('action', url);
-    });
 
 
     $btnImprimirListaReposicao.click(function () {
@@ -143,3 +134,26 @@ $(document).ready(function () {
 });
 
 
+class Carrinho {
+
+    static adicionar(args) {
+        args = args.split('|');
+
+        $.getJSON(
+            Routing.generate('relEstoque01_carrinho_adicionar', {'codProduto': args[0], 'filial': args[1]}),
+            function (results) {
+                if (results.produto) {
+                    toastrr.success(results.msg);
+                } else {
+                    toastrr.error(results.msg);
+                }
+            }
+        );
+    }
+
+    static remover() {
+
+    }
+}
+
+global.Carrinho = Carrinho;

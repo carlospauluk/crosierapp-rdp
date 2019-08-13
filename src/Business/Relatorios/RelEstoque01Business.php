@@ -89,8 +89,8 @@ class RelEstoque01Business
                 $linha = $linha[-1] === '|' ? substr($linha, 0, -1) : $linha;
 
                 $campos = explode('|', $linha);
-                if (count($campos) !== 10) {
-                    throw new ViewException('Qtde de campos difere de 10 para a linha "' . $linha . '" (qtde: ' . count($campos) . ')');
+                if (count($campos) !== 11) {
+                    throw new ViewException('Qtde de campos difere de 11 para a linha "' . $linha . '" (qtde: ' . count($campos) . ')');
                 }
 
                 if ($campos[8] ?: false) {
@@ -102,6 +102,8 @@ class RelEstoque01Business
                     $campos[$c] = trim($campos[$c]) !== '' ? "'" . trim(str_replace("'", "''", $campos[$c])) . "'" : 'null';
                 }
 
+                // CODIGO|DESCRICAO|CUSTO_MEDIO|PRECO_VENDA|FILIAL|QTDE_MINIMA|QTDE_MAXIMA|QTDE_ATUAL|DATA_ULT_SAIDA|CODIGO_FORNECEDOR|FORNECEDOR
+
                 $sql = sprintf(
                     'INSERT INTO rdp_rel_estoque01 (
                             id,                            
@@ -112,12 +114,14 @@ class RelEstoque01Business
                             desc_filial,   
                             qtde_minima,   
                             qtde_maxima,   
-                            qtde_atual,    
+                            qtde_atual,  
+                            deficit,  
                             dt_ult_saida,  
+                            cod_fornec,   
                             nome_fornec,   
                             estabelecimento_id,inserted,updated,user_inserted_id,user_updated_id
                         )
-                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
+                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
                     $campos[0],
                     $campos[1],
                     $campos[2],
@@ -126,8 +130,10 @@ class RelEstoque01Business
                     $campos[5],
                     $campos[6],
                     $campos[7],
+                    'DEFAULT',
                     $campos[8],
-                    $campos[9]
+                    $campos[9],
+                    $campos[10]
                 );
 
                 try {
@@ -159,22 +165,32 @@ class RelEstoque01Business
     }
 
 
-    public function gerarPedidoCompra(array $ids): string
+    public function gerarPedidoCompra(array $carrinhoDeCompra): string
     {
         /** @var RelEstoque01Repository $repoEstoque */
         $repoEstoque = $this->doctrine->getRepository(RelEstoque01::class);
 
         $linhas = [];
 
-        foreach ($ids as $id) {
-            /** @var RelEstoque01 $e */
-            $e = $repoEstoque->find($id);
+        $nomeFornecedor = $repoEstoque->getNomeFornecedorByCodigo((int)$carrinhoDeCompra['fornecedor']);
+
+        $comprador = explode(' - ', $carrinhoDeCompra['comprador']);
+
+
+        foreach ($carrinhoDeCompra['itens'] as $item) {
 
             $regs = [
-                $e->getCodProduto(),
-                $e->getDescProduto(),
-                $e->getNomeFornecedor(),
-                $e->getDeficit()
+                $item['codProduto'],
+                $item['descProduto'],
+                $item['descFilial'],
+                $carrinhoDeCompra['fornecedor'],
+                $nomeFornecedor,
+                $item['custoMedio'],
+                $item['precoVenda'],
+                $item['qtde'],
+                $item['totalCustoMedio'],
+                $comprador[0],
+                $comprador[1]
             ];
             $linhas[] = implode('|', $regs);
         }
