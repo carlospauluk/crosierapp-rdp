@@ -202,6 +202,7 @@ $(document).ready(function () {
                             duration: 1000,
                             easing: 'out',
                         },
+                        colors: ['lightgreen', 'red']
                     };
 
 

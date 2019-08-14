@@ -103,7 +103,7 @@ class RelEstoque01Controller extends FormListController
         return [
             new FilterData(['descProduto'], 'LIKE', 'descProduto', $params),
             new FilterData(['descFilial'], 'EQ', 'descFilial', $params),
-            new FilterData(['nomeFornecedor'], 'EQ', 'nomeFornecedor', $params),
+            new FilterData(['codFornecedor'], 'EQ', 'codFornecedor', $params),
             new FilterData(['qtdeMinima'], 'GT', 'qtdeMinima', $params),
             new FilterData(['deficit'], 'GT', 'deficit', $params),
             new FilterData(['dtUltSaida'], 'GT', 'dtUltSaidaApartirDe', $params),
@@ -158,13 +158,6 @@ class RelEstoque01Controller extends FormListController
                 'qtdeAtual' => 0
             ]
         ];
-        // RTA: como o nomeFornecedor é também o id do select2, ele está com urlencode, então...
-        if ($request->get('formPesquisar') ?? null) {
-            parse_str($request->get('formPesquisar'), $formPesquisar);
-            if ($formPesquisar['filter']['nomeFornecedor'] ?? null) {
-                $defaultFilters['filter']['nomeFornecedor'] = urldecode($formPesquisar['filter']['nomeFornecedor']);
-            }
-        }
         return $this->doDatatablesJsList($request, $defaultFilters);
     }
 
@@ -225,14 +218,6 @@ class RelEstoque01Controller extends FormListController
                 'deficit' => 0
             ]
         ];
-        // RTA: como o nomeFornecedor é também o id do select2, ele está com urlencode, então...
-        if ($request->get('formPesquisar') ?? null) {
-            parse_str($request->get('formPesquisar'), $formPesquisar);
-            if ($formPesquisar['filter']['nomeFornecedor'] ?? null) {
-                $defaultFilters['filter']['nomeFornecedor'] = urldecode($formPesquisar['filter']['nomeFornecedor']);
-            }
-        }
-
         $this->crudParams['listId'] = 'relEstoque01List_reposicao';
         $this->crudParams['listRoute'] = 'relEstoque01_listReposicao';
         $this->crudParams['listRouteAjax'] = 'relEstoque01_listReposicao_datatablesJsList';
@@ -290,10 +275,6 @@ class RelEstoque01Controller extends FormListController
 
         $params['filter'] = $request->get('filter');
 
-
-        if ($params['filter']['nomeFornecedor'] ?? null) {
-            $params['filter']['nomeFornecedor'] = urldecode($params['filter']['nomeFornecedor']);
-        }
 
         $params['filter']['qtdeAtual'] = 0;
         $params['filter']['deficit'] = 0;
