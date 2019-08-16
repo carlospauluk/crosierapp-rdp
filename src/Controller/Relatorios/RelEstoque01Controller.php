@@ -195,8 +195,9 @@ class RelEstoque01Controller extends FormListController
             }
         }
 
-        $descFilial = $queryParams['filter']['descFilial'] ?: null;
-        $codFornecedor = $queryParams['filter']['codFornecedor'] ?: null;
+        $descFilial = $queryParams['filter']['descFilial'] ?? null;
+        $codFornecedor = $queryParams['filter']['codFornecedor'] ?? null;
+        $codFornecedor = $codFornecedor ?: null;
 
 
         if ($request->get('filter')['dtUltSaidaApartirDe'] ?? null) {
