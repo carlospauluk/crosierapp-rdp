@@ -17,7 +17,7 @@ $arquivo = $argv[2];
 
 $ch = curl_init();
 
-curl_setopt($ch, CURLOPT_CAINFO, '/home/carlos/_.dev.crosier');
+curl_setopt($ch, CURLOPT_CAINFO, '/home/carlos/Downloads/_.dev.crosier');
 
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_URL, $endpoint);

@@ -4,13 +4,10 @@ namespace App\Controller\Relatorios;
 
 
 use App\Business\Relatorios\RelEstoque01Business;
-use App\Entity\Financeiro\Movimentacao;
 use App\Entity\Relatorios\RelCompras01;
 use App\Entity\Relatorios\RelEstoque01;
 use App\Entity\Relatorios\RelVendas01;
-use App\EntityHandler\Financeiro\MovimentacaoEntityHandler;
 use App\EntityHandler\Relatorios\RelEstoque01EntityHandler;
-use App\Form\Financeiro\MovimentacaoAlterarEmLoteType;
 use App\Repository\Relatorios\RelCompras01Repository;
 use App\Repository\Relatorios\RelEstoque01Repository;
 use App\Repository\Relatorios\RelVendas01Repository;
@@ -22,7 +19,6 @@ use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -176,12 +172,32 @@ class RelEstoque01Controller extends FormListController
         $filiais = $repo->getFiliais();
         array_unshift($filiais, ['id' => '', 'text' => 'TODAS']);
         $params['filiais'] = json_encode($filiais);
-        $descFilial = $request->get('filter')['descFilial'] ?? null;
 
         $fornecedores = $repo->getFornecedores();
         array_unshift($fornecedores, ['id' => '', 'text' => 'TODOS']);
         $params['fornecedores'] = json_encode($fornecedores);
-        $codFornecedor = $request->get('filter')['codFornecedor'] ?? null;
+
+
+        $queryParams = $request->query->all();
+        if (!array_key_exists('filter', $queryParams)) {
+            // inicializa para evitar o erro
+            $queryParams['filter'] = null;
+
+            if (isset($queryParams['r']) and $queryParams['r']) {
+                $this->storedViewInfoBusiness->clear('relEstoque01_listReposicao');
+            } else {
+                if ($svi = $this->storedViewInfoBusiness->retrieve('relEstoque01_listReposicao')) {
+                    $formPesquisar = $svi['formPesquisar'] ?? null;
+                    if ($formPesquisar and $formPesquisar !== $queryParams) {
+                        return $this->redirectToRoute('relEstoque01_listReposicao', $formPesquisar);
+                    }
+                }
+            }
+        }
+
+        $descFilial = $queryParams['filter']['descFilial'] ?: null;
+        $codFornecedor = $queryParams['filter']['codFornecedor'] ?: null;
+
 
         if ($request->get('filter')['dtUltSaidaApartirDe'] ?? null) {
             $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr($request->get('filter')['dtUltSaidaApartirDe']);
@@ -401,7 +417,6 @@ class RelEstoque01Controller extends FormListController
     }
 
 
-
     /**
      *
      * @Route("/relEstoque01/carrinho/exibir", name="relEstoque01_carrinho_exibir")
@@ -409,7 +424,7 @@ class RelEstoque01Controller extends FormListController
      * @return Response
      * @throws \Exception
      */
-    public function exibirCarrinho(): Response
+    public function exibirCarrinho(Request $request): Response
     {
         $vParams['carrinho'] = $this->session->get('carrinho') ?? ['itens' => []];
 
@@ -428,10 +443,15 @@ class RelEstoque01Controller extends FormListController
         $vParams['carrinho']['comprador'] = $vParams['carrinho']['comprador'] ?? '';
 
         $total = 0.0;
-        foreach ($vParams['carrinho']['itens'] as $item) {
-            $total += $item['qtde'] * $item['custoMedio'];
+        if (isset($vParams['carrinho']['itens']) && count($vParams['carrinho']['itens']) > 0) {
+            foreach ($vParams['carrinho']['itens'] as $item) {
+                $total += $item['qtde'] * $item['custoMedio'];
+            }
+        } else {
+            $this->addFlash('info', 'Carrinho de compras vazio.');
         }
         $vParams['carrinho']['total'] = $total;
+
         return $this->doRender('Relatorios/relEstoque01_carrinhoDeCompras.html.twig', $vParams);
     }
 
@@ -449,10 +469,17 @@ class RelEstoque01Controller extends FormListController
         $carrinho['fornecedor'] = $request->get('fornecedor');
         $carrinho['comprador'] = $request->get('comprador');
         $carrinho['itens'] = $request->get('itens');
-        foreach ($carrinho['itens'] as $key => $item) {
-            $carrinho['itens'][$key]['totalCustoMedio'] = $item['qtde'] * $item['custoMedio'];
+        if (isset($carrinho['itens']) && count($carrinho['itens']) > 0) {
+            foreach ($carrinho['itens'] as $key => $item) {
+                $carrinho['itens'][$key]['totalCustoMedio'] = $item['qtde'] * $item['custoMedio'];
+            }
         }
         $this->session->set('carrinho', $carrinho);
+
+        if ($request->get('btnGerarPedidoCompra')) {
+            $this->gerarPedidoCompra($carrinho);
+        }
+
         return $this->redirectToRoute('relEstoque01_carrinho_exibir');
     }
 
@@ -460,14 +487,11 @@ class RelEstoque01Controller extends FormListController
     /**
      *
      * @Route("/relEstoque01/gerarPedidoCompra/", name="relEstoque01_gerarPedidoCompra")
-     * @param Request $request
-     * @return RedirectResponse
-     * @throws \Exception
+     * @param array $carrinho
      */
-    public function gerarPedidoCompra(Request $request): RedirectResponse
+    public function gerarPedidoCompra(array $carrinho): void
     {
         try {
-            $carrinho = $this->session->get('carrinho');
             if (!($carrinho['fornecedor'] ?? null)) {
                 $this->addFlash('warn', 'É necessário selecionar um fornecedor.');
                 throw new ViewException('É necessário selecionar um fornecedor.');
@@ -480,14 +504,11 @@ class RelEstoque01Controller extends FormListController
             $this->addFlash('info', $arquivo);
             $this->addFlash('success', 'Pedido de compra gerado com sucesso!');
             $this->session->set('carrinho', null);
-            return $this->redirectToRoute('index');
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
             $this->logger->error('Erro ao gerar pedido de compra');
             $this->addFlash('error', 'Erro ao gerar pedido de compra');
         }
-
-        return $this->redirectToRoute('relEstoque01_carrinho_exibir');
     }
 
 }
