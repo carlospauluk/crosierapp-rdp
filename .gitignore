@@ -39,3 +39,6 @@ files/*
 
 curl_uploadRel_HOM.php
 curl_uploadRel_PROD.php
+
+curl_relatoriospush_HOM.php
+curl_relatoriospush_PROD.php
