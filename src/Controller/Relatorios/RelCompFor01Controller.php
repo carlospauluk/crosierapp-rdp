@@ -45,7 +45,7 @@ class RelCompFor01Controller extends FormListController
             'list_PROGRAM_UUID' => null,
             'listJS' => '',
 
-            'role_access' => 'ROLE_RELVENDAS01',
+            'role_access' => 'ROLE_RELVENDAS',
             'role_delete' => 'ROLE_ADMIN',
 
         ];

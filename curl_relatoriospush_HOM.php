@@ -7,7 +7,7 @@ $ch = curl_init();
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
 //Set the Url
-curl_setopt($ch, CURLOPT_URL, 'https://rdp.crosier.rodoponta.com.br/api/utils/relatoriosPush/upload');
+curl_setopt($ch, CURLOPT_URL, 'https://rdp.crosier-hom.rodoponta.com.br/api/utils/relatoriosPush/upload');
 
 curl_setopt($ch, CURLOPT_POST, 1);
 

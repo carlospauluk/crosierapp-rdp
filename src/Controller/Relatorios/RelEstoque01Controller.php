@@ -42,7 +42,7 @@ class RelEstoque01Controller extends FormListController
             'listId' => 'relEstoque01List',
             'list_PROGRAM_UUID' => '',
 
-            'role_access' => 'ROLE_RELVENDAS01',
+            'role_access' => 'ROLE_RELVENDAS',
             'role_delete' => 'ROLE_ADMIN',
 
         ];
