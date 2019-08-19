@@ -245,10 +245,10 @@ class RelVendas01Repository extends FilterRepository
         $query->setParameter('dtIni', $dtIni);
         $query->setParameter('dtFim', $dtFim);
         if ($grupos) {
-            $query->setParameter('grupos', $grupos);
+            $query->setParameter('grupos', explode(',', $grupos));
         }
         if ($lojas) {
-            $query->setParameter('lojas', $lojas);
+            $query->setParameter('lojas', explode(',', $lojas));
         }
 
         return $query->getOneOrNullResult();
