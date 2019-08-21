@@ -1,0 +1,81 @@
+{% extends '@CrosierLibBase/index.html.twig' %}
+
+
+
+
+{% block page_content %}
+
+
+    <div class="card">
+        <div class="card-header">
+
+
+            <div class="d-flex flex-wrap">
+
+                <div>
+                    <h3>Compras de Produto</h3>
+                    <h6>{{ produto }}</h6>
+                </div>
+                <div class="ml-auto justify-content-end text-right">
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive-sm">
+
+
+                <table class="table table-sm table-striped table-hover crsr-datatable" id="datatableItens">
+
+                    <thead>
+                    <tr>
+                        <th scope="col" title="">#</th>
+                        <th scope="col">Lancto</th>
+                        <th scope="col">Docto</th>
+                        <th scope="col">Dt Movto</th>
+                        <th scope="col">Preço Custo</th>
+                        <th scope="col">Qtde</th>
+                        <th scope="col">Total Custo</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for item in dados %}
+                        <tr>
+                            <td>
+                                <span class="badge badge-pill badge-light">{{ loop.index }}</span>
+                            </td>
+                            <td>{{ item.lancto }}</td>
+                            <td>{{ item.docto }}</td>
+                            <td>{{ item.dt_movto|date('d/m/Y') }}</td>
+                            <td class="text-right">
+                                {{ item.preco_custo|number_format(2,',','.') }}
+                            </td>
+                            <td class="text-right">
+                                {{ item.qtde|number_format(0,',','.') }}
+                            </td>
+                            <td class="text-right" data-order="{{ item.total }}">
+                                {{ item.total|number_format(2,',','.') }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+
+                    </tbody>
+
+
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block down_scripts %}
+    <script src="{{ asset('build/Relatorios/relCompFor01_list.js') }}"></script>
+{% endblock %}

@@ -53,7 +53,6 @@
                         <thead>
                         <tr>
                             <th scope="col" title="">#</th>
-                            <th scope="col">Código</th>
                             <th scope="col">Produto</th>
                             <th scope="col">Qtde</th>
                             <th scope="col">Total Custo</th>
@@ -67,9 +66,12 @@
                                     <span class="badge badge-pill badge-light">{{ loop.index }}</span>
                                 </td>
                                 <td>
-                                    {{ item.cod_prod }}
-                                </td><td>
-                                    {{ item.desc_prod }}
+                                    <div class="float-left">{{ item.cod_prod }} - {{ item.desc_prod }}</div>
+                                    <div class="float-right">
+                                        <a role="button" class="btn btn-outline-primary btn-sm"
+                                           href="{{ url('relCompFor01_list', {'filter':{'codProd':item.cod_prod, 'dts': filter.dts}}) }}">
+                                            <i class="fas fa-clipboard-list"></i></a>
+                                    </div>
                                 </td>
                                 <td class="text-right">
                                     {{ item.qtde_total|number_format(0,',','.') }}
@@ -81,13 +83,12 @@
                         {% endfor %}
 
 
-
                         </tbody>
 
                         <tfoot>
 
                         <tr style="background-color: antiquewhite; font-weight: bold">
-                            <td  colspan="3" class="text-right">
+                            <td colspan="2" class="text-right">
 
                             </td>
                             <td class="text-right">

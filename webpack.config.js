@@ -44,6 +44,7 @@ Encore
     .addEntry('Relatorios/relVendas01_listPreVendasPorProduto', './assets/js/Relatorios/relVendas01_listPreVendasPorProduto.js')
     .addEntry('Relatorios/relVendas01_listItensDoPreVenda', './assets/js/Relatorios/relVendas01_listItensDoPreVenda.js')
     .addEntry('Relatorios/relCompFor01_listItensCompradosPorFornecedor', './assets/js/Relatorios/relCompFor01_listItensCompradosPorFornecedor.js')
+    .addEntry('Relatorios/relCompFor01_list', './assets/js/Relatorios/relCompFor01_list.js')
 
     .addEntry('Relatorios/relEstoque01_list', './assets/js/Relatorios/relEstoque01_list.js')
     .addEntry('Relatorios/relEstoque01_list_reposicao', './assets/js/Relatorios/relEstoque01_list_reposicao.js')

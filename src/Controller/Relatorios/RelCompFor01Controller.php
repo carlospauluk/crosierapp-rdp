@@ -9,7 +9,6 @@ use App\EntityHandler\Relatorios\RelCompFor01EntityHandler;
 use App\Repository\Relatorios\RelCompFor01Repository;
 use CrosierSource\CrosierLibBaseBundle\APIClient\Base\DiaUtilAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
-use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,9 +24,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class RelCompFor01Controller extends FormListController
 {
 
-    /** @var DiaUtilAPIClient */
-    private $diaUtilAPIClient;
-
     protected $crudParams =
         [
             'typeClass' => null,
@@ -37,7 +33,7 @@ class RelCompFor01Controller extends FormListController
             'formPageTitle' => null,
             'form_PROGRAM_UUID' => null,
 
-            'listView' => 'relCompFor01_list.html.twig',
+            'listView' => 'Relatorios/relCompFor01_list.html.twig',
             'listRoute' => 'relCompFor01_list',
             'listRouteAjax' => 'relCompFor01_datatablesJsList',
             'listPageTitle' => 'CompFor',
@@ -49,7 +45,8 @@ class RelCompFor01Controller extends FormListController
             'role_delete' => 'ROLE_ADMIN',
 
         ];
-
+    /** @var DiaUtilAPIClient */
+    private $diaUtilAPIClient;
     /** @var SessionInterface */
     private $session;
 
@@ -84,8 +81,7 @@ class RelCompFor01Controller extends FormListController
     public function getFilterDatas(array $params): array
     {
         return [
-            new FilterData(['descProduto'], 'LIKE', 'descProduto', $params),
-            new FilterData(['nomeFornecedor'], 'LIKE', 'nomeFornecedor', $params)
+            new FilterData(['codProd'], 'LIKE', 'codProd', $params)
         ];
     }
 
@@ -98,19 +94,36 @@ class RelCompFor01Controller extends FormListController
      */
     public function list(Request $request): Response
     {
-        return $this->doList($request);
-    }
+        $codProd = $request->get('filter')['codProd'];
 
-    /**
-     *
-     * @Route("/relCompFor01/datatablesJsList/", name="relCompFor01_datatablesJsList")
-     * @param Request $request
-     * @return Response
-     * @throws ViewException
-     */
-    public function datatablesJsList(Request $request): Response
-    {
-        return $this->doDatatablesJsList($request);
+        /** @var RelCompFor01Repository $repo */
+        $repo = $this->getDoctrine()->getRepository(RelCompFor01::class);
+        $produto = $repo->getProdutoByCodigo($codProd);
+
+
+        $vParams = $request->query->all();
+
+
+        $dtIni = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 0, 10)) ?: new \DateTime();
+        $dtFim = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 13, 10)) ?: new \DateTime();
+
+        $r = $repo->itensCompradosPorProduto($dtIni, $dtFim, $codProd);
+
+        $dtAnterior = clone $dtIni;
+        $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');
+
+        $prox = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, true);
+        $ante = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, false);
+        $vParams['antePeriodoI'] = $ante['dtIni'];
+        $vParams['antePeriodoF'] = $ante['dtFim'];
+        $vParams['proxPeriodoI'] = $prox['dtIni'];
+        $vParams['proxPeriodoF'] = $prox['dtFim'];
+
+        $vParams['dados'] = $r;
+
+        $vParams['produto'] = $codProd . ' - ' . $produto;
+
+        return $this->doRender('Relatorios/relCompFor01_list.html.twig', $vParams);
     }
 
 

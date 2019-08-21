@@ -4,6 +4,7 @@ namespace App\Repository\Relatorios;
 
 use App\Entity\Relatorios\RelCompFor01;
 use CrosierSource\CrosierLibBaseBundle\Repository\FilterRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query\ResultSetMapping;
 
 /**
@@ -92,6 +93,58 @@ class RelCompFor01Repository extends FilterRepository
 
     }
 
+    /**
+     * @param \DateTime|null $dtIni
+     * @param \DateTime|null $dtFim
+     * @param string $codProd
+     * @return mixed
+     */
+    public function itensCompradosPorProduto(\DateTime $dtIni, \DateTime $dtFim, string $codProd)
+    {
+        $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
+        $dtIni->setTime(0, 0, 0, 0);
+        $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
+        $dtFim->setTime(23, 59, 59, 99999);
+
+        $sql = 'SELECT lancto, docto, dt_movto, qtde, preco_custo, total
+                    FROM rdp_rel_compfor01
+                     WHERE cod_prod = :codProd AND dt_movto BETWEEN :dtIni AND :dtFim ORDER BY dt_movto';
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('lancto', 'lancto');
+        $rsm->addScalarResult('docto', 'docto');
+        $rsm->addScalarResult('dt_movto', 'dt_movto');
+        $rsm->addScalarResult('qtde', 'qtde');
+        $rsm->addScalarResult('preco_custo', 'preco_custo');
+        $rsm->addScalarResult('total', 'total');
+
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('dtIni', $dtIni);
+        $query->setParameter('dtFim', $dtFim);
+        $query->setParameter('codProd', $codProd);
+
+        return $query->getResult();
+
+    }
+
+
+    /**
+     * @param string $codigo
+     * @return null|string
+     */
+    public function getProdutoByCodigo(string $codigo): ?string
+    {
+        $sql = 'SELECT desc_prod FROM rdp_rel_compfor01 WHERE cod_prod = :codigo GROUP BY cod_prod, desc_prod';
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('desc_prod', 'desc_prod');
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('codigo', $codigo);
+        try {
+            return $query->getOneOrNullResult()['desc_prod'] ?? null;
+        } catch (NonUniqueResultException $e) {
+            return null;
+        }
+    }
 
 }
 
