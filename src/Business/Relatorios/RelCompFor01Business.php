@@ -3,7 +3,11 @@
 namespace App\Business\Relatorios;
 
 
+use CrosierSource\CrosierLibBaseBundle\APIClient\CrosierEntityIdAPIClient;
+use CrosierSource\CrosierLibBaseBundle\Entity\Config\AppConfig;
+use CrosierSource\CrosierLibBaseBundle\EntityHandler\Config\AppConfigEntityHandler;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
+use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ConnectionException;
@@ -25,15 +29,40 @@ class RelCompFor01Business
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var AppConfigEntityHandler */
+    private $appConfigEntityHandler;
+
     /**
      * @param RegistryInterface $doctrine
      * @param LoggerInterface $logger
+     * @param AppConfigEntityHandler $appConfigEntityHandler
      */
     public function __construct(RegistryInterface $doctrine,
-                                LoggerInterface $logger)
+                                LoggerInterface $logger,
+                                AppConfigEntityHandler $appConfigEntityHandler)
     {
         $this->doctrine = $doctrine;
+        $this->appConfigEntityHandler = $appConfigEntityHandler;
         $this->logger = $logger;
+    }
+
+    /**
+     * @throws ViewException
+     */
+    private function marcarDtHrAtualizacao()
+    {
+        try {
+            /** @var AppConfigRepository $repoAppConfig */
+            $repoAppConfig = $this->doctrine->getRepository(AppConfig::class);
+            /** @var AppConfig $appConfig */
+            $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relCompFor01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
+            $appConfig->setValor((new \DateTime())->format('Y-m-d H:i:s.u'));
+            $this->appConfigEntityHandler->save($appConfig);
+        } catch (\Exception $e) {
+            $this->logger->error('Erro ao marcar app_config (relCompFor01.dthrAtualizacao)');
+            $this->logger->error($e->getMessage());
+            throw new ViewException('Erro ao marcar dt/hr atualização');
+        }
     }
 
     /**
@@ -48,6 +77,7 @@ class RelCompFor01Business
 
                 try {
                     $this->processarArquivo($file);
+                    $this->marcarDtHrAtualizacao();
                     $this->logger->info('Arquivo processado com sucesso.');
                     rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCOMPFOR01'] . 'ok/' . $file);
                     $this->logger->info('Arquivo movido para pasta "ok".');
