@@ -9,6 +9,8 @@ use App\Entity\Relatorios\RelVendas01;
 use App\Repository\Relatorios\RelEstoque01Repository;
 use CrosierSource\CrosierLibBaseBundle\Business\Config\StoredViewInfoBusiness;
 use CrosierSource\CrosierLibBaseBundle\Controller\BaseController;
+use CrosierSource\CrosierLibBaseBundle\Entity\Config\AppConfig;
+use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -91,6 +93,21 @@ class DefaultController extends BaseController
         $params['reposicaoEstoqueTotais']['filiais'] = $repoEstoque01->getReposicaoEstoqueTotalPorFilial();
         $svi = $this->storedViewInfoBusiness->retrieve('relEstoque01_listReposicao');
         $params['reposicaoEstoqueTotais']['filter'] = $svi['formPesquisar']['filter'] ?? null;
+
+
+        /** @var AppConfigRepository $repoAppConfig */
+        $repoAppConfig = $this->getDoctrine()->getRepository(AppConfig::class);
+        /** @var AppConfig $appConfig */
+        $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relCompFor01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
+        $params['relCompFor01_dthrAtualizacao'] = DateTimeUtils::parseDateStr($appConfig->getValor());
+        $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relCompras01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
+        $params['relCompras01_dthrAtualizacao'] = DateTimeUtils::parseDateStr($appConfig->getValor());
+        $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relCtsPagRec01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
+        $params['relCtsPagRec01_dthrAtualizacao'] = DateTimeUtils::parseDateStr($appConfig->getValor());
+        $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relEstoque01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
+        $params['relEstoque01_dthrAtualizacao'] = DateTimeUtils::parseDateStr($appConfig->getValor());
+        $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relVendas01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
+        $params['relVendas01_dthrAtualizacao'] = DateTimeUtils::parseDateStr($appConfig->getValor());
 
         return $this->doRender('dashboard.html.twig', $params);
     }
