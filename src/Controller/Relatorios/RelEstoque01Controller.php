@@ -119,6 +119,8 @@ class RelEstoque01Controller extends FormListController
         $totais = $repo->totalEstoque($dtUltSaidaApartirDe, $descFilial, $codFornecedor);
         $params['totais'] = $totais[0] ?? null;
 
+        $params['qtdeProdutosNoCarrinho'] = isset($this->session->get('carrinho')['itens']) ? count($this->session->get('carrinho')['itens']) : '';
+
         return $this->doList($request, $params);
     }
 
@@ -202,6 +204,8 @@ class RelEstoque01Controller extends FormListController
         $params['listRouteAjax'] = 'relEstoque01_listReposicao_datatablesJsList';
         $params['listPageTitle'] = 'Reposição de Estoque';
         $params['listView'] = 'Relatorios/relEstoque01_reposicao_list.html.twig';
+
+        $params['qtdeProdutosNoCarrinho'] = isset($this->session->get('carrinho')['itens']) ? count($this->session->get('carrinho')['itens']) : '';
 
         return $this->doList($request, $params);
     }
@@ -356,8 +360,9 @@ class RelEstoque01Controller extends FormListController
             } else {
                 $carrinho = $this->session->get('carrinho') ?? ['itens' => []];
                 $achou = false;
+                /** @var RelEstoque01 $item */
                 foreach ($carrinho['itens'] as $item) {
-                    if ($item['codProduto'] === $codProduto) {
+                    if ($item->getCodProduto() === $codProduto) {
                         $achou = true;
                         break;
                     }
@@ -366,15 +371,7 @@ class RelEstoque01Controller extends FormListController
                     if (!($carrinho['fornecedor'] ?? null)) {
                         $carrinho['fornecedor'] = $produto->getCodFornecedor();
                     }
-                    $carrinho['itens'][] = [
-                        'codProduto' => $codProduto,
-                        'descProduto' => $produto->getDescProduto(),
-                        'descFilial' => $produto->getDescFilial(),
-                        'custoMedio' => $produto->getCustoMedio(),
-                        'precoVenda' => $produto->getPrecoVenda(),
-                        'qtde' => (float)$produto->getDeficit(),
-                        'totalCustoMedio' => (float)$produto->getTotalCustoMedio(),
-                    ];
+                    $carrinho['itens'][] = $produto;
                     $results['msg'] = '"' . $produto->getCodProduto() . ' - ' . $produto->getDescProduto() . '" adicionado com sucesso';
                     $results['produto'] = $produto->getCodProduto() . ' - ' . $produto->getDescProduto();
                 } else {
@@ -403,13 +400,27 @@ class RelEstoque01Controller extends FormListController
     {
         $codProduto = urldecode($codProduto);
         $carrinho = $this->session->get('carrinho') ?? ['itens' => []];
+        /** @var RelEstoque01 $item */
         foreach ($carrinho['itens'] as $key => $item) {
-            if ($item['codProduto'] === $codProduto) {
+            if ($item->getCodProduto() === $codProduto) {
                 array_splice($carrinho['itens'], $key, 1);
                 break;
             }
         }
         $this->session->set('carrinho', $carrinho);
+        return $this->redirectToRoute('relEstoque01_carrinho_exibir');
+    }
+
+    /**
+     * @Route("/relEstoque01/carrinho/limparCarrinho", name="relEstoque01_carrinho_limparCarrinho")
+     * @return Response
+     * @throws \Exception
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     */
+    public function limparCarrinho(): Response
+    {
+        $this->session->set('carrinho', null);
         return $this->redirectToRoute('relEstoque01_carrinho_exibir');
     }
 
@@ -443,13 +454,19 @@ class RelEstoque01Controller extends FormListController
 
         $total = 0.0;
         if (isset($vParams['carrinho']['itens']) && count($vParams['carrinho']['itens']) > 0) {
+            /** @var RelEstoque01 $item */
             foreach ($vParams['carrinho']['itens'] as $item) {
-                $total += $item['qtde'] * $item['custoMedio'];
+                $total += $item->getDeficit() * $item->getCustoMedio();
             }
         } else {
             $this->addFlash('info', 'Carrinho de compras vazio.');
         }
         $vParams['carrinho']['total'] = $total;
+
+        if (strpos($request->headers->get('referer'),'carrinho') === false) {
+            $this->session->set('backUrl_carrinho', $request->headers->get('referer'));
+        }
+        $vParams['backUrl'] = $this->session->get('backUrl_carrinho') ??  $this->generateUrl('relEstoque01_listReposicao');
 
         return $this->doRender('Relatorios/relEstoque01_carrinhoDeCompras.html.twig', $vParams);
     }
@@ -469,10 +486,15 @@ class RelEstoque01Controller extends FormListController
         $carrinho = $this->session->get('carrinho');
         $carrinho['fornecedor'] = $request->get('fornecedor');
         $carrinho['comprador'] = $request->get('comprador');
-        $carrinho['itens'] = $request->get('itens');
         if (isset($carrinho['itens']) && count($carrinho['itens']) > 0) {
-            foreach ($carrinho['itens'] as $key => $item) {
-                $carrinho['itens'][$key]['totalCustoMedio'] = $item['qtde'] * $item['custoMedio'];
+            /** @var RelEstoque01 $item */
+            foreach ($carrinho['itens'] as $item) {
+                foreach ($request->get('itens') as $rItem) {
+                    if ($rItem['codProduto'] === $item->getCodProduto()) {
+                        $item->setDeficit($rItem['qtde']);
+                        continue;
+                    }
+                }
             }
         }
         $this->session->set('carrinho', $carrinho);
@@ -513,5 +535,52 @@ class RelEstoque01Controller extends FormListController
             $this->addFlash('error', 'Erro ao gerar pedido de compra');
         }
     }
+
+
+    /**
+     * @Route("/relEstoque01/carrinho/adicionarTudoNoCarrinho", name="relEstoque01_carrinho_adicionarTudoNoCarrinho")
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @throws ViewException
+     */
+    public function adicionarTudoNoCarrinho(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
+    {
+        /** @var RelEstoque01Repository $repoRelEstoque01 */
+        $repoRelEstoque01 = $this->getDoctrine()->getRepository(RelEstoque01::class);
+        $filters['filter'] = $request->get('filter');
+        $filters['filter']['qtdeAtual'] = 0;
+        $filters['filter']['deficit'] = 0;
+
+        $filterDatas = $this->getSomenteFilterDatasComValores($filters);
+        $produtos = $repoRelEstoque01->findByFilters($filterDatas, null, 0, -1);
+
+        $q = 0;
+        /** @var RelEstoque01 $produto */
+        foreach ($produtos as $produto) {
+            $carrinho = $this->session->get('carrinho') ?? ['itens' => []];
+            $achou = false;
+            /** @var RelEstoque01 $item */
+            foreach ($carrinho['itens'] as $item) {
+                if ($item->getCodProduto() === $produto->getCodProduto()) {
+                    $achou = true;
+                    break;
+                }
+            }
+            if (!$achou) {
+                if (!($carrinho['fornecedor'] ?? null)) {
+                    $carrinho['fornecedor'] = $produto->getCodFornecedor();
+                }
+                $carrinho['itens'][] = $produto;
+                $q++;
+            }
+            $this->session->set('carrinho', $carrinho);
+        }
+        $this->addFlash('info', $q . ' produto(s) adicionado(s) ao carrinho');
+        return $this->redirectToRoute('relEstoque01_carrinho_exibir');
+
+    }
+
 
 }

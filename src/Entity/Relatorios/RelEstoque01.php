@@ -239,6 +239,17 @@ class RelEstoque01 implements EntityId
     }
 
     /**
+     * @param float|null $deficit
+     * @return RelEstoque01
+     */
+    public function setDeficit(?float $deficit): RelEstoque01
+    {
+        $this->deficit = $deficit;
+        return $this;
+    }
+
+
+    /**
      * @Groups("entity")
      */
     public function getTotalPrecoVenda()

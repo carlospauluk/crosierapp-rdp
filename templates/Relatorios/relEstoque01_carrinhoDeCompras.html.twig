@@ -18,7 +18,13 @@
                     </div>
                     <div class="d-sm-flex flex-nowrap ml-auto">
 
-                        <a role="button" href="{{ url('relEstoque01_listReposicao') }}"
+                        <a role="button" href="#" data-target="#confirmationModal" data-toggle="modal"
+                           data-url="{{ url('relEstoque01_carrinho_limparCarrinho') }}"
+                           class="btn btn-warning ml-1"
+                           title="Remover todos os itens do carrinho">
+                            <i class="far fa-trash-alt"></i> Esvaziar carrinho</a>
+
+                        <a role="button" href="{{ backUrl }}"
                            class="btn btn-outline-info ml-1">
                             <i class="fas fa-arrow-left"></i> Voltar
                         </a>
@@ -92,25 +98,19 @@
                                     <td>
                                         <input type="hidden" name="itens[{{ loop.index0 }}][codProduto]"
                                                value="{{ item.codProduto }}">
-                                        <input type="hidden" name="itens[{{ loop.index0 }}][descProduto]"
-                                               value="{{ item.descProduto }}">
-                                        <input type="hidden" name="itens[{{ loop.index0 }}][descFilial]"
-                                               value="{{ item.descFilial }}">
                                         {{ item.codProduto }} - {{ item.descProduto }}
+                                        <br />
+                                        <span style="font-size: small; color: darkgrey">{{ item.nomeFornecedor }}</span>
                                     </td>
                                     <td class="text-right">
                                         <input type="number" name="itens[{{ loop.index0 }}][qtde]" class="form-control"
-                                               value="{{ item.qtde }}">
+                                               value="{{ item.deficit }}">
                                     </td>
                                     <td class="text-right" data-order="{{ item.precoVenda }}">
                                         {{ item.precoVenda|number_format(2,',','.') }}
-                                        <input type="hidden" name="itens[{{ loop.index0 }}][precoVenda]"
-                                               value="{{ item.precoVenda }}">
                                     </td>
                                     <td class="text-right" data-order="{{ item.custoMedio }}">
                                         {{ item.custoMedio|number_format(2,',','.') }}
-                                        <input type="hidden" name="itens[{{ loop.index0 }}][custoMedio]"
-                                               value="{{ item.custoMedio }}">
                                     </td>
                                     <td class="text-right" data-order="{{ item.totalCustoMedio }}">
                                         {{ item.totalCustoMedio|number_format(2,',','.') }}
