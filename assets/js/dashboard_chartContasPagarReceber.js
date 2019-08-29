@@ -51,7 +51,7 @@ $(document).ready(function () {
     }
     $filter_contasPagRec_filial.on('select2:select', function () {
         // handleLocalizadorPorFilial();
-        drawChart_contasPagRec();
+        // drawChart_contasPagRec();
     });
 
 
