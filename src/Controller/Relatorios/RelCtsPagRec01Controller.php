@@ -6,11 +6,13 @@ namespace App\Controller\Relatorios;
 use App\Entity\Relatorios\RelCtsPagRec01;
 use App\EntityHandler\Relatorios\RelCtsPagRec01EntityHandler;
 use App\Repository\Relatorios\RelCtsPagRec01Repository;
-use CrosierSource\CrosierLibBaseBundle\APIClient\Base\DiaUtilAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
+use CrosierSource\CrosierLibBaseBundle\Entity\Base\DiaUtil;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
+use CrosierSource\CrosierLibBaseBundle\Repository\Base\DiaUtilRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,30 +25,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class RelCtsPagRec01Controller extends FormListController
 {
-    protected $crudParams =
-        [
-            'typeClass' => null,
 
-            'formView' => null,
-//            'formRoute' => null,
-            'formPageTitle' => null,
-            'form_PROGRAM_UUID' => null,
-
-            'listView' => 'Relatorios/relCtsPagRec01_list.html.twig',
-            'listRoute' => 'relCtsPagRec01_list',
-            'listRouteAjax' => 'relCtsPagRec01_datatablesJsList',
-            'listPageTitle' => 'CtsPagRec',
-            'listId' => 'relCtsPagRec01List',
-            'list_PROGRAM_UUID' => null,
-            'listJS' => '',
-
-            'role_access' => 'ROLE_RELVENDAS',
-            'role_delete' => 'ROLE_ADMIN',
-
-        ];
-
-    /** @var DiaUtilAPIClient */
-    private $diaUtilAPIClient;
 
     /** @var SessionInterface */
     private $session;
@@ -59,16 +38,6 @@ class RelCtsPagRec01Controller extends FormListController
     {
         $this->entityHandler = $entityHandler;
     }
-
-    /**
-     * @required
-     * @param DiaUtilAPIClient $diaUtilAPIClient
-     */
-    public function setDiaUtilAPIClient(DiaUtilAPIClient $diaUtilAPIClient): void
-    {
-        $this->diaUtilAPIClient = $diaUtilAPIClient;
-    }
-
 
     /**
      * @required
@@ -85,10 +54,15 @@ class RelCtsPagRec01Controller extends FormListController
      * @param Request $request
      * @return Response
      * @throws \Exception
+     *
+     * @IsGranted({"ROLE_FINAN"}, statusCode=403)
+     *
      */
     public function list(Request $request): Response
     {
         $parameters = $this->buildListData($request);
+        $parameters['listRoute'] = 'relCtsPagRec01_list';
+        $parameters['listView'] = 'Relatorios/relCtsPagRec01_list.html.twig';
         return $this->doList($request, $parameters);
     }
 
@@ -106,7 +80,7 @@ class RelCtsPagRec01Controller extends FormListController
         if (!array_key_exists('filter', $parameters)) {
 
             if ($parameters['r'] ?? null) {
-                $this->storedViewInfoBusiness->clear($this->crudParams['listRoute']);
+                $this->storedViewInfoBusiness->clear('relCtsPagRec01_list');
             }
             $svi = $this->storedViewInfoBusiness->retrieve('relCtsPagRec01_list');
             if (isset($svi['filter'])) {
@@ -182,8 +156,12 @@ class RelCtsPagRec01Controller extends FormListController
 
         $parameters['dias'] = $dias;
 
-        $prox = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, true);
-        $ante = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, false);
+        /** @var DiaUtilRepository $repoDiaUtil */
+        $repoDiaUtil = $this->getDoctrine()->getRepository(DiaUtil::class);
+
+        $prox = $repoDiaUtil->incPeriodo($dtIni, $dtFim, true);
+        $ante = $repoDiaUtil->incPeriodo($dtIni, $dtFim, false);
+
         $parameters['antePeriodoI'] = $ante['dtIni'];
         $parameters['antePeriodoF'] = $ante['dtFim'];
         $parameters['proxPeriodoI'] = $prox['dtIni'];
@@ -197,9 +175,8 @@ class RelCtsPagRec01Controller extends FormListController
         $parameters['localizadores'] = json_encode($localizadores);
 
         $parameters['page_title'] = 'Contas a Pagar/Receber';
-        $parameters['PROGRAM_UUID'] = $this->crudParams['list_PROGRAM_UUID'];
 
-//        $parameters['filter']['localizador'] = urlencode($localizador);
+        //        $parameters['filter']['localizador'] = urlencode($localizador);
 
         $viewInfo = [];
         $viewInfo['filter'] = $parameters['filter'];
@@ -208,6 +185,10 @@ class RelCtsPagRec01Controller extends FormListController
         return $parameters;
     }
 
+    /**
+     * @param array $params
+     * @return array
+     */
     public function getFilterDatas(array $params): array
     {
         return [
@@ -237,6 +218,8 @@ class RelCtsPagRec01Controller extends FormListController
      * @param Request $request
      * @return Response
      * @throws ViewException
+     *
+     * @IsGranted({"ROLE_FINAN"}, statusCode=403)
      */
     public function datatablesJsList(Request $request): Response
     {
@@ -250,6 +233,8 @@ class RelCtsPagRec01Controller extends FormListController
      * @return JsonResponse
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
+     *
+     * @IsGranted({"ROLE_FINAN"}, statusCode=403)
      */
     public function graficoCtsPagRec01(Request $request): JsonResponse
     {

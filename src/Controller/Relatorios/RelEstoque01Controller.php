@@ -11,13 +11,13 @@ use App\EntityHandler\Relatorios\RelEstoque01EntityHandler;
 use App\Repository\Relatorios\RelCompras01Repository;
 use App\Repository\Relatorios\RelEstoque01Repository;
 use App\Repository\Relatorios\RelVendas01Repository;
-use CrosierSource\CrosierLibBaseBundle\APIClient\Base\DiaUtilAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,26 +30,6 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class RelEstoque01Controller extends FormListController
 {
-
-    protected $crudParams =
-        [
-            'typeClass' => null,
-
-            'listView' => 'Relatorios/relEstoque01_list.html.twig',
-            'listRoute' => 'relEstoque01_list',
-            'listRouteAjax' => 'relEstoque01_datatablesJsList',
-            'listPageTitle' => 'Estoque',
-            'listId' => 'relEstoque01List',
-            'list_PROGRAM_UUID' => '',
-
-            'role_access' => 'ROLE_RELVENDAS',
-            'role_delete' => 'ROLE_ADMIN',
-
-        ];
-
-
-    /** @var DiaUtilAPIClient */
-    private $diaUtilAPIClient;
 
     /** @var SessionInterface */
     private $session;
@@ -64,15 +44,6 @@ class RelEstoque01Controller extends FormListController
     public function setEntityHandler(RelEstoque01EntityHandler $entityHandler): void
     {
         $this->entityHandler = $entityHandler;
-    }
-
-    /**
-     * @required
-     * @param DiaUtilAPIClient $diaUtilAPIClient
-     */
-    public function setDiaUtilAPIClient(DiaUtilAPIClient $diaUtilAPIClient): void
-    {
-        $this->diaUtilAPIClient = $diaUtilAPIClient;
     }
 
     /**
@@ -112,9 +83,20 @@ class RelEstoque01Controller extends FormListController
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Exception
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function list(Request $request): Response
     {
+        $params = [
+            'listView' => 'Relatorios/relEstoque01_list.html.twig',
+            'listRoute' => 'relEstoque01_list',
+            'listRouteAjax' => 'relEstoque01_datatablesJsList',
+            'listPageTitle' => 'Estoque',
+            'listId' => 'relEstoque01List'
+        ];
+
+
         /** @var RelEstoque01Repository $repo */
         $repo = $this->getDoctrine()->getRepository(RelEstoque01::class);
 
@@ -146,6 +128,8 @@ class RelEstoque01Controller extends FormListController
      * @param Request $request
      * @return Response
      * @throws \CrosierSource\CrosierLibBaseBundle\Exception\ViewException
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function datatablesJsList(Request $request): Response
     {
@@ -164,6 +148,8 @@ class RelEstoque01Controller extends FormListController
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Exception
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function listReposicao(Request $request): Response
     {
@@ -211,11 +197,11 @@ class RelEstoque01Controller extends FormListController
         $params['totais'] = $totais[0] ?? null;
 
 
-        $this->crudParams['listId'] = 'relEstoque01List_reposicao';
-        $this->crudParams['listRoute'] = 'relEstoque01_listReposicao';
-        $this->crudParams['listRouteAjax'] = 'relEstoque01_listReposicao_datatablesJsList';
-        $this->crudParams['listPageTitle'] = 'Reposição de Estoque';
-        $this->crudParams['listView'] = 'Relatorios/relEstoque01_reposicao_list.html.twig';
+        $params['listId'] = 'relEstoque01List_reposicao';
+        $params['listRoute'] = 'relEstoque01_listReposicao';
+        $params['listRouteAjax'] = 'relEstoque01_listReposicao_datatablesJsList';
+        $params['listPageTitle'] = 'Reposição de Estoque';
+        $params['listView'] = 'Relatorios/relEstoque01_reposicao_list.html.twig';
 
         return $this->doList($request, $params);
     }
@@ -226,6 +212,8 @@ class RelEstoque01Controller extends FormListController
      * @param Request $request
      * @return Response
      * @throws \CrosierSource\CrosierLibBaseBundle\Exception\ViewException
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function listReposicao_datatablesJsList(Request $request): Response
     {
@@ -235,11 +223,11 @@ class RelEstoque01Controller extends FormListController
                 'deficit' => 0
             ]
         ];
-        $this->crudParams['listId'] = 'relEstoque01List_reposicao';
-        $this->crudParams['listRoute'] = 'relEstoque01_listReposicao';
-        $this->crudParams['listRouteAjax'] = 'relEstoque01_listReposicao_datatablesJsList';
-        $this->crudParams['listPageTitle'] = 'Reposição de Estoque';
-        $this->crudParams['listView'] = 'Relatorios/relEstoque01_reposicao_list.html.twig';
+        $params['listId'] = 'relEstoque01List_reposicao';
+        $params['listRoute'] = 'relEstoque01_listReposicao';
+        $params['listRouteAjax'] = 'relEstoque01_listReposicao_datatablesJsList';
+        $params['listPageTitle'] = 'Reposição de Estoque';
+        $params['listView'] = 'Relatorios/relEstoque01_reposicao_list.html.twig';
 
         return $this->doDatatablesJsList($request, $defaultFilters);
     }
@@ -265,6 +253,8 @@ class RelEstoque01Controller extends FormListController
      * @Route("/relEstoque01/graficoTotalEstoquePorFilial/", name="relEstoque01_graficoTotalEstoquePorFilial")
      * @param Request $request
      * @return JsonResponse
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function graficoTotalEstoquePorFilial(Request $request): JsonResponse
     {
@@ -283,6 +273,8 @@ class RelEstoque01Controller extends FormListController
      * @return void
      * @throws ViewException
      * @throws \Exception
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function imprimirListaReposicao(Request $request): void
     {
@@ -342,6 +334,8 @@ class RelEstoque01Controller extends FormListController
      * @Route("/relEstoque01/carrinho/adicionar", name="relEstoque01_carrinho_adicionar")
      * @param Request $request
      * @return JsonResponse
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function adicionarNoCarrinho(Request $request): JsonResponse
     {
@@ -402,6 +396,8 @@ class RelEstoque01Controller extends FormListController
      * @param string $codProduto
      * @return Response
      * @throws \Exception
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function removerDoCarrinhoEExibir(string $codProduto): Response
     {
@@ -424,6 +420,8 @@ class RelEstoque01Controller extends FormListController
      * @param Request $request
      * @return Response
      * @throws \Exception
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function exibirCarrinho(Request $request): Response
     {
@@ -463,6 +461,8 @@ class RelEstoque01Controller extends FormListController
      * @param Request $request
      * @return Response
      * @throws \Exception
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function salvarCarrinho(Request $request): Response
     {
@@ -489,6 +489,8 @@ class RelEstoque01Controller extends FormListController
      *
      * @Route("/relEstoque01/gerarPedidoCompra/", name="relEstoque01_gerarPedidoCompra")
      * @param array $carrinho
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function gerarPedidoCompra(array $carrinho): void
     {

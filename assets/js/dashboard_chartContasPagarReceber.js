@@ -158,7 +158,7 @@ $(document).ready(function () {
 
         }
         ).on('apply.daterangepicker', function (ev, picker) {
-            drawChart_contasPagRec();
+            // drawChart_contasPagRec();
         });
 
 

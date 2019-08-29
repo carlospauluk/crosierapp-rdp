@@ -7,10 +7,12 @@ use App\Entity\Relatorios\RelCompFor01;
 use App\Entity\Relatorios\RelVendas01;
 use App\EntityHandler\Relatorios\RelCompFor01EntityHandler;
 use App\Repository\Relatorios\RelCompFor01Repository;
-use CrosierSource\CrosierLibBaseBundle\APIClient\Base\DiaUtilAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
+use CrosierSource\CrosierLibBaseBundle\Entity\Base\DiaUtil;
+use CrosierSource\CrosierLibBaseBundle\Repository\Base\DiaUtilRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,40 +26,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class RelCompFor01Controller extends FormListController
 {
 
-    protected $crudParams =
-        [
-            'typeClass' => null,
-
-            'formView' => null,
-//            'formRoute' => null,
-            'formPageTitle' => null,
-            'form_PROGRAM_UUID' => null,
-
-            'listView' => 'Relatorios/relCompFor01_list.html.twig',
-            'listRoute' => 'relCompFor01_list',
-            'listRouteAjax' => 'relCompFor01_datatablesJsList',
-            'listPageTitle' => 'CompFor',
-            'listId' => 'relCompFor01List',
-            'list_PROGRAM_UUID' => null,
-            'listJS' => '',
-
-            'role_access' => 'ROLE_RELVENDAS',
-            'role_delete' => 'ROLE_ADMIN',
-
-        ];
-    /** @var DiaUtilAPIClient */
-    private $diaUtilAPIClient;
     /** @var SessionInterface */
     private $session;
-
-    /**
-     * @required
-     * @param DiaUtilAPIClient $diaUtilAPIClient
-     */
-    public function setDiaUtilAPIClient(DiaUtilAPIClient $diaUtilAPIClient): void
-    {
-        $this->diaUtilAPIClient = $diaUtilAPIClient;
-    }
 
     /**
      * @required
@@ -91,6 +61,8 @@ class RelCompFor01Controller extends FormListController
      * @param Request $request
      * @return Response
      * @throws \Exception
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function list(Request $request): Response
     {
@@ -112,8 +84,11 @@ class RelCompFor01Controller extends FormListController
         $dtAnterior = clone $dtIni;
         $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');
 
-        $prox = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, true);
-        $ante = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, false);
+        /** @var DiaUtilRepository $repoDiaUtil */
+        $repoDiaUtil = $this->getDoctrine()->getRepository(DiaUtil::class);
+
+        $prox = $repoDiaUtil->incPeriodo($dtIni, $dtFim, true);
+        $ante = $repoDiaUtil->incPeriodo($dtIni, $dtFim, false);
         $vParams['antePeriodoI'] = $ante['dtIni'];
         $vParams['antePeriodoF'] = $ante['dtFim'];
         $vParams['proxPeriodoI'] = $prox['dtIni'];
@@ -132,6 +107,8 @@ class RelCompFor01Controller extends FormListController
      * @Route("/relCompFor01/graficoTotalPorFornecedor/", name="relCompFor01_graficoTotalPorFornecedor")
      * @param Request $request
      * @return JsonResponse
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function totalPorFornecedor(Request $request): JsonResponse
     {
@@ -153,16 +130,20 @@ class RelCompFor01Controller extends FormListController
      * @param Request $request
      * @return Response
      * @throws \Exception
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function listItensCompradosPorFornecedor(Request $request): Response
     {
+        $this->denyAccessUnlessGranted(['ROLE_ADMIN', 'ROLE_RELVENDAS']);
+
         $vParams = $request->query->all();
         /** @var RelCompFor01Repository $repo */
         $repo = $this->getDoctrine()->getRepository(RelCompFor01::class);
         if (!array_key_exists('filter', $vParams)) {
 
             if ($vParams['r'] ?? null) {
-                $this->storedViewInfoBusiness->clear($this->crudParams['listRoute']);
+                $this->storedViewInfoBusiness->clear('relCompFor01_listItensCompradosPorFornecedor');
             }
             $svi = $this->storedViewInfoBusiness->retrieve('relCompFor01_listItensCompradosPorFornecedor');
             if (isset($svi['filter'])) {
@@ -186,8 +167,12 @@ class RelCompFor01Controller extends FormListController
         $dtAnterior = clone $dtIni;
         $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');
 
-        $prox = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, true);
-        $ante = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, false);
+
+        /** @var DiaUtilRepository $repoDiaUtil */
+        $repoDiaUtil = $this->getDoctrine()->getRepository(DiaUtil::class);
+
+        $prox = $repoDiaUtil->incPeriodo($dtIni, $dtFim, true);
+        $ante = $repoDiaUtil->incPeriodo($dtIni, $dtFim, false);
         $vParams['antePeriodoI'] = $ante['dtIni'];
         $vParams['antePeriodoF'] = $ante['dtFim'];
         $vParams['proxPeriodoI'] = $prox['dtIni'];

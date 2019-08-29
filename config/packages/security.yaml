@@ -13,6 +13,8 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main_%env(CROSIERAPP_ID)%:
+            access_denied_handler: CrosierSource\CrosierLibBaseBundle\Security\AccessDeniedHandler
+
             anonymous: true
 
             guard:
@@ -32,6 +34,8 @@ security:
                 samesite: lax
 
             switch_user: true
+
+
 
             # activate different ways to authenticate
 

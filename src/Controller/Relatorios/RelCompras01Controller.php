@@ -7,11 +7,11 @@ use App\Entity\Relatorios\RelCompras01;
 use App\Entity\Relatorios\RelVendas01;
 use App\Repository\Relatorios\RelCompras01Repository;
 use App\Repository\Relatorios\RelVendas01Repository;
-use CrosierSource\CrosierLibBaseBundle\APIClient\Base\DiaUtilAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Exception;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -24,20 +24,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class RelCompras01Controller extends FormListController
 {
 
-    /** @var DiaUtilAPIClient */
-    private $diaUtilAPIClient;
-
     /** @var SessionInterface */
     private $session;
-
-    /**
-     * @required
-     * @param DiaUtilAPIClient $diaUtilAPIClient
-     */
-    public function setDiaUtilAPIClient(DiaUtilAPIClient $diaUtilAPIClient): void
-    {
-        $this->diaUtilAPIClient = $diaUtilAPIClient;
-    }
 
     /**
      * @required
@@ -55,6 +43,8 @@ class RelCompras01Controller extends FormListController
      * @param Request $request
      * @return Response
      * @throws Exception
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function listComprasPorProduto(Request $request): Response
     {
@@ -64,7 +54,7 @@ class RelCompras01Controller extends FormListController
         if (!array_key_exists('filter', $vParams)) {
 
             if ($vParams['r'] ?? null) {
-                $this->storedViewInfoBusiness->clear($this->crudParams['listRoute']);
+                $this->storedViewInfoBusiness->clear('relCompras01_listComprasPorProduto');
             }
             $svi = $this->storedViewInfoBusiness->retrieve('relCompras01_listComprasPorProduto');
             if (isset($svi['filter'])) {
@@ -100,6 +90,8 @@ class RelCompras01Controller extends FormListController
      * @param int $pv
      * @return Response
      * @throws Exception
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function listPreVendaItens(int $pv): Response
     {

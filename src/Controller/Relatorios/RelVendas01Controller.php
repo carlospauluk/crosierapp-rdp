@@ -5,13 +5,15 @@ namespace App\Controller\Relatorios;
 
 use App\Entity\Relatorios\RelVendas01;
 use App\Repository\Relatorios\RelVendas01Repository;
-use CrosierSource\CrosierLibBaseBundle\APIClient\Base\DiaUtilAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
+use CrosierSource\CrosierLibBaseBundle\Entity\Base\DiaUtil;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
+use CrosierSource\CrosierLibBaseBundle\Repository\Base\DiaUtilRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use DateTime;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,20 +27,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class RelVendas01Controller extends FormListController
 {
 
-    /** @var DiaUtilAPIClient */
-    private $diaUtilAPIClient;
-
     /** @var SessionInterface */
     private $session;
-
-    /**
-     * @required
-     * @param DiaUtilAPIClient $diaUtilAPIClient
-     */
-    public function setDiaUtilAPIClient(DiaUtilAPIClient $diaUtilAPIClient): void
-    {
-        $this->diaUtilAPIClient = $diaUtilAPIClient;
-    }
 
     /**
      * @required
@@ -49,13 +39,14 @@ class RelVendas01Controller extends FormListController
         $this->session = $session;
     }
 
-
     /**
      *
      * @Route("/relVendas01/listItensVendidosPorFornecedor/", name="relVendas01_listItensVendidosPorFornecedor")
      * @param Request $request
      * @return Response
      * @throws Exception
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function listItensVendidosPorFornecedor(Request $request): Response
     {
@@ -65,7 +56,7 @@ class RelVendas01Controller extends FormListController
         if (!array_key_exists('filter', $vParams)) {
 
             if ($vParams['r'] ?? null) {
-                $this->storedViewInfoBusiness->clear($this->crudParams['listRoute']);
+                $this->storedViewInfoBusiness->clear('relVendas01_listItensVendidosPorFornecedor');
             }
             $svi = $this->storedViewInfoBusiness->retrieve('relVendas01_listItensVendidosPorFornecedor');
             if (isset($svi['filter'])) {
@@ -94,8 +85,12 @@ class RelVendas01Controller extends FormListController
         $dtAnterior = clone $dtIni;
         $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');
 
-        $prox = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, true);
-        $ante = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, false);
+        /** @var DiaUtilRepository $repoDiaUtil */
+        $repoDiaUtil = $this->getDoctrine()->getRepository(DiaUtil::class);
+
+        $prox = $repoDiaUtil->incPeriodo($dtIni, $dtFim, true);
+        $ante = $repoDiaUtil->incPeriodo($dtIni, $dtFim, false);
+
         $vParams['antePeriodoI'] = $ante['dtIni'];
         $vParams['antePeriodoF'] = $ante['dtFim'];
         $vParams['proxPeriodoI'] = $prox['dtIni'];
@@ -127,6 +122,8 @@ class RelVendas01Controller extends FormListController
      * @Route("/relVendas01/graficoTotalPorFornecedor/", name="relVendas01_graficoTotalPorFornecedor")
      * @param Request $request
      * @return JsonResponse
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function graficoTotalPorFornecedor(Request $request): JsonResponse
     {
@@ -155,6 +152,8 @@ class RelVendas01Controller extends FormListController
      * @param Request $request
      * @return JsonResponse
      * @throws NonUniqueResultException
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function graficoTotalPorVendedor(Request $request): JsonResponse
     {
@@ -165,7 +164,7 @@ class RelVendas01Controller extends FormListController
         $this->session->set('dashboard.filter.chartVendasTotalPorVendedor.dts', $dts);
         $this->session->set('dashboard.filter.chartVendasTotalPorVendedor.lojas', $lojas);
         $this->session->set('dashboard.filter.chartVendasTotalPorVendedor.grupos', $grupos);
-        
+
         $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
         $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
 
@@ -183,6 +182,8 @@ class RelVendas01Controller extends FormListController
      * @param Request $request
      * @return Response
      * @throws Exception
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function listPreVendasPorVendedor(Request $request): Response
     {
@@ -192,7 +193,7 @@ class RelVendas01Controller extends FormListController
         if (!array_key_exists('filter', $vParams)) {
 
             if ($vParams['r'] ?? null) {
-                $this->storedViewInfoBusiness->clear($this->crudParams['listRoute']);
+                $this->storedViewInfoBusiness->clear('relVendas01_listPreVendasPorVendedor');
             }
             $svi = $this->storedViewInfoBusiness->retrieve('relVendas01_listPreVendasPorVendedor');
             if (isset($svi['filter'])) {
@@ -223,8 +224,12 @@ class RelVendas01Controller extends FormListController
         $dtAnterior = clone $dtIni;
         $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');
 
-        $prox = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, true);
-        $ante = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, false);
+        /** @var DiaUtilRepository $repoDiaUtil */
+        $repoDiaUtil = $this->getDoctrine()->getRepository(DiaUtil::class);
+
+        $prox = $repoDiaUtil->incPeriodo($dtIni, $dtFim, true);
+        $ante = $repoDiaUtil->incPeriodo($dtIni, $dtFim, false);
+
         $vParams['antePeriodoI'] = $ante['dtIni'];
         $vParams['antePeriodoF'] = $ante['dtFim'];
         $vParams['proxPeriodoI'] = $prox['dtIni'];
@@ -255,6 +260,8 @@ class RelVendas01Controller extends FormListController
      * @param Request $request
      * @return Response
      * @throws Exception
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function listPreVendasPorProduto(Request $request): Response
     {
@@ -264,7 +271,7 @@ class RelVendas01Controller extends FormListController
         if (!array_key_exists('filter', $vParams)) {
 
             if ($vParams['r'] ?? null) {
-                $this->storedViewInfoBusiness->clear($this->crudParams['listRoute']);
+                $this->storedViewInfoBusiness->clear('relVendas01_listPreVendasPorProduto');
             }
             $svi = $this->storedViewInfoBusiness->retrieve('relVendas01_listPreVendasPorProduto');
             if (isset($svi['filter'])) {
@@ -295,8 +302,12 @@ class RelVendas01Controller extends FormListController
         $dtAnterior = clone $dtIni;
         $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');
 
-        $prox = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, true);
-        $ante = $this->diaUtilAPIClient->incPeriodo($dtIni, $dtFim, false);
+        /** @var DiaUtilRepository $repoDiaUtil */
+        $repoDiaUtil = $this->getDoctrine()->getRepository(DiaUtil::class);
+
+        $prox = $repoDiaUtil->incPeriodo($dtIni, $dtFim, true);
+        $ante = $repoDiaUtil->incPeriodo($dtIni, $dtFim, false);
+
         $vParams['antePeriodoI'] = $ante['dtIni'];
         $vParams['antePeriodoF'] = $ante['dtFim'];
         $vParams['proxPeriodoI'] = $prox['dtIni'];
@@ -325,6 +336,8 @@ class RelVendas01Controller extends FormListController
      * @param int $pv
      * @return Response
      * @throws Exception
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
     public function listPreVendaItens(int $pv): Response
     {

@@ -23,28 +23,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class RelatoriosPushController extends FormListController
 {
 
-    protected $crudParams =
-        [
-            'typeClass' => null,
-
-            'formView' => null,
-//            'formRoute' => null,
-            'formPageTitle' => null,
-            'form_PROGRAM_UUID' => null,
-
-            'listView' => 'Utils/pushList.html.twig',
-            'listRoute' => 'utils_relatorioPush_list',
-            'listRouteAjax' => 'utils_relatorioPush_datatablesJsList',
-            'listPageTitle' => 'Push',
-            'listId' => 'relatorioPushList',
-            'list_PROGRAM_UUID' => null,
-            'listJS' => 'utils/relatorioPushList.js',
-
-            'role_access' => 'ROLE_RELATORIOSPUSH',
-            'role_delete' => 'ROLE_ADMIN',
-
-        ];
-
     /**
      * @required
      * @param RelatorioPushEntityHandler $entityHandler
@@ -72,7 +50,16 @@ class RelatoriosPushController extends FormListController
      */
     public function list(Request $request): Response
     {
-        return $this->doList($request);
+        $params = [
+            'listView' => 'Utils/pushList.html.twig',
+            'listRoute' => 'utils_relatorioPush_list',
+            'listRouteAjax' => 'utils_relatorioPush_datatablesJsList',
+            'listPageTitle' => 'Push',
+            'listId' => 'relatorioPushList',
+            'list_PROGRAM_UUID' => null,
+            'listJS' => 'utils/relatorioPushList.js'
+        ];
+        return $this->doList($request, $params);
     }
 
     /**
