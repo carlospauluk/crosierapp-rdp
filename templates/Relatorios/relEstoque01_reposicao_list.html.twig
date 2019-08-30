@@ -17,7 +17,7 @@
 
     {% if filter.codFornecedor|default('') != '' %}
         <a role="button" href="#" data-target="#confirmationModal" data-toggle="modal"
-           data-url="{{ url('relEstoque01_carrinho_adicionarTudoNoCarrinho', {'filter': filter}) }}"
+           data-url="{{ url('relEstoque01_carrinho_adicionarTudoNoCarrinho', {'filter': filter, 'reposicao': true}) }}"
            class="btn btn-primary ml-1"
            title="Adicionar todos os produtos do fornecedor listado ao carrinho">
             <i class="fas fa-folder-plus"></i> Adicionar Tudo</a>

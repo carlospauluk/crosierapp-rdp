@@ -109,6 +109,7 @@ class RelEstoque01Controller extends FormListController
         array_unshift($fornecedores, ['id' => '', 'text' => 'TODOS']);
         $params['fornecedores'] = json_encode($fornecedores);
         $codFornecedor = $request->get('filter')['codFornecedor'] ?? null;
+        $codFornecedor = $codFornecedor ? (int)$codFornecedor : null;
 
         if ($request->get('filter')['dtUltSaidaApartirDe'] ?? null) {
             $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr($request->get('filter')['dtUltSaidaApartirDe']);
@@ -463,10 +464,10 @@ class RelEstoque01Controller extends FormListController
         }
         $vParams['carrinho']['total'] = $total;
 
-        if (strpos($request->headers->get('referer'),'carrinho') === false) {
+        if (strpos($request->headers->get('referer'), 'carrinho') === false) {
             $this->session->set('backUrl_carrinho', $request->headers->get('referer'));
         }
-        $vParams['backUrl'] = $this->session->get('backUrl_carrinho') ??  $this->generateUrl('relEstoque01_listReposicao');
+        $vParams['backUrl'] = $this->session->get('backUrl_carrinho') ?? $this->generateUrl('relEstoque01_listReposicao');
 
         return $this->doRender('Relatorios/relEstoque01_carrinhoDeCompras.html.twig', $vParams);
     }
@@ -550,16 +551,18 @@ class RelEstoque01Controller extends FormListController
         /** @var RelEstoque01Repository $repoRelEstoque01 */
         $repoRelEstoque01 = $this->getDoctrine()->getRepository(RelEstoque01::class);
         $filters['filter'] = $request->get('filter');
-        $filters['filter']['qtdeAtual'] = 0;
-        $filters['filter']['deficit'] = 0;
+        if ($request->get('reposicao')) {
+            $filters['filter']['qtdeAtual'] = 0;
+            $filters['filter']['deficit'] = 0;
+        }
 
         $filterDatas = $this->getSomenteFilterDatasComValores($filters);
         $produtos = $repoRelEstoque01->findByFilters($filterDatas, null, 0, -1);
 
+        $carrinho = $this->session->get('carrinho') ?? ['itens' => []];
         $q = 0;
         /** @var RelEstoque01 $produto */
         foreach ($produtos as $produto) {
-            $carrinho = $this->session->get('carrinho') ?? ['itens' => []];
             $achou = false;
             /** @var RelEstoque01 $item */
             foreach ($carrinho['itens'] as $item) {
@@ -575,8 +578,8 @@ class RelEstoque01Controller extends FormListController
                 $carrinho['itens'][] = $produto;
                 $q++;
             }
-            $this->session->set('carrinho', $carrinho);
         }
+        $this->session->set('carrinho', $carrinho);
         $this->addFlash('info', $q . ' produto(s) adicionado(s) ao carrinho');
         return $this->redirectToRoute('relEstoque01_carrinho_exibir');
 
