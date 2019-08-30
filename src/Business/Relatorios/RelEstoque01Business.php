@@ -194,6 +194,11 @@ class RelEstoque01Business
     }
 
 
+    /**
+     * @param array $carrinhoDeCompra
+     * @return string
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
     public function gerarPedidoCompra(array $carrinhoDeCompra): string
     {
         /** @var RelEstoque01Repository $repoEstoque */
@@ -208,18 +213,19 @@ class RelEstoque01Business
         $comprador = explode(' - ', $carrinhoDeCompra['comprador']);
 
 
+        /** @var RelEstoque01 $item */
         foreach ($carrinhoDeCompra['itens'] as $item) {
 
             $regs = [
-                $item['codProduto'],
-                $item['descProduto'],
-                $item['descFilial'],
-                $carrinhoDeCompra['fornecedor'],
-                $nomeFornecedor,
-                $item['custoMedio'],
-                $item['precoVenda'],
-                $item['qtde'],
-                $item['totalCustoMedio'],
+                $item->getCodProduto(),
+                $item->getDescProduto(),
+                $item->getDescFilial(),
+                $item->getCodFornecedor(),
+                $item->getNomeFornecedor(),
+                $item->getCustoMedio(),
+                $item->getPrecoVenda(),
+                $item->getDeficit(),
+                $item->getTotalCustoMedio(),
                 $comprador[0],
                 $comprador[1]
             ];
