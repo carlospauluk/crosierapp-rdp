@@ -68,21 +68,12 @@ class PV implements EntityId
 
     /**
      *
-     * @ORM\Column(name="vendedor_cod", type="integer", nullable=false)
+     * @ORM\Column(name="vendedor", type="string", nullable=false)
      * @Groups("entity")
      *
      * @var int|null
      */
-    private $vendedorCod;
-
-    /**
-     *
-     * @ORM\Column(name="vendedor_nome", type="string", nullable=false)
-     * @Groups("entity")
-     *
-     * @var string|null
-     */
-    private $vendedorNome;
+    private $vendedor;
 
     /**
      *
@@ -115,8 +106,9 @@ class PV implements EntityId
      * Transient.
      * Montado com clienteDocumento - clienteNome (clienteCod)
      * @var string|null
+     * @Groups("entity")
      */
-    private $cliente;
+    private $clienteNomeMontado;
 
     /**
      * JSON.
@@ -248,36 +240,18 @@ class PV implements EntityId
     /**
      * @return int|null
      */
-    public function getVendedorCod(): ?int
+    public function getVendedor(): ?int
     {
-        return $this->vendedorCod;
+        return $this->vendedor;
     }
 
     /**
-     * @param int|null $vendedorCod
+     * @param int|null $vendedor
      * @return PV
      */
-    public function setVendedorCod(?int $vendedorCod): PV
+    public function setVendedor(?int $vendedor): PV
     {
-        $this->vendedorCod = $vendedorCod;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getVendedorNome(): ?string
-    {
-        return $this->vendedorNome;
-    }
-
-    /**
-     * @param string|null $vendedorNome
-     * @return PV
-     */
-    public function setVendedorNome(?string $vendedorNome): PV
-    {
-        $this->vendedorNome = $vendedorNome;
+        $this->vendedor = $vendedor;
         return $this;
     }
 
@@ -338,10 +312,12 @@ class PV implements EntityId
     /**
      * @return string|null
      */
-    public function getCliente(): ?string
+    public function getClienteNomeMontado(): ?string
     {
-        $this->cliente = StringUtils::mascararCnpjCpf($this->clienteDocumento) . ' - ' . $this->clienteNome . ' (' . $this->clienteCod . ')';
-        return $this->cliente;
+        if ($this->clienteDocumento && $this->clienteNome && $this->clienteCod) {
+            $this->clienteNomeMontado = StringUtils::mascararCnpjCpf($this->clienteDocumento) . ' - ' . $this->clienteNome . ' (' . $this->clienteCod . ')';
+        }
+        return $this->clienteNomeMontado;
     }
 
     /**

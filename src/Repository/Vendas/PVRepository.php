@@ -36,6 +36,23 @@ class PVRepository extends FilterRepository
         return $arr;
     }
 
+    /**
+     * @return array
+     */
+    public function getVendedores(): array
+    {
+        $sql = 'SELECT CONCAT(cod_vendedor, \' - \', nome_vendedor) as vendedor FROM rdp_rel_vendas01 GROUP BY cod_vendedor, nome_vendedor ORDER BY nome_vendedor';
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('vendedor', 'vendedor');
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $r = $query->getResult();
+        $arr = [];
+        foreach ($r as $item) {
+            $arr[$item['vendedor']] = urlencode($item['vendedor']);
+        }
+        return $arr;
+    }
+
 
 
 

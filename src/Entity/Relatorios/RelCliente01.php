@@ -4,6 +4,7 @@ namespace App\Entity\Relatorios;
 
 use CrosierSource\CrosierLibBaseBundle\Entity\EntityId;
 use CrosierSource\CrosierLibBaseBundle\Entity\EntityIdTrait;
+use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -39,6 +40,14 @@ class RelCliente01 implements EntityId
      * @var string|null
      */
     private $nome;
+
+    /**
+     * Transient.
+     * Montado com documento - nome (codigo)
+     * @var string|null
+     * @Groups("entity")
+     */
+    private $nomeMontado;
 
     /**
      *
@@ -227,6 +236,18 @@ class RelCliente01 implements EntityId
     {
         $this->nome = $nome;
         return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getNomeMontado(): ?string
+    {
+        if ($this->documento && $this->nome && $this->codigo) {
+            $this->nomeMontado = StringUtils::mascararCnpjCpf($this->documento) . ' - ' . $this->nome . ' (' . $this->codigo . ')';
+        }
+        return $this->nomeMontado;
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Controller\Vendas;
 
 
+use App\Entity\Financeiro\TipoLancto;
 use App\Entity\Relatorios\RelCliente01;
 use App\Entity\Vendas\PV;
 use App\EntityHandler\Vendas\PVEntityHandler;
@@ -11,6 +12,7 @@ use App\Repository\Relatorios\RelCliente01Repository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Utils\EntityIdUtils\EntityIdUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
+use CrosierSource\CrosierLibBaseBundle\Utils\ViewUtils\Select2JsUtils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -144,8 +146,13 @@ class PVController extends FormListController
         /** @var RelCliente01Repository $repoCliente */
         $repoCliente = $this->getDoctrine()->getRepository(RelCliente01::class);
         $clientes = $repoCliente->findClienteByStr($str);
-        $clientesJSON = $this->entityIdUtils->serializeAll($clientes);
-        return new JsonResponse($clientesJSON);
+        return new JsonResponse(
+            ['results' =>
+            Select2JsUtils::toSelect2DataFn($clientes, function ($e) {
+                /** @var RelCliente01 $e */
+                return urlencode($e->getNomeMontado());
+            })]
+        );
     }
 
 

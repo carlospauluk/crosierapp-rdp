@@ -2,7 +2,9 @@
 
 namespace App\Form\Vendas;
 
+use App\Entity\Relatorios\RelVendas01;
 use App\Entity\Vendas\PV;
+use App\Repository\Relatorios\RelVendas01Repository;
 use App\Repository\Vendas\PVRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Form\AbstractType;
@@ -45,6 +47,9 @@ class PVType extends AbstractType
             $pv = $event->getData();
             $builder = $event->getForm();
 
+            /** @var PVRepository $repoPV */
+            $repoPV = $this->doctrine->getRepository(PV::class);
+
             $builder->add('uuid', TextType::class, [
                 'label' => 'UUID',
                 'attr' => [
@@ -69,12 +74,14 @@ class PVType extends AbstractType
                 'required' => false,
             ]);
 
-            $builder->add('vendedor', TextType::class, [
+            $vendedorChoices = $repoPV->getVendedores();
+
+            $builder->add('vendedor', ChoiceType::class, [
                 'label' => 'Vendedor',
+                'choices' => $vendedorChoices,
                 'attr' => [
-                    'readonly' => true,
-                ],
-                'required' => false,
+                    'class' => 'autoSelect2'
+                ]
             ]);
 
             $builder->add('dtEmissao', DateTimeType::class, [
@@ -87,8 +94,7 @@ class PVType extends AbstractType
                 ]
             ]);
 
-            /** @var PVRepository $repoPV */
-            $repoPV = $this->doctrine->getRepository(PV::class);
+
             $filialChoices = $repoPV->getFiliais();
 
             $builder->add('filial', ChoiceType::class, [
@@ -110,11 +116,11 @@ class PVType extends AbstractType
 
             $clienteChoices = null;
             $clienteData = null;
-            if ($pv->getCliente()) {
-                $clienteChoices[$pv->getCliente()] = urlencode($pv->getCliente());
-                $clienteData = urlencode($pv->getCliente());
+            if ($pv->getClienteNomeMontado()) {
+                $clienteChoices[$pv->getClienteNomeMontado()] = urlencode($pv->getClienteNomeMontado());
+                $clienteData = urlencode($pv->getClienteNomeMontado());
             }
-            $builder->add('pessoa', ChoiceType::class, [
+            $builder->add('clienteNomeMontado', ChoiceType::class, [
                 'label' => 'Cliente',
                 'choices' => $clienteChoices,
                 'data' => $clienteData,
