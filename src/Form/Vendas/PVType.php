@@ -8,10 +8,13 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -37,78 +40,101 @@ class PVType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
 
-        $builder->add('uuid', TextType::class, [
-            'label' => 'UUID',
-            'attr' => [
-                'readonly' => true,
-            ],
-            'required' => false,
-        ]);
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            /** @var PV $pv */
+            $pv = $event->getData();
+            $builder = $event->getForm();
 
-        $builder->add('pvEkt', IntegerType::class, [
-            'label' => 'PV (EKT)',
-            'attr' => [
-                'readonly' => true,
-            ],
-            'required' => false,
-        ]);
+            $builder->add('uuid', TextType::class, [
+                'label' => 'UUID',
+                'attr' => [
+                    'readonly' => true,
+                ],
+                'required' => false,
+            ]);
 
-        $builder->add('status', TextType::class, [
-            'label' => 'Status',
-            'attr' => [
-                'readonly' => true,
-            ],
-            'required' => false,
-        ]);
+            $builder->add('pvEkt', IntegerType::class, [
+                'label' => 'PV (EKT)',
+                'attr' => [
+                    'readonly' => true,
+                ],
+                'required' => false,
+            ]);
 
-        $builder->add('dtEmissao', DateTimeType::class, [
-            'label' => 'Dt Emissão',
-            'widget' => 'single_text',
-            'required' => true,
-            'format' => 'dd/MM/yyyy HH:ii:ss',
-            'attr' => [
-                'class' => 'crsr-datetime focusOnReady'
-            ]
-        ]);
+            $builder->add('status', TextType::class, [
+                'label' => 'Status',
+                'attr' => [
+                    'readonly' => true,
+                ],
+                'required' => false,
+            ]);
 
-        /** @var PVRepository $repoPV */
-        $repoPV = $this->doctrine->getRepository(PV::class);
-        $filialChoices = $repoPV->getFiliais();
+            $builder->add('vendedor', TextType::class, [
+                'label' => 'Vendedor',
+                'attr' => [
+                    'readonly' => true,
+                ],
+                'required' => false,
+            ]);
 
-        $builder->add('filial', ChoiceType::class, [
-            'label' => 'Filial',
-            'choices' => $filialChoices
-        ]);
+            $builder->add('dtEmissao', DateTimeType::class, [
+                'label' => 'Dt Emissão',
+                'widget' => 'single_text',
+                'required' => true,
+                'format' => 'dd/MM/yyyy HH:mm:ss',
+                'attr' => [
+                    'class' => 'crsr-datetime focusOnReady'
+                ]
+            ]);
 
-        $builder->add('vendedorCod', IntegerType::class, [
-            'label' => 'Código'
-        ]);
+            /** @var PVRepository $repoPV */
+            $repoPV = $this->doctrine->getRepository(PV::class);
+            $filialChoices = $repoPV->getFiliais();
 
-        $builder->add('vendedorNome', TextType::class, [
-            'label' => 'Nome',
-        ]);
+            $builder->add('filial', ChoiceType::class, [
+                'label' => 'Filial',
+                'choices' => $filialChoices,
+                'attr' => [
+                    'class' => 'autoSelect2'
+                ]
+            ]);
 
-
-        $builder->add('clienteCod', IntegerType::class, [
-            'label' => 'Código'
-        ]);
-
-        $builder->add('clienteDocumento', TextType::class, [
-            'label' => 'CPF/CNPJ',
-            'attr' => [
-                'class' => 'cpfCnpj'
-            ],
-        ]);
-
-        $builder->add('clienteNome', TextType::class, [
-            'label' => 'Nome',
-        ]);
-
-        $builder->add('obs', TextareaType::class, [
-            'label' => 'Obs',
-        ]);
+            $builder->add('status', TextType::class, [
+                'label' => 'Status',
+                'attr' => [
+                    'readonly' => true,
+                ],
+                'required' => false,
+            ]);
 
 
+            $clienteChoices = null;
+            $clienteData = null;
+            if ($pv->getCliente()) {
+                $clienteChoices[$pv->getCliente()] = urlencode($pv->getCliente());
+                $clienteData = urlencode($pv->getCliente());
+            }
+            $builder->add('pessoa', ChoiceType::class, [
+                'label' => 'Cliente',
+                'choices' => $clienteChoices,
+                'data' => $clienteData,
+                'attr' => [
+                    'class' => 'autoSelect2',
+                    'data-route-url' => '/ven/pv/findClienteByStr/',
+                ]
+            ]);
+
+
+            $builder->add('clienteCod', HiddenType::class);
+            $builder->add('clienteDocumento', HiddenType::class);
+            $builder->add('clienteNome', HiddenType::class);
+
+            $builder->add('obs', TextareaType::class, [
+                'label' => 'Obs',
+            ]);
+
+
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver)

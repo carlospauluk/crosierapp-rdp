@@ -31,10 +31,13 @@ class PVRepository extends FilterRepository
         $r = $query->getResult();
         $arr = [];
         foreach ($r as $item) {
-            $arr[] = [$item['desc_filial'] => urlencode($item['desc_filial'])];
+            $arr[$item['desc_filial']] = urlencode($item['desc_filial']);
         }
         return $arr;
     }
+
+
+
 
 }
 

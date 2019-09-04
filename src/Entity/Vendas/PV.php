@@ -4,6 +4,7 @@ namespace App\Entity\Vendas;
 
 use CrosierSource\CrosierLibBaseBundle\Entity\EntityId;
 use CrosierSource\CrosierLibBaseBundle\Entity\EntityIdTrait;
+use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -109,6 +110,13 @@ class PV implements EntityId
      * @var string|null
      */
     private $clienteDocumento;
+
+    /**
+     * Transient.
+     * Montado com clienteDocumento - clienteNome (clienteCod)
+     * @var string|null
+     */
+    private $cliente;
 
     /**
      * JSON.
@@ -326,6 +334,26 @@ class PV implements EntityId
         $this->clienteDocumento = $clienteDocumento;
         return $this;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getCliente(): ?string
+    {
+        $this->cliente = StringUtils::mascararCnpjCpf($this->clienteDocumento) . ' - ' . $this->clienteNome . ' (' . $this->clienteCod . ')';
+        return $this->cliente;
+    }
+
+    /**
+     * @param string|null $cliente
+     * @return PV
+     */
+    public function setCliente(?string $cliente): PV
+    {
+        $this->cliente = $cliente;
+        return $this;
+    }
+
 
     /**
      * @return string|null

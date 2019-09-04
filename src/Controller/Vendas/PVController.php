@@ -3,12 +3,16 @@
 namespace App\Controller\Vendas;
 
 
+use App\Entity\Relatorios\RelCliente01;
 use App\Entity\Vendas\PV;
 use App\EntityHandler\Vendas\PVEntityHandler;
 use App\Form\Vendas\PVType;
+use App\Repository\Relatorios\RelCliente01Repository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
+use CrosierSource\CrosierLibBaseBundle\Utils\EntityIdUtils\EntityIdUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -23,6 +27,9 @@ class PVController extends FormListController
 
     /** @var SessionInterface */
     private $session;
+
+    /** @var EntityIdUtils */
+    private $entityIdUtils;
 
     /**
      * @required
@@ -40,6 +47,15 @@ class PVController extends FormListController
     public function setSession(SessionInterface $session): void
     {
         $this->session = $session;
+    }
+
+    /**
+     * @required
+     * @param EntityIdUtils $entityIdUtils
+     */
+    public function setEntityIdUtils(EntityIdUtils $entityIdUtils): void
+    {
+        $this->entityIdUtils = $entityIdUtils;
     }
 
 
@@ -110,6 +126,26 @@ class PVController extends FormListController
             'formPageTitle' => 'PV'
         ];
         return $this->doForm($request, $pv, $params);
+    }
+
+
+    /**
+     *
+     * @Route("/ven/pv/findClienteByStr/", name="ven_pv_findClienteByStr")
+     * @param Request $request
+     * @return JsonResponse
+     * @throws \Exception
+     *
+     * @IsGranted({"ROLE_PV"}, statusCode=403)
+     */
+    public function findClienteByStr(Request $request): JsonResponse
+    {
+        $str = $request->get('term') ?? '';
+        /** @var RelCliente01Repository $repoCliente */
+        $repoCliente = $this->getDoctrine()->getRepository(RelCliente01::class);
+        $clientes = $repoCliente->findClienteByStr($str);
+        $clientesJSON = $this->entityIdUtils->serializeAll($clientes);
+        return new JsonResponse($clientesJSON);
     }
 
 

@@ -14,8 +14,7 @@ CREATE TABLE `rdp_ven_pv`
     `status`             VARCHAR(50)  NOT NULL,
     `filial`             VARCHAR(200) NOT NULL,
 
-    `vendedor_cod`       BIGINT(20)    DEFAULT NULL,
-    `vendedor_nome`      VARCHAR(200)  DEFAULT NULL,
+    `vendedor`           VARCHAR(200)  DEFAULT NULL COMMENT 'codigo - nome',
 
     `cliente_cod`        BIGINT(20)   NOT NULL,
     `cliente_nome`       VARCHAR(250) NOT NULL,
