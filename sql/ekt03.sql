@@ -1,5 +1,7 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
+
+
 DROP TABLE IF EXISTS `rdp_cts_d001_controle`;
 CREATE TABLE `rdp_cts_d001_controle`
 (
@@ -35,7 +37,7 @@ CREATE TABLE `rdp_cts_d001_controle`
     CONSTRAINT `fk_rdp_cts_d001_controle_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   AUTO_INCREMENT = 4
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -181,7 +183,7 @@ CREATE TABLE `rdp_cts_d002_cliente`
     CONSTRAINT `fk_rdp_cts_d002_cliente_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   AUTO_INCREMENT = 10
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -213,7 +215,7 @@ CREATE TABLE `rdp_cts_d005_localizador`
     CONSTRAINT `fk_rdp_cts_d005_localizador_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   AUTO_INCREMENT = 4
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -268,7 +270,7 @@ CREATE TABLE `rdp_cts_d009_filial`
     CONSTRAINT `fk_rdp_cts_d009_filial_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   AUTO_INCREMENT = 6
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -342,7 +344,7 @@ CREATE TABLE `rdp_cts_d010_cts_pagrec`
     CONSTRAINT `fk_rdp_cts_d010_cts_pagrec_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   AUTO_INCREMENT = 7
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -374,7 +376,7 @@ CREATE TABLE `rdp_cts_d011_baixas`
     CONSTRAINT `fk_rdp_cts_d011_baixas_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_cts_d011_baixas_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -452,7 +454,7 @@ CREATE TABLE `rdp_cts_obs2_cliente`
     CONSTRAINT `fk_rdp_cts_obs2_cliente_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_cts_obs2_cliente_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -532,7 +534,7 @@ CREATE TABLE `rdp_cts_obs3_cliente`
     CONSTRAINT `fk_rdp_cts_obs3_cliente_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_cts_obs3_cliente_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -560,7 +562,7 @@ CREATE TABLE `rdp_cxa_d001_controle`
     CONSTRAINT `fk_rdp_cxa_d001_controle_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_cxa_d001_controle_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -595,7 +597,7 @@ CREATE TABLE `rdp_cxa_d002_recebimentos`
     CONSTRAINT `fk_rdp_cxa_d002_recebimentos_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_cxa_d002_recebimentos_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -626,7 +628,7 @@ CREATE TABLE `rdp_cxa_d003_caixa`
     CONSTRAINT `fk_rdp_cxa_d003_caixa_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_cxa_d003_caixa_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -650,7 +652,7 @@ CREATE TABLE `rdp_dep_d113_controle`
     CONSTRAINT `fk_rdp_dep_d113_controle_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_dep_d113_controle_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -675,7 +677,7 @@ CREATE TABLE `rdp_dep_d114_deposito`
     CONSTRAINT `fk_rdp_dep_d114_deposito_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_dep_d114_deposito_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -710,7 +712,7 @@ CREATE TABLE `rdp_dep_d115_movimento`
     CONSTRAINT `fk_rdp_dep_d115_movimento_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_dep_d115_movimento_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -737,7 +739,7 @@ CREATE TABLE `rdp_dep_d116_localizacao`
     CONSTRAINT `fk_rdp_dep_d116_localizacao_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_dep_d116_localizacao_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -804,7 +806,7 @@ CREATE TABLE `rdp_dep_d117_compra`
     CONSTRAINT `fk_rdp_dep_d117_compra_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_dep_d117_compra_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -830,7 +832,7 @@ CREATE TABLE `rdp_dep_d118_insumo`
     CONSTRAINT `fk_rdp_dep_d118_insumo_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_dep_d118_insumo_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -864,7 +866,7 @@ CREATE TABLE `rdp_dep_d119_reposicao`
     CONSTRAINT `fk_rdp_dep_d119_reposicao_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_dep_d119_reposicao_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -897,7 +899,7 @@ CREATE TABLE `rdp_dweb_d037_os_dpz`
     CONSTRAINT `fk_rdp_dweb_d037_os_dpz_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_dweb_d037_os_dpz_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1
+  DEFAULT charset = utf8
   row_format = compact;
 
 
@@ -927,7 +929,7 @@ CREATE TABLE `rdp_dweb_d038_corpo_dpz`
     CONSTRAINT `fk_rdp_dweb_d038_corpo_dpz_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_dweb_d038_corpo_dpz_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -953,7 +955,7 @@ CREATE TABLE `rdp_est_curv_abc`
     CONSTRAINT `fk_rdp_est_curv_abc_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_est_curv_abc_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -981,7 +983,7 @@ CREATE TABLE `rdp_est_d067_ncm`
     CONSTRAINT `fk_rdp_est_d067_ncm_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_est_d067_ncm_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 DROP TABLE IF EXISTS `rdp_est_d070_controle`;
@@ -1011,7 +1013,7 @@ CREATE TABLE `rdp_est_d070_controle`
     CONSTRAINT `fk_rdp_est_d070_controle_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_est_d070_controle_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1110,7 +1112,7 @@ CREATE TABLE `rdp_est_d071_produto`
 
 
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1180,7 +1182,7 @@ CREATE TABLE `rdp_est_d072_movimento`
     CONSTRAINT `fk_rdp_est_d072_movimento_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_est_d072_movimento_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1212,7 +1214,7 @@ CREATE TABLE `rdp_est_d073_dep1`
     CONSTRAINT `fk_rdp_est_d073_dep1_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_est_d073_dep1_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1238,7 +1240,7 @@ CREATE TABLE `rdp_est_d074_dep2`
     CONSTRAINT `fk_rdp_est_d074_dep2_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_est_d074_dep2_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1266,7 +1268,7 @@ CREATE TABLE `rdp_est_d075_marca`
     CONSTRAINT `fk_rdp_est_d075_marca_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 DROP TABLE IF EXISTS `rdp_est_d076_comissao`;
@@ -1292,7 +1294,7 @@ CREATE TABLE `rdp_est_d076_comissao`
     CONSTRAINT `fk_rdp_est_d076_comissao_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_est_d076_comissao_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1321,7 +1323,7 @@ CREATE TABLE `rdp_est_d078_edi`
     CONSTRAINT `fk_rdp_est_d078_edi_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_est_d078_edi_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1353,7 +1355,7 @@ CREATE TABLE `rdp_est_d079_balanco`
     CONSTRAINT `fk_rdp_est_d079_balanco_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_est_d079_balanco_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 DROP TABLE IF EXISTS `rdp_est_d080_nfentrada`;
@@ -1463,7 +1465,7 @@ CREATE TABLE `rdp_est_d080_nfentrada`
     CONSTRAINT `fk_rdp_est_d080_nfentrada_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_est_d080_nfentrada_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1534,7 +1536,7 @@ CREATE TABLE `rdp_est_d081_corpo_nfentrada`
     CONSTRAINT `fk_rdp_est_d081_corpo_nfentrada_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_est_d081_corpo_nfentrada_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 DROP TABLE IF EXISTS `rdp_fat_d039_clivscfop`;
@@ -1567,7 +1569,7 @@ CREATE TABLE `rdp_fat_d039_clivscfop`
     CONSTRAINT `fk_rdp_fat_d039_clivscfop_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_fat_d039_clivscfop_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1600,7 +1602,7 @@ CREATE TABLE `rdp_fat_d090_controle`
     CONSTRAINT `fk_rdp_fat_d090_controle_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_fat_d090_controle_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1644,7 +1646,7 @@ CREATE TABLE `rdp_fat_d091_natureza`
     CONSTRAINT `fk_rdp_fat_d091_natureza_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_fat_d091_natureza_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1690,7 +1692,7 @@ CREATE TABLE `rdp_fat_d092_condpag`
     CONSTRAINT `fk_rdp_fat_d092_condpag_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   AUTO_INCREMENT = 3
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1836,7 +1838,7 @@ CREATE TABLE `rdp_fat_d093_nf`
     CONSTRAINT `fk_rdp_fat_d093_nf_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_fat_d093_nf_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1872,7 +1874,7 @@ CREATE TABLE `rdp_fat_d094_corpo`
     CONSTRAINT `fk_rdp_fat_d094_corpo_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_fat_d094_corpo_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1903,7 +1905,7 @@ CREATE TABLE `rdp_fat_d095_vendedor`
     CONSTRAINT `fk_rdp_fat_d095_vendedor_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_fat_d095_vendedor_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1931,7 +1933,7 @@ CREATE TABLE `rdp_fat_d101_oficina`
     CONSTRAINT `fk_rdp_fat_d101_oficina_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_fat_d101_oficina_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -1961,7 +1963,7 @@ CREATE TABLE `rdp_fat_d103_comissao`
     CONSTRAINT `fk_rdp_fat_d103_comissao_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_fat_d103_comissao_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -2060,7 +2062,7 @@ CREATE TABLE `rdp_fat_d200_pv`
     CONSTRAINT `fk_rdp_fat_d200_pv_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_fat_d200_pv_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -2106,7 +2108,7 @@ CREATE TABLE `rdp_fat_d201_corpo`
     CONSTRAINT `fk_rdp_fat_d201_corpo_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_fat_d201_corpo_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -2205,7 +2207,7 @@ CREATE TABLE `rdp_fat_d300`
     CONSTRAINT `fk_rdp_fat_d300_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_fat_d300_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -2243,7 +2245,7 @@ CREATE TABLE `rdp_fat_d301`
     CONSTRAINT `fk_rdp_fat_d301_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_fat_d301_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -2307,7 +2309,7 @@ CREATE TABLE `rdp_fat_dtri`
     CONSTRAINT `fk_rdp_fat_dtri_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_fat_dtri_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -2406,7 +2408,7 @@ CREATE TABLE `rdp_fat_x200_pvb`
     CONSTRAINT `fk_rdp_fat_x200_pvb_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_fat_x200_pvb_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -2452,7 +2454,7 @@ CREATE TABLE `rdp_fat_x201_corpob`
     CONSTRAINT `fk_rdp_fat_x201_corpob_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_fat_x201_corpob_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -2479,7 +2481,7 @@ CREATE TABLE `rdp_ibg_d001_codmunicipio`
     CONSTRAINT `fk_rdp_ibg_d001_codmunicipio_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_ibg_d001_codmunicipio_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -2515,7 +2517,7 @@ CREATE TABLE `rdp_mot_d053`
     CONSTRAINT `fk_rdp_mot_d053_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_mot_d053_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -2540,7 +2542,7 @@ CREATE TABLE `rdp_mot_d064`
     CONSTRAINT `fk_rdp_mot_d064_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_mot_d064_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 DROP TABLE IF EXISTS `rdp_pes_d054_pesquisa`;
@@ -2593,7 +2595,7 @@ CREATE TABLE `rdp_pes_d054_pesquisa`
     CONSTRAINT `fk_rdp_pes_d054_pesquisa_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_pes_d054_pesquisa_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -2621,7 +2623,7 @@ CREATE TABLE `rdp_veiculos`
     CONSTRAINT `fk_rdp_veiculos_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_veiculos_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1;
+  DEFAULT charset = utf8;
 
 
 
@@ -2665,7 +2667,7 @@ CREATE TABLE `rdp_web_cliente`
     CONSTRAINT `fk_rdp_web_cliente_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   AUTO_INCREMENT = 2
-  DEFAULT charset = latin1
+  DEFAULT charset = utf8
   pack_keys = 0;
 
 
@@ -2697,7 +2699,7 @@ CREATE TABLE `rdp_web_condpag`
     CONSTRAINT `fk_rdp_web_condpag_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_web_condpag_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1
+  DEFAULT charset = utf8
   pack_keys = 0;
 
 
@@ -2725,7 +2727,7 @@ CREATE TABLE `rdp_web_deposito`
     CONSTRAINT `fk_rdp_web_deposito_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   AUTO_INCREMENT = 5
-  DEFAULT charset = latin1
+  DEFAULT charset = utf8
   pack_keys = 0;
 
 
@@ -2754,7 +2756,7 @@ CREATE TABLE `rdp_web_edi`
     CONSTRAINT `fk_rdp_web_edi_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_web_edi_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1
+  DEFAULT charset = utf8
   pack_keys = 0;
 
 
@@ -2781,7 +2783,7 @@ CREATE TABLE `rdp_web_localizador`
     CONSTRAINT `fk_rdp_web_localizador_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_web_localizador_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  DEFAULT charset = latin1
+  DEFAULT charset = utf8
   pack_keys = 0;
 
 
@@ -2809,7 +2811,7 @@ CREATE TABLE `rdp_web_oficina`
     CONSTRAINT `fk_rdp_web_oficina_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   AUTO_INCREMENT = 4
-  DEFAULT charset = latin1
+  DEFAULT charset = utf8
   pack_keys = 0;
 
 
@@ -2835,7 +2837,7 @@ CREATE TABLE `rdp_web_parametro`
     CONSTRAINT `fk_rdp_web_parametro_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   AUTO_INCREMENT = 2
-  DEFAULT charset = latin1
+  DEFAULT charset = utf8
   pack_keys = 0;
 
 
@@ -2862,7 +2864,7 @@ CREATE TABLE `rdp_web_permissao`
     CONSTRAINT `fk_rdp_web_permissao_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   AUTO_INCREMENT = 2
-  DEFAULT charset = latin1
+  DEFAULT charset = utf8
   pack_keys = 0;
 
 
@@ -2902,104 +2904,7 @@ CREATE TABLE `rdp_web_produto`
     CONSTRAINT `fk_rdp_web_produto_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   AUTO_INCREMENT = 2
-  DEFAULT charset = latin1
-  pack_keys = 0;
-
-
-
-DROP TABLE IF EXISTS `rdp_web_venda_cabec`;
-CREATE TABLE `rdp_web_venda_cabec`
-(
-    `id`                 BIGINT(20) NOT NULL AUTO_INCREMENT,
-    `prevendaekt`        INT(11)    NOT NULL,
-    `data_emissao`       DATE       NOT NULL,
-    `tipo`               VARCHAR(1) NOT NULL comment 'venda, orcamento e transferencia',
-    `deposito_id`        INT(11)        DEFAULT NULL,
-    `vendedor_id`        INT(11)        DEFAULT NULL,
-    `cliente_id`         INT(11)        DEFAULT NULL,
-    `oficina_id`         INT(11)        DEFAULT NULL,
-    `localizador_id`     INT(11)        DEFAULT NULL,
-    `cond_pagto_id`      INT(11)        DEFAULT NULL,
-    `venc1`              DATE           DEFAULT NULL,
-    `venc2`              DATE           DEFAULT NULL,
-    `venc3`              DATE           DEFAULT NULL,
-    `venc4`              DATE           DEFAULT NULL,
-    `venc5`              DATE           DEFAULT NULL,
-    `venc6`              DATE           DEFAULT NULL,
-    `valor1`             DECIMAL(11, 2) DEFAULT NULL,
-    `valor2`             DECIMAL(11, 2) DEFAULT NULL,
-    `valor3`             DECIMAL(11, 2) DEFAULT NULL,
-    `valor4`             DECIMAL(11, 2) DEFAULT NULL,
-    `valor5`             DECIMAL(11, 2) DEFAULT NULL,
-    `valor6`             DECIMAL(11, 2) DEFAULT NULL,
-    `observacao`         char(1)        DEFAULT NULL,
-    `data`               DATETIME       DEFAULT NULL,
-    KEY `web_venda_cabec_fk1` (`deposito_id`),
-    KEY `web_venda_cabec_fk2` (`vendedor_id`),
-    KEY `web_venda_cabec_fk3` (`cliente_id`),
-    KEY `web_venda_cabec_fk4` (`oficina_id`),
-    KEY `web_venda_cabec_fk5` (`cond_pagto_id`),
-    KEY `web_venda_cabec_fk6` (`localizador_id`),
-    CONSTRAINT `web_venda_cabec_fk6` FOREIGN KEY (`localizador_id`) references `web_localizador` (`codigo`),
-    CONSTRAINT `web_venda_cabec_fk1` FOREIGN KEY (`deposito_id`) references `web_deposito` (`codigo`),
-    CONSTRAINT `web_venda_cabec_fk2` FOREIGN KEY (`vendedor_id`) references `web_vendedor` (`codigo`),
-    CONSTRAINT `web_venda_cabec_fk3` FOREIGN KEY (`cliente_id`) references `web_cliente` (`codigo`),
-    CONSTRAINT `web_venda_cabec_fk4` FOREIGN KEY (`oficina_id`) references `web_oficina` (`codigo`),
-    CONSTRAINT `web_venda_cabec_fk5` FOREIGN KEY (`cond_pagto_id`) references `web_condpag` (`codigo`),
-
-    -- campos de controle do crosier
-    PRIMARY KEY (`id`),
-    `estabelecimento_id` BIGINT(20) NOT NULL,
-    `inserted`           DATETIME   NOT NULL,
-    `updated`            DATETIME   NOT NULL,
-    `user_inserted_id`   BIGINT(20) NOT NULL,
-    `user_updated_id`    BIGINT(20) NOT NULL,
-    KEY `k_rdp_web_venda_cabec_estabelecimento` (`estabelecimento_id`),
-    KEY `k_rdp_web_venda_cabec_user_inserted` (`user_inserted_id`),
-    KEY `k_rdp_web_venda_cabec_user_updated` (`user_updated_id`),
-    CONSTRAINT `fk_rdp_web_venda_cabec_user_updated` FOREIGN KEY (`user_updated_id`) references `sec_user` (`id`),
-    CONSTRAINT `fk_rdp_web_venda_cabec_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
-    CONSTRAINT `fk_rdp_web_venda_cabec_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
-) ENGINE = INNODB
-  AUTO_INCREMENT = 6
-  DEFAULT charset = latin1
-  pack_keys = 0;
-
-
-
-DROP TABLE IF EXISTS `rdp_web_venda_corpo`;
-CREATE TABLE `rdp_web_venda_corpo`
-(
-    `id`                 BIGINT(20)  NOT NULL AUTO_INCREMENT,
-    `deposito_id`        BIGINT(20)  NOT NULL,
-    `venda_id`           BIGINT(20)     DEFAULT NULL,
-    `produto_id`         VARCHAR(13) NOT NULL,
-    `descricao`          VARCHAR(50) NOT NULL,
-    `qtde`               DECIMAL(11, 2) DEFAULT NULL,
-    `preco_cad`          DECIMAL(11, 2) DEFAULT NULL,
-    `preco_cus`          DECIMAL(11, 2) DEFAULT NULL,
-    `preco_ven`          DECIMAL(11, 2) DEFAULT NULL,
-    `preco_orc`          INT(11)        DEFAULT NULL,
-    `total`              DECIMAL(11, 2) DEFAULT NULL,
-    `data`               DATETIME       DEFAULT NULL,
-    KEY `web_venda_corpo_fk1` (`produto_id`),
-    CONSTRAINT `web_venda_corpo_fk1` FOREIGN KEY (`produto_id`) references `web_edi` (`codigo_edi`),
-
-    -- campos de controle do crosier
-    PRIMARY KEY (`id`),
-    `estabelecimento_id` BIGINT(20)  NOT NULL,
-    `inserted`           DATETIME    NOT NULL,
-    `updated`            DATETIME    NOT NULL,
-    `user_inserted_id`   BIGINT(20)  NOT NULL,
-    `user_updated_id`    BIGINT(20)  NOT NULL,
-    KEY `k_rdp_web_venda_corpo_estabelecimento` (`estabelecimento_id`),
-    KEY `k_rdp_web_venda_corpo_user_inserted` (`user_inserted_id`),
-    KEY `k_rdp_web_venda_corpo_user_updated` (`user_updated_id`),
-    CONSTRAINT `fk_rdp_web_venda_corpo_user_updated` FOREIGN KEY (`user_updated_id`) references `sec_user` (`id`),
-    CONSTRAINT `fk_rdp_web_venda_corpo_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
-    CONSTRAINT `fk_rdp_web_venda_corpo_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
-) ENGINE = INNODB
-  DEFAULT charset = latin1
+  DEFAULT charset = utf8
   pack_keys = 0;
 
 
@@ -3028,8 +2933,7 @@ CREATE TABLE `rdp_web_vendedor`
     CONSTRAINT `fk_rdp_web_vendedor_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
     CONSTRAINT `fk_rdp_web_vendedor_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
-  AUTO_INCREMENT = 4
-  DEFAULT charset = latin1
+  DEFAULT charset = utf8
   pack_keys = 0;
 
 
@@ -3061,7 +2965,7 @@ CREATE TABLE `rdp_zip_contas_pagrec`
     CONSTRAINT `fk_rdp_zip_contas_pagrec_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   AUTO_INCREMENT = 3
-  DEFAULT charset = latin1
+  DEFAULT charset = utf8
   pack_keys = 0;
 
 
@@ -3092,7 +2996,7 @@ CREATE TABLE `rdp_zip_motoristas`
     CONSTRAINT `fk_rdp_zip_motoristas_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   AUTO_INCREMENT = 5
-  DEFAULT charset = latin1
+  DEFAULT charset = utf8
   pack_keys = 0 comment ='cadastro de motoristas programa teste iapo';
 
 
@@ -3126,5 +3030,5 @@ CREATE TABLE `rdp_zip_refeicoes`
     CONSTRAINT `fk_rdp_zip_refeicoes_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   AUTO_INCREMENT = 4
-  DEFAULT charset = latin1
+  DEFAULT charset = utf8
   pack_keys = 0;

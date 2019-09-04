@@ -51,4 +51,19 @@ VALUES ('a1552faa-632b-4118-9b38-05ce63e899c7', 'Clientes', 'fas fa-users', 'ENT
 
 
 
+
+
+DELETE FROM cfg_program WHERE uuid = '39d89cfb-d917-4b63-b9c6-8a49a866c845';
+DELETE FROM cfg_entmenu WHERE uuid = 'd2da155f-427e-47cd-8466-5cbc5ba6af50';
+
+INSERT INTO cfg_program(uuid, descricao, url, app_uuid, entmenu_uuid ,inserted, updated, estabelecimento_id, user_inserted_id, user_updated_id)
+VALUES ('39d89cfb-d917-4b63-b9c6-8a49a866c845','Listagem de PVs', '/ven/pv/list/', 'b10ef8c0-841f-4688-9ee2-30e39639be8a', null, now(), now(), 1, 1, 1);
+
+INSERT INTO cfg_entmenu(uuid, label, icon, tipo, program_uuid, pai_uuid, ordem, css_style, inserted, updated, estabelecimento_id, user_inserted_id, user_updated_id)
+VALUES ('d2da155f-427e-47cd-8466-5cbc5ba6af50', 'PVs', 'fas fa-shopping-cart', 'ENT', '39d89cfb-d917-4b63-b9c6-8a49a866c845', 'f5dd11fb-dfde-40af-91c9-6583192e8d83', 1 , null, now(), now(), 1, 1, 1);
+
+
+
+
+
 COMMIT;

@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Controller\Relatorios;
+namespace App\Controller\Vendas;
 
 
-use App\Entity\Relatorios\RelCliente01;
-use App\EntityHandler\Relatorios\RelCliente01EntityHandler;
-use App\Form\Relatorios\RelCliente01Type;
-use App\Repository\Relatorios\RelCliente01Repository;
+use App\Entity\Vendas\PV;
+use App\EntityHandler\Vendas\PVEntityHandler;
+use App\Form\Vendas\PVType;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -19,7 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * @author Carlos Eduardo Pauluk
  */
-class RelCliente01Controller extends FormListController
+class PVController extends FormListController
 {
 
     /** @var SessionInterface */
@@ -27,9 +26,9 @@ class RelCliente01Controller extends FormListController
 
     /**
      * @required
-     * @param RelCliente01EntityHandler $entityHandler
+     * @param PVEntityHandler $entityHandler
      */
-    public function setEntityHandler(RelCliente01EntityHandler $entityHandler): void
+    public function setEntityHandler(PVEntityHandler $entityHandler): void
     {
         $this->entityHandler = $entityHandler;
     }
@@ -47,40 +46,41 @@ class RelCliente01Controller extends FormListController
     public function getFilterDatas(array $params): array
     {
         return [
-            new FilterData(['codigo'], 'EQ', 'codigo', $params)
+            new FilterData(['dtEmissao'], 'BETWEEN', 'dtEmissao', $params),
+            new FilterData(['clienteNome'], 'EQ', 'clienteNome', $params)
         ];
     }
 
     /**
      *
-     * @Route("/relCliente01/list/", name="relCliente01_list")
+     * @Route("/ven/pv/list/", name="ven_pv_list")
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted({"ROLE_PV"}, statusCode=403)
      */
     public function list(Request $request): Response
     {
         $params = [
-            'formRoute' => 'relCliente01_form',
-            'listView' => 'Relatorios/pv_list.html.twig',
-            'listRoute' => 'relCliente01_list',
-            'listRouteAjax' => 'relCliente01_datatablesJsList',
-            'listPageTitle' => 'Clientes',
-            'listId' => 'relCliente01_list'
+            'formRoute' => 'ven_pv_form',
+            'listView' => 'Vendas/pv_list.html.twig',
+            'listRoute' => 'ven_pv_list',
+            'listRouteAjax' => 'ven_pv_datatablesJsList',
+            'listPageTitle' => 'PVs',
+            'listId' => 'pv_list'
         ];
         return $this->doList($request, $params);
     }
 
     /**
      *
-     * @Route("/relCliente01/datatablesJsList/", name="relCliente01_datatablesJsList")
+     * @Route("/ven/pv/datatablesJsList/", name="ven_pv_datatablesJsList")
      * @param Request $request
      * @return Response
      * @throws \CrosierSource\CrosierLibBaseBundle\Exception\ViewException
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted({"ROLE_PV"}, statusCode=403)
      */
     public function datatablesJsList(Request $request): Response
     {
@@ -89,27 +89,27 @@ class RelCliente01Controller extends FormListController
 
     /**
      *
-     * @Route("/relCliente01/form/{id}", name="relCliente01_form", defaults={"id"=null}, requirements={"id"="\d+"})
+     * @Route("/ven/pv/form/{id}", name="ven_pv_form", defaults={"id"=null}, requirements={"id"="\d+"})
      * @param Request $request
-     * @param RelCliente01|null $cliente
+     * @param PV|null $pv
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted({"ROLE_PV"}, statusCode=403)
      */
-    public function form(Request $request, RelCliente01 $cliente = null)
+    public function form(Request $request, PV $pv = null)
     {
-        if (!$cliente) {
-            $cliente = new RelCliente01();
-            $cliente->setClienteBloqueado('N');
+        if (!$pv) {
+            $pv = new PV();
+            $pv->setDtEmissao(new \DateTime());
         }
         $params = [
-            'typeClass' => RelCliente01Type::class,
-            'formView' => 'Relatorios/pv_form.html.twig',
-            'formRoute' => 'relCliente01_form',
-            'formPageTitle' => 'Cliente'
+            'typeClass' => PVType::class,
+            'formView' => 'Vendas/pv_form.html.twig',
+            'formRoute' => 'ven_pv_form',
+            'formPageTitle' => 'PV'
         ];
-        return $this->doForm($request, $cliente, $params);
+        return $this->doForm($request, $pv, $params);
     }
 
 

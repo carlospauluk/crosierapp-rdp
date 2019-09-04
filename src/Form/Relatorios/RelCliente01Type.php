@@ -12,7 +12,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class FichaTecnicaType
  *
  * @author Carlos Eduardo Pauluk
  */
