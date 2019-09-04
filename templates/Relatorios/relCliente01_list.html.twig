@@ -1,0 +1,20 @@
+{% extends '@CrosierLibBase/list.html.twig' %}
+
+
+
+{% block campos_pesquisar %}
+
+    <div class="form-group">
+        <label for="filter[codigo]">Código</label>
+        <input type="text"
+               class="form-control" id="filter[codigo]"
+               name="filter[codigo]"
+               value="{{ filter.codigo|default('') }}">
+    </div>
+
+{% endblock %}
+
+
+{% block down_scripts %}
+    <script src="{{ asset('build/Relatorios/relCliente01_list.js') }}"></script>
+{% endblock %}

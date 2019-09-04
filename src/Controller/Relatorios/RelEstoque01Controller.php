@@ -101,9 +101,13 @@ class RelEstoque01Controller extends FormListController
         $repo = $this->getDoctrine()->getRepository(RelEstoque01::class);
 
         $filiais = $repo->getFiliais();
-        array_unshift($filiais, ['id' => '', 'text' => 'TODAS']);
+        // array_unshift($filiais, ['id' => '', 'text' => 'TODAS']);
         $params['filiais'] = json_encode($filiais);
-        $descFilial = $request->get('filter')['descFilial'] ?? null;
+        $descFilial = $request->get('filter')['descFilial'] ?? 'MATRIZ'; // se não selecionou nenhuma, seta a MATRIZ
+        $params['filter']['descFilial'] = $descFilial;
+
+        $params['page_subTitle'] = $descFilial;
+
 
         $fornecedores = $repo->getFornecedores();
         array_unshift($fornecedores, ['id' => '', 'text' => 'TODOS']);

@@ -307,3 +307,47 @@ CREATE TABLE `rdp_rel_compras01`
     CONSTRAINT `fk_rdp_rel_compras01_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   DEFAULT charset = latin1;
+
+
+
+DROP TABLE IF EXISTS `rdp_rel_cliente01`;
+CREATE TABLE `rdp_rel_cliente01`
+(
+    `id`                 BIGINT(20)     NOT NULL AUTO_INCREMENT,
+    `codigo`             BIGINT(20)     NOT NULL,
+    `nome`               VARCHAR(250)   NOT NULL,
+    `documento`          VARCHAR(50)    NOT NULL,
+    `rg`                 VARCHAR(50)    DEFAULT NULL,
+    `endereco`           VARCHAR(250)   DEFAULT NULL,
+    `cidade`             VARCHAR(50)    DEFAULT NULL,
+    `estado`             VARCHAR(50)    DEFAULT NULL,
+    `cep`                VARCHAR(15)    DEFAULT NULL,
+    `fone`               VARCHAR(50)    DEFAULT NULL,
+    `bairro`             VARCHAR(50)    DEFAULT NULL,
+    `localizador`        VARCHAR(10)    DEFAULT NULL,
+    `cond_pagto`         VARCHAR(10)    DEFAULT NULL,
+    `desbloqueio_tmp`    VARCHAR(10)    NOT NULL,
+    `ac_compras`         DECIMAL(15, 2) DEFAULT NULL,
+    `flag_lib_preco`     CHAR(1)        NOT NULL,
+    `sugere_consulta`    CHAR(1)        NOT NULL,
+    `margem_especial`    DECIMAL(15, 2) DEFAULT NULL,
+    `limite_compras`     DECIMAL(15, 2) DEFAULT NULL,
+    `cliente_bloqueado`  CHAR(1)        NOT NULL,
+
+    UNIQUE KEY `uk_rdp_rel_cliente01` (`codigo`,`documento`,`nome`),
+
+    -- campos de controle do crosier
+    PRIMARY KEY (`id`),
+    `estabelecimento_id` BIGINT(20)     NOT NULL,
+    `inserted`           DATETIME       NOT NULL,
+    `updated`            DATETIME       NOT NULL,
+    `user_inserted_id`   BIGINT(20)     NOT NULL,
+    `user_updated_id`    BIGINT(20)     NOT NULL,
+    KEY `k_rdp_rel_cliente01_estabelecimento` (`estabelecimento_id`),
+    KEY `k_rdp_rel_cliente01_user_inserted` (`user_inserted_id`),
+    KEY `k_rdp_rel_cliente01_user_updated` (`user_updated_id`),
+    CONSTRAINT `fk_rdp_rel_cliente01_user_updated` FOREIGN KEY (`user_updated_id`) references `sec_user` (`id`),
+    CONSTRAINT `fk_rdp_rel_cliente01_user_inserted` FOREIGN KEY (`user_inserted_id`) references `sec_user` (`id`),
+    CONSTRAINT `fk_rdp_rel_cliente01_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
+) ENGINE = INNODB
+  DEFAULT charset = utf8;

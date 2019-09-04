@@ -6,7 +6,6 @@ use App\Entity\Relatorios\RelVendas01;
 use CrosierSource\CrosierLibBaseBundle\EntityHandler\EntityHandler;
 
 /**
- * EntityHandler para RelVendas01.
  *
  * @author Carlos Eduardo Pauluk
  */

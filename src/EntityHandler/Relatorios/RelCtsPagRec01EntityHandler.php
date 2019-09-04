@@ -6,7 +6,6 @@ use App\Entity\Relatorios\RelCtsPagRec01;
 use CrosierSource\CrosierLibBaseBundle\EntityHandler\EntityHandler;
 
 /**
- * EntityHandler para RelCtsPagRec01.
  *
  * @author Carlos Eduardo Pauluk
  */

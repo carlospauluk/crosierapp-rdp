@@ -51,6 +51,8 @@ Encore
 
     .addEntry('Relatorios/relCompras01_listComprasPorProduto', './assets/js/Relatorios/relCompras01_listComprasPorProduto.js')
 
+    .addEntry('Relatorios/relCliente01_list', './assets/js/Relatorios/relCliente01_list.js')
+
 
 
 

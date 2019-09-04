@@ -46,25 +46,6 @@ class RelCtsPagRec01Business
     }
 
     /**
-     * @throws ViewException
-     */
-    private function marcarDtHrAtualizacao()
-    {
-        try {
-            /** @var AppConfigRepository $repoAppConfig */
-            $repoAppConfig = $this->doctrine->getRepository(AppConfig::class);
-            /** @var AppConfig $appConfig */
-            $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relCtsPagRec01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
-            $appConfig->setValor((new \DateTime())->format('Y-m-d H:i:s.u'));
-            $this->appConfigEntityHandler->save($appConfig);
-        } catch (\Exception $e) {
-            $this->logger->error('Erro ao marcar app_config (relCtsPagRec01.dthrAtualizacao)');
-            $this->logger->error($e->getMessage());
-            throw new ViewException('Erro ao marcar dt/hr atualização');
-        }
-    }
-
-    /**
      *
      */
     public function processarArquivosNaFila(): void
@@ -198,6 +179,25 @@ class RelCtsPagRec01Business
         return $t;
 
 
+    }
+
+    /**
+     * @throws ViewException
+     */
+    private function marcarDtHrAtualizacao(): void
+    {
+        try {
+            /** @var AppConfigRepository $repoAppConfig */
+            $repoAppConfig = $this->doctrine->getRepository(AppConfig::class);
+            /** @var AppConfig $appConfig */
+            $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relCtsPagRec01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
+            $appConfig->setValor((new \DateTime())->format('Y-m-d H:i:s.u'));
+            $this->appConfigEntityHandler->save($appConfig);
+        } catch (\Exception $e) {
+            $this->logger->error('Erro ao marcar app_config (relCtsPagRec01.dthrAtualizacao)');
+            $this->logger->error($e->getMessage());
+            throw new ViewException('Erro ao marcar dt/hr atualização');
+        }
     }
 
 }
