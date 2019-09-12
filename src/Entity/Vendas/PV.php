@@ -2,12 +2,14 @@
 
 namespace App\Entity\Vendas;
 
+use App\Entity\Relatorios\RelCliente01;
+use CrosierSource\CrosierLibBaseBundle\Doctrine\Annotations\NotUppercase;
 use CrosierSource\CrosierLibBaseBundle\Entity\EntityId;
 use CrosierSource\CrosierLibBaseBundle\Entity\EntityIdTrait;
-use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  *
@@ -41,7 +43,7 @@ class PV implements EntityId
 
     /**
      *
-     * @ORM\Column(name="dt_emissao", type="date", nullable=false)
+     * @ORM\Column(name="dt_emissao", type="datetime", nullable=false)
      * @Groups("entity")
      *
      * @var \DateTime|null
@@ -49,6 +51,10 @@ class PV implements EntityId
     private $dtEmissao;
 
     /**
+     * ABERTO: Ainda não enviado (em preenchimento).
+     * CANCELADO: .
+     * ENVIADO: enviado ao EKT, aguardando;
+     * CONCLUÍDO: gerado no EKT.
      *
      * @ORM\Column(name="status", type="string", nullable=false)
      * @Groups("entity")
@@ -71,9 +77,21 @@ class PV implements EntityId
      * @ORM\Column(name="vendedor", type="string", nullable=false)
      * @Groups("entity")
      *
-     * @var int|null
+     * @var string|null
      */
     private $vendedor;
+
+
+    /**
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\Relatorios\RelCliente01")
+     * @ORM\JoinColumn(name="cliente_id", nullable=true)
+     * @Groups("entity")
+     * @MaxDepth(1)
+     *
+     * @var RelCliente01|null
+     */
+    private $cliente;
 
     /**
      *
@@ -103,18 +121,38 @@ class PV implements EntityId
     private $clienteDocumento;
 
     /**
-     * Transient.
-     * Montado com clienteDocumento - clienteNome (clienteCod)
-     * @var string|null
+     *
+     * @ORM\Column(name="deposito", type="string", nullable=false)
      * @Groups("entity")
+     *
+     * @var string|null
      */
-    private $clienteNomeMontado;
+    private $deposito;
+
+    /**
+     *
+     * @ORM\Column(name="localizador", type="string", nullable=false)
+     * @Groups("entity")
+     *
+     * @var string|null
+     */
+    private $localizador;
+
+    /**
+     *
+     * @ORM\Column(name="cond_pagto", type="string", nullable=false)
+     * @Groups("entity")
+     *
+     * @var string|null
+     */
+    private $condPagto;
 
     /**
      * JSON.
      *
      * @ORM\Column(name="venctos", type="string", nullable=false)
      * @Groups("entity")
+     * @NotUppercase()
      *
      * @var string|null
      */
@@ -137,6 +175,33 @@ class PV implements EntityId
      * @var PVItem[]|ArrayCollection|null
      */
     private $itens;
+
+    /**
+     *
+     * @ORM\Column(name="subtotal", type="decimal", nullable=false)
+     * @Groups("entity")
+     *
+     * @var float|null
+     */
+    private $subtotal;
+
+    /**
+     *
+     * @ORM\Column(name="descontos", type="decimal", nullable=false)
+     * @Groups("entity")
+     *
+     * @var float|null
+     */
+    private $descontos;
+
+    /**
+     *
+     * @ORM\Column(name="total", type="decimal", nullable=false)
+     * @Groups("entity")
+     *
+     * @var float|null
+     */
+    private $total;
 
 
     /**
@@ -238,20 +303,38 @@ class PV implements EntityId
     }
 
     /**
-     * @return int|null
+     * @return string|null
      */
-    public function getVendedor(): ?int
+    public function getVendedor(): ?string
     {
         return $this->vendedor;
     }
 
     /**
-     * @param int|null $vendedor
+     * @param string|null $vendedor
      * @return PV
      */
-    public function setVendedor(?int $vendedor): PV
+    public function setVendedor(?string $vendedor): PV
     {
         $this->vendedor = $vendedor;
+        return $this;
+    }
+
+    /**
+     * @return RelCliente01|null
+     */
+    public function getCliente(): ?RelCliente01
+    {
+        return $this->cliente;
+    }
+
+    /**
+     * @param RelCliente01|null $cliente
+     * @return PV
+     */
+    public function setCliente(?RelCliente01 $cliente): PV
+    {
+        $this->cliente = $cliente;
         return $this;
     }
 
@@ -312,24 +395,56 @@ class PV implements EntityId
     /**
      * @return string|null
      */
-    public function getClienteNomeMontado(): ?string
+    public function getDeposito(): ?string
     {
-        if ($this->clienteDocumento && $this->clienteNome && $this->clienteCod) {
-            $this->clienteNomeMontado = StringUtils::mascararCnpjCpf($this->clienteDocumento) . ' - ' . $this->clienteNome . ' (' . $this->clienteCod . ')';
-        }
-        return $this->clienteNomeMontado;
+        return $this->deposito;
     }
 
     /**
-     * @param string|null $cliente
+     * @param string|null $deposito
      * @return PV
      */
-    public function setCliente(?string $cliente): PV
+    public function setDeposito(?string $deposito): PV
     {
-        $this->cliente = $cliente;
+        $this->deposito = $deposito;
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
+    public function getLocalizador(): ?string
+    {
+        return $this->localizador;
+    }
+
+    /**
+     * @param string|null $localizador
+     * @return PV
+     */
+    public function setLocalizador(?string $localizador): PV
+    {
+        $this->localizador = $localizador;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCondPagto(): ?string
+    {
+        return $this->condPagto;
+    }
+
+    /**
+     * @param string|null $condPagto
+     * @return PV
+     */
+    public function setCondPagto(?string $condPagto): PV
+    {
+        $this->condPagto = $condPagto;
+        return $this;
+    }
 
     /**
      * @return string|null
@@ -379,57 +494,82 @@ class PV implements EntityId
      * @param PVItem[]|ArrayCollection|null $itens
      * @return PV
      */
-    public function setItens($itens)
+    public function setItens($itens): PV
     {
         $this->itens = $itens;
         return $this;
     }
 
 
-}
-
-
-class Vencto
-{
-    /** @var \DateTime */
-    private $dt;
-
-    /** @var float */
-    private $valor;
-
     /**
-     * @return \DateTime
+     * Lê um PV de um array (vindo de um request) e faz o parse para JSON.
+     * @param array $pvArr
      */
-    public function getDt(): \DateTime
+    public function requestToVenctos(array $pvArr): void
     {
-        return $this->dt;
+        $venctos = [];
+        for ($i = 1; $i <= 6; $i++) {
+            $dt = $pvArr['venctos_dt0' . $i];
+            $valor = $pvArr['venctos_valor0' . $i];
+            $venctos[] = [
+                'dtVencto' => $dt,
+                'valor' => $valor
+            ];
+        }
+        $this->setVenctos(json_encode($venctos));
     }
 
     /**
-     * @param \DateTime $dt
-     * @return Vencto
+     * @return float|null
      */
-    public function setDt(\DateTime $dt): Vencto
+    public function getSubtotal(): ?float
     {
-        $this->dt = $dt;
+        return $this->subtotal;
+    }
+
+    /**
+     * @param float|null $subtotal
+     * @return PV
+     */
+    public function setSubtotal(?float $subtotal): PV
+    {
+        $this->subtotal = $subtotal;
         return $this;
     }
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getValor(): float
+    public function getDescontos(): ?float
     {
-        return $this->valor;
+        return $this->descontos;
     }
 
     /**
-     * @param float $valor
-     * @return Vencto
+     * @param float|null $descontos
+     * @return PV
      */
-    public function setValor(float $valor): Vencto
+    public function setDescontos(?float $descontos): PV
     {
-        $this->valor = $valor;
+        $this->descontos = $descontos;
+        return $this;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getTotal(): ?float
+    {
+        return $this->total;
+    }
+
+    /**
+     * @param float|null $total
+     * @return PV
+     */
+    public function setTotal(?float $total): PV
+    {
+        $this->total = $total;
         return $this;
     }
 

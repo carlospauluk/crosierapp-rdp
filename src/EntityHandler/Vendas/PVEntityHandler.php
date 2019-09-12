@@ -23,6 +23,14 @@ class PVEntityHandler extends EntityHandler
         if (!$pv->getUuid()) {
             $pv->setUuid(StringUtils::guidv4());
         }
+        if ($pv->getCliente()) {
+            $pv->setClienteCod($pv->getCliente()->getCodigo());
+            $pv->setClienteNome($pv->getCliente()->getNomeMontado());
+            $pv->setClienteDocumento($pv->getCliente()->getDocumento());
+        }
+        if (!$pv->getStatus()) {
+            $pv->setStatus('ABERTO');
+        }
 
     }
 

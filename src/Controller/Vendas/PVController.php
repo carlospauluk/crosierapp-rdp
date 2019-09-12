@@ -3,10 +3,12 @@
 namespace App\Controller\Vendas;
 
 
-use App\Entity\Financeiro\TipoLancto;
 use App\Entity\Relatorios\RelCliente01;
 use App\Entity\Vendas\PV;
+use App\Entity\Vendas\PVItem;
 use App\EntityHandler\Vendas\PVEntityHandler;
+use App\EntityHandler\Vendas\PVItemEntityHandler;
+use App\Form\Vendas\PVItemType;
 use App\Form\Vendas\PVType;
 use App\Repository\Relatorios\RelCliente01Repository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
@@ -33,6 +35,9 @@ class PVController extends FormListController
     /** @var EntityIdUtils */
     private $entityIdUtils;
 
+    /** @var PVItemEntityHandler */
+    private $pvItemEntityHandler;
+
     /**
      * @required
      * @param PVEntityHandler $entityHandler
@@ -53,13 +58,21 @@ class PVController extends FormListController
 
     /**
      * @required
+     * @param PVItemEntityHandler $pvItemEntityHandler
+     */
+    public function setPvItemEntityHandler(PVItemEntityHandler $pvItemEntityHandler): void
+    {
+        $this->pvItemEntityHandler = $pvItemEntityHandler;
+    }
+
+    /**
+     * @required
      * @param EntityIdUtils $entityIdUtils
      */
     public function setEntityIdUtils(EntityIdUtils $entityIdUtils): void
     {
         $this->entityIdUtils = $entityIdUtils;
     }
-
 
     public function getFilterDatas(array $params): array
     {
@@ -130,6 +143,18 @@ class PVController extends FormListController
         return $this->doForm($request, $pv, $params);
     }
 
+    /**
+     * @param Request $request
+     * @param $pv
+     */
+    public function handleRequestOnValid(Request $request, $pv): void
+    {
+        if ($request->request->get('pv')) {
+            /** @var PV $pv */
+            $pv->requestToVenctos($request->request->get('pv'));
+        }
+    }
+
 
     /**
      *
@@ -146,13 +171,54 @@ class PVController extends FormListController
         /** @var RelCliente01Repository $repoCliente */
         $repoCliente = $this->getDoctrine()->getRepository(RelCliente01::class);
         $clientes = $repoCliente->findClienteByStr($str);
+        $select2js = Select2JsUtils::toSelect2DataFn($clientes, function ($e) {
+            /** @var RelCliente01 $e */
+            return $e->getNomeMontado();
+        });
         return new JsonResponse(
-            ['results' =>
-            Select2JsUtils::toSelect2DataFn($clientes, function ($e) {
-                /** @var RelCliente01 $e */
-                return urlencode($e->getNomeMontado());
-            })]
+            ['results' => $select2js]
         );
+    }
+
+
+    /**
+     *
+     * @Route("/ven/pvItem/form/{pv}/{pvItem}", name="ven_pvItem_form", defaults={"pvItem"=null}, requirements={"pv"="\d+","pvItem"="\d+"})
+     * @param Request $request
+     * @param PV|null $pv
+     * @param PVItem|null $pvItem
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \Exception
+     * @IsGranted({"ROLE_PV"}, statusCode=403)
+     */
+    public function formItem(Request $request, PV $pv, PVItem $pvItem = null)
+    {
+        if (!$pvItem) {
+            $pvItem = new PVItem();
+            $pvItem->setPv($pv);
+        }
+        $params = [
+            'typeClass' => PVItemType::class,
+            'formView' => 'Vendas/pvItem_form.html.twig',
+            'formRoute' => 'ven_pvItem_form',
+            'formPageTitle' => 'Item do PV',
+            'routeParams' => ['pv' => $pv],
+            'entityHandler' => $this->pvItemEntityHandler
+        ];
+        return $this->doForm($request, $pvItem, $params);
+    }
+
+    /**
+     * @Route("/ven/pvItem/delete/{pvItem}", name="ven_pvItem_delete", defaults={"pvItem"=null}, requirements={"pvItem"="\d+"})
+     * @param PVItem $pvItem
+     * @return Response
+     * @throws \CrosierSource\CrosierLibBaseBundle\Exception\ViewException
+     * @IsGranted({"ROLE_PV"}, statusCode=403)
+     */
+    public function removerItem(PVItem $pvItem): Response
+    {
+        $this->pvItemEntityHandler->delete($pvItem);
+        return $this->redirectToRoute('ven_pv_form', ['id' => $pvItem->getPv()->getId(), '_fragment' => 'itens']);
     }
 
 

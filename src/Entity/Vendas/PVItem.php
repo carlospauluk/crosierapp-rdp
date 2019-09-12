@@ -2,7 +2,6 @@
 
 namespace App\Entity\Vendas;
 
-use App\Entity\Vendas\PV;
 use CrosierSource\CrosierLibBaseBundle\Entity\EntityId;
 use CrosierSource\CrosierLibBaseBundle\Entity\EntityIdTrait;
 use Doctrine\ORM\Mapping as ORM;
@@ -51,6 +50,24 @@ class PVItem implements EntityId
      */
     private $produtoDesc;
 
+    /**
+     *
+     * @ORM\Column(name="cod_fornec", type="bigint", length=20, nullable=false)
+     * @Groups("entity")
+     *
+     * @var string|null
+     */
+    private $codFornecedor;
+
+    /**
+     *
+     * @ORM\Column(name="nome_fornec", type="string", length=200, nullable=false)
+     * @Groups("entity")
+     *
+     * @var string|null
+     */
+    private $nomeFornecedor;
+
 
     /**
      *
@@ -88,6 +105,24 @@ class PVItem implements EntityId
      * @var float|null
      */
     private $qtde;
+
+    /**
+     *
+     * @ORM\Column(name="desconto", type="decimal", nullable=false)
+     * @Groups("entity")
+     *
+     * @var float|null
+     */
+    private $desconto;
+
+    /**
+     *
+     * @ORM\Column(name="total", type="decimal", nullable=false)
+     * @Groups("entity")
+     *
+     * @var float|null
+     */
+    private $total;
 
     /**
      *
@@ -149,6 +184,42 @@ class PVItem implements EntityId
     public function setProdutoDesc(?string $produtoDesc): PVItem
     {
         $this->produtoDesc = $produtoDesc;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCodFornecedor(): ?string
+    {
+        return $this->codFornecedor;
+    }
+
+    /**
+     * @param string|null $codFornecedor
+     * @return PVItem
+     */
+    public function setCodFornecedor(?string $codFornecedor): PVItem
+    {
+        $this->codFornecedor = $codFornecedor;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNomeFornecedor(): ?string
+    {
+        return $this->nomeFornecedor;
+    }
+
+    /**
+     * @param string|null $nomeFornecedor
+     * @return PVItem
+     */
+    public function setNomeFornecedor(?string $nomeFornecedor): PVItem
+    {
+        $this->nomeFornecedor = $nomeFornecedor;
         return $this;
     }
 
@@ -225,6 +296,42 @@ class PVItem implements EntityId
     }
 
     /**
+     * @return float|null
+     */
+    public function getDesconto(): ?float
+    {
+        return $this->desconto;
+    }
+
+    /**
+     * @param float|null $desconto
+     * @return PVItem
+     */
+    public function setDesconto(?float $desconto): PVItem
+    {
+        $this->desconto = $desconto;
+        return $this;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getTotal(): ?float
+    {
+        return $this->total;
+    }
+
+    /**
+     * @param float|null $total
+     * @return PVItem
+     */
+    public function setTotal(?float $total): PVItem
+    {
+        $this->total = $total;
+        return $this;
+    }
+
+    /**
      * @return string|null
      */
     public function getObs(): ?string
@@ -241,6 +348,16 @@ class PVItem implements EntityId
         $this->obs = $obs;
         return $this;
     }
+
+
+//
+//    public function getProdutoMontado(): ?string {
+//        return $this->produtoCod ?? '' . ' - ' . $this->produtoDesc;
+//    }
+//
+//    public function getFornecedorMontado(): ?string {
+//        return $this->produtoCod ?? '' . ' - ' . $this->produtoDesc;
+//    }
 
 
 }

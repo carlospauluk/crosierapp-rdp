@@ -140,12 +140,14 @@ class RelEstoque01Controller extends FormListController
      */
     public function datatablesJsList(Request $request): Response
     {
-        $defaultFilters = [
-            'filter' => [
-                'qtdeAtual' => 0
-            ]
-        ];
-        return $this->doDatatablesJsList($request, $defaultFilters);
+        // Comentei pq não tem funcionalidade, visto os filters definidos no getFilterDatas()
+        // Mas pq estava aqui???
+//        $defaultFilters = [
+//            'filter' => [
+//                'qtdeAtual' => 0
+//            ]
+//        ];
+        return $this->doDatatablesJsList($request); // , $defaultFilters);
     }
 
 

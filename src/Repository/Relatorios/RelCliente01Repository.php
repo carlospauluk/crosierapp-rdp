@@ -18,13 +18,14 @@ class RelCliente01Repository extends FilterRepository
         return RelCliente01::class;
     }
 
-    public function findClienteByStr(string $str): array
+    public function findClienteByStr(string $str, int $maxResults = 30): array
     {
         $sql = 'SELECT c FROM App\Entity\Relatorios\RelCliente01 c WHERE c.documento LIKE :documento OR c.nome LIKE :nome OR c.codigo LIKE :codigo ORDER BY c.nome';
         $query = $this->getEntityManager()->createQuery($sql);
         $query->setParameter('documento', $str);
         $query->setParameter('nome', '%' . $str . '%');
         $query->setParameter('codigo', $str);
+        $query->setMaxResults($maxResults);
         return $query->getResult();
     }
 

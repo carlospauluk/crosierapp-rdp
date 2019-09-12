@@ -1,0 +1,53 @@
+<div class="tab-pane fade show active" id="cabecalho" role="tabpanel" aria-labelledby="cabecalho-tab">
+
+    <div class="container" style="margin-bottom: 50px">
+
+        {{ form_row(form._token) }}
+
+        {{ form_row(form.id) }}
+
+
+        {{ form_row(form.pvEkt) }}
+        {{ form_row(form.status) }}
+        {{ form_row(form.vendedor) }}
+
+        {{ form_row(form.dtEmissao) }}
+        {{ form_row(form.filial) }}
+        {{ form_row(form.cliente) }}
+        {{ form_row(form.deposito) }}
+        {{ form_row(form.localizador) }}
+        {{ form_row(form.condPagto) }}
+        {{ form_row(form.obs) }}
+
+
+
+        <fieldset class="border p-2 mb-3 mt-3 mb-3">
+            <legend class="w-auto p-2">Prazos</legend>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Dt Vencto</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for i in 1..6 %}
+                    <tr>
+                        <td>{{ i }}</td>
+                        <td>{{ form_widget(form['venctos_dt0' ~ i]) }}</td>
+                        <td>{{ form_widget(form['venctos_valor0' ~ i]) }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+
+            </table>
+
+
+        </fieldset>
+
+    </div>
+
+
+</div>
