@@ -196,6 +196,11 @@ class RelCompras01Business
             $repoAppConfig = $this->doctrine->getRepository(AppConfig::class);
             /** @var AppConfig $appConfig */
             $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relCompras01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
+            if (!$appConfig) {
+                $appConfig = new AppConfig();
+                $appConfig->setChave('relCompras01.dthrAtualizacao');
+                $appConfig->setAppUUID($_SERVER['CROSIERAPP_UUID']);
+            }
             $appConfig->setValor((new \DateTime())->format('Y-m-d H:i:s.u'));
             $this->appConfigEntityHandler->save($appConfig);
         } catch (\Exception $e) {

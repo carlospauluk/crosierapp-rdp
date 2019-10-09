@@ -184,6 +184,10 @@ class RelEstoque01Business
             $repoAppConfig = $this->doctrine->getRepository(AppConfig::class);
             /** @var AppConfig $appConfig */
             $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relEstoque01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
+            if (!$appConfig) {
+                $appConfig->setChave('relEstoque01.dthrAtualizacao');
+                $appConfig->setAppUUID($_SERVER['CROSIERAPP_UUID']);
+            }
             $appConfig->setValor((new \DateTime())->format('Y-m-d H:i:s.u'));
             $this->appConfigEntityHandler->save($appConfig);
         } catch (\Exception $e) {
@@ -214,7 +218,6 @@ class RelEstoque01Business
 
         /** @var RelEstoque01 $item */
         foreach ($carrinhoDeCompra['itens'] as $item) {
-
             $regs = [
                 $item->getCodProduto(),
                 $item->getDescProduto(),

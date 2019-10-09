@@ -179,8 +179,6 @@ class RelCliente01Business
         }
 
         return $t;
-
-
     }
 
     /**
