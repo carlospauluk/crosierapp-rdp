@@ -99,15 +99,15 @@ class DefaultController extends BaseController
         $repoAppConfig = $this->getDoctrine()->getRepository(AppConfig::class);
         /** @var AppConfig $appConfig */
         $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relCompFor01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
-        $params['relCompFor01_dthrAtualizacao'] = DateTimeUtils::parseDateStr($appConfig->getValor());
+        $params['relCompFor01_dthrAtualizacao'] = $appConfig ? DateTimeUtils::parseDateStr($appConfig->getValor()) : '';
         $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relCompras01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
-        $params['relCompras01_dthrAtualizacao'] = DateTimeUtils::parseDateStr($appConfig->getValor());
+        $params['relCompras01_dthrAtualizacao'] = $appConfig ? DateTimeUtils::parseDateStr($appConfig->getValor()) : '';
         $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relCtsPagRec01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
-        $params['relCtsPagRec01_dthrAtualizacao'] = DateTimeUtils::parseDateStr($appConfig->getValor());
+        $params['relCtsPagRec01_dthrAtualizacao'] = $appConfig ? DateTimeUtils::parseDateStr($appConfig->getValor()) : '';
         $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relEstoque01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
-        $params['relEstoque01_dthrAtualizacao'] = DateTimeUtils::parseDateStr($appConfig->getValor());
+        $params['relEstoque01_dthrAtualizacao'] = $appConfig ? DateTimeUtils::parseDateStr($appConfig->getValor()) : '';
         $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relVendas01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
-        $params['relVendas01_dthrAtualizacao'] = DateTimeUtils::parseDateStr($appConfig->getValor());
+        $params['relVendas01_dthrAtualizacao'] = $appConfig ? DateTimeUtils::parseDateStr($appConfig->getValor()) : '';
 
         return $this->doRender('dashboard.html.twig', $params);
     }
