@@ -76,4 +76,22 @@ VALUES ('9985913b-3081-4d50-a23b-da6b421120b1', 'Produtos', 'fas fa-boxes', 'ENT
 
 
 
+DELETE
+FROM cfg_entmenu
+WHERE uuid = '10a42e4e-3317-4c4f-a7a5-376be0e505b9';
+INSERT INTO cfg_entmenu(uuid, label, icon, tipo, app_uuid, pai_uuid, ordem, css_style, inserted, updated,
+                        estabelecimento_id, user_inserted_id, user_updated_id, url)
+VALUES ('10a42e4e-3317-4c4f-a7a5-376be0e505b9', 'Download Excel', 'far fa-file-excel', 'ENT',
+        'b10ef8c0-841f-4688-9ee2-30e39639be8a', 'f5dd11fb-dfde-40af-91c9-6583192e8d83', 1, null, now(), now(), 1, 1, 1,
+        '/est/produto/exportarExcel/');
+
+
+
+
+--
+INSERT INTO cfg_entmenu_locator(menu_uuid, url_regexp, quem, inserted, updated, estabelecimento_id, user_inserted_id,
+                                user_updated_id)
+VALUES ('71d1456b-3a9f-4589-8f71-42bbf6c91a3e', '.', '*', now(), now(), 1, 1, 1);
+
+
 COMMIT;
