@@ -20,6 +20,7 @@
         "crosiersource/crosierlib-base": "*@dev",
         "dompdf/dompdf": "^0.8.3",
         "friendsofsymfony/jsrouting-bundle": "^2.2",
+        "phpoffice/phpspreadsheet": "^1.9",
         "sensio/framework-extra-bundle": "^5.2",
         "nelmio/cors-bundle": "^1.5",
         "sensiolabs/security-checker": "^5.0",

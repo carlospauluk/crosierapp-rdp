@@ -4,3 +4,9 @@ FLUSH PRIVILEGES;
 
 
 
+-- mysql_config_editor set --login-path=crosier_rodoponta_dev --host=localhost --user=crosier_rodoponta_dev --password=crosier_rodoponta_dev
+
+-- sudo vim /usr/local/bin/crosier_rodoponta_dev
+-- mysql --login-path=crosier_rodoponta_dev crosier_rodoponta_dev
+
+-- sudo chmod a+x /usr/local/bin/crosier_rodoponta_dev
