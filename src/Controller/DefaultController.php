@@ -109,7 +109,7 @@ class DefaultController extends BaseController
         $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relVendas01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
         $params['relVendas01_dthrAtualizacao'] = $appConfig ? DateTimeUtils::parseDateStr($appConfig->getValor()) : '';
 
-        return $this->doRender('dashboard.html.twig', $params);
+        return $this->doRender('excelProdutos.html.twig', $params);
     }
 
 
