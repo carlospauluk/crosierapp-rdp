@@ -57,6 +57,9 @@ Encore
     .addEntry('Vendas/relEstoque01_list', './assets/js/Vendas/relEstoque01_list.js')
 
 
+    .addEntry('Estoque/produto_list', './assets/js/Estoque/produto_list.js')
+
+
 
 
     /*

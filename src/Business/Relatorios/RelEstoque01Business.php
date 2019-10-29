@@ -185,6 +185,7 @@ class RelEstoque01Business
             /** @var AppConfig $appConfig */
             $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relEstoque01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
             if (!$appConfig) {
+                $appConfig = new AppConfig();
                 $appConfig->setChave('relEstoque01.dthrAtualizacao');
                 $appConfig->setAppUUID($_SERVER['CROSIERAPP_UUID']);
             }
