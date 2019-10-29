@@ -2,6 +2,7 @@
 
 namespace App\Command\Relatorios;
 
+use App\Business\Estoque\ProdutoBusiness;
 use App\Business\Relatorios\RelCliente01Business;
 use App\Business\Relatorios\RelCompFor01Business;
 use App\Business\Relatorios\RelCompras01Business;
@@ -31,6 +32,9 @@ class ProcessarRelatoriosCommand extends Command
 
     /** @var RelEstoque01Business */
     private $relEstoque01Business;
+
+    /** @var ProdutoBusiness */
+    private $produtoBusiness;
 
     /** @var RelCompras01Business */
     private $relCompras01Business;
@@ -72,6 +76,15 @@ class ProcessarRelatoriosCommand extends Command
     public function setRelEstoque01Business(RelEstoque01Business $relEstoque01Business): void
     {
         $this->relEstoque01Business = $relEstoque01Business;
+    }
+
+    /**
+     * @required
+     * @param ProdutoBusiness $produtoBusiness
+     */
+    public function setProdutoBusiness(ProdutoBusiness $produtoBusiness): void
+    {
+        $this->produtoBusiness = $produtoBusiness;
     }
 
     /**
@@ -122,6 +135,7 @@ class ProcessarRelatoriosCommand extends Command
                 break;
             case 'RELESTOQUE01':
                 $this->relEstoque01Business->processarArquivosNaFila();
+                $this->produtoBusiness->atualizarCamposEstoqueProdutoPelaRelEstoque01();
                 break;
             case 'RELCOMPRAS01':
                 $this->relCompras01Business->processarArquivosNaFila();

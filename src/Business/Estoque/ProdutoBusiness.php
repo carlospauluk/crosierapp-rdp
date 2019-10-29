@@ -5,7 +5,6 @@ namespace App\Business\Estoque;
 
 
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
-use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -177,7 +176,7 @@ class ProdutoBusiness
                             $atributosProduto[$atributo['label'] . '_' . $labelSubCampoConfigs[0]] = $subcampo;
                         }
                     } else {
-                        $atributosProduto[$atributo['label']] =  $atributo['valor'];
+                        $atributosProduto[$atributo['label']] = $atributo['valor'];
                     }
                 }
 
@@ -268,6 +267,120 @@ class ProdutoBusiness
         }
         // else
         return $letter;
+    }
+
+    /**
+     *
+     */
+    public function atualizarCamposEstoqueProdutoPelaRelEstoque01()
+    {
+        $conn = $this->doctrine->getEntityManager()->getConnection();
+
+        $qryProdutos = $conn->query('SELECT * FROM est_produto');
+
+        $qryRelEstoque01 = $conn->prepare('SELECT qtde_atual FROM rdp_rel_estoque01 WHERE cod_prod = :cod_prod AND desc_filial = :desc_filial');
+
+
+        $qryAtributo = $conn->prepare('SELECT id FROM est_atributo WHERE uuid = :uuid');
+
+        $qryAtributo->bindValue('uuid', 'c37e9985-53f2-47f4-833a-52ace1f84e60');
+        $qryAtributo->execute();
+        $atrEstoqueAcessorios = $qryAtributo->fetch();
+
+        $qryAtributo->bindValue('uuid', '3edb71db-375d-4d37-b36d-8287f291606b');
+        $qryAtributo->execute();
+        $atrEstoqueMatriz = $qryAtributo->fetch();
+
+        $qryAtributo->bindValue('uuid', '8f25a3e6-cf93-4111-be2b-a46dedc30107');
+        $qryAtributo->execute();
+        $atrEstoqueTotal = $qryAtributo->fetch();
+
+        while ($produto = $qryProdutos->fetch()) {
+
+            $this->verificaEInsereProdutoPossuiAtributosEstoques($produto, $atrEstoqueMatriz['id'], 1);
+            $this->verificaEInsereProdutoPossuiAtributosEstoques($produto, $atrEstoqueAcessorios['id'], 2);
+            $this->verificaEInsereProdutoPossuiAtributosEstoques($produto, $atrEstoqueTotal['id'], 3);
+
+            $qryRelEstoque01->bindValue('cod_prod', $produto['codigo_from']);
+            $qryRelEstoque01->bindValue('desc_filial', 'MATRIZ');
+            $qryRelEstoque01->execute();
+            $matriz = $qryRelEstoque01->fetch();
+
+            $total = 0;
+
+            if ($matriz) {
+                $estAtributoProduto['valor'] = $matriz['qtde_atual'];
+                $total += (float)$matriz['qtde_atual'];
+                $conn->update('est_produto_atributo', $estAtributoProduto,
+                    [
+                        'produto_id' => $produto['id'],
+                        'atributo_id' => $atrEstoqueMatriz['id']
+                    ]);
+            }
+
+            $qryRelEstoque01->bindValue('cod_prod', $produto['codigo_from']);
+            $qryRelEstoque01->bindValue('desc_filial', 'ACESSÓRIOS');
+            $qryRelEstoque01->execute();
+            $acessorios = $qryRelEstoque01->fetch();
+
+            if ($acessorios) {
+                $estAtributoProduto['valor'] = $acessorios['qtde_atual'];
+                $total += (float)$acessorios['qtde_atual'];
+                $conn->update('est_produto_atributo', $estAtributoProduto,
+                    [
+                        'produto_id' => $produto['id'],
+                        'atributo_id' => $atrEstoqueAcessorios['id']
+                    ]);
+            }
+
+            if ($total) {
+                $estAtributoProduto['valor'] = $total;
+                $conn->update('est_produto_atributo', $estAtributoProduto,
+                    [
+                        'produto_id' => $produto['id'],
+                        'atributo_id' => $atrEstoqueTotal['id']
+                    ]);
+            }
+
+
+        }
+
+    }
+
+    /**
+     * @param array $produto
+     * @param int $atributoId
+     * @param int $ordem
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function verificaEInsereProdutoPossuiAtributosEstoques(array $produto, int $atributoId, int $ordem): void
+    {
+        $conn = $this->doctrine->getEntityManager()->getConnection();
+        $qryAtributoProduto = $conn->prepare('SELECT * FROM est_produto_atributo WHERE atributo_id = :atributo_id AND produto_id = :produto_id');
+
+        $qryAtributoProduto->bindValue('atributo_id', $atributoId);
+        $qryAtributoProduto->bindValue('produto_id', $produto['id']);
+        $qryAtributoProduto->execute();
+        if (!$qryAtributoProduto->fetch()) {
+            $atributoEstoqueMatriz = [
+                'produto_id' => $produto['id'],
+                'atributo_id' => $atributoId,
+                'aba' => 'Estoques',
+                'grupo' => '',
+                'ordem' => $ordem,
+                'soma_preench' => 0,
+                'quantif' => 'N',
+                'precif' => 'N',
+                'valor' => '',
+                'inserted' => '1900-01-01 00:00:00',
+                'updated' => '1900-01-01 00:00:00',
+                'version' => '0',
+                'estabelecimento_id' => '1',
+                'user_inserted_id' => '1',
+                'user_updated_id' => '1',
+            ];
+            $conn->insert('est_produto_atributo', $atributoEstoqueMatriz);
+        }
     }
 
 
