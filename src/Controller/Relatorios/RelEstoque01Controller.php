@@ -246,7 +246,7 @@ class RelEstoque01Controller extends FormListController
     /**
      * @param array $dados
      */
-    public function handleDadosList(array &$dados)
+    public function handleDadosList(array &$dados): void
     {
         /** @var RelCompras01Repository $repoCompras */
         $repoCompras = $this->getDoctrine()->getRepository(RelCompras01::class);
