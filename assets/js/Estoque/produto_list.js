@@ -54,7 +54,7 @@ function getDatatablesColumns() {
             data: 'e',
             title: 'Status Cad',
             render: function (data, type, row) {
-                return Numeral(parseFloat(data.porcentPreench) * 100).format('0,0') + '%';
+                return Numeral(parseFloat(data) * 100).format('0,0') + '%';
             }
         },
         {
@@ -62,8 +62,27 @@ function getDatatablesColumns() {
             data: 'e.saldoEstoqueMatriz',
             title: 'Estoque Matriz',
             render: function (data, type, row) {
-                return Numeral(parseFloat(data.estoqueMatriz)).format('0,0[.000]');
-            }
+                return Numeral(parseFloat(data)).format('0,0[000]');
+            },
+            className: 'text-right'
+        },
+        {
+            name: 'e.saldoEstoqueAcessorios',
+            data: 'e.saldoEstoqueAcessorios',
+            title: 'Estoque Acessórios',
+            render: function (data, type, row) {
+                return Numeral(parseFloat(data)).format('0,0.[000]');
+            },
+            className: 'text-right'
+        },
+        {
+            name: 'e.saldoEstoqueTotal',
+            data: 'e.saldoEstoqueTotal',
+            title: 'Estoque Total',
+            render: function (data, type, row) {
+                return Numeral(parseFloat(data)).format('0,0[000]');
+            },
+            className: 'text-right'
         },
         {
             name: 'e.updated',

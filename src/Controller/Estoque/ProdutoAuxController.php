@@ -127,4 +127,34 @@ class ProdutoAuxController extends FormListController
     }
 
 
+    /**
+     *
+     * @Route("/moverImagens", name="moverImagens")
+     * @param Request $request
+     * @return Response
+     * @throws ViewException
+     *
+     * @IsGranted({"ROLE_ESTOQUE_ADMIN"}, statusCode=403)
+     */
+    public function moverImagens(Request $request): Response
+    {
+        $conn = $this->getDoctrine()->getConnection();
+
+        $qryProdutos = $conn->query('SELECT p.*, img.* FROM est_produto_imagem img JOIN est_produto p ON p.id = img.produto_id');
+        while ($produto = $qryProdutos->fetch()) {
+            if (!mkdir($concurrentDirectory = '/opt/crosier/crosierapp-vendest/public/images/produtos/' . $produto['depto_codigo'] . '/' . $produto['grupo_codigo'] . '/' . $produto['subgrupo_codigo'] . '/') && !is_dir($concurrentDirectory)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+            }
+            rename('/opt/crosier/crosierapp-vendest/public/images/produtos/5d/' . $produto['image_name'], $concurrentDirectory . $produto['image_name']);
+
+        }
+
+        return new Response('OK');
+    }
+
+
+
+
+
+
 }
