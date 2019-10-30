@@ -144,9 +144,9 @@ class ProdutoAuxController extends FormListController
 
         $qryProdutos = $conn->query('SELECT p.*, img.* FROM est_produto_imagem img JOIN est_produto p ON p.id = img.produto_id');
         while ($produto = $qryProdutos->fetch()) {
-            $novoDir = $crosierBaseDir . 'crosierapp-vendest/public/images/produtos/' . $produto['depto_codigo'] . '/' . $produto['grupo_codigo'] . '/' . $produto['subgrupo_codigo'] . '/';
+            $novoDir = $crosierBaseDir . 'crosierapp-vendest/public/images/produtos/' . $produto['depto_id'] . '/' . $produto['grupo_id'] . '/' . $produto['subgrupo_id'] . '/';
             $this->logger->info($novoDir);
-            if (!mkdir($concurrentDirectory = $novoDir) && !is_dir($concurrentDirectory)) {
+            if (!mkdir($concurrentDirectory = $novoDir, 0777, true) && !is_dir($concurrentDirectory)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
             }
             rename($crosierBaseDir . 'crosierapp-vendest/public/images/produtos/5d/' . $produto['image_name'], $concurrentDirectory . $produto['image_name']);
