@@ -146,10 +146,10 @@ class ProdutoAuxController extends FormListController
         while ($produto = $qryProdutos->fetch()) {
             $novoDir = $crosierBaseDir . 'crosierapp-vendest/public/images/produtos/' . $produto['depto_id'] . '/' . $produto['grupo_id'] . '/' . $produto['subgrupo_id'] . '/';
             $this->logger->info($novoDir);
-            if (!file_exists($novoDir) && !mkdir($concurrentDirectory = $novoDir, 0777, true) && !is_dir($concurrentDirectory)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+            if (!file_exists($novoDir) && !mkdir($novoDir, 0777, true) && !is_dir($novoDir)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $novoDir));
             }
-            rename($crosierBaseDir . 'crosierapp-vendest/public/images/produtos/5d/' . $produto['image_name'], $concurrentDirectory . $produto['image_name']);
+            rename($crosierBaseDir . 'crosierapp-vendest/public/images/produtos/5d/' . $produto['image_name'], $novoDir . $produto['image_name']);
 
         }
 
