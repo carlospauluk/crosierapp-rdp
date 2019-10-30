@@ -30,7 +30,7 @@ class Produto implements EntityId
 
     /**
      *
-     * @ORM\Column(name="depto_id", type="int")
+     * @ORM\Column(name="depto_id", type="integer")
      * @Groups("entity")
      *
      * @var int|null
@@ -60,7 +60,7 @@ class Produto implements EntityId
 
     /**
      *
-     * @ORM\Column(name="grupo_id", type="int")
+     * @ORM\Column(name="grupo_id", type="integer")
      * @Groups("entity")
      *
      * @var int|null
@@ -90,7 +90,7 @@ class Produto implements EntityId
 
     /**
      *
-     * @ORM\Column(name="subgrupo_id", type="int")
+     * @ORM\Column(name="subgrupo_id", type="integer")
      * @Groups("entity")
      *
      * @var int|null
