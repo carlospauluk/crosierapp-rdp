@@ -28,7 +28,7 @@ function getDatatablesColumns() {
             render: function (data, type, row) {
                 let s = '<div class="float-left">' + data.titulo + '</div>';
                 if (data.imagem1) {
-                    s += '<div class="float-right"><img src="' + crosierAppVendestUrl + '/' + data.depto.id + '/' + data.grupo.id + '/' + data.subgrupo.id + '/' + data.imagem1 + '" width="50px"/></div>';
+                    s += '<div class="float-right"><img src="' + crosierAppVendestUrl + '/' + data.deptoId + '/' + data.grupoId + '/' + data.subgrupoId + '/' + data.imagem1 + '" width="50px"/></div>';
                 }
                 return s;
             },
