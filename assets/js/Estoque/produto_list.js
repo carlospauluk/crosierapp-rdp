@@ -58,24 +58,6 @@ function getDatatablesColumns() {
             }
         },
         {
-            name: 'e.saldoEstoqueMatriz',
-            data: 'e.saldoEstoqueMatriz',
-            title: 'Estoque Matriz',
-            render: function (data, type, row) {
-                return Numeral(parseFloat(data)).format('0,0[000]');
-            },
-            className: 'text-right'
-        },
-        {
-            name: 'e.saldoEstoqueAcessorios',
-            data: 'e.saldoEstoqueAcessorios',
-            title: 'Estoque Acessórios',
-            render: function (data, type, row) {
-                return Numeral(parseFloat(data)).format('0,0.[000]');
-            },
-            className: 'text-right'
-        },
-        {
             name: 'e.saldoEstoqueTotal',
             data: 'e.saldoEstoqueTotal',
             title: 'Estoque Total',
