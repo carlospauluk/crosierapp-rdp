@@ -149,16 +149,15 @@ class ProdutoAuxController extends FormListController
             if (!file_exists($novoDir) && !mkdir($novoDir, 0777, true) && !is_dir($novoDir)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $novoDir));
             }
-            rename($crosierBaseDir . 'crosierapp-vendest/public/images/produtos/5d/' . $produto['image_name'], $novoDir . $produto['image_name']);
+            if (file_exists($crosierBaseDir . 'crosierapp-vendest/public/images/produtos/5d/' . $produto['image_name']) &&
+                !file_exists($novoDir . $produto['image_name'])) {
+                rename($crosierBaseDir . 'crosierapp-vendest/public/images/produtos/5d/' . $produto['image_name'], $novoDir . $produto['image_name']);
+            }
 
         }
 
         return new Response('OK');
     }
-
-
-
-
 
 
 }
