@@ -271,8 +271,9 @@ class ProdutoBusiness
 
     /**
      *
+     * @throws \Doctrine\DBAL\DBALException
      */
-    public function atualizarCamposEstoqueProdutoPelaRelEstoque01()
+    public function atualizarCamposEstoqueProdutoPelaRelEstoque01(): void
     {
         $conn = $this->doctrine->getEntityManager()->getConnection();
 
