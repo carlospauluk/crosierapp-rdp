@@ -29,6 +29,15 @@ class Produto implements EntityId
 
 
     /**
+     *
+     * @ORM\Column(name="depto_id", type="int")
+     * @Groups("entity")
+     *
+     * @var int|null
+     */
+    public $deptoId;
+
+    /**
      * Redundante: apenas para auxiliar acesso.
      *
      * @ORM\Column(name="depto_codigo", type="string")
@@ -50,6 +59,15 @@ class Produto implements EntityId
     public $nomeDepto;
 
     /**
+     *
+     * @ORM\Column(name="grupo_id", type="int")
+     * @Groups("entity")
+     *
+     * @var int|null
+     */
+    public $grupoId;
+
+    /**
      * Redundante: apenas para auxiliar acesso.
      *
      * @ORM\Column(name="grupo_codigo", type="string")
@@ -69,6 +87,15 @@ class Produto implements EntityId
      * @var string|null
      */
     public $nomeGrupo;
+
+    /**
+     *
+     * @ORM\Column(name="subgrupo_id", type="int")
+     * @Groups("entity")
+     *
+     * @var int|null
+     */
+    public $subgrupoId;
 
     /**
      * Redundante: apenas para auxiliar acesso.
