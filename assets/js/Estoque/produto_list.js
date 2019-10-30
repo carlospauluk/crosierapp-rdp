@@ -51,7 +51,7 @@ function getDatatablesColumns() {
         },
         {
             name: 'e.porcentPreench',
-            data: 'e',
+            data: 'e.porcentPreench',
             title: 'Status Cad',
             render: function (data, type, row) {
                 return Numeral(parseFloat(data) * 100).format('0,0') + '%';
