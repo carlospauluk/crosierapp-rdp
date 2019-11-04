@@ -2,9 +2,9 @@ DROP VIEW vw_rdp_est_produto;
 CREATE VIEW vw_rdp_est_produto AS
 
 SELECT p.*,
-       atribEstoqueMatriz.valor     as saldo_estoque_matriz,
-       atribEstoqueAcessorios.valor as saldo_estoque_acessorios,
-       atribEstoqueTotal.valor      as saldo_estoque_total,
+       CAST(IFNULL(atribEstoqueMatriz.valor, '0.0') AS DECIMAL(15,3))     as saldo_estoque_matriz,
+       CAST(IFNULL(atribEstoqueAcessorios.valor, '0.0') AS DECIMAL(15,3)) as saldo_estoque_acessorios,
+       CAST(IFNULL(atribEstoqueTotal.valor, '0.0') AS DECIMAL(15,3))      as saldo_estoque_total,
        img1.image_name              as imagem1
 FROM est_produto p
          LEFT JOIN est_produto_atributo atribEstoqueMatriz
