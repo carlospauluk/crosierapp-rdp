@@ -111,6 +111,10 @@ class RelCtsPagRec01Business
                     $campos[$c] = $campos[$c] ? "'" . trim(str_replace("'", "''", $campos[$c])) . "'" : 'null';
                 }
 
+                if (!$campos[11]) {
+                    $campos[11] = 0.0; // valor_titulo
+                }
+
                 $sql = sprintf(
                     'INSERT INTO rdp_rel_ctspagrec01 (
                             id,
