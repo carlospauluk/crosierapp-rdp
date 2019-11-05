@@ -198,11 +198,12 @@ class ProdutoBusiness
             //        foreach ($todos as $produto) {
             //
             //        }
+
+            array_map('unlink', glob($_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL'] . '*.xlsx'));
             $writer = new Xlsx($spreadsheet);
             $nomeArquivo = StringUtils::guidv4() . '_produtos.xlsx';
             $outputFile = $_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL'] . $nomeArquivo;
             $writer->save($outputFile);
-            array_map('unlink', glob($_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL'] . '*.xlsx'));
             $params['arquivo'] = $_SERVER['CROSIERAPPRDP_URL'] . $_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL_DOWNLOAD'] . $nomeArquivo;
             $params['qtdeProdutos'] = $qtdeProdutos;
             return $params;
