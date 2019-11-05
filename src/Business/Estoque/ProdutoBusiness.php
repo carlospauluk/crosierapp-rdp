@@ -5,6 +5,7 @@ namespace App\Business\Estoque;
 
 
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
+use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
 use Doctrine\DBAL\DBALException;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -198,9 +199,10 @@ class ProdutoBusiness
             //
             //        }
             $writer = new Xlsx($spreadsheet);
-            $nomeArquivo = 'produtos.xlsx';
+            $nomeArquivo = StringUtils::guidv4() . '_produtos.xlsx';
             $outputFile = $_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL'] . $nomeArquivo;
             $writer->save($outputFile);
+            array_map('unlink', glob($_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL'] . '*.xlsx'));
             $params['arquivo'] = $_SERVER['CROSIERAPPRDP_URL'] . $_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL_DOWNLOAD'] . $nomeArquivo;
             $params['qtdeProdutos'] = $qtdeProdutos;
             return $params;
