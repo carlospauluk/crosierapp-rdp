@@ -53,22 +53,6 @@ class ProdutoAuxController extends FormListController
     }
 
     /**
-     * @param int $num
-     * @return string
-     */
-    public function excelCol(int $num): string
-    {
-        $numeric = ($num - 1) % 26;
-        $letter = chr(65 + $numeric);
-        $num2 = (int)(($num - 1) / 26);
-        if ($num2 > 0) {
-            return $this->excelCol($num2) . $letter;
-        }
-        // else
-        return $letter;
-    }
-
-    /**
      * @param array $params
      * @return array
      */
@@ -126,38 +110,6 @@ class ProdutoAuxController extends FormListController
         return $this->doDatatablesJsList($request);
     }
 
-
-    /**
-     *
-     * @Route("/moverImagens", name="moverImagens")
-     * @param Request $request
-     * @return Response
-     * @throws ViewException
-     *
-     * @IsGranted({"ROLE_ESTOQUE_ADMIN"}, statusCode=403)
-     */
-    public function moverImagens(Request $request): Response
-    {
-        $conn = $this->getDoctrine()->getConnection();
-
-        $crosierBaseDir = '/opt/crosier/';
-
-        $qryProdutos = $conn->query('SELECT p.*, img.* FROM est_produto_imagem img JOIN est_produto p ON p.id = img.produto_id');
-        while ($produto = $qryProdutos->fetch()) {
-            $novoDir = $crosierBaseDir . 'crosierapp-vendest/public/images/produtos/' . $produto['depto_id'] . '/' . $produto['grupo_id'] . '/' . $produto['subgrupo_id'] . '/';
-            $this->logger->info($novoDir);
-            if (!file_exists($novoDir) && !mkdir($novoDir, 0777, true) && !is_dir($novoDir)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $novoDir));
-            }
-            if (file_exists($crosierBaseDir . 'crosierapp-vendest/public/images/produtos/5d/' . $produto['image_name']) &&
-                !file_exists($novoDir . $produto['image_name'])) {
-                rename($crosierBaseDir . 'crosierapp-vendest/public/images/produtos/5d/' . $produto['image_name'], $novoDir . $produto['image_name']);
-            }
-
-        }
-
-        return new Response('OK');
-    }
 
 
 }

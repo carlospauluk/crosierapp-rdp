@@ -50,53 +50,8 @@ class ProdutoBusiness
     {
 
         try {
-//            $pool = new \Cache\Adapter\Apcu\ApcuCachePool();
-//            $simpleCache = new \Cache\Bridge\SimpleCache\SimpleCacheBridge($pool);
-//
-//            \PhpOffice\PhpSpreadsheet\Settings::setCache($simpleCache);
-
-
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
-
-
-//            $col = 1;
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'Código');
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'Depto');
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'Grupo');
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'Subgrupo');
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'Fornecedor');
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'Nome');
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'Título');
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'Características');
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'EAN');
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'Referência');
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'NCM');
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'Status');
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'Unidade');
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'Código From');
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'Status Cad');
-//            $sheet->setCellValue($this->excelCol($col++) . '1', 'Atualizado');
-//
-//
-//
-//
-//            $qryAtributos = $conn->query('SELECT a.id, a.label, a.tipo, a.config FROM est_atributo a, est_produto_atributo pa WHERE pa.atributo_id = a.id GROUP BY a.id, a.label, a.tipo');
-//            $ordemAtributos = [];
-//            while ($atributo = $qryAtributos->fetch()) {
-//                $ordemAtributos[$atributo['id']] = $col;
-//                if ($atributo['tipo'] === 'COMPO') {
-//                    $subcampos = explode('|', $atributo['config']);
-//                    foreach ($subcampos as $subcampo) {
-//                        $subCampo_configs = explode(',', $subcampo);
-//                        $sheet->setCellValue($this->excelCol($col++) . '1', $atributo['label'] . ' (' . $subCampo_configs[0] . ') ' . $subCampo_configs[2]);
-//                    }
-//                } else {
-//                    $sheet->setCellValue($this->excelCol($col) . '1', $atributo['label']);
-//                    $col++;
-//                }
-//            }
-
 
             $titulos[] = 'Atualizado';
             $titulos[] = 'Código';
@@ -147,6 +102,10 @@ class ProdutoBusiness
             $titulos[] = 'COFINS';
             $titulos[] = 'Dt Últ Saída';
             $titulos[] = 'Dt Últ Entrada';
+
+            $titulos[] = 'Estoque Matriz';
+            $titulos[] = 'Estoque Acessórios';
+            $titulos[] = 'Estoque Total';
 
 
             $conn = $this->doctrine->getEntityManager()->getConnection();
@@ -233,6 +192,10 @@ class ProdutoBusiness
                 $r[] = $atributosProduto['COFINS'] ?? '';
                 $r[] = $atributosProduto['Dt Últ Saída'] ?? '';
                 $r[] = $atributosProduto['Dt Últ Entrada'] ?? '';
+
+                $r[] = $atributosProduto['Estoque "Matriz"'] ?? '';
+                $r[] = $atributosProduto['Estoque "Acessórios"'] ?? '';
+                $r[] = $atributosProduto['Estoque Total'] ?? '';
 
                 $dados[] = $r;
                 $this->logger->info($linha++ . ' escrita(s)');
