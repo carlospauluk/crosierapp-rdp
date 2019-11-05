@@ -199,7 +199,7 @@ class ProdutoBusiness
             //
             //        }
 
-            array_map('unlink', glob($_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL'] . '*.xlsx'));
+            // array_map('unlink', glob($_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL'] . '*.xlsx'));
             $writer = new Xlsx($spreadsheet);
             $nomeArquivo = StringUtils::guidv4() . '_produtos.xlsx';
             $outputFile = $_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL'] . $nomeArquivo;
