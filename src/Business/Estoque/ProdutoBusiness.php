@@ -63,10 +63,6 @@ class ProdutoBusiness
             $titulos[] = 'Grupo';
             $titulos[] = 'Subgrupo';
             $titulos[] = 'Fornecedor';
-            $titulos[] = 'Estoque Deposito';
-            $titulos[] = 'Estoque Matriz';
-            $titulos[] = 'Estoque Acessorios';
-            $titulos[] = 'Total Estoque ';
             $titulos[] = 'Preço Tabela';
             $titulos[] = 'Preço Site';
             $titulos[] = 'Preço Atacado';
@@ -153,10 +149,6 @@ class ProdutoBusiness
                 $r[] = $produto['grupo_codigo'] . ' - ' . $produto['grupo_nome'];
                 $r[] = $produto['subgrupo_codigo'] . ' - ' . $produto['subgrupo_nome'];
                 $r[] = $produto['fornecedor_nome'];
-                $r[] = 0; // $produto['estoque_deposito'];
-                $r[] = 0; // $produto['estoque_matriz'];
-                $r[] = 0; // $produto['estoque_acessorios'];
-                $r[] = 0; // $produto['total_estoque'];
                 $r[] = $atributosProduto['Preço Tabela'] ?? '';
                 $r[] = $atributosProduto['Preço Site'] ?? '';
                 $r[] = $atributosProduto['Preço Atacado'] ?? '';
