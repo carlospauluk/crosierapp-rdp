@@ -41,7 +41,7 @@ class ProdutoAuxController extends FormListController
      *
      * @Route("/est/produto/exportarExcel/", name="est_produto_exportarExcel")
      * @return \Symfony\Component\HttpFoundation\Response
-     * @IsGranted({"ROLE_ESTOQUE_ADMIN"}, statusCode=403)
+     * @IsGranted({"ROLE_ESTOQUE"}, statusCode=403)
      */
     public function exportarExcel(): Response
     {
@@ -71,7 +71,7 @@ class ProdutoAuxController extends FormListController
      * @return Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_ESTOQUE_ADMIN"}, statusCode=403)
+     * @IsGranted({"ROLE_ESTOQUE"}, statusCode=403)
      */
     public function list(Request $request): Response
     {
@@ -103,7 +103,7 @@ class ProdutoAuxController extends FormListController
      * @return Response
      * @throws ViewException
      *
-     * @IsGranted({"ROLE_ESTOQUE_ADMIN"}, statusCode=403)
+     * @IsGranted({"ROLE_ESTOQUE"}, statusCode=403)
      */
     public function datatablesJsList(Request $request): Response
     {
