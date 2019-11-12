@@ -6,8 +6,10 @@ namespace App\Controller\Estoque;
 
 use App\Business\Estoque\ProdutoBusiness;
 use App\Entity\Estoque\Produto;
+use App\Repository\Estoque\ProdutoRepository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
+use CrosierSource\CrosierLibBaseBundle\Twig\FilterInput;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -76,6 +78,8 @@ class ProdutoAuxController extends FormListController
     {
         return [
             new FilterData(['nome', 'titulo', 'id', 'codigoFrom'], 'LIKE', 'str', $params),
+            new FilterData(['nomeDepto'], 'LIKE', 'nomeDepto', $params),
+            new FilterData(['porcentPreench'], 'BETWEEN_PORCENT', 'porcentPreench', $params),
         ];
     }
 
@@ -98,6 +102,11 @@ class ProdutoAuxController extends FormListController
             'listRouteAjax' => 'est_produto_datatablesJsList',
             'listPageTitle' => 'Produtos',
             'listId' => 'produto_list'
+        ];
+        $params['filterInputs'] = [
+            new FilterInput('Nome/Título/Código', 'str'),
+            new FilterInput('Depto', 'nomeDepto'),
+            new FilterInput('Status Cad', 'porcentPreench', 'BETWEEN_INTEGER', null, ['sufixo' => '%'])
         ];
         $params['listAuxDatas'] = json_encode(['crosierAppVendestUrl' => $_SERVER['CROSIERAPPVENDEST_URL']]);
         return $this->doList($request, $params);
@@ -129,34 +138,40 @@ class ProdutoAuxController extends FormListController
 
     /**
      *
-     * @Route("/moverImagens", name="moverImagens")
+     * @Route("/est/produto/dashboard", name="est_produto_dashboard")
      * @param Request $request
      * @return Response
-     * @throws ViewException
      *
-     * @IsGranted({"ROLE_ESTOQUE_ADMIN"}, statusCode=403)
+     * @IsGranted({"ROLE_ESTOQUE"}, statusCode=403)
+     * @throws \Exception
      */
-    public function moverImagens(Request $request): Response
+    public function dashboardEstoque(Request $request): Response
     {
-        $conn = $this->getDoctrine()->getConnection();
+        $hoje = (new \DateTime())->format('d/m/Y');
 
-        $crosierBaseDir = '/opt/crosier/';
+        /** @var ProdutoRepository $repoProdutos */
+        $repoProdutos = $this->getDoctrine()->getRepository(Produto::class);
 
-        $qryProdutos = $conn->query('SELECT p.*, img.* FROM est_produto_imagem img JOIN est_produto p ON p.id = img.produto_id');
-        while ($produto = $qryProdutos->fetch()) {
-            $novoDir = $crosierBaseDir . 'crosierapp-vendest/public/images/produtos/' . $produto['depto_id'] . '/' . $produto['grupo_id'] . '/' . $produto['subgrupo_id'] . '/';
-            $this->logger->info($novoDir);
-            if (!file_exists($novoDir) && !mkdir($novoDir, 0777, true) && !is_dir($novoDir)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $novoDir));
-            }
-            if (file_exists($crosierBaseDir . 'crosierapp-vendest/public/images/produtos/5d/' . $produto['image_name']) &&
-                !file_exists($novoDir . $produto['image_name'])) {
-                rename($crosierBaseDir . 'crosierapp-vendest/public/images/produtos/5d/' . $produto['image_name'], $novoDir . $produto['image_name']);
-            }
+        $deptos = $repoProdutos->findDeptos();
 
+        foreach ($deptos as $depto) {
+            $qtde = $repoProdutos->count(['nomeDepto' => $depto['deptoNome']]);
+            $params['deptos'][$depto['deptoNome']] = $qtde;
         }
 
-        return new Response('OK');
+
+        $qtde = $repoProdutos->doCountByFiltersSimpl([['porcentPreench', 'EQ', 0]]);
+        $params['porcentPreench'][0] = $qtde;
+        for ($i = 1 ; $i<100 ; $i+=10) {
+            $qtde = $repoProdutos->doCountByFiltersSimpl([['porcentPreench', 'BETWEEN', [$i/100, ($i+9)/100]]]);
+            $params['porcentPreench'][$i] = $qtde;
+        }
+
+
+        $params['hoje'] = $hoje;
+
+        return $this->doRender('/Estoque/dashboardEstoque.html.twig', $params);
+
     }
 
 

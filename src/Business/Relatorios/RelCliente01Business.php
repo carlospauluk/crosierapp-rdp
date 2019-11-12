@@ -49,7 +49,7 @@ class RelCliente01Business
      */
     public function processarArquivosNaFila(): void
     {
-        $pastaFila = $_SERVER['PASTA_UPLOAD_RELCLIENTE01'] . 'fila/';
+        $pastaFila = $_SERVER['PASTA_UPLOAD_RELCLIENTES01'] . 'fila/';
         $files = scandir($pastaFila, 0);
         foreach ($files as $file) {
             if (!in_array($file, array('.', '..'))) {
@@ -58,10 +58,10 @@ class RelCliente01Business
                     $this->processarArquivo($file);
                     $this->marcarDtHrAtualizacao();
                     $this->logger->info('Arquivo processado com sucesso.');
-                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCLIENTE01'] . 'ok/' . $file);
+                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCLIENTES01'] . 'ok/' . $file);
                     $this->logger->info('Arquivo movido para pasta "ok".');
                 } catch (\Exception $e) {
-                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCLIENTE01'] . 'falha/' . $file);
+                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCLIENTES01'] . 'falha/' . $file);
                     $this->logger->info('Arquivo movido para pasta "falha".');
                 }
             }
@@ -75,7 +75,7 @@ class RelCliente01Business
      */
     public function processarArquivo(string $arquivo): int
     {
-        $pastaFila = $_SERVER['PASTA_UPLOAD_RELCLIENTE01'] . 'fila/';
+        $pastaFila = $_SERVER['PASTA_UPLOAD_RELCLIENTES01'] . 'fila/';
         $conteudo = file_get_contents($pastaFila . $arquivo);
         $linhas = explode(PHP_EOL, $conteudo);
         $totalRegistros = count($linhas);

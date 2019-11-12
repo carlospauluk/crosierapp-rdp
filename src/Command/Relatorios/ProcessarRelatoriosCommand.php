@@ -110,7 +110,7 @@ class ProcessarRelatoriosCommand extends Command
     {
         $this->setName('crosierapprdp:processarRelatorios');
         $this->addArgument('tipoRelatorio', InputArgument::REQUIRED,
-            'Tipo de relatório [\'RELCTSPAGREC01\', \'RELVENDAS01\', \'RELCOMPFOR01\', \'RELESTOQUE01\', \'RELCOMPRAS01\', \'RELCLIENTE01\']');
+            'Tipo de relatório [\'RELCTSPAGREC01\', \'RELVENDAS01\', \'RELCOMPFOR01\', \'RELESTOQUE01\', \'RELCOMPRAS01\', \'RELCLIENTES01\']');
     }
 
     /**
@@ -140,7 +140,7 @@ class ProcessarRelatoriosCommand extends Command
             case 'RELCOMPRAS01':
                 $this->relCompras01Business->processarArquivosNaFila();
                 break;
-            case 'RELCLIENTE01':
+            case 'RELCLIENTES01':
                 $this->relCliente01Business->processarArquivosNaFila();
                 break;
             default:
