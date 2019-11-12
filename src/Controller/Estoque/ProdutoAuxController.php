@@ -43,7 +43,7 @@ class ProdutoAuxController extends FormListController
      *
      * @Route("/est/produto/exportarExcel/", name="est_produto_exportarExcel")
      * @return \Symfony\Component\HttpFoundation\Response
-     * @IsGranted({"ROLE_ESTOQUE_ADMIN"}, statusCode=403)
+     * @IsGranted({"ROLE_ESTOQUE"}, statusCode=403)
      */
     public function exportarExcel(): Response
     {
@@ -52,22 +52,6 @@ class ProdutoAuxController extends FormListController
         @unlink($outputFile);
         $params = $this->produtoBusiness->gerarExcel();
         return $this->doRender('Estoque/excelProdutos.html.twig', $params);
-    }
-
-    /**
-     * @param int $num
-     * @return string
-     */
-    public function excelCol(int $num): string
-    {
-        $numeric = ($num - 1) % 26;
-        $letter = chr(65 + $numeric);
-        $num2 = (int)(($num - 1) / 26);
-        if ($num2 > 0) {
-            return $this->excelCol($num2) . $letter;
-        }
-        // else
-        return $letter;
     }
 
     /**
@@ -91,7 +75,7 @@ class ProdutoAuxController extends FormListController
      * @return Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_ESTOQUE_ADMIN"}, statusCode=403)
+     * @IsGranted({"ROLE_ESTOQUE"}, statusCode=403)
      */
     public function list(Request $request): Response
     {
@@ -128,7 +112,7 @@ class ProdutoAuxController extends FormListController
      * @return Response
      * @throws ViewException
      *
-     * @IsGranted({"ROLE_ESTOQUE_ADMIN"}, statusCode=403)
+     * @IsGranted({"ROLE_ESTOQUE"}, statusCode=403)
      */
     public function datatablesJsList(Request $request): Response
     {
@@ -162,8 +146,8 @@ class ProdutoAuxController extends FormListController
 
         $qtde = $repoProdutos->doCountByFiltersSimpl([['porcentPreench', 'EQ', 0]]);
         $params['porcentPreench'][0] = $qtde;
-        for ($i = 1 ; $i<100 ; $i+=10) {
-            $qtde = $repoProdutos->doCountByFiltersSimpl([['porcentPreench', 'BETWEEN', [$i/100, ($i+9)/100]]]);
+        for ($i = 1; $i < 100; $i += 10) {
+            $qtde = $repoProdutos->doCountByFiltersSimpl([['porcentPreench', 'BETWEEN', [$i / 100, ($i + 9) / 100]]]);
             $params['porcentPreench'][$i] = $qtde;
         }
 
