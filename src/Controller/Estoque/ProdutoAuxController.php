@@ -94,6 +94,7 @@ class ProdutoAuxController extends FormListController
             new FilterInput('Depto', 'nomeDepto'),
             new FilterInput('Status Cad', 'porcentPreench', 'BETWEEN_INTEGER', null, ['sufixo' => '%']),
             new FilterInput('Qtde Imagens', 'qtdeImagens', 'INTEGER'),
+            new FilterInput('', 'tituloIsNotEmpty', 'HIDDEN'),
         ];
         $params['listAuxDatas'] = json_encode(['crosierAppVendestUrl' => $_SERVER['CROSIERAPPVENDEST_URL']]);
         return $this->doList($request, $params);

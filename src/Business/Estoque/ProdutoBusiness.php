@@ -88,6 +88,7 @@ class ProdutoBusiness
             $titulos[] = 'Largura';
             $titulos[] = 'Profundidade';
             $titulos[] = 'Peso';
+            $titulos[] = 'Qtde Imagens';
             $titulos[] = 'Integr E-commerce';
             $titulos[] = 'Código ERP';
             $titulos[] = 'NCM';
@@ -107,7 +108,7 @@ class ProdutoBusiness
 
             $conn = $this->doctrine->getEntityManager()->getConnection();
 
-            $qryProdutos = $conn->query('SELECT p.*, u.label as unidade FROM est_produto p, est_unidade_produto u WHERE p.unidade_produto_id = u.id ORDER BY id ');
+            $qryProdutos = $conn->query('SELECT p.*, u.label as unidade FROM vw_rdp_est_produto p, est_unidade_produto u WHERE p.unidade_produto_id = u.id AND p.titulo IS NOT NULL AND trim(p.titulo) != \'\' ORDER BY id ');
 
 
             $qryAtributosProduto = $conn->prepare('SELECT a.id, a.label, a.tipo, a.config, a.descricao, pa.valor FROM est_atributo a, est_produto_atributo pa WHERE pa.atributo_id = a.id AND pa.produto_id = :produto_id ORDER BY pa.ordem');
@@ -174,6 +175,7 @@ class ProdutoBusiness
                 $r[] = $atributosProduto['Dimensões_L'] ?? '';
                 $r[] = $atributosProduto['Dimensões_C'] ?? '';
                 $r[] = $atributosProduto['Peso'] ?? '';
+                $r[] = $produto['qtde_imagens'] ?? '';
                 $r[] = $atributosProduto['Integr E-commerce'] ?? '';
                 $r[] = $produto['codigo_from'];
                 $r[] = $produto['ncm'];
