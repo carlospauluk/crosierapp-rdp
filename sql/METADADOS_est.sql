@@ -5,7 +5,8 @@ SELECT p.*,
        CAST(IFNULL(atribEstoqueMatriz.valor, '0.0') AS DECIMAL(15,3))     as saldo_estoque_matriz,
        CAST(IFNULL(atribEstoqueAcessorios.valor, '0.0') AS DECIMAL(15,3)) as saldo_estoque_acessorios,
        CAST(IFNULL(atribEstoqueTotal.valor, '0.0') AS DECIMAL(15,3))      as saldo_estoque_total,
-       img1.image_name              as imagem1
+       img1.image_name              as imagem1,
+       (SELECT count(id) FROM est_produto_imagem imgs WHERE imgs.produto_id = p.id) as qtde_imagens
 FROM est_produto p
          LEFT JOIN est_produto_atributo atribEstoqueMatriz
                    ON (p.id = atribEstoqueMatriz.produto_id AND atribEstoqueMatriz.atributo_id IN (SELECT id
@@ -20,6 +21,7 @@ FROM est_produto p
                                                                                                  FROM est_atributo
                                                                                                  WHERE uuid = '8f25a3e6-cf93-4111-be2b-a46dedc30107'))
          LEFT JOIN est_produto_imagem img1 ON (img1.produto_id = p.id AND img1.ordem = 1)
+
 ;
 
 

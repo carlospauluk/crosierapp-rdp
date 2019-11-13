@@ -235,17 +235,6 @@ class Produto implements EntityId
     /**
      * Redundante: apenas para auxiliar acesso.
      *
-     * @ORM\Column(name="imagem1", type="string")
-     * @NotUppercase()
-     * @Groups("entity")
-     *
-     * @var string|null
-     */
-    public $imagem1;
-
-    /**
-     * Redundante: apenas para auxiliar acesso.
-     *
      * @ORM\Column(name="saldo_estoque_matriz", type="float")
      * @Groups("entity")
      *
@@ -273,6 +262,27 @@ class Produto implements EntityId
      */
     public $saldoEstoqueTotal;
 
+
+    /**
+     * Redundante: apenas para auxiliar acesso.
+     *
+     * @ORM\Column(name="imagem1", type="string")
+     * @NotUppercase()
+     * @Groups("entity")
+     *
+     * @var string|null
+     */
+    public $imagem1;
+
+    /**
+     * Redundante: apenas para auxiliar acesso.
+     *
+     * @ORM\Column(name="qtde_imagens", type="integer")
+     * @Groups("entity")
+     *
+     * @var int|null
+     */
+    public $qtdeImagens;
 
     private function __construct()
     {

@@ -26,7 +26,7 @@ function getDatatablesColumns() {
             data: 'e',
             title: 'Título',
             render: function (data, type, row) {
-                let s = '<div class="float-left">' + data.titulo + '</div>';
+                let s = '<div class="float-left">' + data.titulo ? data.titulo : '' + '</div>';
                 if (data.imagem1) {
                     s += '<div class="float-right"><img src="' + crosierAppVendestUrl + '/images/produtos/' + data.deptoId + '/' + data.grupoId + '/' + data.subgrupoId + '/' + data.imagem1 + '" width="50px"/></div>';
                 }
@@ -56,6 +56,12 @@ function getDatatablesColumns() {
             render: function (data, type, row) {
                 return Numeral(parseFloat(data) * 100).format('0,0') + '%';
             }
+        },
+        {
+            name: 'e.qtdeImagens',
+            data: 'e.qtdeImagens',
+            title: 'Qtde Imagens',
+            className: 'text-center'
         },
         {
             name: 'e.saldoEstoqueTotal',

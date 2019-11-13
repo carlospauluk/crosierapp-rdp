@@ -64,6 +64,8 @@ class ProdutoAuxController extends FormListController
             new FilterData(['nome', 'titulo', 'id', 'codigoFrom'], 'LIKE', 'str', $params),
             new FilterData(['nomeDepto'], 'LIKE', 'nomeDepto', $params),
             new FilterData(['porcentPreench'], 'BETWEEN_PORCENT', 'porcentPreench', $params),
+            new FilterData(['qtdeImagens'], 'EQ', 'qtdeImagens', $params),
+            new FilterData(['titulo'], 'IS_NOT_EMPTY', 'tituloIsNotEmpty', $params),
         ];
     }
 
@@ -90,7 +92,8 @@ class ProdutoAuxController extends FormListController
         $params['filterInputs'] = [
             new FilterInput('Nome/Título/Código', 'str'),
             new FilterInput('Depto', 'nomeDepto'),
-            new FilterInput('Status Cad', 'porcentPreench', 'BETWEEN_INTEGER', null, ['sufixo' => '%'])
+            new FilterInput('Status Cad', 'porcentPreench', 'BETWEEN_INTEGER', null, ['sufixo' => '%']),
+            new FilterInput('Qtde Imagens', 'qtdeImagens', 'INTEGER'),
         ];
         $params['listAuxDatas'] = json_encode(['crosierAppVendestUrl' => $_SERVER['CROSIERAPPVENDEST_URL']]);
         return $this->doList($request, $params);
@@ -151,6 +154,13 @@ class ProdutoAuxController extends FormListController
             $params['porcentPreench'][$i] = $qtde;
         }
 
+
+        $qtdeProdutosComTitulo = $repoProdutos->doCountByFiltersSimpl([['titulo', 'IS_NOT_EMPTY']]);
+        $params['qtdeProdutosComTitulo'] = $qtdeProdutosComTitulo;
+
+
+        $qtdeProdutosComTituloESemFoto = $repoProdutos->doCountByFiltersSimpl([['titulo', 'IS_NOT_EMPTY'], ['qtdeImagens', 'EQ', 0]]);
+        $params['qtdeProdutosComTituloESemFoto'] = $qtdeProdutosComTituloESemFoto;
 
         $params['hoje'] = $hoje;
 
