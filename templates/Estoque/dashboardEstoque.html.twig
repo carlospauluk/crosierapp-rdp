@@ -30,7 +30,9 @@
 
                                 <div class="card flex-fill m-2">
                                     <div class="card-body p-0 d-flex align-items-center">
-                                        <i class="fas fa-boxes bg-info p-4 px-5 font-2xl mr-3"></i>
+                                        <a href="{{ url('est_produto_list', {'filter' : {'tituloIsNotEmpty' : 'true'}}) }}">
+                                            <i class="fas fa-boxes bg-info p-4 px-5 font-2xl mr-3"></i>
+                                        </a>
                                         <div>
                                             <div class="text-value-sm text-info">{{ qtdeProdutosComTitulo }}</div>
                                             <div class="text-muted text-uppercase font-weight-bold small">produtos
