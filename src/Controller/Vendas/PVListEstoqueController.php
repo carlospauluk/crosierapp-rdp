@@ -3,15 +3,14 @@
 namespace App\Controller\Vendas;
 
 
-use App\Entity\Relatorios\RelEstoque01;
+use App\Entity\Estoque\Produto;
 use App\Entity\Vendas\PV;
 use App\Entity\Vendas\PVItem;
-use App\EntityHandler\Relatorios\RelEstoque01EntityHandler;
+use App\EntityHandler\Estoque\ProdutoEntityHandler;
 use App\EntityHandler\Vendas\PVItemEntityHandler;
-use App\Repository\Relatorios\RelEstoque01Repository;
+use App\Repository\Estoque\ProdutoRepository;
 use App\Repository\Vendas\PVRepository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
-use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\EntityIdUtils\EntityIdUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -39,9 +38,9 @@ class PVListEstoqueController extends FormListController
 
     /**
      * @required
-     * @param RelEstoque01EntityHandler $entityHandler
+     * @param ProdutoEntityHandler $entityHandler
      */
-    public function setEntityHandler(RelEstoque01EntityHandler $entityHandler): void
+    public function setEntityHandler(ProdutoEntityHandler $entityHandler): void
     {
         $this->entityHandler = $entityHandler;
     }
@@ -77,62 +76,35 @@ class PVListEstoqueController extends FormListController
     public function getFilterDatas(array $params): array
     {
         return [
-            new FilterData(['descProduto'], 'LIKE', 'descProduto', $params),
-            new FilterData(['descFilial'], 'EQ', 'descFilial', $params),
-            new FilterData(['codFornecedor'], 'EQ', 'codFornecedor', $params),
-            new FilterData(['qtdeMinima'], 'GT', 'qtdeMinima', $params),
-            new FilterData(['deficit'], 'GT', 'deficit', $params),
-            new FilterData(['dtUltSaida'], 'GT', 'dtUltSaidaApartirDe', $params),
+            new FilterData(['nome'], 'LIKE', 'nome', $params),
         ];
     }
 
 
     /**
      *
-     * @Route("/ven/pv/relEstoque01/list/{pv}", name="ven_pv_relEstoque01_list", requirements={"pv"="\d+"})
+     * @Route("/ven/pv/produto/list/{pv}", name="ven_pv_produto_list", requirements={"pv"="\d+"})
      * @param Request $request
      * @param PV $pv
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @throws \Exception
      * @IsGranted({"ROLE_PV"}, statusCode=403)
      */
     public function list(Request $request, PV $pv): Response
     {
         $params = [
-            'listView' => 'Vendas/relEstoque01_list.html.twig',
-            'listRoute' => 'ven_pv_relEstoque01_list',
-            'listRouteAjax' => 'ven_pv_relEstoque01_datatablesJsList',
+            'listView' => 'Vendas/produto_list.html.twig',
+            'listRoute' => 'ven_pv_produto_list',
+            'listRouteAjax' => 'ven_pv_produto_datatablesJsList',
             'listPageTitle' => 'Estoque',
-            'listId' => 'ven_pv_relEstoque01List'
+            'listId' => 'ven_pv_produtoList'
         ];
 
 
-        /** @var RelEstoque01Repository $repo */
-        $repo = $this->getDoctrine()->getRepository(RelEstoque01::class);
-
-        $filiais = $repo->getFiliais();
-        // array_unshift($filiais, ['id' => '', 'text' => 'TODAS']);
-        $params['filiais'] = json_encode($filiais);
-        $descFilial = $request->get('filter')['descFilial'] ?? 'MATRIZ'; // se não selecionou nenhuma, seta a MATRIZ
-        $params['filter']['descFilial'] = $descFilial;
+        /** @var ProdutoRepository $repo */
+        $repo = $this->getDoctrine()->getRepository(Produto::class);
 
         $params['page_subTitle'] = 'PV ' . $pv->getId() . ' (' . $pv->getClienteNome() . ')';
-
-
-        $fornecedores = $repo->getFornecedores();
-        array_unshift($fornecedores, ['id' => '', 'text' => 'TODOS']);
-        $params['fornecedores'] = json_encode($fornecedores);
-        $codFornecedor = $request->get('filter')['codFornecedor'] ?? null;
-        $codFornecedor = $codFornecedor ? (int)$codFornecedor : null;
-
-        if ($request->get('filter')['dtUltSaidaApartirDe'] ?? null) {
-            $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr($request->get('filter')['dtUltSaidaApartirDe']);
-        } else {
-            $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr('1900-01-01');
-        }
-
-        $totais = $repo->totalEstoque($dtUltSaidaApartirDe, $descFilial, $codFornecedor);
-        $params['totais'] = $totais[0] ?? null;
 
         $params['qtdeProdutosNoCarrinho'] = isset($this->session->get('carrinho')['itens']) ? count($this->session->get('carrinho')['itens']) : '';
 
@@ -143,7 +115,7 @@ class PVListEstoqueController extends FormListController
 
     /**
      *
-     * @Route("/ven/pv/relEstoque01/datatablesJsList/", name="ven_pv_relEstoque01_datatablesJsList")
+     * @Route("/ven/pv/produto/datatablesJsList/", name="ven_pv_produto_datatablesJsList")
      * @param Request $request
      * @return Response
      * @throws \CrosierSource\CrosierLibBaseBundle\Exception\ViewException
@@ -166,61 +138,54 @@ class PVListEstoqueController extends FormListController
     public function adicionarNoPV(Request $request): JsonResponse
     {
         $pvId = $request->get('pv');
-        $codProduto = $request->get('codProduto');
-        $filial = $request->get('filial');
+        $produtoId = $request->get('produtoId');
         $qtde = $request->get('qtde');
-        $codFornecedor = $request->get('codFornecedor');
         try {
             $results = [
                 'msg' => null,
                 'produto' => null
             ];
-            /** @var RelEstoque01Repository $repoEstoque */
-            $repoEstoque = $this->getDoctrine()->getRepository(RelEstoque01::class);
-            /** @var RelEstoque01 $produto */
-            $produto = $repoEstoque->findOneBy(['codProduto' => $codProduto, 'codFornecedor' => $codFornecedor, 'descFilial' => $filial], null, 1);
+            /** @var ProdutoRepository $repoEstoque */
+            $repoEstoque = $this->getDoctrine()->getRepository(Produto::class);
+            /** @var Produto $produto */
+            $produto = $repoEstoque->find($produtoId);
 
             /** @var PVRepository $repoPV */
             $repoPV = $this->getDoctrine()->getRepository(PV::class);
             /** @var PV $pv */
             $pv = $repoPV->find($pvId);
 
-            if (!$produto) {
-                $results['msg'] = 'Nenhum produto encontrado com o código "' . $codProduto . '"';
+
+            $achou = false;
+            /** @var PVItem $item */
+            foreach ($pv->getItens() as $item) {
+                if ($item->getProdutoCod() === $produtoId) {
+                    $achou = true;
+                    break;
+                }
+            }
+            if (!$achou) {
+                $pvItem = new PVItem();
+                $pvItem->setPv($pv);
+                $pvItem->setQtde($qtde);
+                $pvItem->setProdutoCod($produto->getId());
+                $pvItem->setProdutoDesc($produto->nome);
+                $pvItem->setCodFornecedor($produto->fornecedorId);
+                $pvItem->setNomeFornecedor($produto->nomeFornecedor);
+                $pvItem->setPrecoCusto($produto->precoCusto);
+                $pvItem->setPrecoVenda($produto->precoTabela);
+                $pvItem->setPrecoOrc($produto->precoTabela);
+                $pvItem->setDesconto(0.0);
+                $pvItem->setTotal(bcmul($produto->precoTabela, $qtde));
+
+                $this->pvItemEntityHandler->save($pvItem);
+
+                $results['msg'] = '"' . $produto->getId() . ' - ' . $produto->nome . '" adicionado com sucesso';
+                $results['produto'] = $produto->getId() . ' - ' . $produto->nome;
             } else {
+                $results['msg'] = '"' . $produto->getId() . ' - ' . $produto->nome . '" já adicionado ao carrinho';
+                $results['produto'] = $produto->getId() . ' - ' . $produto->nome;
 
-                $achou = false;
-                /** @var PVItem $item */
-                foreach ($pv->getItens() as $item) {
-                    if ($item->getProdutoCod() === $codProduto) {
-                        $achou = true;
-                        break;
-                    }
-                }
-                if (!$achou) {
-                    $pvItem = new PVItem();
-                    $pvItem->setPv($pv);
-                    $pvItem->setQtde($qtde);
-                    $pvItem->setProdutoCod($produto->getCodProduto());
-                    $pvItem->setProdutoDesc($produto->getDescProduto());
-                    $pvItem->setCodFornecedor($produto->getCodFornecedor());
-                    $pvItem->setNomeFornecedor($produto->getNomeFornecedor());
-                    $pvItem->setPrecoCusto($produto->getCustoMedio());
-                    $pvItem->setPrecoVenda($produto->getPrecoVenda());
-                    $pvItem->setPrecoOrc($produto->getPrecoVenda());
-                    $pvItem->setDesconto(0.0);
-                    $pvItem->setTotal(bcmul($produto->getPrecoVenda(), $qtde));
-
-                    $this->pvItemEntityHandler->save($pvItem);
-
-
-                    $results['msg'] = '"' . $produto->getCodProduto() . ' - ' . $produto->getDescProduto() . '" adicionado com sucesso';
-                    $results['produto'] = $produto->getCodProduto() . ' - ' . $produto->getDescProduto();
-                } else {
-                    $results['msg'] = '"' . $produto->getCodProduto() . ' - ' . $produto->getDescProduto() . '" já adicionado ao carrinho';
-                    $results['produto'] = $produto->getCodProduto() . ' - ' . $produto->getDescProduto();
-
-                }
             }
 
         } catch (\Exception $e) {

@@ -7,11 +7,11 @@ namespace App\Business\Estoque;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
 use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * Controller auxiliar ao ProdutoController
@@ -25,7 +25,7 @@ class ProdutoBusiness
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var RegistryInterface */
+    /** @var EntityManagerInterface */
     private $doctrine;
 
     /**
@@ -39,9 +39,9 @@ class ProdutoBusiness
 
     /**
      * @required
-     * @param RegistryInterface $doctrine
+     * @param EntityManagerInterface $doctrine
      */
-    public function setDoctrine(RegistryInterface $doctrine): void
+    public function setDoctrine(EntityManagerInterface $doctrine): void
     {
         $this->doctrine = $doctrine;
     }
@@ -106,7 +106,7 @@ class ProdutoBusiness
             $titulos[] = 'Estoque Total';
 
 
-            $conn = $this->doctrine->getEntityManager()->getConnection();
+            $conn = $this->doctrine->getConnection();
 
             $qryProdutos = $conn->query('SELECT p.*, u.label as unidade FROM vw_rdp_est_produto p, est_unidade_produto u WHERE p.unidade_produto_id = u.id AND p.titulo IS NOT NULL AND trim(p.titulo) != \'\' ORDER BY id ');
 
@@ -237,7 +237,7 @@ class ProdutoBusiness
     public function atualizarCamposEstoqueProdutoPelaRelEstoque01(): void
     {
         $this->logger->debug('Iniciando atualizarCamposEstoqueProdutoPelaRelEstoque01()');
-        $conn = $this->doctrine->getEntityManager()->getConnection();
+        $conn = $this->doctrine->getConnection();
         $conn->beginTransaction();
 
 
@@ -337,7 +337,7 @@ class ProdutoBusiness
      */
     private function verificaEInsereProdutoPossuiAtributosEstoques(array $produto, int $atributoId, int $ordem): void
     {
-        $conn = $this->doctrine->getEntityManager()->getConnection();
+        $conn = $this->doctrine->getConnection();
         $qryAtributoProduto = $conn->prepare('SELECT * FROM est_produto_atributo WHERE atributo_id = :atributo_id AND produto_id = :produto_id');
 
         $qryAtributoProduto->bindValue('atributo_id', $atributoId);

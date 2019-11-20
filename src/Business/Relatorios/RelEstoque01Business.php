@@ -13,7 +13,7 @@ use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ConnectionException;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  *
@@ -23,7 +23,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 class RelEstoque01Business
 {
 
-    /** @var RegistryInterface */
+    /** @var EntityManagerInterface */
     private $doctrine;
 
     /** @var LoggerInterface */
@@ -33,11 +33,11 @@ class RelEstoque01Business
     private $appConfigEntityHandler;
 
     /**
-     * @param RegistryInterface $doctrine
+     * @param EntityManagerInterface $doctrine
      * @param LoggerInterface $logger
      * @param AppConfigEntityHandler $appConfigEntityHandler
      */
-    public function __construct(RegistryInterface $doctrine,
+    public function __construct(EntityManagerInterface $doctrine,
                                 LoggerInterface $logger,
                                 AppConfigEntityHandler $appConfigEntityHandler)
     {
@@ -82,7 +82,7 @@ class RelEstoque01Business
         $linhas = explode(PHP_EOL, $conteudo);
         $totalRegistros = count($linhas);
         /** @var Connection $conn */
-        $conn = $this->doctrine->getEntityManager()->getConnection();
+        $conn = $this->doctrine->getConnection();
 
         $conn->beginTransaction();
 

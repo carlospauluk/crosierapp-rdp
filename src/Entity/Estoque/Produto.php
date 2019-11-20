@@ -38,7 +38,6 @@ class Produto implements EntityId
     public $deptoId;
 
     /**
-     * Redundante: apenas para auxiliar acesso.
      *
      * @ORM\Column(name="depto_codigo", type="string")
      * @NotUppercase()
@@ -49,7 +48,6 @@ class Produto implements EntityId
     public $codigoDepto;
 
     /**
-     * Redundante: apenas para auxiliar acesso.
      *
      * @ORM\Column(name="depto_nome", type="string")
      * @Groups("entity")
@@ -68,7 +66,6 @@ class Produto implements EntityId
     public $grupoId;
 
     /**
-     * Redundante: apenas para auxiliar acesso.
      *
      * @ORM\Column(name="grupo_codigo", type="string")
      * @NotUppercase()
@@ -79,7 +76,6 @@ class Produto implements EntityId
     public $codigoGrupo;
 
     /**
-     * Redundante: apenas para auxiliar acesso.
      *
      * @ORM\Column(name="grupo_nome", type="string")
      * @Groups("entity")
@@ -98,7 +94,6 @@ class Produto implements EntityId
     public $subgrupoId;
 
     /**
-     * Redundante: apenas para auxiliar acesso.
      *
      * @ORM\Column(name="subgrupo_codigo", type="string")
      * @NotUppercase()
@@ -109,7 +104,6 @@ class Produto implements EntityId
     public $codigoSubgrupo;
 
     /**
-     * Redundante: apenas para auxiliar acesso.
      *
      * @ORM\Column(name="subgrupo_nome", type="string")
      * @Groups("entity")
@@ -119,17 +113,15 @@ class Produto implements EntityId
     public $nomeSubgrupo;
 
     /**
-     * Redundante: apenas para auxiliar acesso.
      *
-     * @ORM\Column(name="fornecedor_nome", type="string")
+     * @ORM\Column(name="fornecedor_id", type="bigint")
      * @Groups("entity")
      *
-     * @var string|null
+     * @var int|null
      */
-    public $nomeFornecedor;
+    public $fornecedorId;
 
     /**
-     * Redundante: apenas para auxiliar acesso.
      *
      * @ORM\Column(name="fornecedor_documento", type="string")
      * @Groups("entity")
@@ -137,6 +129,15 @@ class Produto implements EntityId
      * @var string|null
      */
     public $documentoFornecedor;
+
+    /**
+     *
+     * @ORM\Column(name="fornecedor_nome", type="string")
+     * @Groups("entity")
+     *
+     * @var string|null
+     */
+    public $nomeFornecedor;
 
     /**
      *
@@ -233,7 +234,6 @@ class Produto implements EntityId
     public $porcentPreench;
 
     /**
-     * Redundante: apenas para auxiliar acesso.
      *
      * @ORM\Column(name="saldo_estoque_matriz", type="float")
      * @Groups("entity")
@@ -243,7 +243,6 @@ class Produto implements EntityId
     public $saldoEstoqueMatriz;
 
     /**
-     * Redundante: apenas para auxiliar acesso.
      *
      * @ORM\Column(name="saldo_estoque_acessorios", type="float")
      * @Groups("entity")
@@ -253,7 +252,6 @@ class Produto implements EntityId
     public $saldoEstoqueAcessorios;
 
     /**
-     * Redundante: apenas para auxiliar acesso.
      *
      * @ORM\Column(name="saldo_estoque_total", type="float")
      * @Groups("entity")
@@ -261,6 +259,24 @@ class Produto implements EntityId
      * @var float|null
      */
     public $saldoEstoqueTotal;
+
+    /**
+     *
+     * @ORM\Column(name="preco_custo", type="float")
+     * @Groups("entity")
+     *
+     * @var float|null
+     */
+    public $precoCusto;
+
+    /**
+     *
+     * @ORM\Column(name="preco_tabela", type="float")
+     * @Groups("entity")
+     *
+     * @var float|null
+     */
+    public $precoTabela;
 
 
     /**

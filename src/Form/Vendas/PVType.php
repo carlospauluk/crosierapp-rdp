@@ -9,7 +9,7 @@ use App\Repository\Vendas\PVRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\NumberUtils\DecimalUtils;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -31,14 +31,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class PVType extends AbstractType
 {
 
-    /** @var RegistryInterface */
+    /** @var EntityManagerInterface */
     private $doctrine;
 
     /**
      * @required
-     * @param RegistryInterface $doctrine
+     * @param EntityManagerInterface $doctrine
      */
-    public function setDoctrine(RegistryInterface $doctrine): void
+    public function setDoctrine(EntityManagerInterface $doctrine): void
     {
         $this->doctrine = $doctrine;
     }

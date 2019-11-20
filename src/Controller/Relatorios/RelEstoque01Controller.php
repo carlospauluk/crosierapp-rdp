@@ -81,7 +81,7 @@ class RelEstoque01Controller extends FormListController
      *
      * @Route("/relEstoque01/list/", name="relEstoque01_list")
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @throws \Exception
      *
      * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
@@ -134,7 +134,7 @@ class RelEstoque01Controller extends FormListController
      * @Route("/relEstoque01/datatablesJsList/", name="relEstoque01_datatablesJsList")
      * @param Request $request
      * @return Response
-     * @throws \CrosierSource\CrosierLibBaseBundle\Exception\ViewException
+     * @throws ViewException
      *
      * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */
@@ -155,7 +155,7 @@ class RelEstoque01Controller extends FormListController
      *
      * @Route("/relEstoque01/listReposicao/", name="relEstoque01_listReposicao")
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @throws \Exception
      *
      * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
@@ -222,7 +222,7 @@ class RelEstoque01Controller extends FormListController
      * @Route("/relEstoque01/listReposicao/datatablesJsList/", name="relEstoque01_listReposicao_datatablesJsList")
      * @param Request $request
      * @return Response
-     * @throws \CrosierSource\CrosierLibBaseBundle\Exception\ViewException
+     * @throws ViewException
      *
      * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
      */

@@ -8,6 +8,9 @@ use App\EntityHandler\Relatorios\RelCliente01EntityHandler;
 use App\Form\Relatorios\RelCliente01Type;
 use App\Repository\Relatorios\RelCliente01Repository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
+use CrosierSource\CrosierLibBaseBundle\Entity\Config\AppConfig;
+use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
+use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -62,12 +65,21 @@ class RelCliente01Controller extends FormListController
      */
     public function list(Request $request): Response
     {
+
+        /** @var AppConfigRepository $repoAppConfig */
+        $repoAppConfig = $this->getDoctrine()->getRepository(AppConfig::class);
+        /** @var AppConfig $appConfig */
+        $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'relCliente01.dthrAtualizacao'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
+        $dthrAtualizacao = $appConfig ? $appConfig->getValor() : null;
+        $dthrAtualizacao = $dthrAtualizacao ? DateTimeUtils::parseDateStr($dthrAtualizacao) : '';
+
         $params = [
             'formRoute' => 'relCliente01_form',
-            'listView' => 'Relatorios/pv_list.html.twig',
+            'listView' => 'Relatorios/relCliente01_list.html.twig',
             'listRoute' => 'relCliente01_list',
             'listRouteAjax' => 'relCliente01_datatablesJsList',
             'listPageTitle' => 'Clientes',
+            'page_subTitle' => 'Atualizado em: ' . $dthrAtualizacao->format('d/m/Y H:i:s'),
             'listId' => 'relCliente01_list'
         ];
         return $this->doList($request, $params);
@@ -105,7 +117,7 @@ class RelCliente01Controller extends FormListController
         }
         $params = [
             'typeClass' => RelCliente01Type::class,
-            'formView' => 'Relatorios/pv_form.html.twig',
+            'formView' => 'Relatorios/relCliente01_form.html.twig',
             'formRoute' => 'relCliente01_form',
             'formPageTitle' => 'Cliente'
         ];
