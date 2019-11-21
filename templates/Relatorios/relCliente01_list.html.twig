@@ -12,6 +12,14 @@
                value="{{ filter.codigo|default('') }}">
     </div>
 
+    <div class="form-group">
+        <label for="filter[nome]">Nome</label>
+        <input type="text"
+               class="form-control" id="filter[nome]"
+               name="filter[nome]"
+               value="{{ filter.nome|default('') }}">
+    </div>
+
 {% endblock %}
 
 

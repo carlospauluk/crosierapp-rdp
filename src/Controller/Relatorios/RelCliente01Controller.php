@@ -50,7 +50,8 @@ class RelCliente01Controller extends FormListController
     public function getFilterDatas(array $params): array
     {
         return [
-            new FilterData(['codigo'], 'EQ', 'codigo', $params)
+            new FilterData(['codigo'], 'EQ', 'codigo', $params),
+            new FilterData(['nome'], 'LIKE', 'nome', $params)
         ];
     }
 
