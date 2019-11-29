@@ -12,60 +12,93 @@ class CrosierMasks {
             clearIfNotMatch: true,
             selectOnFocus: true
         });
+        $('.crsr-date-diames').mask('00/00', {
+            clearIfNotMatch: true,
+            selectOnFocus: true
+        });
+        $('.crsr-mesano').mask('00/0000', {
+            clearIfNotMatch: true,
+            selectOnFocus: true
+        });
         $('.crsr-datetime').mask('00/00/0000 00:00:00', {
+            clearIfNotMatch: true,
+            selectOnFocus: true
+        });
+        $('.crsr-datetime-hm').mask('00/00/0000 00:00', {
             clearIfNotMatch: true,
             selectOnFocus: true
         });
     }
 
-    static maskMoneys() {
-        $(".crsr-money").each(function () {
-
-            $(this).maskMoney({
-                prefix: '',
-                thousands: '.',
-                decimal: ',',
-                affixesStay: true,
-                allowZero: true,
-                precision: 2
-            });
-            $(this).trigger('mask.maskMoney');
-
-        });
-    }
-
     static maskDecs() {
 
-        $(".crsr-dec2").maskMoney({
+
+
+        let $dec1 = $(".crsr-dec1, .decimal1");
+        let $dec2 = $(".crsr-dec2, .decimal2, .crsr-money, .money, .dinheiro");
+        let $dec3 = $(".crsr-dec3, .decimal3");
+        let $dec4 = $(".crsr-dec4, .decimal4");
+        let $dec5 = $(".crsr-dec5, .decimal5");
+
+        $dec1.maskMoney({
+            prefix: '',
+            thousands: '.',
+            decimal: ',',
+            affixesStay: true,
+            precision: 1,
+            allowZero: true,
+            allowEmpty: true,
+            selectAllOnFocus: true
+        });
+        $dec1.trigger('mask.maskMoney');
+
+        $dec2.maskMoney({
             prefix: '',
             thousands: '.',
             decimal: ',',
             affixesStay: true,
             precision: 2,
-            allowZero: true
+            allowZero: true,
+            allowEmpty: true,
+            selectAllOnFocus: true
         });
-        $(".crsr-dec2").trigger('mask.maskMoney');
+        $dec2.trigger('mask.maskMoney');
 
-        $(".crsr-dec3").maskMoney({
+        $dec3.maskMoney({
             prefix: '',
             thousands: '.',
             decimal: ',',
             affixesStay: true,
             precision: 3,
-            allowZero: true
+            allowZero: true,
+            allowEmpty: true,
+            selectAllOnFocus: true
         });
-        $(".crsr-dec3").trigger('mask.maskMoney');
+        $dec3.trigger('mask.maskMoney');
 
-
-        $(".crsr-dec4").maskMoney({
+        $dec4.maskMoney({
             prefix: '',
             thousands: '.',
             decimal: ',',
             affixesStay: true,
             precision: 4,
-            allowZero: true
+            allowZero: true,
+            allowEmpty: true,
+            selectAllOnFocus: true
         });
-        $(".crsr-dec4").trigger('mask.maskMoney');
+        $dec4.trigger('mask.maskMoney');
+
+        $dec5.maskMoney({
+            prefix: '',
+            thousands: '.',
+            decimal: ',',
+            affixesStay: true,
+            precision: 4,
+            allowZero: true,
+            allowEmpty: true,
+            selectAllOnFocus: true
+        });
+        $dec5.trigger('mask.maskMoney');
 
     }
 
@@ -78,10 +111,33 @@ class CrosierMasks {
             clearIfNotMatch: true,
             selectOnFocus: true
         });
+
+        $('.cpfCnpj').on('focus', function (e) {
+            $(this).unmask();
+        });
+
+        $('.cpfCnpj').on('blur', function (e) {
+            $(this).val($(this).val().replace(/[^\d]+/g,''));
+            if ($(this).val().length == 11) {
+                $(this).mask('000.000.000-00', {
+                    clearIfNotMatch: true,
+                    selectOnFocus: true
+                });
+            } else if ($(this).val().length == 14) {
+                $(this).mask('00.000.000/0000-00', {
+                    clearIfNotMatch: true,
+                    selectOnFocus: true
+                });
+            }
+        });
     }
 
     static maskCEP() {
         $('.cep').mask('00000-000', {
+            clearIfNotMatch: true,
+            selectOnFocus: true
+        });
+        $('.cepComBtnConsulta').mask('00000-000', {
             clearIfNotMatch: true,
             selectOnFocus: true
         });
@@ -105,7 +161,6 @@ class CrosierMasks {
 
     static maskAll() {
         CrosierMasks.maskDateTimes();
-        CrosierMasks.maskMoneys();
         CrosierMasks.maskDecs();
         CrosierMasks.maskCPF_CNPJ();
         CrosierMasks.maskTelefone9digitos();
