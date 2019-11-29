@@ -35,19 +35,24 @@ class DatatablesJs {
 
             $.extend(defaultParams, params);
 
-            Pace.track(function() {
-                let datatable = $(listId).DataTable(defaultParams);
+            let datatable = $(listId).on('preXhr.dt', function (e, settings, processing) {
+                console.log('foi');
+                if (processing) {
+                    Pace.start();
+                } else {
+                    Pace.stop();
+                }
+            }).DataTable(defaultParams);
 
-                datatable.on('preDraw', function () {
-                    console.log('preDraw');
-                });
+            datatable.on('preDraw', function () {
+                console.log('preDraw');
+            });
 
-                datatable.on('draw', function () {
-                    $('[data-toggle="tooltip"]').tooltip();
-                    CrosierMasks.maskAll();
-                    Pace.restart();
-                    console.log('draw');
-                });
+            datatable.on('draw', function () {
+                $('[data-toggle="tooltip"]').tooltip();
+                CrosierMasks.maskAll();
+                Pace.restart();
+                console.log('draw');
             });
 
 
