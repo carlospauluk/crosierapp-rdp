@@ -61,7 +61,9 @@ class ProdutoAuxController extends FormListController
     public function getFilterDatas(array $params): array
     {
         return [
-            new FilterData(['nome', 'titulo', 'id', 'codigoFrom'], 'LIKE', 'str', $params),
+            new FilterData(['id'], 'EQ', 'id', $params),
+            new FilterData(['codigoFrom'], 'EQ', 'codigoFrom', $params),
+            new FilterData(['nome', 'titulo'], 'LIKE', 'nomeTitulo', $params),
             new FilterData(['nomeDepto'], 'LIKE', 'nomeDepto', $params),
             new FilterData(['porcentPreench'], 'BETWEEN_PORCENT', 'porcentPreench', $params),
             new FilterData(['qtdeImagens'], 'EQ', 'qtdeImagens', $params),
@@ -90,7 +92,9 @@ class ProdutoAuxController extends FormListController
             'listId' => 'produto_list'
         ];
         $params['filterInputs'] = [
-            new FilterInput('Nome/Título/Código', 'str'),
+            new FilterInput('Código', 'id'),
+            new FilterInput('Código (ERP)', 'codigoFrom'),
+            new FilterInput('Nome/Título/Código', 'nomeTitulo'),
             new FilterInput('Depto', 'nomeDepto'),
             new FilterInput('Status Cad', 'porcentPreench', 'BETWEEN_INTEGER', null, ['sufixo' => '%']),
             new FilterInput('Qtde Imagens', 'qtdeImagens', 'INTEGER'),
