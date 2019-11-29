@@ -89,6 +89,7 @@ class ProdutoAuxController extends FormListController
             'listRoute' => 'est_produto_list',
             'listRouteAjax' => 'est_produto_datatablesJsList',
             'listPageTitle' => 'Produtos',
+            'formUrl' => $_SERVER['CROSIERAPPVENDEST_URL'] . '/est/produto/form',
             'listId' => 'produto_list'
         ];
         $params['filterInputs'] = [

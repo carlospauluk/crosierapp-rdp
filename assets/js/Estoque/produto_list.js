@@ -88,6 +88,8 @@ function getDatatablesColumns() {
     ];
 }
 
+Pace.start();
+Pace.restart();
 
 DatatablesJs.makeDatatableJs(listId, getDatatablesColumns());
 
