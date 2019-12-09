@@ -84,7 +84,124 @@ class RelCliente01Business
 
         $conn->beginTransaction();
 
-        // CODIGO,NOME,CPF,RG,ENDER,CIDADE,UF,CEP,DDD,FONE,BAIRRO,LOCALIZADOR,COND_PAGTO,DESBLOQUEIO_TMP,AC_COMPRAS,FLAG_LIB_PRECO,SUGERE_CONSULTA,MARGEM_ESPECIAL,LIMITE_COMPRAS,CLIENTE_BLOQUEADO
+        /**
+         * CODIGO    codigo
+         * NOME    nome
+         * DATA_PRI    dt_pri
+         * DATA_CADASTRO    dt_cadastro
+         * CPF_CNPJ    documento
+         * RG_IE    rg
+         * ENDER    endereco
+         * CIDADE    cidade
+         * UF    estado
+         * CEP    cep
+         * DDD    fone
+         * FONE
+         * BAIRRO    bairro
+         * TIPO    tipo
+         * ENDER_TRABALHO    trabalho_endereco
+         * CIDADE_TRA    trabalho_cidade
+         * UF_TRA    trabalho_estado
+         * CEP_TRA    trabalho_cep
+         * DDD_FAX    trabalho_fax
+         * FONE_FAX
+         * DATA_ULT_COMPRA    dt_ult_compra
+         * CARGO_TRA    trabalho_cargo
+         * MAIOR_COMPRA    vlr_maior_compra
+         * CONJUGE    conjuge_nome
+         * NASC_CONJUGE    conjuge_dt_nasc
+         * TRABALHO_CON    conjuge_trabalho
+         * RG_CON    conjuge_rg
+         * ENDER_TRA_CON    conjuge_trabalho_endereco
+         * CID_TRA_CON    conjuge_trabalho_cidade
+         * DIAS_ATRASO    dias_atraso
+         * CEP_TRA_CON    conjuge_trabalho_cep
+         * DDD_TRA_CON    conjuge_trabalho_fone
+         * FONE_TRA_CON
+         * ADM_TRA_CON    conjuge_trabalho_adm
+         * CLIENTE_BLOQUEADO    cliente_bloqueado
+         * VLR_ULTCOMPRA    vlr_ult_compra
+         * OBS3    obs3
+         * PESSOAS_AUTO2    pessoas_auto2
+         * DESBLOQUEIO_TMP    desbloqueio_tmp
+         * DATA_PAGTO    dt_pagto
+         * OBS1    obs1
+         * OBS2    obs2
+         * COND_PAGTO    cond_pagto
+         * SUSPENSO    suspenso
+         * LIMITE_COMPRAS    limite_compras
+         * AC_COMPRAS    ac_compras
+         * LOCALIZADOR    localizador
+         * ENDERCOB    cobranca_endereco
+         * CIDADECOB    cobranca_cidade
+         * UFCOB    cobranca_estado
+         * CEPCOB    cobranca_cep
+         * BAIRROCOB    cobranca_bairro
+         * OBS4    obs4
+         * OBS5    obs5
+         * OBS6    obs6
+         * NAS_PROP    dt_nas_prop
+         * NAS_FUNDA    dt_nas_funda
+         * RAMO    ramo
+         * BENS01    bens1
+         * BENS02    bens2
+         * SCANIA    scania
+         * VOLVO    volvo
+         * MB    mb
+         * OUTROS    outros
+         * SCANIA01    scania01
+         * VOLVO01    volvo01
+         * MB01    mb01
+         * OUTROS01    outros01
+         * FLAG_CASA    flag_casa
+         * REF_BANCO    ref_banco
+         * REF_BANCO01    ref_banco01
+         * REF_COME    ref_come
+         * REF_COME01    ref_come01
+         * VENDEDOR    vendedor
+         * PAI    pai
+         * MAE    mae
+         * PES_CONHE    conhecido_pes
+         * FON_CONHE    conhecido_fone
+         * EMAIL    email
+         * INTEG_WLE    integ_wle
+         * OBS01    obs01
+         * OBS02    obs02
+         * OBS03    obs03
+         * OBS04    obs04
+         * OBS05    obs05
+         * OBS06    obs06
+         * OBS07    obs07
+         * OBS08    obs08
+         * OBS09    obs09
+         * OBS10    obs10
+         * OBS11    obs11
+         * OBS12    obs12
+         * OBS13    obs13
+         * OBS14    obs14
+         * OBS15    obs15
+         * OBS16    obs16
+         * OBS17    obs17
+         * OBS18    obs18
+         * OBS19    obs19
+         * OBS20    obs20
+         * RG2    rg2
+         * NUMERO_ENDER    endereco
+         * COMPLEMENTO    complemento
+         * COD_MUNIC    cod_munic
+         * FLAG_LIB_PRECO    flag_lib_preco
+         * SUGERE_CONSULTA    sugere_consulta
+         * FLAG_COMISSAO    flag_comissao
+         * DIAS_TRV_FAT    dias_trv_fat
+         * MARGEM_ESPECIAL    margem_especial
+         * TIPO_CLIENTE    tipo_cliente
+         * TIPO_FORNEC    tipo_fornec
+         * FLAG_SCP    flag_scp
+         * FLAG_CHEQUEDEV    flag_chequedev
+         * COD_CONSUL    cod_consul
+         * FROTISTA    frotista
+         * CLASSIFICACAO    classificacao
+         */
 
         $t = 0;
         $linha = null;
@@ -95,11 +212,15 @@ class RelCliente01Business
                     continue;
                 }
                 $campos = explode('|', $linha);
-                if (count($campos) !== 20) {
-                    throw new ViewException('Qtde de campos difere de 20 para a linha "' . $linha . '"');
+                if (count($campos) !== 116) {
+                    throw new ViewException('Qtde de campos difere de 116 para a linha "' . $linha . '"');
                 }
 
-                $campos[8] .= $campos[9];
+                $campos[6] .= $campos[101]; # ENDER + NUMERO_ENDER
+                $campos[10] .= $campos[11]; # DDD + FONE
+                $campos[18] .= $campos[19]; # DDD_FAX + FONE_FAX
+                $campos[31] .= $campos[32]; # DDD_TRA_CON + FONE_TRA_CON
+
                 $campos[13] = $campos[13] ? 'S' : 'N';
                 $campos[15] = $campos[15] ? 'S' : 'N';
                 $campos[16] = $campos[16] ? 'S' : 'N';
@@ -112,26 +233,7 @@ class RelCliente01Business
 
                 $sql = sprintf(
                     'INSERT INTO rdp_rel_cliente01 (
-                            id,
-                            codigo,
-                            nome,
-                            documento,
-                            rg,
-                            endereco,
-                            cidade,
-                            estado,
-                            cep,
-                            fone,
-                            bairro,
-                            localizador,
-                            cond_pagto,
-                            desbloqueio_tmp,
-                            ac_compras,
-                            flag_lib_preco,
-                            sugere_consulta,
-                            margem_especial,
-                            limite_compras,
-                            cliente_bloqueado,
+                            
                             estabelecimento_id,inserted,updated,user_inserted_id,user_updated_id
                         )
                     VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
@@ -206,3 +308,6 @@ class RelCliente01Business
     }
 
 }
+
+
+

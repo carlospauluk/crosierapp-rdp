@@ -313,36 +313,39 @@ CREATE TABLE `rdp_rel_compras01`
 DROP TABLE IF EXISTS `rdp_rel_cliente01`;
 CREATE TABLE `rdp_rel_cliente01`
 (
-    `id`                 BIGINT(20)     NOT NULL AUTO_INCREMENT,
-    `codigo`             BIGINT(20)     NOT NULL,
-    `nome`               VARCHAR(250)   NOT NULL,
-    `documento`          VARCHAR(50)    NOT NULL,
-    `rg`                 VARCHAR(50)    DEFAULT NULL,
-    `endereco`           VARCHAR(250)   DEFAULT NULL,
-    `cidade`             VARCHAR(50)    DEFAULT NULL,
-    `estado`             VARCHAR(50)    DEFAULT NULL,
-    `cep`                VARCHAR(15)    DEFAULT NULL,
-    `fone`               VARCHAR(50)    DEFAULT NULL,
-    `bairro`             VARCHAR(50)    DEFAULT NULL,
-    `localizador`        VARCHAR(10)    DEFAULT NULL,
-    `cond_pagto`         VARCHAR(10)    DEFAULT NULL,
-    `desbloqueio_tmp`    VARCHAR(10)    NOT NULL,
-    `ac_compras`         DECIMAL(15, 2) DEFAULT NULL,
-    `flag_lib_preco`     CHAR(1)        NOT NULL,
-    `sugere_consulta`    CHAR(1)        NOT NULL,
-    `margem_especial`    DECIMAL(15, 2) DEFAULT NULL,
-    `limite_compras`     DECIMAL(15, 2) DEFAULT NULL,
-    `cliente_bloqueado`  CHAR(1)        NOT NULL,
+    `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
+    `codigo`             BIGINT(20)   NOT NULL,
+    `nome`               VARCHAR(250) NOT NULL,
+    `documento`          VARCHAR(50)  NOT NULL, #CPF
+    `rg`                 VARCHAR(50),
 
-    UNIQUE KEY `uk_rdp_rel_cliente01` (`codigo`,`documento`,`nome`),
+    `endereco`           VARCHAR(250),          #ENDER, NUMERO
+    `bairro`             VARCHAR(50),
+    `complemento`        VARCHAR(60),
+    `cidade`             VARCHAR(50),
+    `estado`             VARCHAR(50),
+    `cep`                VARCHAR(15),
+    `fone`               VARCHAR(50),           # DDD FONE
+
+    `localizador`        VARCHAR(10),
+    `cond_pagto`         VARCHAR(10),
+    `desbloqueio_tmp`    VARCHAR(10)  NOT NULL,
+    `ac_compras`         DECIMAL(15, 2),        #COMPRAS
+    `flag_lib_preco`     CHAR(1)      NOT NULL,
+    `sugere_consulta`    CHAR(1)      NOT NULL,
+    `margem_especial`    DECIMAL(15, 2),        # PERC_MARGEM
+    `limite_compras`     DECIMAL(15, 2),
+    `cliente_bloqueado`  CHAR(1)      NOT NULL, # FLAG_BLOQUEIO
+
+    UNIQUE KEY `uk_rdp_rel_cliente01` (`codigo`, `documento`, `nome`),
 
     -- campos de controle do crosier
     PRIMARY KEY (`id`),
-    `estabelecimento_id` BIGINT(20)     NOT NULL,
-    `inserted`           DATETIME       NOT NULL,
-    `updated`            DATETIME       NOT NULL,
-    `user_inserted_id`   BIGINT(20)     NOT NULL,
-    `user_updated_id`    BIGINT(20)     NOT NULL,
+    `estabelecimento_id` BIGINT(20)   NOT NULL,
+    `inserted`           DATETIME     NOT NULL,
+    `updated`            DATETIME     NOT NULL,
+    `user_inserted_id`   BIGINT(20)   NOT NULL,
+    `user_updated_id`    BIGINT(20)   NOT NULL,
     KEY `k_rdp_rel_cliente01_estabelecimento` (`estabelecimento_id`),
     KEY `k_rdp_rel_cliente01_user_inserted` (`user_inserted_id`),
     KEY `k_rdp_rel_cliente01_user_updated` (`user_updated_id`),
@@ -351,3 +354,115 @@ CREATE TABLE `rdp_rel_cliente01`
     CONSTRAINT `fk_rdp_rel_cliente01_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   DEFAULT charset = utf8;
+
+
+
+ALTER TABLE rdp_rel_cliente01
+    ADD dt_cadastro datetime,
+    ADD tipo varchar(50),
+    ADD `trabalho_endereco` VARCHAR(250),
+    ADD `trabalho_cidade` VARCHAR(50),
+    ADD `trabalho_estado` VARCHAR(50),
+    ADD `trabalho_cargo` VARCHAR(200),
+    ADD `trabalho_cep` VARCHAR(15),
+    ADD `trabalho_fax` VARCHAR(50), # DDD_FAX+FONE_FAZ
+    ADD dt_pri datetime,
+    ADD dt_ult_compra datetime,
+    ADD dt_pagto datetime,
+    ADD vlr_maior_compra DECIMAL(15, 2),
+    ADD vlr_ult_compra DECIMAL(15, 2),
+    ADD conjuge_nome VARCHAR(250),
+    ADD conjuge_dt_nasc DATETIME,
+    ADD conjuge_rg VARCHAR(50),
+    ADD conjuge_trabalho VARCHAR(200),
+    ADD conjuge_trabalho_endereco VARCHAR(250),
+    ADD conjuge_trabalho_cidade VARCHAR(50),
+    ADD conjuge_trabalho_cep VARCHAR(15),
+    ADD conjuge_trabalho_fone VARCHAR(50), # DDD_TRA_CON + FONE_TRA_CON
+    ADD conjuge_trabalho_adm datetime, # ADM_TRA_CON: Data de admissão
+    ADD pessoas_auto2 VARCHAR(150),
+    ADD obs1 VARCHAR(150),
+    ADD obs2 VARCHAR(150),
+    ADD obs3 VARCHAR(150),
+    ADD obs4 VARCHAR(150),
+    ADD obs5 VARCHAR(150),
+    ADD obs6 VARCHAR(150),
+    ADD obs01 VARCHAR(150),
+    ADD obs02 VARCHAR(150),
+    ADD obs03 VARCHAR(150),
+    ADD obs04 VARCHAR(150),
+    ADD obs05 VARCHAR(150),
+    ADD obs06 VARCHAR(150),
+    ADD obs07 VARCHAR(150),
+    ADD obs08 VARCHAR(150),
+    ADD obs09 VARCHAR(150),
+    ADD obs10 VARCHAR(150),
+    ADD obs11 VARCHAR(150),
+    ADD obs12 VARCHAR(150),
+    ADD obs13 VARCHAR(150),
+    ADD obs14 VARCHAR(150),
+    ADD obs15 VARCHAR(150),
+    ADD obs16 VARCHAR(150),
+    ADD obs17 VARCHAR(150),
+    ADD obs18 VARCHAR(150),
+    ADD obs19 VARCHAR(150),
+    ADD obs20 VARCHAR(150),
+    ADD dias_atraso int,
+    ADD `suspenso` CHAR(1) NOT NULL,
+    ADD `cobranca_endereco` VARCHAR(250),
+    ADD `cobranca_bairro` VARCHAR(50),
+    ADD `cobranca_cidade` VARCHAR(50),
+    ADD `cobranca_estado` VARCHAR(50),
+    ADD `cobranca_cep` VARCHAR(15),
+    ADD dt_nas_prop DATETIME,
+    ADD dt_nas_funda DATETIME,
+    ADD ramo VARCHAR(60),
+    ADD bens1 VARCHAR(100),
+    ADD bens2 VARCHAR(100),
+    ADD scania int,
+    ADD volvo int,
+    ADD mb int,
+    ADD outros int,
+    ADD scania01 int,
+    ADD volvo01 int,
+    ADD mb01 int,
+    ADD outros01 int,
+    ADD flag_casa char(1),
+    ADD ref_banco VARCHAR(50),
+    ADD ref_banco01 VARCHAR(50),
+    ADD ref_come VARCHAR(50),
+    ADD ref_come01 VARCHAR(50),
+    ADD vendedor int,
+    ADD pai VARCHAR(250),
+    ADD mae VARCHAR(250),
+    ADD conhecido_pes VARCHAR(20),
+    ADD conhecido_fone VARCHAR(20),
+    ADD email VARCHAR(40),
+    ADD integ_wle char(1),
+    ADD rg2 VARCHAR(20),
+    ADD cod_munic int,
+    ADD flag_comissao char(1),
+    ADD dias_trv_fat int,
+    ADD tipo_cliente char(1),
+    ADD tipo_fornec char(1),
+    ADD flag_scp char(1),
+    ADD flag_chequedev char(1),
+    ADD cod_consul int,
+    ADD frotista char(1),
+    ADD classificacao char(1);
+
+
+alter table rdp_rel_cliente01 add complemento varchar(50) after endereco;
+
+alter table rdp_rel_cliente01 add conjuge_trabalho_cargo varchar(200) after conjuge_trabalho_adm;
+
+
+
+
+
+
+    
+
+
+
+
