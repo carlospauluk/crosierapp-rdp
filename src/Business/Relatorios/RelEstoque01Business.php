@@ -230,6 +230,7 @@ class RelEstoque01Business
 
                 $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE codigo = ?', [$campos[9]]);
                 if (!$fornecedor) {
+                    unset($dadosFornecedor, $fornecedor);
                     $dadosFornecedor['codigo'] = $campos[9];
                     $dadosFornecedor['nome'] = $campos[10];
                     $dadosFornecedor['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');

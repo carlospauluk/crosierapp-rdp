@@ -453,7 +453,7 @@ ALTER TABLE rdp_rel_cliente01
 alter table rdp_rel_cliente01 add complemento varchar(50) after endereco;
 
 
-
+alter table rdp_rel_cliente01 change conhecido_pes conhecido_pes varchar(50);
 
 
     
