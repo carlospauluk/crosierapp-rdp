@@ -358,7 +358,6 @@ CREATE TABLE `rdp_rel_cliente01`
 
 
 ALTER TABLE rdp_rel_cliente01
-    ADD dt_cadastro datetime,
     ADD tipo varchar(50),
     ADD `trabalho_endereco` VARCHAR(250),
     ADD `trabalho_cidade` VARCHAR(50),
@@ -380,7 +379,6 @@ ALTER TABLE rdp_rel_cliente01
     ADD conjuge_trabalho_cep VARCHAR(15),
     ADD conjuge_trabalho_fone VARCHAR(50), # DDD_TRA_CON + FONE_TRA_CON
     ADD conjuge_trabalho_adm datetime, # ADM_TRA_CON: Data de admissão
-    ADD pessoas_auto2 VARCHAR(150),
     ADD obs1 VARCHAR(150),
     ADD obs2 VARCHAR(150),
     ADD obs3 VARCHAR(150),
@@ -453,9 +451,6 @@ ALTER TABLE rdp_rel_cliente01
 
 
 alter table rdp_rel_cliente01 add complemento varchar(50) after endereco;
-
-alter table rdp_rel_cliente01 add conjuge_trabalho_cargo varchar(200) after conjuge_trabalho_adm;
-
 
 
 

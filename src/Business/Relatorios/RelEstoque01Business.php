@@ -10,10 +10,15 @@ use CrosierSource\CrosierLibBaseBundle\EntityHandler\Config\AppConfigEntityHandl
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
+use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ConnectionException;
-use Psr\Log\LoggerInterface;
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Cache\InvalidArgumentException;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  *
@@ -32,6 +37,9 @@ class RelEstoque01Business
     /** @var AppConfigEntityHandler */
     private $appConfigEntityHandler;
 
+    /** @var array */
+    private $ids;
+
     /**
      * @param EntityManagerInterface $doctrine
      * @param LoggerInterface $logger
@@ -44,6 +52,19 @@ class RelEstoque01Business
         $this->doctrine = $doctrine;
         $this->appConfigEntityHandler = $appConfigEntityHandler;
         $this->logger = $logger;
+
+        $this->prepararCampos();
+    }
+
+
+    public function prepararCampos()
+    {
+        /** @var Connection $conn */
+        $conn = $this->doctrine->getConnection();
+
+        $this->ids['depto'] = $conn->fetchAssoc('SELECT id FROM est_depto WHERE uuid = \'54d9b263-1ac1-11ea-aa1a-02f5eec21cc2\'')['id'];
+        $this->ids['grupo'] = $conn->fetchAssoc('SELECT id FROM est_grupo WHERE uuid = \'b111cb42-1ac1-11ea-aa1a-02f5eec21cc2\'')['id'];
+        $this->ids['subgrupo'] = $conn->fetchAssoc('SELECT id FROM est_subgrupo WHERE uuid = \'ee784eec-1ac1-11ea-aa1a-02f5eec21cc2\'')['id'];
     }
 
     /**
@@ -90,7 +111,7 @@ class RelEstoque01Business
         $t = 0;
         $linha = null;
         try {
-            $conn->executeUpdate('DELETE FROM rdp_rel_estoque01');
+            $conn->executeUpdate('SET FOREIGN_KEY_CHECKS=0;TRUNCATE TABLE rdp_rel_estoque01;');
             for ($i = 1; $i < $totalRegistros; $i++) {
                 $linha = $linhas[$i];
                 if (!trim($linha)) {
@@ -153,11 +174,14 @@ class RelEstoque01Business
                     $this->logger->info('Erro ao inserir a linha "' . $linha . '"');
                     $this->logger->info('Continuando.');
                 }
+
+                $this->handleNaEstProduto($campos);
+
             }
             $this->logger->info($t . ' registros inseridos');
             $conn->commit();
             $this->logger->info('commit');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->error('processarArquivo() - erro ');
             $this->logger->info('Erro ao inserir a linha "' . $linha . '"');
             $this->logger->error($e->getMessage());
@@ -172,6 +196,165 @@ class RelEstoque01Business
         return $t;
 
 
+    }
+
+    /**
+     * @param array $campos
+     */
+    private function handleNaEstProduto(array $campos): void
+    {
+
+        try {
+
+            foreach ($campos as $k => $v) {
+                // remove o que foi adicionado anteriormente
+                $campos[$k] = str_replace("'", '', $v);
+            }
+
+            /** @var Connection $conn */
+            $conn = $this->doctrine->getConnection();
+            $existe = $conn->fetchAssoc('SELECT * FROM est_produto WHERE codigo_from = ?', [$campos[0]]);
+            if (!$existe) {
+
+                $this->logger->info('Produto novo na est_produto (' . $campos[0] . '). Inserindo...');
+                $produto['uuid'] = StringUtils::guidv4();
+                $produto['depto_id'] = $this->ids['depto'];
+                $produto['depto_codigo'] = '00';
+                $produto['depto_nome'] = 'INDEFINIDO';
+                $produto['grupo_id'] = $this->ids['grupo'];
+                $produto['grupo_codigo'] = '00';
+                $produto['grupo_nome'] = 'INDEFINIDO';
+                $produto['subgrupo_id'] = $this->ids['subgrupo'];
+                $produto['subgrupo_codigo'] = '00';
+                $produto['subgrupo_nome'] = 'INDEFINIDO';
+
+                $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE codigo = ?', [$campos[9]]);
+                if (!$fornecedor) {
+                    $dadosFornecedor['codigo'] = $campos[9];
+                    $dadosFornecedor['nome'] = $campos[10];
+                    $dadosFornecedor['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+                    $dadosFornecedor['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+                    $dadosFornecedor['version'] = 0;
+                    $dadosFornecedor['estabelecimento_id'] = 1;
+                    $dadosFornecedor['user_inserted_id'] = 1;
+                    $dadosFornecedor['user_updated_id'] = 1;
+                    $fornecedor = $conn->insert('est_fornecedor', $dadosFornecedor);
+                    $fornecedor['id'] = $conn->lastInsertId();
+                }
+
+                $produto['fornecedor_id'] = $fornecedor['id'];
+                $produto['fornecedor_nome'] = $fornecedor['nome'];
+                $produto['fornecedor_documento'] = $fornecedor['documento'];
+
+                $produto['nome'] = $campos[1];
+                $produto['titulo'] = null;
+                $produto['caracteristicas'] = null;
+                $produto['ean'] = null;
+                $produto['referencia'] = null;
+                $produto['ncm'] = null;
+                $produto['status'] = 'INATIVO';
+                $produto['composicao'] = 'N';
+                $produto['obs'] = null;
+                $produto['codigo_from'] = $campos[0];
+                $produto['porcent_preench'] = null;
+                $produto['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+                $produto['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+                $produto['version'] = 0;
+                $produto['estabelecimento_id'] = 1;
+                $produto['user_inserted_id'] = 1;
+                $produto['user_updated_id'] = 1;
+                $produto['unidade_produto_id'] = 1;
+
+                $conn->insert('est_produto', $produto);
+
+                // Já copia as configurações de atributos de um produto já montado
+                $id = $conn->lastInsertId();
+                $this->colarConfigs($id);
+
+            } else {
+                $this->logger->info('Produto com codigo_from ' . $campos[0] . ' já existente na base');
+            }
+        } catch (\Throwable | DBALException $e) {
+            $this->logger->error('Erro ao handleNaEstProduto');
+            $this->logger->error($e->getMessage());
+            throw new \RuntimeException('Erro ao handleNaEstProduto');
+        }
+    }
+
+    /**
+     * Copiado do crosierapp-vendest (App\EntityHandler\Estoque\ProdutoAtributoEntityHandler)
+     *
+     * @param int $produtoToId
+     */
+    public function colarConfigs(int $produtoToId): void
+    {
+
+
+        try {
+            $cache = new FilesystemAdapter($_SERVER['CROSIERAPP_ID'] . '.cache', 0, $_SERVER['CROSIER_SESSIONS_FOLDER']);
+            $produtoFromId = $cache->get('produtoBusiness.colarConfigs.produtoFromId', function (ItemInterface $item) {
+                /** @var AppConfigRepository $repoAppConfig */
+                $repoAppConfig = $this->doctrine->getRepository(AppConfig::class);
+                /** @var AppConfig $appConfig */
+                $appConfig = $repoAppConfig->findOneByFiltersSimpl([['chave', 'EQ', 'produtoBusiness.colarConfigs.produtoFromId'], ['appUUID', 'EQ', $_SERVER['CROSIERAPP_UUID']]]);
+
+                return $appConfig->getValor();
+            });
+            /** @var Connection $conn */
+            $conn = $this->doctrine->getConnection();
+            $produtoFromAtributos = $conn->fetchAll('SELECT * FROM est_produto_atributo WHERE produto_id = :produto_id', ['produto_id' => $produtoFromId]);
+            foreach ($produtoFromAtributos as $produtoAtributoFrom) {
+
+                $produtoAtributoTo = null;
+                $produtoToAtributos = $conn->fetchAll('SELECT * FROM est_produto_atributo WHERE produto_id = :produto_id', ['produto_id' => $produtoToId]);
+
+                if ($produtoToAtributos) {
+                    foreach ($produtoToAtributos as $prodAtribTo_) {
+                        if ((int)$produtoAtributoFrom['atributo_id'] === (int)$prodAtribTo_['atributo_id']) {
+                            $produtoAtributoTo = $prodAtribTo_;
+                            break;
+                        }
+                    }
+                }
+
+                if (!$produtoAtributoTo) {
+                    $produtoAtributoTo = [];
+                    $produtoAtributoTo['produto_id'] = $produtoToId;
+                    $produtoAtributoTo['atributo_id'] = $produtoAtributoFrom['atributo_id'];
+                } else if ($produtoAtributoTo['precif'] === $produtoAtributoFrom['precif'] &&
+                    $produtoAtributoTo['quantif'] === $produtoAtributoFrom['quantif'] &&
+                    $produtoAtributoTo['soma_preench'] === $produtoAtributoFrom['soma_preench'] &&
+                    $produtoAtributoTo['aba'] === $produtoAtributoFrom['aba'] &&
+                    $produtoAtributoTo['grupo'] === $produtoAtributoFrom['grupo'] &&
+                    (int)$produtoAtributoTo['ordem'] === (int)$produtoAtributoFrom['ordem']) {
+                    continue;
+                }
+
+                $produtoAtributoTo['precif'] = $produtoAtributoFrom['precif'];
+                $produtoAtributoTo['quantif'] = $produtoAtributoFrom['quantif'];
+                $produtoAtributoTo['soma_preench'] = $produtoAtributoFrom['soma_preench'];
+                $produtoAtributoTo['aba'] = $produtoAtributoFrom['aba'];
+                $produtoAtributoTo['grupo'] = $produtoAtributoFrom['grupo'];
+                $produtoAtributoTo['ordem'] = $produtoAtributoFrom['ordem'];
+
+                if ($produtoAtributoTo['id'] ?? null) {
+                    $produtoAtributoTo['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+                    $conn->update('est_produto_atributo', $produtoAtributoTo, ['id' => $produtoAtributoTo['id']]);
+                } else {
+                    $produtoAtributoTo['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+                    $produtoAtributoTo['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+                    $produtoAtributoTo['user_inserted_id'] = 1;
+                    $produtoAtributoTo['user_updated_id'] = 1;
+                    $produtoAtributoTo['estabelecimento_id'] = 1;
+                    $conn->insert('est_produto_atributo', $produtoAtributoTo);
+                }
+            }
+
+        } catch (\Throwable | InvalidArgumentException $e) {
+            $this->logger->error('Erro ao colarConfigs($produtoToId=' . $produtoToId . ')');
+            $this->logger->error($e->getMessage());
+            throw new \RuntimeException('Erro ao colarConfigs($produtoToId=' . $produtoToId . ')');
+        }
     }
 
     /**
@@ -240,5 +423,6 @@ class RelEstoque01Business
         file_put_contents($pasta . $nomeArquivo, implode(PHP_EOL, $linhas));
         return $nomeArquivo;
     }
+
 
 }

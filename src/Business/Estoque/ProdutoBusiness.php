@@ -6,6 +6,7 @@ namespace App\Business\Estoque;
 
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -105,7 +106,7 @@ class ProdutoBusiness
             $titulos[] = 'Estoque Acessórios';
             $titulos[] = 'Estoque Total';
 
-
+            /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
 
             $qryProdutos = $conn->query('SELECT p.*, u.label as unidade FROM vw_rdp_est_produto p, est_unidade_produto u WHERE p.unidade_produto_id = u.id AND p.titulo IS NOT NULL AND trim(p.titulo) != \'\' ORDER BY id ');
@@ -244,21 +245,58 @@ class ProdutoBusiness
         try {
             $qryProdutos = $conn->query('SELECT * FROM est_produto');
 
-            $qryRelEstoque01 = $conn->prepare('SELECT qtde_atual FROM rdp_rel_estoque01 WHERE cod_prod = :cod_prod AND desc_filial = :desc_filial');
-
             $qryAtributo = $conn->prepare('SELECT id FROM est_atributo WHERE uuid = :uuid');
 
-            $qryAtributo->bindValue('uuid', 'c37e9985-53f2-47f4-833a-52ace1f84e60');
+            $qryAtributo->bindValue('uuid', 'c37e9985-53f2-47f4-833a-52ace1f84e60'); // Estoque "Acessórios"
             $qryAtributo->execute();
             $atrEstoqueAcessorios = $qryAtributo->fetch();
 
-            $qryAtributo->bindValue('uuid', '3edb71db-375d-4d37-b36d-8287f291606b');
+            $qryAtributo->bindValue('uuid', '3edb71db-375d-4d37-b36d-8287f291606b'); // Estoque "Matriz"
             $qryAtributo->execute();
             $atrEstoqueMatriz = $qryAtributo->fetch();
 
-            $qryAtributo->bindValue('uuid', '8f25a3e6-cf93-4111-be2b-a46dedc30107');
+            $qryAtributo->bindValue('uuid', '8f25a3e6-cf93-4111-be2b-a46dedc30107'); // Estoque Total
             $qryAtributo->execute();
             $atrEstoqueTotal = $qryAtributo->fetch();
+
+            // Atualização do atributo Dt Últ Saída (o campo se refere a MATRIZ)
+            $qryAtributo->bindValue('uuid', '4cad1e55-a08c-4550-adfd-f8baca8f44a7'); // Dt Últ Saída
+            $qryAtributo->execute();
+            $atrDtUltSaida = $qryAtributo->fetch();
+            $qryDtUltSaida = $conn->prepare('SELECT max(dt_ult_saida) as dt FROM rdp_rel_estoque01 WHERE cod_prod = :cod_prod AND desc_filial = \'MATRIZ\'');
+
+            // Atualização do atributo Dt Últ Entrada (o campo se refere a MATRIZ)
+            $qryAtributo->bindValue('uuid', 'f6673979-149f-4813-83b8-5722c0aa35ee'); // Dt Últ Entrada
+            $qryAtributo->execute();
+            $atrDtUltEntrada = $qryAtributo->fetch();
+            $qryDtUltEntrada = $conn->prepare('SELECT MAX(dt_emissao) as dt FROM rdp_rel_compras01 WHERE cod_prod = :cod_prod AND loja = \'MATRIZ\'');
+
+            // Atualização do atributo Preço Custo (o campo se refere a MATRIZ)
+            $qryAtributo->bindValue('uuid', '84ec35ff-22c1-4479-8368-baf766702e5e'); // Preço Custo
+            $qryAtributo->execute();
+            $atrPrecoCusto = $qryAtributo->fetch();
+            $qryPrecoCusto = $conn->prepare('SELECT custo_medio FROM rdp_rel_estoque01 WHERE cod_prod = :cod_prod AND desc_filial = \'MATRIZ\'');
+
+            // Atualização do atributo Preço Acessórios (o campo se refere a loja ACESSÓRIOS)
+            $qryAtributo->bindValue('uuid', '2445ba8a-cb2d-4de5-b519-21c71248a727'); // Preço Acessórios
+            $qryAtributo->execute();
+            $atrPrecoAcessorios = $qryAtributo->fetch();
+            $qryPrecoAcessorios = $conn->prepare('SELECT preco_venda FROM rdp_rel_estoque01 WHERE cod_prod = :cod_prod AND desc_filial = \'ACESSORIOS\'');
+
+            // ????
+//            $qryAtributo->bindValue('uuid', '1809d058-337c-46b2-a540-fd5315467d1a'); // Preço Atacado
+//            $qryAtributo->execute();
+//            $atrPrecoAtacado = $qryAtributo->fetch();
+
+            // Atualização do atributo Preço Tabela (o campo se refere a loja MATRIZ)
+            $qryAtributo->bindValue('uuid', 'c22e79c5-4dfd-4506-b3f5-53473f88bf2f'); // Preço Tabela
+            $qryAtributo->execute();
+            $atrPrecoTabela = $qryAtributo->fetch();
+            $qryPrecoTabela = $conn->prepare('SELECT preco_venda FROM rdp_rel_estoque01 WHERE cod_prod = :cod_prod AND desc_filial = \'MATRIZ\'');
+
+
+            $qryRelEstoque01 = $conn->prepare('SELECT qtde_atual FROM rdp_rel_estoque01 WHERE cod_prod = :cod_prod AND desc_filial = :desc_filial');
+
 
             $produtos = [];
 
@@ -270,9 +308,9 @@ class ProdutoBusiness
             $this->logger->debug('Atualizando ' . count($produtos) . ' produtos');
             foreach ($produtos as $produto) {
 
-                $this->verificaEInsereProdutoPossuiAtributosEstoques($produto, $atrEstoqueMatriz['id'], 1);
-                $this->verificaEInsereProdutoPossuiAtributosEstoques($produto, $atrEstoqueAcessorios['id'], 2);
-                $this->verificaEInsereProdutoPossuiAtributosEstoques($produto, $atrEstoqueTotal['id'], 3);
+                $this->insereAtributoSeProdutoAindaNaoTem($produto, $atrEstoqueMatriz['id'], 1, 'Estoques');
+                $this->insereAtributoSeProdutoAindaNaoTem($produto, $atrEstoqueAcessorios['id'], 2, 'Estoques');
+                $this->insereAtributoSeProdutoAindaNaoTem($produto, $atrEstoqueTotal['id'], 3, 'Estoques');
 
                 $qryRelEstoque01->bindValue('cod_prod', $produto['codigo_from']);
                 $qryRelEstoque01->bindValue('desc_filial', 'MATRIZ');
@@ -306,14 +344,82 @@ class ProdutoBusiness
                         ]);
                 }
 
-                if ($total) {
-                    $estAtributoProduto['valor'] = $total;
-                    $conn->update('est_produto_atributo', $estAtributoProduto,
+                $conn->update('est_produto_atributo', ['valor' => $total],
+                    [
+                        'produto_id' => $produto['id'],
+                        'atributo_id' => $atrEstoqueTotal['id']
+                    ]);
+
+
+                // Atualização do campo Dt Últ Saída
+                $qryDtUltSaida->bindValue('cod_prod', $produto['codigo_from']);
+                $qryDtUltSaida->execute();
+                $dtUltSaidaMatriz = $qryDtUltSaida->fetch()['dt'];
+                if ($dtUltSaidaMatriz) {
+                    $dtUltSaidaMatriz = DateTimeUtils::parseDateStr($dtUltSaidaMatriz)->format('d/m/Y');
+                    $conn->update('est_produto_atributo',
+                        ['valor' => $dtUltSaidaMatriz],
                         [
                             'produto_id' => $produto['id'],
-                            'atributo_id' => $atrEstoqueTotal['id']
+                            'atributo_id' => $atrDtUltSaida['id']
                         ]);
                 }
+
+
+                // Atualização do campo Dt Últ Entrada
+                $qryDtUltEntrada->bindValue('cod_prod', $produto['codigo_from']);
+                $qryDtUltEntrada->execute();
+                $dtUltEntradaMatriz = $qryDtUltEntrada->fetch()['dt'];
+                if ($dtUltEntradaMatriz) {
+                    $dtUltEntradaMatriz = DateTimeUtils::parseDateStr($dtUltEntradaMatriz)->format('d/m/Y');
+                    $conn->update('est_produto_atributo',
+                        ['valor' => $dtUltEntradaMatriz],
+                        [
+                            'produto_id' => $produto['id'],
+                            'atributo_id' => $atrDtUltEntrada['id']
+                        ]);
+                }
+
+                // Atualização do campo Preço Custo
+                $qryPrecoCusto->bindValue('cod_prod', $produto['codigo_from']);
+                $qryPrecoCusto->execute();
+                $precoCusto = $qryPrecoCusto->fetch()['custo_medio'];
+                if ($precoCusto) {
+                    $conn->update('est_produto_atributo',
+                        ['valor' => $precoCusto],
+                        [
+                            'produto_id' => $produto['id'],
+                            'atributo_id' => $atrPrecoCusto['id']
+                        ]);
+                }
+
+                // Atualização do campo Preço Acessórios
+                $qryPrecoAcessorios->bindValue('cod_prod', $produto['codigo_from']);
+                $qryPrecoAcessorios->execute();
+                $precoAcessorios = $qryPrecoAcessorios->fetch()['preco_venda'];
+                if ($precoAcessorios) {
+                    $conn->update('est_produto_atributo',
+                        ['valor' => $precoAcessorios],
+                        [
+                            'produto_id' => $produto['id'],
+                            'atributo_id' => $atrPrecoAcessorios['id']
+                        ]);
+                }
+
+
+                // Atualização do campo Preço Tabela
+                $qryPrecoTabela->bindValue('cod_prod', $produto['codigo_from']);
+                $qryPrecoTabela->execute();
+                $precoTabela = $qryPrecoTabela->fetch()['preco_venda'];
+                if ($precoTabela) {
+                    $conn->update('est_produto_atributo',
+                        ['valor' => $precoTabela],
+                        [
+                            'produto_id' => $produto['id'],
+                            'atributo_id' => $atrPrecoTabela['id']
+                        ]);
+                }
+
 
                 $this->logger->debug(++$i . ' atualizado(s)');
 
@@ -329,13 +435,16 @@ class ProdutoBusiness
 
     }
 
+
     /**
+     * Verifica se o produto possui os atributos de 'estoques'. Se não tiver, insere.
+     *
      * @param array $produto
      * @param int $atributoId
      * @param int $ordem
      * @throws \Doctrine\DBAL\DBALException
      */
-    private function verificaEInsereProdutoPossuiAtributosEstoques(array $produto, int $atributoId, int $ordem): void
+    private function insereAtributoSeProdutoAindaNaoTem(array $produto, int $atributoId, int $ordem, string $aba): void
     {
         $conn = $this->doctrine->getConnection();
         $qryAtributoProduto = $conn->prepare('SELECT * FROM est_produto_atributo WHERE atributo_id = :atributo_id AND produto_id = :produto_id');
@@ -344,10 +453,10 @@ class ProdutoBusiness
         $qryAtributoProduto->bindValue('produto_id', $produto['id']);
         $qryAtributoProduto->execute();
         if (!$qryAtributoProduto->fetch()) {
-            $atributoEstoqueMatriz = [
+            $estProdutoAtributo = [
                 'produto_id' => $produto['id'],
                 'atributo_id' => $atributoId,
-                'aba' => 'Estoques',
+                'aba' => $aba,
                 'grupo' => '',
                 'ordem' => $ordem,
                 'soma_preench' => 0,
@@ -361,7 +470,7 @@ class ProdutoBusiness
                 'user_inserted_id' => '1',
                 'user_updated_id' => '1',
             ];
-            $conn->insert('est_produto_atributo', $atributoEstoqueMatriz);
+            $conn->insert('est_produto_atributo', $estProdutoAtributo);
         }
     }
 

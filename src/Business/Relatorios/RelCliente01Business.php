@@ -7,9 +7,9 @@ use CrosierSource\CrosierLibBaseBundle\Entity\Config\AppConfig;
 use CrosierSource\CrosierLibBaseBundle\EntityHandler\Config\AppConfigEntityHandler;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
+use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ConnectionException;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -49,8 +49,9 @@ class RelCliente01Business
      */
     public function processarArquivosNaFila(): void
     {
-        $pastaFila = $_SERVER['PASTA_UPLOAD_RELCLIENTES01'] . 'fila/';
+        $pastaFila = $_SERVER['PASTA_UPLOAD_RELCLIENTE01'] . 'fila/';
         $files = scandir($pastaFila, 0);
+
         foreach ($files as $file) {
             if (!in_array($file, array('.', '..'))) {
 
@@ -58,10 +59,10 @@ class RelCliente01Business
                     $this->processarArquivo($file);
                     $this->marcarDtHrAtualizacao();
                     $this->logger->info('Arquivo processado com sucesso.');
-                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCLIENTES01'] . 'ok/' . $file);
+                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCLIENTE01'] . 'ok/' . $file);
                     $this->logger->info('Arquivo movido para pasta "ok".');
                 } catch (\Exception $e) {
-                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCLIENTES01'] . 'falha/' . $file);
+                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCLIENTE01'] . 'falha/' . $file);
                     $this->logger->info('Arquivo movido para pasta "falha".');
                 }
             }
@@ -75,7 +76,7 @@ class RelCliente01Business
      */
     public function processarArquivo(string $arquivo): int
     {
-        $pastaFila = $_SERVER['PASTA_UPLOAD_RELCLIENTES01'] . 'fila/';
+        $pastaFila = $_SERVER['PASTA_UPLOAD_RELCLIENTE01'] . 'fila/';
         $conteudo = file_get_contents($pastaFila . $arquivo);
         $linhas = explode(PHP_EOL, $conteudo);
         $totalRegistros = count($linhas);
@@ -85,123 +86,237 @@ class RelCliente01Business
         $conn->beginTransaction();
 
         /**
-         * CODIGO    codigo
-         * NOME    nome
-         * DATA_PRI    dt_pri
-         * DATA_CADASTRO    dt_cadastro
-         * CPF_CNPJ    documento
-         * RG_IE    rg
-         * ENDER    endereco
-         * CIDADE    cidade
-         * UF    estado
-         * CEP    cep
-         * DDD    fone
-         * FONE
-         * BAIRRO    bairro
-         * TIPO    tipo
-         * ENDER_TRABALHO    trabalho_endereco
-         * CIDADE_TRA    trabalho_cidade
-         * UF_TRA    trabalho_estado
-         * CEP_TRA    trabalho_cep
-         * DDD_FAX    trabalho_fax
-         * FONE_FAX
-         * DATA_ULT_COMPRA    dt_ult_compra
-         * CARGO_TRA    trabalho_cargo
-         * MAIOR_COMPRA    vlr_maior_compra
-         * CONJUGE    conjuge_nome
-         * NASC_CONJUGE    conjuge_dt_nasc
-         * TRABALHO_CON    conjuge_trabalho
-         * RG_CON    conjuge_rg
-         * ENDER_TRA_CON    conjuge_trabalho_endereco
-         * CID_TRA_CON    conjuge_trabalho_cidade
-         * DIAS_ATRASO    dias_atraso
-         * CEP_TRA_CON    conjuge_trabalho_cep
-         * DDD_TRA_CON    conjuge_trabalho_fone
-         * FONE_TRA_CON
-         * ADM_TRA_CON    conjuge_trabalho_adm
-         * CLIENTE_BLOQUEADO    cliente_bloqueado
-         * VLR_ULTCOMPRA    vlr_ult_compra
-         * OBS3    obs3
-         * PESSOAS_AUTO2    pessoas_auto2
-         * DESBLOQUEIO_TMP    desbloqueio_tmp
-         * DATA_PAGTO    dt_pagto
-         * OBS1    obs1
-         * OBS2    obs2
-         * COND_PAGTO    cond_pagto
-         * SUSPENSO    suspenso
-         * LIMITE_COMPRAS    limite_compras
-         * AC_COMPRAS    ac_compras
-         * LOCALIZADOR    localizador
-         * ENDERCOB    cobranca_endereco
-         * CIDADECOB    cobranca_cidade
-         * UFCOB    cobranca_estado
-         * CEPCOB    cobranca_cep
-         * BAIRROCOB    cobranca_bairro
-         * OBS4    obs4
-         * OBS5    obs5
-         * OBS6    obs6
-         * NAS_PROP    dt_nas_prop
-         * NAS_FUNDA    dt_nas_funda
-         * RAMO    ramo
-         * BENS01    bens1
-         * BENS02    bens2
-         * SCANIA    scania
-         * VOLVO    volvo
-         * MB    mb
-         * OUTROS    outros
-         * SCANIA01    scania01
-         * VOLVO01    volvo01
-         * MB01    mb01
-         * OUTROS01    outros01
-         * FLAG_CASA    flag_casa
-         * REF_BANCO    ref_banco
-         * REF_BANCO01    ref_banco01
-         * REF_COME    ref_come
-         * REF_COME01    ref_come01
-         * VENDEDOR    vendedor
-         * PAI    pai
-         * MAE    mae
-         * PES_CONHE    conhecido_pes
-         * FON_CONHE    conhecido_fone
-         * EMAIL    email
-         * INTEG_WLE    integ_wle
-         * OBS01    obs01
-         * OBS02    obs02
-         * OBS03    obs03
-         * OBS04    obs04
-         * OBS05    obs05
-         * OBS06    obs06
-         * OBS07    obs07
-         * OBS08    obs08
-         * OBS09    obs09
-         * OBS10    obs10
-         * OBS11    obs11
-         * OBS12    obs12
-         * OBS13    obs13
-         * OBS14    obs14
-         * OBS15    obs15
-         * OBS16    obs16
-         * OBS17    obs17
-         * OBS18    obs18
-         * OBS19    obs19
-         * OBS20    obs20
-         * RG2    rg2
-         * NUMERO_ENDER    endereco
-         * COMPLEMENTO    complemento
-         * COD_MUNIC    cod_munic
-         * FLAG_LIB_PRECO    flag_lib_preco
-         * SUGERE_CONSULTA    sugere_consulta
-         * FLAG_COMISSAO    flag_comissao
-         * DIAS_TRV_FAT    dias_trv_fat
-         * MARGEM_ESPECIAL    margem_especial
-         * TIPO_CLIENTE    tipo_cliente
-         * TIPO_FORNEC    tipo_fornec
-         * FLAG_SCP    flag_scp
-         * FLAG_CHEQUEDEV    flag_chequedev
-         * COD_CONSUL    cod_consul
-         * FROTISTA    frotista
-         * CLASSIFICACAO    classificacao
+         * 0    CODIGO            NUM    6.0
+         * 1    NOME                ASC    70
+         * 2    DATA_PRI            DAT    3
+         * 3    CPF                ASC    20
+         * 4    RG                ASC    20
+         * 5    ENDER                ASC    40
+         * 6    CIDADE            ASC    30
+         * 7    UF                ASC    2
+         * 8    CEP                ASC    9
+         * 9    DDD                ASC    4
+         * 10    FONE                ASC    12
+         * 11    BAIRRO            ASC    30
+         * 12    TIPO                ASC    1
+         * 13    ENDER_TRA            ASC    40
+         * 14    CIDADE_TRA        ASC    30
+         * 15    UF_TRA            ASC    2
+         * 16    CEP_TRA            ASC    9
+         * 17    DDD_FAX            ASC    4
+         * 18    FONE_FAX            ASC    12
+         * 19    DATA_ULT            DAT    3
+         * 20    CARGO_TRA            ASC    15
+         * 21    MAIOR_COMPRA        NUM    10.2
+         * 22    CONJUGE            ASC    30
+         * 23    NASC_CON            DAT    3
+         * 24    TRABALHO_CON        ASC    30
+         * 25    RG_CON            ASC    20
+         * 26    ENDER_TRA_CON        ASC    30
+         * 27    CID_TRA_CON        ASC    30
+         * 28    DIAS_ATRASO        NUM    4.0
+         * 29    CEP_TRA_CON        ASC    9
+         * 30    DDD_TRA_CON        ASC    4
+         * 31    FONE_TRA_CON        ASC    12
+         * 32    ADM_TRA_CON        DAT    3
+         * 33    CARGO_TRA_CON        ASC    15
+         * 34    VLR_ULTCOMPRA        NUM    10.2
+         * 35    OBS3                ASC    60
+         * 36    PESSOAS_AUTO2        ASC    60
+         * 37    DATA_PAGTO        DAT    3
+         * 38    OBS1                ASC    60
+         * 39    OBS2                ASC    60
+         * 40    COND_PAGTO        NUM    4.0
+         * 41    SUSPENSO            ASC    1
+         * 42    LIM_COMPRAS        NUM    6.2
+         * 43    COMPRAS            NUM    6.2
+         * 44    LOCALIZADOR        NUM    2.0
+         * 45    ENDERCOB            ASC    40
+         * 46    CIDADECOB            ASC    30
+         * 47    UFCOB                ASC    2
+         * 48    CEPCOB            ASC    9
+         * 49    BAIRROCOB            ASC    30
+         * 50    OBS4                ASC    60
+         * 51    OBS5                ASC    60
+         * 52    OBS6                ASC    60
+         * 53    NAS_PROP            DAT    3
+         * 54    NAS_FUNDA            DAT    3
+         * 55    RAMO                ASC    30
+         * 56    BENS01            ASC    50
+         * 57    BENS02            ASC    50
+         * 58    SCANIA            NUM    4.0
+         * 59    VOLVO                NUM    4.0
+         * 60    MB                NUM    4.0
+         * 61    OUTROS            NUM    4.0
+         * 62    SCANIA01            NUM    4.0
+         * 63    VOLVO01            NUM    4.0
+         * 64    MB01                NUM    4.0
+         * 65    OUTROS01            NUM    4.0
+         * 66    FLAG_CASA            ASC    1
+         * 67    REF_BANCO            ASC    50
+         * 68    REF_BANCO01        ASC    50
+         * 69    REF_COME            ASC    50
+         * 70    REF_COME01        ASC    50
+         * 71    VENDEDOR            NUM    4.0
+         * 72    PAI                ASC    30
+         * 73    MAE                ASC    30
+         * 74    PES_CONHE            ASC    50
+         * 75    FON_CONHE            ASC    20
+         * 76    EMAIL                ASC    40
+         * 77    INTEG_WLE            ASC    1
+         * 78    OBS01                ASC    75
+         * 79    OBS02                ASC    75
+         * 80    OBS03                ASC    75
+         * 81    OBS04                ASC    75
+         * 82    OBS05                ASC    75
+         * 83    OBS06                ASC    75
+         * 84    OBS07                ASC    75
+         * 85    OBS08                ASC    75
+         * 86    OBS09                ASC    75
+         * 87    OBS10                ASC    75
+         * 88    OBS11                ASC    75
+         * 89    OBS12                ASC    75
+         * 90    OBS13                ASC    75
+         * 91    OBS14                ASC    75
+         * 92    OBS15                ASC    75
+         * 93    OBS16                ASC    75
+         * 94    OBS17                ASC    75
+         * 95    OBS18                ASC    75
+         * 96    OBS19                ASC    75
+         * 97    OBS20                ASC    75
+         * 98    RG2                ASC    20
+         * 99    NUMERO            ASC    20
+         * 100    COMPLEMENTO        ASC    60
+         * 101    COD_MUNIC            NUM    8.0
+         * 102    FLAG_LIB_PRECO    ASC    1
+         * 103    FLAG_BLOQUEIO        ASC    1
+         * 104    FLAG_COMISSAO        ASC    1
+         * 105    DIAS_TRV_FAT        NUM    4.0
+         * 106    PERC_MARGEM        NUM    4.2
+         * 107    TIPO_CLIENTE        ASC    1
+         * 108    TIPO_FORNEC        ASC    1
+         * 109    FLAG_SCP            ASC    1
+         * 110    FLAG_CHEQUEDEV    ASC    1
+         * 111    COD_CONSUL        NUM    4.0
+         * 112    FROTISTA            ASC    1
+         * 113    CLASSIFICACAO        ASC    1
          */
+
+        $camposMySQL = [
+            0 => 'codigo',
+            1 => 'nome',
+            3 => 'documento',
+            4 => 'rg',
+            5 => 'endereco',
+            100 => 'complemento',
+            6 => 'cidade',
+            7 => 'estado',
+            8 => 'cep',
+            9 => 'fone',
+            11 => 'bairro',
+            44 => 'localizador',
+            40 => 'cond_pagto',
+            36 => 'desbloqueio_tmp',
+            43 => 'ac_compras',
+            102 => 'flag_lib_preco',
+            103 => 'sugere_consulta',
+            106 => 'margem_especial',
+            42 => 'limite_compras',
+            33 => 'cliente_bloqueado',
+            12 => 'tipo',
+            13 => 'trabalho_endereco',
+            14 => 'trabalho_cidade',
+            15 => 'trabalho_estado',
+            20 => 'trabalho_cargo',
+            16 => 'trabalho_cep',
+            17 => 'trabalho_fax',
+            2 => 'dt_pri',
+            19 => 'dt_ult_compra',
+            37 => 'dt_pagto',
+            21 => 'vlr_maior_compra',
+            34 => 'vlr_ult_compra',
+            22 => 'conjuge_nome',
+            23 => 'conjuge_dt_nasc',
+            25 => 'conjuge_rg',
+            24 => 'conjuge_trabalho',
+            26 => 'conjuge_trabalho_endereco',
+            27 => 'conjuge_trabalho_cidade',
+            29 => 'conjuge_trabalho_cep',
+            30 => 'conjuge_trabalho_fone',
+            32 => 'conjuge_trabalho_adm',
+            38 => 'obs1',
+            39 => 'obs2',
+            35 => 'obs3',
+            50 => 'obs4',
+            51 => 'obs5',
+            52 => 'obs6',
+            78 => 'obs01',
+            79 => 'obs02',
+            80 => 'obs03',
+            81 => 'obs04',
+            82 => 'obs05',
+            83 => 'obs06',
+            84 => 'obs07',
+            85 => 'obs08',
+            86 => 'obs09',
+            87 => 'obs10',
+            88 => 'obs11',
+            89 => 'obs12',
+            90 => 'obs13',
+            91 => 'obs14',
+            92 => 'obs15',
+            93 => 'obs16',
+            94 => 'obs17',
+            95 => 'obs18',
+            96 => 'obs19',
+            97 => 'obs20',
+            28 => 'dias_atraso',
+            41 => 'suspenso',
+            45 => 'cobranca_endereco',
+            49 => 'cobranca_bairro',
+            46 => 'cobranca_cidade',
+            47 => 'cobranca_estado',
+            48 => 'cobranca_cep',
+            53 => 'dt_nas_prop',
+            54 => 'dt_nas_funda',
+            55 => 'ramo',
+            56 => 'bens1',
+            57 => 'bens2',
+            58 => 'scania',
+            59 => 'volvo',
+            60 => 'mb',
+            61 => 'outros',
+            62 => 'scania01',
+            63 => 'volvo01',
+            64 => 'mb01',
+            65 => 'outros01',
+            66 => 'flag_casa',
+            67 => 'ref_banco',
+            68 => 'ref_banco01',
+            69 => 'ref_come',
+            70 => 'ref_come01',
+            71 => 'vendedor',
+            72 => 'pai',
+            73 => 'mae',
+            74 => 'conhecido_pes',
+            75 => 'conhecido_fone',
+            76 => 'email',
+            77 => 'integ_wle',
+            98 => 'rg2',
+            101 => 'cod_munic',
+            104 => 'flag_comissao',
+            105 => 'dias_trv_fat',
+            107 => 'tipo_cliente',
+            108 => 'tipo_fornec',
+            109 => 'flag_scp',
+            110 => 'flag_chequedev',
+            111 => 'cod_consul',
+            112 => 'frotista',
+            113 => 'classificacao'
+        ];
+
+        ksort($camposMySQL);
+
 
         $t = 0;
         $linha = null;
@@ -211,60 +326,80 @@ class RelCliente01Business
                 if (!trim($linha)) {
                     continue;
                 }
-                $campos = explode('|', $linha);
-                if (count($campos) !== 116) {
-                    throw new ViewException('Qtde de campos difere de 116 para a linha "' . $linha . '"');
+                $campos = explode('|@|', $linha);
+                if (count($campos) !== 114) {
+                    throw new ViewException('Qtde de campos difere de 114 para a linha "' . $linha . '"');
                 }
 
-                $campos[6] .= $campos[101]; # ENDER + NUMERO_ENDER
-                $campos[10] .= $campos[11]; # DDD + FONE
-                $campos[18] .= $campos[19]; # DDD_FAX + FONE_FAX
-                $campos[31] .= $campos[32]; # DDD_TRA_CON + FONE_TRA_CON
-
-                $campos[13] = $campos[13] ? 'S' : 'N';
-                $campos[15] = $campos[15] ? 'S' : 'N';
-                $campos[16] = $campos[16] ? 'S' : 'N';
-                $campos[19] = $campos[19] ? 'S' : 'N';
-
-                $cMax = count($campos);
-                for ($c = 0; $c < $cMax; $c++) {
-                    $campos[$c] = $campos[$c] ? "'" . utf8_encode(trim(str_replace("'", "''", $campos[$c]))) . "'" : 'null';
+                $existeCodigo = $conn->fetchAssoc('SELECT * FROM rdp_rel_cliente01 WHERE codigo = :codigo', ['codigo' => $campos[0]]);
+                if ($existeCodigo) {
+                    $this->logger->info('Cliente com código ' . $campos[0] . ' já existe na base. Continuando...');
+                    continue;
                 }
-
-                $sql = sprintf(
-                    'INSERT INTO rdp_rel_cliente01 (
-                            
-                            estabelecimento_id,inserted,updated,user_inserted_id,user_updated_id
-                        )
-                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
-                    $campos[0], // codigo,
-                    $campos[1], // nome,
-                    $campos[2], // documento,
-                    $campos[3], // rg,
-                    $campos[4], // endereco,
-                    $campos[5], // cidade,
-                    $campos[6], // estado,
-                    $campos[7], // cep,
-                    $campos[8], // fone,
-                    $campos[10], // bairro,
-                    $campos[11],// localizador,
-                    $campos[12],// cond_pagto,
-                    $campos[13],// desbloqueio_tmp,
-                    $campos[14],// ac_compras,
-                    $campos[15],// flag_lib_preco,
-                    $campos[16],// sugere_consulta,
-                    $campos[17],// margem_especial,
-                    $campos[18],// limite_compras,
-                    $campos[19] // cliente_bloqueado
-                );
 
                 try {
-                    $t += $conn->executeUpdate($sql);
-                    $this->logger->info($t . ' inseridos');
-                } catch (UniqueConstraintViolationException $e) {
-                    $this->logger->info('Registro já existente para a linha "' . $linha . '"');
-                    $this->logger->info('Continuando.');
+                    $campos[2] = DateTimeUtils::parseDateStr($campos[2])->format('Y-m-d');
+                } catch (\Throwable $e) {
+                    $campos[2] = null;
                 }
+                try {
+                    $campos[19] = DateTimeUtils::parseDateStr($campos[19])->format('Y-m-d');
+                } catch (\Throwable $e) {
+                    $campos[19] = null;
+                }
+                try {
+                    $campos[23] = DateTimeUtils::parseDateStr($campos[23])->format('Y-m-d');
+                } catch (\Throwable $e) {
+                    $campos[23] = null;
+                }
+                try {
+                    $campos[37] = DateTimeUtils::parseDateStr($campos[37])->format('Y-m-d');
+                } catch (\Throwable $e) {
+                    $campos[37] = null;
+                }
+                try {
+                    $campos[53] = DateTimeUtils::parseDateStr($campos[53])->format('Y-m-d');
+                } catch (\Throwable $e) {
+                    $campos[53] = null;
+                }
+                try {
+                    $campos[54] = DateTimeUtils::parseDateStr($campos[54])->format('Y-m-d');
+                } catch (\Throwable $e) {
+                    $campos[54] = null;
+                }
+
+                $campos[5] = trim($campos[5]) . ($campos[99] ? ',' . trim($campos[99]) : ''); # ENDER + NUMERO_ENDER
+                $campos[9] .= trim($campos[9]) . ($campos[10] ? ',' . trim($campos[10]) : ''); # DDD + FONE
+                $campos[17] .= trim($campos[17]) . ($campos[18] ? ',' . trim($campos[18]) : ''); # DDD_FAX + FONE_FAX
+                $campos[30] .= trim($campos[30]) . ($campos[31] ? ',' . trim($campos[31]) : ''); # DDD_TRA_CON + FONE_TRA_CON
+
+                // Reduz para 110 campos
+                unset($campos[99], $campos[10], $campos[18], $campos[31]);
+
+
+                // Flags
+                $campos[41] = $campos[41] ? 'S' : 'N';
+                $campos[66] = $campos[66] ? 'S' : 'N';
+                $campos[77] = $campos[77] ? 'S' : 'N';
+                $campos[102] = $campos[102] ? 'S' : 'N';
+                $campos[103] = $campos[103] ? 'S' : 'N';
+                $campos[104] = $campos[104] ? 'S' : 'N';
+                $campos[109] = $campos[109] ? 'S' : 'N';
+                $campos[110] = $campos[110] ? 'S' : 'N';
+                $campos[112] = $campos[112] ? 'S' : 'N';
+
+                $cMax = count($campos);
+                foreach ($campos as $k => $v) {
+                    $campos[$k] = $v ? "'" . utf8_encode(trim(str_replace("'", "''", $v))) . "'" : 'null';
+                }
+
+                $sql = vsprintf(
+                    'INSERT INTO rdp_rel_cliente01 (id, ' . implode(', ', $camposMySQL) . ', inserted,updated,estabelecimento_id,user_inserted_id,user_updated_id)
+                    VALUES(null,' . str_repeat('%s,', 110) . ' now(), now(),1, 1, 1)', $campos
+                );
+
+                $t += $conn->executeUpdate($sql);
+                $this->logger->info($t . ' inseridos');
             }
             $this->logger->info($t . ' registros inseridos');
             $conn->commit();
@@ -308,6 +443,9 @@ class RelCliente01Business
     }
 
 }
+
+
+
 
 
 
