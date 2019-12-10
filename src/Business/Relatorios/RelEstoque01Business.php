@@ -231,6 +231,7 @@ class RelEstoque01Business
                 $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE codigo = ?', [$campos[9]]);
                 if (!$fornecedor) {
                     unset($dadosFornecedor, $fornecedor);
+                    $dadosFornecedor = [];
                     $dadosFornecedor['codigo'] = $campos[9];
                     $dadosFornecedor['nome'] = $campos[10];
                     $dadosFornecedor['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
@@ -240,7 +241,8 @@ class RelEstoque01Business
                     $dadosFornecedor['user_inserted_id'] = 1;
                     $dadosFornecedor['user_updated_id'] = 1;
                     $conn->insert('est_fornecedor', $dadosFornecedor);
-                    $fornecedor['id'] = $conn->lastInsertId();
+                    $fornecedorId = $conn->lastInsertId();
+                    $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE codigo = ?', [$fornecedorId]);
                 }
 
                 $produto['fornecedor_id'] = $fornecedor['id'];
