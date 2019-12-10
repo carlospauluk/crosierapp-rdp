@@ -242,7 +242,7 @@ class RelEstoque01Business
                     $dadosFornecedor['user_updated_id'] = 1;
                     $conn->insert('est_fornecedor', $dadosFornecedor);
                     $fornecedorId = $conn->lastInsertId();
-                    $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE codigo = ?', [$fornecedorId]);
+                    $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE id = ?', [$fornecedorId]);
                 }
 
                 $produto['fornecedor_id'] = $fornecedor['id'];
