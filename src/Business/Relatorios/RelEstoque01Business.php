@@ -239,7 +239,7 @@ class RelEstoque01Business
                     $dadosFornecedor['estabelecimento_id'] = 1;
                     $dadosFornecedor['user_inserted_id'] = 1;
                     $dadosFornecedor['user_updated_id'] = 1;
-                    $fornecedor = $conn->insert('est_fornecedor', $dadosFornecedor);
+                    $conn->insert('est_fornecedor', $dadosFornecedor);
                     $fornecedor['id'] = $conn->lastInsertId();
                 }
 
