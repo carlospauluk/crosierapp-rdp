@@ -31,12 +31,9 @@ class DatatablesJs {
             order: [[columns.length - 1, "desc"]]
         };
 
-        // console.dir(defaultParams);
-
         $.extend(defaultParams, params);
 
         let datatable = $(listId).on('preXhr.dt', function (e, settings, processing) {
-            console.log('foi preXhr');
             if (processing) {
                 Pace.restart();
             } else {
@@ -44,15 +41,10 @@ class DatatablesJs {
             }
         }).DataTable(defaultParams);
 
-        datatable.on('preDraw', function () {
-            console.log('preDraw');
-        });
-
         datatable.on('draw', function () {
             $('[data-toggle="tooltip"]').tooltip();
             CrosierMasks.maskAll();
             Pace.restart();
-            console.log('draw');
         });
 
 
