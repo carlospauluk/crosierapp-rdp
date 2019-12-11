@@ -182,7 +182,7 @@ class RelEstoque01Business
                     $this->logger->info('Continuando.');
                 }
 
-                if (!isset($estProdutos[$campos[0]])) {
+                if (!isset($estProdutos[str_replace("'", '', $campos[0])])) {
                     $this->handleNaEstProduto($campos);
                 }
 
