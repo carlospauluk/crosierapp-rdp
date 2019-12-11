@@ -111,6 +111,13 @@ class RelEstoque01Business
         $t = 0;
         $linha = null;
         try {
+
+            $qryProdutos = $conn->query('SELECT * FROM est_produto');
+
+            while ($produto = $qryProdutos->fetch()) {
+                $estProdutos[$produto['codigo_from']] = $produto['id'];
+            }
+
             $conn->executeUpdate('SET FOREIGN_KEY_CHECKS=0;TRUNCATE TABLE rdp_rel_estoque01;');
             for ($i = 1; $i < $totalRegistros; $i++) {
                 $linha = $linhas[$i];
@@ -175,7 +182,9 @@ class RelEstoque01Business
                     $this->logger->info('Continuando.');
                 }
 
-                $this->handleNaEstProduto($campos);
+                if (!isset($estProdutos[$campos[0]])) {
+                    $this->handleNaEstProduto($campos);
+                }
 
             }
             $this->logger->info($t . ' registros inseridos');
@@ -213,70 +222,65 @@ class RelEstoque01Business
 
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
-            $existe = $conn->fetchAssoc('SELECT * FROM est_produto WHERE codigo_from = ?', [$campos[0]]);
-            if (!$existe) {
 
-                $this->logger->info('Produto novo na est_produto (' . $campos[0] . '). Inserindo...');
-                $produto['uuid'] = StringUtils::guidv4();
-                $produto['depto_id'] = $this->ids['depto'];
-                $produto['depto_codigo'] = '00';
-                $produto['depto_nome'] = 'INDEFINIDO';
-                $produto['grupo_id'] = $this->ids['grupo'];
-                $produto['grupo_codigo'] = '00';
-                $produto['grupo_nome'] = 'INDEFINIDO';
-                $produto['subgrupo_id'] = $this->ids['subgrupo'];
-                $produto['subgrupo_codigo'] = '00';
-                $produto['subgrupo_nome'] = 'INDEFINIDO';
+            $this->logger->info('Produto novo na est_produto (' . $campos[0] . '). Inserindo...');
+            $produto['uuid'] = StringUtils::guidv4();
+            $produto['depto_id'] = $this->ids['depto'];
+            $produto['depto_codigo'] = '00';
+            $produto['depto_nome'] = 'INDEFINIDO';
+            $produto['grupo_id'] = $this->ids['grupo'];
+            $produto['grupo_codigo'] = '00';
+            $produto['grupo_nome'] = 'INDEFINIDO';
+            $produto['subgrupo_id'] = $this->ids['subgrupo'];
+            $produto['subgrupo_codigo'] = '00';
+            $produto['subgrupo_nome'] = 'INDEFINIDO';
 
-                $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE codigo = ?', [$campos[9]]);
-                if (!$fornecedor) {
-                    unset($dadosFornecedor, $fornecedor);
-                    $dadosFornecedor = [];
-                    $dadosFornecedor['codigo'] = $campos[9];
-                    $dadosFornecedor['nome'] = $campos[10];
-                    $dadosFornecedor['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
-                    $dadosFornecedor['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
-                    $dadosFornecedor['version'] = 0;
-                    $dadosFornecedor['estabelecimento_id'] = 1;
-                    $dadosFornecedor['user_inserted_id'] = 1;
-                    $dadosFornecedor['user_updated_id'] = 1;
-                    $conn->insert('est_fornecedor', $dadosFornecedor);
-                    $fornecedorId = $conn->lastInsertId();
-                    $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE id = ?', [$fornecedorId]);
-                }
-
-                $produto['fornecedor_id'] = $fornecedor['id'];
-                $produto['fornecedor_nome'] = $fornecedor['nome'];
-                $produto['fornecedor_documento'] = $fornecedor['documento'];
-
-                $produto['nome'] = $campos[1];
-                $produto['titulo'] = null;
-                $produto['caracteristicas'] = null;
-                $produto['ean'] = null;
-                $produto['referencia'] = null;
-                $produto['ncm'] = null;
-                $produto['status'] = 'INATIVO';
-                $produto['composicao'] = 'N';
-                $produto['obs'] = null;
-                $produto['codigo_from'] = $campos[0];
-                $produto['porcent_preench'] = null;
-                $produto['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
-                $produto['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
-                $produto['version'] = 0;
-                $produto['estabelecimento_id'] = 1;
-                $produto['user_inserted_id'] = 1;
-                $produto['user_updated_id'] = 1;
-                $produto['unidade_produto_id'] = 1;
-
-                $conn->insert('est_produto', $produto);
-
-                // Já copia as configurações de atributos de um produto já montado
-                $id = $conn->lastInsertId();
-                $this->colarConfigs($id);
-
-            } else {
-                $this->logger->info('Produto com codigo_from ' . $campos[0] . ' já existente na base');
+            $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE codigo = ?', [$campos[9]]);
+            if (!$fornecedor) {
+                unset($dadosFornecedor, $fornecedor);
+                $dadosFornecedor = [];
+                $dadosFornecedor['codigo'] = $campos[9];
+                $dadosFornecedor['nome'] = $campos[10];
+                $dadosFornecedor['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+                $dadosFornecedor['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+                $dadosFornecedor['version'] = 0;
+                $dadosFornecedor['estabelecimento_id'] = 1;
+                $dadosFornecedor['user_inserted_id'] = 1;
+                $dadosFornecedor['user_updated_id'] = 1;
+                $conn->insert('est_fornecedor', $dadosFornecedor);
+                $fornecedorId = $conn->lastInsertId();
+                $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE id = ?', [$fornecedorId]);
             }
+
+            $produto['fornecedor_id'] = $fornecedor['id'];
+            $produto['fornecedor_nome'] = $fornecedor['nome'];
+            $produto['fornecedor_documento'] = $fornecedor['documento'];
+
+            $produto['nome'] = $campos[1];
+            $produto['titulo'] = null;
+            $produto['caracteristicas'] = null;
+            $produto['ean'] = null;
+            $produto['referencia'] = null;
+            $produto['ncm'] = null;
+            $produto['status'] = 'INATIVO';
+            $produto['composicao'] = 'N';
+            $produto['obs'] = null;
+            $produto['codigo_from'] = $campos[0];
+            $produto['porcent_preench'] = null;
+            $produto['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+            $produto['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+            $produto['version'] = 0;
+            $produto['estabelecimento_id'] = 1;
+            $produto['user_inserted_id'] = 1;
+            $produto['user_updated_id'] = 1;
+            $produto['unidade_produto_id'] = 1;
+
+            $conn->insert('est_produto', $produto);
+
+            // Já copia as configurações de atributos de um produto já montado
+            $id = $conn->lastInsertId();
+            $this->colarConfigs($id);
+
         } catch (\Throwable | DBALException $e) {
             $this->logger->error('Erro ao handleNaEstProduto');
             $this->logger->error($e->getMessage());
