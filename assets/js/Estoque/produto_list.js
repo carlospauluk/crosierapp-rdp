@@ -26,7 +26,7 @@ function getDatatablesColumns() {
             data: 'e',
             title: 'Título',
             render: function (data, type, row) {
-                let s = '<div class="float-left">' + data.titulo ? data.titulo : '' + '</div>';
+                let s = '<div class="float-left">' + (data.titulo ? data.titulo : '<span style="font-size: small; font-style: italic; color: grey">' + data.nome + '</span>') + '</div>';
                 if (data.imagem1) {
                     s += '<div class="float-right"><img src="' + crosierAppVendestUrl + '/images/produtos/' + data.deptoId + '/' + data.grupoId + '/' + data.subgrupoId + '/' + data.imagem1 + '" width="50px"/></div>';
                 }
