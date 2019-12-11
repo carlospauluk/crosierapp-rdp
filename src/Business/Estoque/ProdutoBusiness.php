@@ -283,6 +283,14 @@ class ProdutoBusiness
             $atrPrecoAcessorios = $qryAtributo->fetch();
             $qryPrecoAcessorios = $conn->prepare('SELECT preco_venda FROM rdp_rel_estoque01 WHERE cod_prod = :cod_prod AND desc_filial = \'ACESSORIOS\'');
 
+
+            // Atualização do atributo 'Código ERP' (apenas copia do est_produto.codigo_from)
+            // Serve apenas para não complicar a exibição deste campo na outra aba (ERP)
+            $qryAtributo->bindValue('uuid', '88bb5c49-1147-4a47-8e46-6d85ddd559bc');
+            $qryAtributo->execute();
+            $atrCodigoERP = $qryAtributo->fetch();
+
+
             // ????
 //            $qryAtributo->bindValue('uuid', '1809d058-337c-46b2-a540-fd5315467d1a'); // Preço Atacado
 //            $qryAtributo->execute();
@@ -307,6 +315,15 @@ class ProdutoBusiness
             $i = 0;
             $this->logger->debug('Atualizando ' . count($produtos) . ' produtos');
             foreach ($produtos as $produto) {
+
+                // Atualização do atributo 'Código ERP' (apenas copia do est_produto.codigo_from)
+                // Serve apenas para não complicar a exibição deste campo na outra aba (ERP)
+                $this->insereAtributoSeProdutoAindaNaoTem($produto, $atrCodigoERP['id'], 1, 'ERP');
+                $conn->update('est_produto_atributo', ['valor' => $produto['codigo_from']],
+                    [
+                        'produto_id' => $produto['id'],
+                        'atributo_id' => $atrCodigoERP['id']
+                    ]);
 
                 $this->insereAtributoSeProdutoAindaNaoTem($produto, $atrEstoqueMatriz['id'], 1, 'Estoques');
                 $this->insereAtributoSeProdutoAindaNaoTem($produto, $atrEstoqueAcessorios['id'], 2, 'Estoques');
