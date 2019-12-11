@@ -183,7 +183,8 @@ class RelEstoque01Business
                 }
 
                 if (!isset($estProdutos[str_replace("'", '', $campos[0])])) {
-                    $this->handleNaEstProduto($campos);
+                    $produtoId = $this->handleNaEstProduto($campos);
+                    $estProdutos[str_replace("'", '', $campos[0])] = $produtoId;
                 }
 
             }
@@ -209,8 +210,9 @@ class RelEstoque01Business
 
     /**
      * @param array $campos
+     * @return string
      */
-    private function handleNaEstProduto(array $campos): void
+    private function handleNaEstProduto(array $campos): string
     {
 
         try {
@@ -280,6 +282,7 @@ class RelEstoque01Business
             // Já copia as configurações de atributos de um produto já montado
             $id = $conn->lastInsertId();
             $this->colarConfigs($id);
+            return $id;
 
         } catch (\Throwable | DBALException $e) {
             $this->logger->error('Erro ao handleNaEstProduto');
