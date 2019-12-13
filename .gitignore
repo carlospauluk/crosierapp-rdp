@@ -37,4 +37,5 @@ public/downloads/estoque/produtos/excel/*
 files/pedidoscompra/*
 files/relatorios/*
 
-
+files/curl_uploadRel_HOM.php
+files/curl_uploadRel_PROD.php
