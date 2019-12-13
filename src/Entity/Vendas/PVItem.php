@@ -2,6 +2,7 @@
 
 namespace App\Entity\Vendas;
 
+use App\Entity\Estoque\Produto;
 use CrosierSource\CrosierLibBaseBundle\Entity\EntityId;
 use CrosierSource\CrosierLibBaseBundle\Entity\EntityIdTrait;
 use Doctrine\ORM\Mapping as ORM;
@@ -34,21 +35,14 @@ class PVItem implements EntityId
 
     /**
      *
-     * @ORM\Column(name="produto_cod", type="string", nullable=false)
+     * @ORM\ManyToOne(targetEntity="App\Entity\Estoque\Produto")
+     * @ORM\JoinColumn(name="produto_id", nullable=false)
      * @Groups("entity")
+     * @MaxDepth(1)
      *
-     * @var string|null
+     * @var Produto|null
      */
-    private $produtoCod;
-
-    /**
-     *
-     * @ORM\Column(name="produto_desc", type="string", nullable=false)
-     * @Groups("entity")
-     *
-     * @var string|null
-     */
-    private $produtoDesc;
+    private $produto;
 
     /**
      *
@@ -152,38 +146,20 @@ class PVItem implements EntityId
     }
 
     /**
-     * @return string|null
+     * @return Produto|null
      */
-    public function getProdutoCod(): ?string
+    public function getProduto(): ?Produto
     {
-        return $this->produtoCod;
+        return $this->produto;
     }
 
     /**
-     * @param string|null $produtoCod
+     * @param Produto|null $produto
      * @return PVItem
      */
-    public function setProdutoCod(?string $produtoCod): PVItem
+    public function setProduto(?Produto $produto): PVItem
     {
-        $this->produtoCod = $produtoCod;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getProdutoDesc(): ?string
-    {
-        return $this->produtoDesc;
-    }
-
-    /**
-     * @param string|null $produtoDesc
-     * @return PVItem
-     */
-    public function setProdutoDesc(?string $produtoDesc): PVItem
-    {
-        $this->produtoDesc = $produtoDesc;
+        $this->produto = $produto;
         return $this;
     }
 

@@ -11,6 +11,7 @@ use App\EntityHandler\Vendas\PVItemEntityHandler;
 use App\Repository\Estoque\ProdutoRepository;
 use App\Repository\Vendas\PVRepository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
+use CrosierSource\CrosierLibBaseBundle\Twig\FilterInput;
 use CrosierSource\CrosierLibBaseBundle\Utils\EntityIdUtils\EntityIdUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -73,13 +74,30 @@ class PVListEstoqueController extends FormListController
         $this->entityIdUtils = $entityIdUtils;
     }
 
+    /**
+     * @return \Doctrine\Common\Persistence\ObjectRepository
+     */
+    public function getRepository(): \Doctrine\Common\Persistence\ObjectRepository
+    {
+        return $this->getDoctrine()->getRepository(Produto::class);
+    }
+
+    /**
+     * @param array $params
+     * @return array
+     */
     public function getFilterDatas(array $params): array
     {
         return [
-            new FilterData(['nome'], 'LIKE', 'nome', $params),
+            new FilterData(['id'], 'EQ', 'id', $params),
+            new FilterData(['codigoFrom'], 'EQ', 'codigoFrom', $params),
+            new FilterData(['nome', 'titulo'], 'LIKE', 'nomeTitulo', $params),
+            new FilterData(['nomeDepto'], 'LIKE', 'nomeDepto', $params),
+            new FilterData(['porcentPreench'], 'BETWEEN_PORCENT', 'porcentPreench', $params),
+            new FilterData(['qtdeImagens'], 'EQ', 'qtdeImagens', $params),
+            new FilterData(['titulo'], 'IS_NOT_EMPTY', 'tituloIsNotEmpty', $params),
         ];
     }
-
 
     /**
      *
@@ -99,16 +117,21 @@ class PVListEstoqueController extends FormListController
             'listPageTitle' => 'Estoque',
             'listId' => 'ven_pv_produtoList'
         ];
-
-
-        /** @var ProdutoRepository $repo */
-        $repo = $this->getDoctrine()->getRepository(Produto::class);
-
         $params['page_subTitle'] = 'PV ' . $pv->getId() . ' (' . $pv->getClienteNome() . ')';
-
         $params['qtdeProdutosNoCarrinho'] = isset($this->session->get('carrinho')['itens']) ? count($this->session->get('carrinho')['itens']) : '';
-
         $params['routeParams'] = ['pv' => $pv->getId()];
+
+        $params['filterInputs'] = [
+            new FilterInput('Código', 'id'),
+            new FilterInput('Código (ERP)', 'codigoFrom'),
+            new FilterInput('Nome/Título/Código', 'nomeTitulo'),
+            new FilterInput('Depto', 'nomeDepto'),
+            new FilterInput('Status Cad', 'porcentPreench', 'BETWEEN_INTEGER', null, ['sufixo' => '%']),
+            new FilterInput('Qtde Imagens', 'qtdeImagens', 'INTEGER'),
+            new FilterInput('', 'tituloIsNotEmpty', 'HIDDEN'),
+        ];
+
+        $params['listAuxDatas'] = json_encode(['crosierAppVendestUrl' => $_SERVER['CROSIERAPPVENDEST_URL']]);
 
         return $this->doList($request, $params);
     }
@@ -159,7 +182,7 @@ class PVListEstoqueController extends FormListController
             $achou = false;
             /** @var PVItem $item */
             foreach ($pv->getItens() as $item) {
-                if ($item->getProdutoCod() === $produtoId) {
+                if ($item->getProduto() === $produto) {
                     $achou = true;
                     break;
                 }
@@ -168,8 +191,7 @@ class PVListEstoqueController extends FormListController
                 $pvItem = new PVItem();
                 $pvItem->setPv($pv);
                 $pvItem->setQtde($qtde);
-                $pvItem->setProdutoCod($produto->getId());
-                $pvItem->setProdutoDesc($produto->nome);
+                $pvItem->setProduto($produto);
                 $pvItem->setCodFornecedor($produto->fornecedorId);
                 $pvItem->setNomeFornecedor($produto->nomeFornecedor);
                 $pvItem->setPrecoCusto($produto->precoCusto);

@@ -9,7 +9,7 @@
                         <h5>Itens do PV</h5>
                     </div>
                     <div class="col-4 text-right">
-                        <button type="button" class="btn btn-primary" title="Pesquisar no estoque para incluir itens"
+                        <button type="button" class="btn btn-outline-primary" title="Pesquisar no estoque para incluir itens"
                                 onclick="window.location.href='{{ url('ven_pv_produto_list', {pv: e.id} ) }}'">
                             <i class="fas fa-search-plus"></i> Estoque
                         </button>
@@ -40,26 +40,27 @@
                             <tr>
                                 <td>{{ loop.index }}</td>
                                 <td>
-                                    {{ item.produtoCod }} - {{ item.produtoDesc }}
+                                    {{ item.produto.id }}
+                                    - {{ item.produto.titulo ? item.produto.titulo : '<span style="font-size: small; font-style: italic; color: grey">' + item.produto.nome + '</span>' }}
                                     <br/>
                                     <span style="font-size: small">{{ item.codFornecedor }} - {{ item.nomeFornecedor }}</span>
                                 </td>
-                                <td>{{ item.qtde|number_format(2,',','.') }}</td>
-                                <td>{{ item.precoOrc|number_format(2,',','.') }}</td>
-                                <td>{{ item.desconto|number_format(2,',','.') }}</td>
-                                <td>{{ item.total|number_format(2,',','.') }}</td>
+                                <td class="text-right">{{ item.qtde|number_format(2,',','.') }}</td>
+                                <td class="text-right">{{ item.precoOrc|number_format(2,',','.') }}</td>
+                                <td class="text-right">{{ item.desconto|number_format(2,',','.') }}</td>
+                                <td class="text-right">{{ item.total|number_format(2,',','.') }}</td>
                                 <td class="text-right">
-                                        <button type="button" class="btn btn-sm btn-primary"
-                                                onclick="window.location.href='{{ url('ven_pvItem_form', {pv: e.id, 'item': item.id} ) }}'">
-                                            <i class="fas fa-wrench" aria-hidden="true"></i>
-                                        </button>
+                                    <button type="button" class="btn btn-sm btn-primary"
+                                            onclick="window.location.href='{{ url('ven_pvItem_form', {pv: e.id, 'item': item.id} ) }}'">
+                                        <i class="fas fa-wrench" aria-hidden="true"></i>
+                                    </button>
 
-                                        <button type="button" class="btn btn-sm btn-danger"
-                                                data-url="{{ url('ven_pvItem_delete', {'pvItem': item.id}) }}"
-                                                data-token="{{ csrf_token('delete') }}"
-                                                data-target="#confirmationModal" data-toggle="modal">
-                                            <i class="fa fa-trash" aria-hidden="true"></i>
-                                        </button>
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                            data-url="{{ url('ven_pvItem_delete', {'pvItem': item.id}) }}"
+                                            data-token="{{ csrf_token('delete') }}"
+                                            data-target="#confirmationModal" data-toggle="modal">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </button>
                                 </td>
                             </tr>
                         {% endfor %}

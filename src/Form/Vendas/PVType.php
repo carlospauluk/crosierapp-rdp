@@ -212,18 +212,17 @@ class PVType extends AbstractType
                 'label' => 'Subtotal',
                 'currency' => 'BRL',
                 'grouping' => 'true',
-                'mapped' => false,
                 'attr' => [
                     'class' => 'crsr-money'
                 ],
-                'required' => false
+                'required' => false,
+                'disabled' => true
             ]);
 
             $builder->add('descontos', MoneyType::class, [
                 'label' => 'Descontos',
                 'currency' => 'BRL',
                 'grouping' => 'true',
-                'mapped' => false,
                 'attr' => [
                     'class' => 'crsr-money'
                 ],
@@ -235,11 +234,11 @@ class PVType extends AbstractType
                 'label' => 'Total',
                 'currency' => 'BRL',
                 'grouping' => 'true',
-                'mapped' => false,
                 'attr' => [
                     'class' => 'crsr-money'
                 ],
-                'required' => false
+                'required' => false,
+                'disabled' => true
             ]);
 
             $venctos = $pv && $pv->getVenctos() ? json_decode($pv->getVenctos(), true) : null;

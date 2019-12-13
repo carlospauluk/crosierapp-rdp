@@ -86,7 +86,7 @@ class PVController extends FormListController
      *
      * @Route("/ven/pv/list/", name="ven_pv_list")
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @throws \Exception
      *
      * @IsGranted({"ROLE_PV"}, statusCode=403)
@@ -123,7 +123,7 @@ class PVController extends FormListController
      * @Route("/ven/pv/form/{id}", name="ven_pv_form", defaults={"id"=null}, requirements={"id"="\d+"})
      * @param Request $request
      * @param PV|null $pv
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      * @throws \Exception
      *
      * @IsGranted({"ROLE_PV"}, statusCode=403)
@@ -187,7 +187,7 @@ class PVController extends FormListController
      * @param Request $request
      * @param PV|null $pv
      * @param PVItem|null $pvItem
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      * @throws \Exception
      * @IsGranted({"ROLE_PV"}, statusCode=403)
      */
@@ -220,6 +220,7 @@ class PVController extends FormListController
         $this->pvItemEntityHandler->delete($pvItem);
         return $this->redirectToRoute('ven_pv_form', ['id' => $pvItem->getPv()->getId(), '_fragment' => 'itens']);
     }
+
 
 
 }

@@ -42,7 +42,7 @@ class ProdutoAuxController extends FormListController
     /**
      *
      * @Route("/est/produto/exportarExcel/", name="est_produto_exportarExcel")
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @IsGranted({"ROLE_ESTOQUE"}, statusCode=403)
      */
     public function exportarExcel(): Response

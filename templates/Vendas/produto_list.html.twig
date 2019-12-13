@@ -21,17 +21,6 @@
 {% endblock %}
 
 
-{% block campos_pesquisar %}
-
-    <div class="form-group">
-        <label for="filter_nome">Produto</label>
-        <input type="text"
-               class="form-control" id="filter_nome"
-               name="filter[nome]"
-               value="{{ filter.nome|default('') }}">
-    </div>
-
-{% endblock %}
 
 
 {% block down_scripts %}

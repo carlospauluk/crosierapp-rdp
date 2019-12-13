@@ -96,3 +96,14 @@ CREATE TABLE `rdp_ven_pv_item`
     CONSTRAINT `fk_rdp_ven_pv_item_estabelecimento` FOREIGN KEY (`estabelecimento_id`) references `cfg_estabelecimento` (`id`)
 ) ENGINE = INNODB
   DEFAULT charset = utf8;
+
+
+ALTER TABLE rdp_ven_pv_item ADD produto_id bigint(20) not null;
+
+ALTER TABLE rdp_ven_pv_item
+    ADD KEY `k_rdp_ven_pv_item_produto` (`produto_id`),
+    ADD CONSTRAINT `fk_rdp_ven_pv_item_produto` FOREIGN KEY (`produto_id`) references `est_produto` (`id`);
+
+ALTER TABLE rdp_ven_pv_item
+    DROP produto_cod,
+    DROP produto_desc;

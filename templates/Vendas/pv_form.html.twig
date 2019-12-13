@@ -31,8 +31,12 @@
                            role="tab" aria-controls="home" aria-selected="true">Dados</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="itens-tab" data-toggle="tab" href="#itens" role="tab"
+                        <a class="nav-link {{ e.id ? '' : 'disabled' }}" id="itens-tab" data-toggle="tab" href="#itens" role="tab"
                            aria-controls="profile" aria-selected="false">Itens</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ e.id ? '' : 'disabled' }}" id="prazos-tab" data-toggle="tab" href="#prazos" role="tab"
+                           aria-controls="profile" aria-selected="false">Prazos</a>
                     </li>
                 </ul>
 
@@ -47,6 +51,7 @@
 
                     {{ include('Vendas/pv_form_cabecalho.html.twig') }}
                     {{ include('Vendas/pv_form_itens.html.twig') }}
+                    {{ include('Vendas/pv_form_prazos.html.twig') }}
 
                 </div>
 
@@ -84,3 +89,7 @@
 
 {% endblock %}
 
+
+{% block down_scripts %}
+    <script src="{{ asset('build/Vendas/pv_form.js') }}"></script>
+{% endblock %}

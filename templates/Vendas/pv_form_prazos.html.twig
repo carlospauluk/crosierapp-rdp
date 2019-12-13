@@ -1,0 +1,40 @@
+<div class="tab-pane fade" id="prazos" role="tabpanel" aria-labelledby="prazos-tab">
+
+    {% if e.id %}
+        <div class="card">
+            <div class="card-header">
+
+                <div class="row">
+                    <div class="col">
+                        <h5>Prazos de Pagto</h5>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="card-body">
+
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Dt Vencto</th>
+                        <th>Valor</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for i in 1..6 %}
+                        <tr>
+                            <td>{{ i }}</td>
+                            <td>{{ form_widget(form['venctos_dt0' ~ i]) }}</td>
+                            <td>{{ form_widget(form['venctos_valor0' ~ i]) }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+</div>

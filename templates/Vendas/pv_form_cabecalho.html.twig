@@ -20,33 +20,6 @@
         {{ form_row(form.obs) }}
 
 
-
-        <fieldset class="border p-2 mb-3 mt-3 mb-3">
-            <legend class="w-auto p-2">Prazos</legend>
-
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Dt Vencto</th>
-                        <th>Valor</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for i in 1..6 %}
-                    <tr>
-                        <td>{{ i }}</td>
-                        <td>{{ form_widget(form['venctos_dt0' ~ i]) }}</td>
-                        <td>{{ form_widget(form['venctos_valor0' ~ i]) }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-
-            </table>
-
-
-        </fieldset>
-
     </div>
 
 

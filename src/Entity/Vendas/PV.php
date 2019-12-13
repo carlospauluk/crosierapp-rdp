@@ -509,12 +509,14 @@ class PV implements EntityId
     {
         $venctos = [];
         for ($i = 1; $i <= 6; $i++) {
-            $dt = $pvArr['venctos_dt0' . $i];
-            $valor = $pvArr['venctos_valor0' . $i];
-            $venctos[] = [
-                'dtVencto' => $dt,
-                'valor' => $valor
-            ];
+            $dt = $pvArr['venctos_dt0' . $i] ?? null;
+            if ($dt) {
+                $valor = $pvArr['venctos_valor0' . $i];
+                $venctos[] = [
+                    'dtVencto' => $dt,
+                    'valor' => $valor
+                ];
+            }
         }
         $this->setVenctos(json_encode($venctos));
     }
@@ -524,6 +526,13 @@ class PV implements EntityId
      */
     public function getSubtotal(): ?float
     {
+        if ($this->getItens()) {
+            $subtotal = 0.0;
+            foreach ($this->getItens() as $item) {
+                $subtotal += $item->getTotal();
+            }
+            $this->subtotal = $subtotal;
+        }
         return $this->subtotal;
     }
 
@@ -560,6 +569,7 @@ class PV implements EntityId
      */
     public function getTotal(): ?float
     {
+        $this->total = bcsub($this->getSubtotal() ?? 0.0, $this->getDescontos() ?? 0.0, 2);
         return $this->total;
     }
 

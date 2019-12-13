@@ -34,11 +34,7 @@ yarn-error.log
 public/downloads/estoque/produtos/excel/*
 
 
-files/*
+files/pedidoscompra/*
+files/relatorios/*
 
 
-curl_uploadRel_HOM.php
-curl_uploadRel_PROD.php
-
-curl_relatoriospush_HOM.php
-curl_relatoriospush_PROD.php

@@ -15,7 +15,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  *
- * @package App\Controller\Utils\API
  *
  * @author Carlos Eduardo Pauluk
  */

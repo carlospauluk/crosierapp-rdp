@@ -5,10 +5,13 @@ import 'numeral/locales/pt-br.js';
 import DatatablesJs from "../crosier/DatatablesJs";
 
 import toastrr from "toastr";
+import $ from "jquery";
 
 Numeral.locale('pt-br');
 
 let listId = "#ven_pv_produtoList";
+
+let crosierAppVendestUrl = $('#listAuxDatas').data('json').crosierAppVendestUrl;
 
 function getDatatablesColumns() {
     return [
@@ -32,11 +35,21 @@ function getDatatablesColumns() {
             className: 'text-center'
         },
         {
-            name: 'e.codProduto',
+            name: 'e.id',
+            data: 'e.id',
+            title: 'Código'
+        },
+        {
+            name: 'e.id',
             data: 'e',
             title: 'Produto',
             render: function (data, type, row) {
-                return data.id + ' - ' + data.nome;
+
+                let s = '<div class="float-left">' + (data.titulo ? data.titulo : '<span style="font-size: small; font-style: italic; color: grey">' + data.nome + '</span>') + '</div>';
+                if (data.imagem1) {
+                    s += '<div class="float-right"><img src="' + crosierAppVendestUrl + '/images/produtos/' + data.deptoId + '/' + data.grupoId + '/' + data.subgrupoId + '/' + data.imagem1 + '" width="50px"/></div>';
+                }
+                return s;
             }
         },
         {

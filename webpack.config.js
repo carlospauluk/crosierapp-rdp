@@ -54,6 +54,7 @@ Encore
     .addEntry('Relatorios/relCliente01_list', './assets/js/Relatorios/relCliente01_list.js')
 
     .addEntry('Vendas/pv_list', './assets/js/Vendas/pv_list.js')
+    .addEntry('Vendas/pv_form', './assets/js/Vendas/pv_form.js')
     .addEntry('Vendas/produto_list', './assets/js/Vendas/produto_list.js')
 
 

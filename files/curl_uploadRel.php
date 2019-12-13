@@ -8,7 +8,7 @@ if (!isset($argv[2])) {
     die('Nenhum arquivo informado.' . PHP_EOL);
 }
 
-$endpoint = 'https://rdp.rodoponta.dev.crosier/api/relatorios/upload';
+$endpoint = 'https://???/api/relatorios/upload';
 
 
 $tipoRelatorio = $argv[1];
