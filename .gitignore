@@ -39,4 +39,4 @@ files/relatorios/*
 
 files/curl_uploadRel_HOM.php
 files/curl_uploadRel_PROD.php
-./files/curl_pv_DEV.php
+files/curl_pv_DEV.php
