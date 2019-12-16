@@ -17,5 +17,10 @@ class PVItemEntityHandler extends EntityHandler
         return PVItem::class;
     }
 
+    public function beforeSave(/** @var PVItem $pvItem */ $pvItem)
+    {
+        $pvItem->setTotal(bcsub(bcmul($pvItem->getPrecoOrc(), $pvItem->getQtde(), 2), $pvItem->getDesconto(), 2));
+    }
+
 
 }

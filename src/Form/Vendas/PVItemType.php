@@ -34,38 +34,6 @@ class PVItemType extends AbstractType
                 'required' => false
             ));
 
-            $builder->add('produtoCodDesc', TextType::class, array(
-                'label' => 'Produto',
-                'required' => false,
-                'mapped' => false,
-                'disabled' => true,
-                'data' => $pvItem->getProdutoCod() . ' - ' . $pvItem->getProdutoDesc()
-            ));
-
-            $builder->add('fornecedorCodDesc', TextType::class, array(
-                'label' => 'Fornecedor',
-                'required' => false,
-                'mapped' => false,
-                'disabled' => true,
-                'data' => $pvItem->getCodFornecedor() . ' - ' . $pvItem->getNomeFornecedor()
-            ));
-
-            $builder->add('produtoCod', HiddenType::class, array(
-                'required' => false
-            ));
-
-            $builder->add('produtoDesc', HiddenType::class, array(
-                'required' => false
-            ));
-
-            $builder->add('codFornecedor', HiddenType::class, array(
-                'required' => false
-            ));
-
-            $builder->add('nomeFornecedor', HiddenType::class, array(
-                'required' => false
-            ));
-
             $builder->add('precoCusto', HiddenType::class, array(
                 'required' => false,
             ));
@@ -119,6 +87,7 @@ class PVItemType extends AbstractType
                 'attr' => [
                     'class' => 'crsr-money'
                 ],
+                'disabled' => true
             ]);
 
         });

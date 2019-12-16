@@ -31,11 +31,13 @@
                            role="tab" aria-controls="home" aria-selected="true">Dados</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ e.id ? '' : 'disabled' }}" id="itens-tab" data-toggle="tab" href="#itens" role="tab"
+                        <a class="nav-link {{ e.id ? '' : 'disabled' }}" id="itens-tab" data-toggle="tab" href="#itens"
+                           role="tab"
                            aria-controls="profile" aria-selected="false">Itens</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ e.id ? '' : 'disabled' }}" id="prazos-tab" data-toggle="tab" href="#prazos" role="tab"
+                        <a class="nav-link {{ e.id ? '' : 'disabled' }}" id="prazos-tab" data-toggle="tab"
+                           href="#prazos" role="tab"
                            aria-controls="profile" aria-selected="false">Prazos</a>
                     </li>
                 </ul>
@@ -63,9 +65,19 @@
                     <div class="col text-right">
 
 
-                        <button type="submit" class="btn btn-primary" value="Salvar">
-                            <i class="fas fa-save" aria-hidden="true"></i> Salvar
-                        </button>
+                        {% if e.id == null or e.status == 'ABERTO' %}
+                            <button type="submit" class="btn btn-primary" value="Salvar">
+                                <i class="fas fa-save" aria-hidden="true"></i> Salvar
+                            </button>
+                        {% endif %}
+
+                        {% if e.id and e.status == 'ABERTO' %}
+                            <a role="button" class="btn btn-outline-primary" title="Enviar para Faturamento"
+                               data-target="#confirmationModal" data-toggle="modal"
+                               data-url="{{ url('ven_pv_enviarParaEKT', {'id' : e.id}) }}">
+                                <i class="fas fa-upload"></i> Enviar
+                            </a>
+                        {% endif %}
 
                         <button type="button" value="Resetar" class="btn btn-secondary"
                                 data-url="{{ url('ven_pv_form', {id: e.id}) }}"

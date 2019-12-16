@@ -12,10 +12,13 @@
                 <div class="row">
                     <div class="col-8">
                         <h3>Item de PV</h3>
+                        <h6>
+                            {{ e.produto.id }} - {{ e.produto.titulo ? e.produto.titulo : ('<span style="font-style: italic; color: grey">' ~ e.produto.nome ~ '</span>')|raw }}
+                        </h6>
                     </div>
                     <div class="col-4 text-right">
                         <button type="button" class="btn btn-secondary"
-                                onclick="window.location.href='{{ url('ven_pv_form', {id: routeParams.pv.id} ) }}'">
+                                onclick="window.location.href='{{ url('ven_pv_form', {id: routeParams.pv, '_fragment': 'itens'} ) }}'">
                             <i class="fas fa-backward" aria-hidden="true"></i> Voltar
                         </button>
                     </div>

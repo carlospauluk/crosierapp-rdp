@@ -17,6 +17,7 @@ use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use CrosierSource\CrosierLibBaseBundle\Utils\ViewUtils\Select2JsUtils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -144,6 +145,23 @@ class PVController extends FormListController
     }
 
     /**
+     *
+     * @Route("/ven/pv/enviarParaEKT/{id}", name="ven_pv_enviarParaEKT", requirements={"id"="\d+"})
+     * @param Request $request
+     * @param PV|null $pv
+     * @return RedirectResponse
+     * @throws \Exception
+     *
+     * @IsGranted({"ROLE_PV"}, statusCode=403)
+     */
+    public function enviarParaEKT(Request $request, PV $pv): RedirectResponse
+    {
+        $pv->setStatus('ENVIADO');
+        $this->entityHandler->save($pv);
+        return $this->redirectToRoute('ven_pv_form', ['id' => $pv->getId()]);
+    }
+
+    /**
      * @param Request $request
      * @param $pv
      */
@@ -202,7 +220,7 @@ class PVController extends FormListController
             'formView' => 'Vendas/pvItem_form.html.twig',
             'formRoute' => 'ven_pvItem_form',
             'formPageTitle' => 'Item do PV',
-            'routeParams' => ['pv' => $pv],
+            'routeParams' => ['pv'=> $pv->getId()],
             'entityHandler' => $this->pvItemEntityHandler
         ];
         return $this->doForm($request, $pvItem, $params);
@@ -220,7 +238,6 @@ class PVController extends FormListController
         $this->pvItemEntityHandler->delete($pvItem);
         return $this->redirectToRoute('ven_pv_form', ['id' => $pvItem->getPv()->getId(), '_fragment' => 'itens']);
     }
-
 
 
 }

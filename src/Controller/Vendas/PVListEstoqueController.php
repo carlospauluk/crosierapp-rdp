@@ -198,7 +198,7 @@ class PVListEstoqueController extends FormListController
                 $pvItem->setPrecoVenda($produto->precoTabela);
                 $pvItem->setPrecoOrc($produto->precoTabela);
                 $pvItem->setDesconto(0.0);
-                $pvItem->setTotal(bcmul($produto->precoTabela, $qtde));
+                $pvItem->setTotal(bcmul($produto->precoTabela, $qtde, 2));
 
                 $this->pvItemEntityHandler->save($pvItem);
 

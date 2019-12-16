@@ -55,6 +55,8 @@ class PVType extends AbstractType
             /** @var PVRepository $repoPV */
             $repoPV = $this->doctrine->getRepository(PV::class);
 
+            $disabled = $pv->getId() && $pv->getStatus() !== 'ABERTO';
+
             $builder->add('id', TextType::class, [
                 'label' => 'ID',
                 'disabled' => true,
@@ -66,6 +68,7 @@ class PVType extends AbstractType
                     'readonly' => true,
                 ],
                 'required' => false,
+                'disabled' => $disabled,
             ]);
 
             $builder->add('pvEkt', IntegerType::class, [
@@ -74,6 +77,7 @@ class PVType extends AbstractType
                     'readonly' => true,
                 ],
                 'required' => false,
+                'disabled' => $disabled,
             ]);
 
             $builder->add('status', TextType::class, [
@@ -82,6 +86,7 @@ class PVType extends AbstractType
                     'readonly' => true,
                 ],
                 'required' => false,
+                'disabled' => $disabled,
             ]);
 
             $vendedorChoices = $repoPV->getVendedores();
@@ -91,7 +96,8 @@ class PVType extends AbstractType
                 'choices' => $vendedorChoices,
                 'attr' => [
                     'class' => 'autoSelect2'
-                ]
+                ],
+                'disabled' => $disabled,
             ]);
 
             $builder->add('dtEmissao', DateTimeType::class, [
@@ -101,7 +107,8 @@ class PVType extends AbstractType
                 'format' => 'dd/MM/yyyy HH:mm:ss',
                 'attr' => [
                     'class' => 'crsr-datetime focusOnReady'
-                ]
+                ],
+                'disabled' => $disabled,
             ]);
 
 
@@ -112,7 +119,8 @@ class PVType extends AbstractType
                 'choices' => $filialChoices,
                 'attr' => [
                     'class' => 'autoSelect2'
-                ]
+                ],
+                'disabled' => $disabled,
             ]);
 
             $builder->add('status', TextType::class, [
@@ -121,6 +129,7 @@ class PVType extends AbstractType
                     'readonly' => true,
                 ],
                 'required' => false,
+                'disabled' => $disabled,
             ]);
 
 
@@ -142,7 +151,8 @@ class PVType extends AbstractType
                     'class' => 'autoSelect2',
                     'data-val' => $clienteVal ? $clienteVal->getId() : '',
                     'data-route-url' => '/ven/pv/findClienteByStr/',
-                ]
+                ],
+                'disabled' => $disabled,
             ]);
 
 
@@ -165,7 +175,8 @@ class PVType extends AbstractType
                 'choices' => $depositoChoices,
                 'attr' => [
                     'class' => 'autoSelect2'
-                ]
+                ],
+                'disabled' => $disabled,
             ]);
 
 
@@ -183,7 +194,8 @@ class PVType extends AbstractType
                 'choices' => $localizadorChoices,
                 'attr' => [
                     'class' => 'autoSelect2'
-                ]
+                ],
+                'disabled' => $disabled,
             ]);
 
 
@@ -199,13 +211,15 @@ class PVType extends AbstractType
                 'choices' => $condPagtoChoices,
                 'attr' => [
                     'class' => 'autoSelect2'
-                ]
+                ],
+                'disabled' => $disabled,
             ]);
 
 
             $builder->add('obs', TextareaType::class, [
                 'label' => 'Obs',
-                'required' => false
+                'required' => false,
+                'disabled' => $disabled,
             ]);
 
             $builder->add('subtotal', MoneyType::class, [
@@ -226,7 +240,8 @@ class PVType extends AbstractType
                 'attr' => [
                     'class' => 'crsr-money'
                 ],
-                'required' => false
+                'required' => false,
+                'disabled' => $disabled,
             ]);
 
 
@@ -256,7 +271,8 @@ class PVType extends AbstractType
                     'attr' => [
                         'class' => 'crsr-date'
                     ],
-                    'required' => false
+                    'required' => false,
+                    'disabled' => $disabled,
                 ]);
 
                 $builder->add('venctos_valor0' . $i, MoneyType::class, [
@@ -267,7 +283,8 @@ class PVType extends AbstractType
                     'attr' => [
                         'class' => 'crsr-money'
                     ],
-                    'required' => false
+                    'required' => false,
+                    'disabled' => $disabled,
                 ]);
             }
 
