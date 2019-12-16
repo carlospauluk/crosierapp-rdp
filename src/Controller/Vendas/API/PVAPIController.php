@@ -57,45 +57,49 @@ class PVAPIController extends AbstractController
 
         /** @var PVRepository $repoPV */
         $repoPV = $this->doctrine->getRepository(PV::class);
-        $abertos = $repoPV->findBy(['status' => 'ABERTO']);
+        $enviados = $repoPV->findBy(['status' => 'ENVIADO']);
 
         $r = [];
 
         $separador = '|@|';
 
-        /** @var PV $pv */
-        foreach ($abertos as $pv) {
-            $r[] = $pv->getUuid() . $separador .
-                $pv->getClienteCod() . $separador .
-                $pv->getCliente()->getDocumento() . $separador .
-                $pv->getCliente()->getNome() . $separador .
-                $pv->getVendedor() . $separador .
-                $pv->getCondPagto() . $separador .
-                $pv->getDeposito() . $separador .
-                $pv->getFilial() . $separador .
-                $pv->getLocalizador() . $separador .
-                $pv->getStatus() . $separador .
-                $pv->getVenctos() . $separador .
-                $pv->getSubtotal() . $separador .
-                $pv->getDescontos() . $separador .
-                $pv->getTotal();
+        if ($enviados) {
+            /** @var PV $pv */
+            foreach ($enviados as $pv) {
+                $r[] = $pv->getUuid() . $separador .
+                    $pv->getClienteCod() . $separador .
+                    $pv->getCliente()->getDocumento() . $separador .
+                    $pv->getCliente()->getNome() . $separador .
+                    $pv->getVendedor() . $separador .
+                    $pv->getCondPagto() . $separador .
+                    $pv->getDeposito() . $separador .
+                    $pv->getFilial() . $separador .
+                    $pv->getLocalizador() . $separador .
+                    $pv->getStatus() . $separador .
+                    $pv->getVenctos() . $separador .
+                    $pv->getSubtotal() . $separador .
+                    $pv->getDescontos() . $separador .
+                    $pv->getTotal();
 
-            foreach ($pv->getItens() as $item) {
-                $r[] = $item->getProduto()->codigoFrom . $separador .
-                    $item->getProduto()->nome . $separador .
-                    $item->getCodFornecedor() . $separador .
-                    $item->getNomeFornecedor() . $separador .
-                    $item->getQtde() . $separador .
-                    $item->getPrecoCusto() . $separador .
-                    $item->getPrecoOrc() . $separador .
-                    $item->getPrecoVenda();
+                foreach ($pv->getItens() as $item) {
+                    $r[] = $item->getProduto()->codigoFrom . $separador .
+                        $item->getProduto()->nome . $separador .
+                        $item->getCodFornecedor() . $separador .
+                        $item->getNomeFornecedor() . $separador .
+                        $item->getQtde() . $separador .
+                        $item->getPrecoCusto() . $separador .
+                        $item->getPrecoOrc() . $separador .
+                        $item->getPrecoVenda();
+                }
+
+                $r[] = '...';
+
             }
-
-            $r[] = '...';
-
+            return new Response(implode(PHP_EOL, $r));
         }
 
-        return new Response(implode(PHP_EOL, $r));
+        return new Response('Nenhum resultado');
+
     }
 
 
@@ -106,7 +110,6 @@ class PVAPIController extends AbstractController
      */
     public function setarStatus(Request $request): Response
     {
-
         try {
             $uuid = $request->get('uuid');
             $codEkt = $request->get('codEkt');
