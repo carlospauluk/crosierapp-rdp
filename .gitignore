@@ -30,13 +30,11 @@ yarn-error.log
 
 
 /public/uploads*
+/public/downloads/estoque/produtos/excel/*
 
-public/downloads/estoque/produtos/excel/*
+/files/curl_pv_DEV.php
+/files/pedidoscompra/*
+/files/relatorios/*
+/files/curl_uploadRel_HOM.php
+/files/curl_uploadRel_PROD.php
 
-
-files/pedidoscompra/*
-files/relatorios/*
-
-files/curl_uploadRel_HOM.php
-files/curl_uploadRel_PROD.php
-files/curl_pv_DEV.php
