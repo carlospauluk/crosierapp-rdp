@@ -32,7 +32,9 @@ yarn-error.log
 /public/uploads*
 /public/downloads/estoque/produtos/excel/*
 
-/files/curl*
+/files/curl*DEV.php
+/files/curl*HOM.php
+/files/curl*PROD.php
 /files/pedidoscompra/*
 /files/relatorios/*
 /files/curl_uploadRel_HOM.php
