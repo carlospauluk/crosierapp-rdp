@@ -23,6 +23,8 @@ $(document).ready(function () {
     let $filter_lojas = $('#filter_chartVendasTotalPorFornecedor_lojas');
     let $filter_grupos = $('#filter_chartVendasTotalPorFornecedor_grupos');
 
+    let $btnRelatorioVendasPorFornecedor = $('#btnRelatorioVendasPorFornecedor');
+
 
     $btnFiltrar.on('click', function () {
         drawChart();
@@ -37,8 +39,9 @@ $(document).ready(function () {
     if ($filter_lojas.data('val')) {
         $filter_lojas.val($filter_lojas.data('val').split(',')).trigger('change');
     }
-    $filter_lojas.on('select2:select', function () {
-        // drawChart();
+    $filter_lojas.on('change', function () {
+        let url = Routing.generate('relVendas01_relatorioTotalPorFornecedor') + '?filter[dts]=' + $filter_dts.val() + '&filter[lojas]=' + $filter_lojas.val() + '&filter[grupos]=' + $filter_grupos.val();
+        $btnRelatorioVendasPorFornecedor.attr('href', url);
     });
 
 
@@ -48,8 +51,9 @@ $(document).ready(function () {
     if ($filter_grupos.data('val')) {
         $filter_grupos.val($filter_grupos.data('val').split(',')).trigger('change');
     }
-    $filter_grupos.on('select2:select', function () {
-        // drawChart();
+    $filter_grupos.on('change', function () {
+        let url = Routing.generate('relVendas01_relatorioTotalPorFornecedor') + '?filterDts=' + $filter_dts.val() + '&lojas=' + $filter_lojas.val() + '&grupos=' + $filter_grupos.val();
+        $btnRelatorioVendasPorFornecedor.attr('href', url);
     });
 
 
@@ -106,9 +110,10 @@ $(document).ready(function () {
 
         }
     ).on('apply.daterangepicker', function (ev, picker) {
-        // drawChart();
+        let url = Routing.generate('relVendas01_relatorioTotalPorFornecedor') + '?filterDts=' + $filter_dts.val() + '&lojas=' + $filter_lojas.val() + '&grupos=' + $filter_grupos.val();
+        $btnRelatorioVendasPorFornecedor.attr('href', url);
     }).on('blur', function (ev, picker) {
-        // 1drawChart();
+
     });
 
 

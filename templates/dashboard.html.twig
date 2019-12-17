@@ -92,6 +92,12 @@
 
                                                 <div id="chart_vendasTotalPorFornecedor" style="height: 450px"></div>
 
+                                                <div class="text-right">
+                                                    <a role="button" class="btn btn-outline-primary" href="{{ url('relVendas01_relatorioTotalPorFornecedor', {'dts': filter.chartVendasTotalPorFornecedor.dts|default(''), 'grupo': filter.chartVendasTotalPorFornecedor.grupos, 'lojas': filter.chartVendasTotalPorFornecedor.lojas}) }}"
+                                                       id="btnRelatorioVendasPorFornecedor">
+                                                        <i class="fas fa-file-alt"></i> Abrir relatório</a>
+                                                </div>
+
                                             </div>
                                         </div>
 

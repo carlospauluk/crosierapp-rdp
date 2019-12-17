@@ -5,8 +5,10 @@ namespace App\Repository\Relatorios;
 use App\Entity\Relatorios\RelVendas01;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\FilterRepository;
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query\ResultSetMapping;
+use Psr\Log\LoggerInterface;
 
 /**
  *
@@ -16,9 +18,65 @@ use Doctrine\ORM\Query\ResultSetMapping;
 class RelVendas01Repository extends FilterRepository
 {
 
+    /** @var LoggerInterface */
+    private $logger;
+
+    /**
+     * @required
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+    }
+
     public function getEntityClass(): string
     {
         return RelVendas01::class;
+    }
+
+    /**
+     * Utilizado no gráfico de Total de Vendas por Fornecedor.
+     *
+     * @param \DateTime|null $dtIni
+     * @param \DateTime|null $dtFim
+     * @param string|null $lojas
+     * @param string|null $grupos
+     * @return mixed
+     * @throws ViewException
+     */
+    public function totalVendasPorFornecedor(\DateTime $dtIni = null, \DateTime $dtFim = null, ?string $lojas = null, ?string $grupos = null)
+    {
+        $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
+        $dtIni->setTime(0, 0, 0, 0);
+        $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
+        $dtFim->setTime(23, 59, 59, 99999);
+
+
+        $sql = 'SELECT nome_fornec, sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE dt_emissao BETWEEN :dtIni and :dtFim ';
+        $sql .= $grupos ? 'AND grupo IN (:grupos) ' : '';
+        $sql .= $lojas ? 'AND loja IN (:lojas) ' : '';
+        $sql .= ' GROUP BY nome_fornec ORDER BY total_venda';
+
+
+        $params['dtIni'] = $dtIni->format('Y-m-d');
+        $params['dtFim'] = $dtFim->format('Y-m-d');
+        if ($grupos) {
+            $params['grupos'] = $grupos;
+        }
+        if ($lojas) {
+            $params['lojas'] = $lojas;
+        }
+
+        $total = $this->totalVendasPor($dtIni, $dtFim, $lojas, $grupos);
+        $results = $this->getEntityManager()->getConnection()->fetchAll($sql, $params);
+
+        foreach ($results as $k => $r) {
+            $results[$k]['participacao'] = bcmul(bcdiv($r['total_venda'], $total, 6), 100, 4);
+        }
+
+
+        return $results;
     }
 
 
@@ -30,42 +88,32 @@ class RelVendas01Repository extends FilterRepository
      * @param string|null $lojas
      * @param string|null $grupos
      * @return mixed
+     * @throws ViewException
      */
-    public function totalVendasPorFornecedor(\DateTime $dtIni = null, \DateTime $dtFim = null, ?string $lojas = null, ?string $grupos = null)
+    public function totalVendasPor(\DateTime $dtIni = null, \DateTime $dtFim = null, ?string $lojas = null, ?string $grupos = null)
     {
-        $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
-        $dtIni->setTime(0, 0, 0, 0);
-        $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
-        $dtFim->setTime(23, 59, 59, 99999);
-
-        $sql = 'SELECT nome_fornec, sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE dt_emissao BETWEEN :dtIni and :dtFim ';
-
-        if ($grupos) {
-            $sql .= 'AND grupo IN (:grupos) ';
+        try {
+            $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
+            $dtIni->setTime(0, 0, 0, 0);
+            $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
+            $dtFim->setTime(23, 59, 59, 99999);
+            $sqlTotal = 'SELECT sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE dt_emissao BETWEEN :dtIni and :dtFim ';
+            $sqlTotal .= $grupos ? 'AND grupo IN (:grupos) ' : '';
+            $sqlTotal .= $lojas ? 'AND loja IN (:lojas) ' : '';
+            $params['dtIni'] = $dtIni->format('Y-m-d');
+            $params['dtFim'] = $dtFim->format('Y-m-d');
+            if ($grupos) {
+                $params['grupos'] = $grupos;
+            }
+            if ($lojas) {
+                $params['lojas'] = $lojas;
+            }
+            return $this->getEntityManager()->getConnection()->fetchAssoc($sqlTotal, $params)['total_venda'];
+        } catch (DBALException | \Throwable $e) {
+            $this->logger->error('Erro ao calcular total');
+            $this->logger->error($e->getMessage());
+            throw new ViewException('Erro ao calcular total');
         }
-        if ($lojas) {
-            $sql .= 'AND loja IN (:lojas) ';
-        }
-
-        $sql .= ' GROUP BY nome_fornec ORDER BY total_venda';
-
-        $rsm = new ResultSetMapping();
-        $rsm->addScalarResult('nome_fornec', 'nome_fornec');
-        $rsm->addScalarResult('total_venda', 'total_venda');
-
-        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
-        $query->setParameter('dtIni', $dtIni);
-        $query->setParameter('dtFim', $dtFim);
-        if ($grupos) {
-            $grupos = explode(',', $grupos);
-            $query->setParameter('grupos', $grupos);
-        }
-        if ($lojas) {
-            $lojas = explode(',', $lojas);
-            $query->setParameter('lojas', $lojas);
-        }
-
-        return $query->getResult();
     }
 
 

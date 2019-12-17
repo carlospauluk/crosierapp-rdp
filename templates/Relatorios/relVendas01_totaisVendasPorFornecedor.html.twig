@@ -1,0 +1,157 @@
+{% extends '@CrosierLibBase/index.html.twig' %}
+
+
+
+
+{% block page_content %}
+
+    <form action="{{ url('relVendas01_relatorioTotalPorFornecedor') }}" method="get" id="formPesquisar">
+
+        <div class="card">
+            <div class="card-header">
+
+                <div class="d-flex flex-wrap align-items-center">
+
+                    <div class="mr-1">
+                        <h3>Total por Fornecedor</h3>
+                    </div>
+
+                    <div class="d-sm-flex flex-nowrap ml-auto">
+
+                        <input type="text" class="form-control ml-2" id="filterDts"
+                               name="filter[dts]" data-mask="00/00/0000 - 00/00/0000"
+                               style="width: 180px; text-align: center"
+                               value="{{ filter.dts|default('') }}">
+
+                        <button class="btn btn-outline-success ml-1"
+                                type="button" id="btnAnterior" title="Anterior"
+                                data-ante-periodoi="{{ antePeriodoI }}"
+                                data-ante-periodof="{{ antePeriodoF }}">
+                            <i class="fas fa-chevron-left"></i></button>
+                        <button class="btn btn-outline-success ml-1"
+                                type="button" id="btnProximo" title="Próximo"
+                                data-prox-periodoi="{{ proxPeriodoI }}"
+                                data-prox-periodof="{{ proxPeriodoF }}">
+                            <i class="fas fa-chevron-right"></i></button>
+
+                        <button type="button" class="btn btn-secondary ml-1"
+                                title="Pesquisar"
+                                data-target="#pesquisarModal" data-toggle="modal">
+                            <i class="fas fa-search" aria-hidden="true"></i>
+                        </button>
+
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="table-responsive-sm">
+
+
+                    <table class="table table-sm table-striped table-hover crsr-datatable" id="datatableItens">
+
+                        <thead>
+                        <tr>
+                            <th scope="col" title="">#</th>
+                            <th scope="col">Fornecedor</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Participação</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for item in dados %}
+                            <tr>
+                                <td>
+                                    <span class="badge badge-pill badge-light">{{ loop.index }}</span>
+                                </td>
+                                <td>
+                                    {{ item.nome_fornec }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.total_venda }}">
+                                    {{ item.total_venda|number_format(2,',','.') }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.participacao }}">
+                                    {{ item.participacao|number_format(4,',','.') }}%
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+
+
+                        </tbody>
+
+                        <tfoot>
+
+                        <tr style="background-color: antiquewhite; font-weight: bold">
+                            <td colspan="2" class="text-right">
+
+                            </td>
+                            <td class="text-right">
+                                {{ total|number_format(2,',','.') }}
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+
+                        </tfoot>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="pesquisarModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+
+                        <h5 class="modal-header">Pesquisar por...</h5>
+
+                        <div class="card">
+                            <div class="card-body">
+
+
+                                <div class="form-group">
+                                    <label for="filter_grupos">Grupos</label>
+                                    <select id="filter_grupos" name="filter[grupos]"
+                                            class="form-control autoSelect2" multiple
+                                            data-options="{{ grupos }}"
+                                            data-val="{{ filter.grupos|join(',') }}"></select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="filter_lojas">Lojas</label>
+                                    <select id="filter_lojas" name="filter[lojas]" class="form-control autoSelect2" multiple
+                                            data-options="{{ lojas }}" data-val="{{ filter.lojas|join(',') }}"></select>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-danger"
+                                id="btnCancelarPesquisa" data-dismiss="modal">
+                            <i class="fa fa-ban" aria-hidden="true"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-success" id="btnPesquisar">
+                            <i class="fas fa-search"></i> Pesquisar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </form>
+{% endblock %}
+
+
+{% block down_scripts %}
+    <script src="{{ asset('build/Relatorios/relVendas01_totaisVendasPorFornecedor.js') }}"></script>
+{% endblock %}

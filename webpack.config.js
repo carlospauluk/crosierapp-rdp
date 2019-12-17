@@ -39,6 +39,7 @@ Encore
     .addEntry('utils/relatorioPushList', './assets/js/utils/relatorioPushList.js')
 
     .addEntry('Relatorios/relCtsPagRec01_list', './assets/js/Relatorios/relCtsPagRec01_list.js')
+    .addEntry('Relatorios/relVendas01_totaisVendasPorFornecedor', './assets/js/Relatorios/relVendas01_totaisVendasPorFornecedor.js')
     .addEntry('Relatorios/relVendas01_listItensVendidosPorFornecedor', './assets/js/Relatorios/relVendas01_listItensVendidosPorFornecedor.js')
     .addEntry('Relatorios/relVendas01_listPreVendasPorVendedor', './assets/js/Relatorios/relVendas01_listPreVendasPorVendedor.js')
     .addEntry('Relatorios/relVendas01_listPreVendasPorProduto', './assets/js/Relatorios/relVendas01_listPreVendasPorProduto.js')

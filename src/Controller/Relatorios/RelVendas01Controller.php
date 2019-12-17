@@ -30,6 +30,19 @@ class RelVendas01Controller extends FormListController
     /** @var SessionInterface */
     private $session;
 
+    /** @var RelVendas01Repository */
+    private $repoRelVendas01;
+
+    /**
+     * @required
+     * @param RelVendas01Repository $repoRelVendas01
+     */
+    public function setRepoRelVendas01(RelVendas01Repository $repoRelVendas01): void
+    {
+        $this->repoRelVendas01 = $repoRelVendas01;
+    }
+
+
     /**
      * @required
      * @param SessionInterface $session
@@ -51,8 +64,7 @@ class RelVendas01Controller extends FormListController
     public function listItensVendidosPorFornecedor(Request $request): Response
     {
         $vParams = $request->query->all();
-        /** @var RelVendas01Repository $repo */
-        $repo = $this->getDoctrine()->getRepository(RelVendas01::class);
+
         if (!array_key_exists('filter', $vParams)) {
 
             if ($vParams['r'] ?? null) {
@@ -72,15 +84,15 @@ class RelVendas01Controller extends FormListController
         $dtIni = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 0, 10)) ?: new DateTime();
         $dtFim = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 13, 10)) ?: new DateTime();
 
-        $nomeFornec = $vParams['filter']['nomeFornec'] ?? $repo->getNomeFornecedorMaisVendido($dtIni, $dtFim);
+        $nomeFornec = $vParams['filter']['nomeFornec'] ?? $this->repoRelVendas01->getNomeFornecedorMaisVendido($dtIni, $dtFim);
         $vParams['filter']['nomeFornec'] = $nomeFornec;
 
         $vParams['filter']['lojas'] = $vParams['filter']['lojas'] ?? null;
         $vParams['filter']['grupos'] = $vParams['filter']['grupos'] ?? null;
 
-        $r = $repo->itensVendidos($dtIni, $dtFim, $nomeFornec, $vParams['filter']['lojas'], $vParams['filter']['grupos']);
+        $r = $this->repoRelVendas01->itensVendidos($dtIni, $dtFim, $nomeFornec, $vParams['filter']['lojas'], $vParams['filter']['grupos']);
 
-        $total = $repo->itensVendidos($dtIni, $dtFim, $nomeFornec, $vParams['filter']['lojas'], $vParams['filter']['grupos'], true)[0];
+        $total = $this->repoRelVendas01->itensVendidos($dtIni, $dtFim, $nomeFornec, $vParams['filter']['lojas'], $vParams['filter']['grupos'], true)[0];
 
         $dtAnterior = clone $dtIni;
         $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');
@@ -143,6 +155,79 @@ class RelVendas01Controller extends FormListController
         $repoRelVendas01 = $this->getDoctrine()->getRepository(RelVendas01::class);
         $r = $repoRelVendas01->totalVendasPorFornecedor($dtIni, $dtFim, $lojas, $grupos);
         return new JsonResponse($r);
+    }
+
+
+    /**
+     *
+     * @Route("/relVendas01/relatorioTotalPorFornecedor/", name="relVendas01_relatorioTotalPorFornecedor")
+     * @param Request $request
+     * @return Response
+     *
+     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     */
+    public function relatorioTotalPorFornecedor(Request $request): Response
+    {
+
+        $vParams = $request->query->all();
+
+        if (!array_key_exists('filter', $vParams)) {
+
+            if ($vParams['r'] ?? null) {
+                $this->storedViewInfoBusiness->clear('relVendas01_listItensVendidosPorFornecedor');
+            }
+            $svi = $this->storedViewInfoBusiness->retrieve('relVendas01_listItensVendidosPorFornecedor');
+            if (isset($svi['filter'])) {
+                $vParams['filter'] = $svi['filter'];
+            } else {
+                $vParams['filter'] = [];
+                $vParams['filter']['dts'] = '01/' . date('m/Y') . ' - ' . date('t/m/Y');
+                $vParams['filter']['lojas'] = null;
+                $vParams['filter']['grupos'] = null;
+            }
+        }
+
+        $dtIni = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 0, 10)) ?: new DateTime();
+        $dtFim = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 13, 10)) ?: new DateTime();
+
+        $vParams['filter']['lojas'] = $vParams['filter']['lojas'] ?? null;
+        $vParams['filter']['grupos'] = $vParams['filter']['grupos'] ?? null;
+
+        $r = $this->repoRelVendas01->totalVendasPorFornecedor($dtIni, $dtFim, $vParams['filter']['lojas'], $vParams['filter']['grupos']);
+
+
+        $dtAnterior = clone $dtIni;
+        $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');
+
+        /** @var DiaUtilRepository $repoDiaUtil */
+        $repoDiaUtil = $this->getDoctrine()->getRepository(DiaUtil::class);
+
+        $prox = $repoDiaUtil->incPeriodo($dtIni, $dtFim, true);
+        $ante = $repoDiaUtil->incPeriodo($dtIni, $dtFim, false);
+
+        $vParams['antePeriodoI'] = $ante['dtIni'];
+        $vParams['antePeriodoF'] = $ante['dtFim'];
+        $vParams['proxPeriodoI'] = $prox['dtIni'];
+        $vParams['proxPeriodoF'] = $prox['dtFim'];
+
+
+        $lojas = $this->repoRelVendas01->getLojas();
+        array_unshift($lojas, ['id' => '', 'text' => 'TODAS']);
+        $vParams['lojas'] = json_encode($lojas);
+        $grupos = $this->repoRelVendas01->getGrupos();
+        array_unshift($grupos, ['id' => '', 'text' => 'TODOS']);
+        $vParams['grupos'] = json_encode($grupos);
+
+        $vParams['fornecedores'] = json_encode($this->repoRelVendas01->getFornecedores());
+
+        $vParams['dados'] = $r;
+        $vParams['total'] = $this->repoRelVendas01->totalVendasPor($dtIni, $dtFim, $vParams['filter']['lojas'], $vParams['filter']['grupos']);
+
+        $viewInfo = [];
+        $viewInfo['filter'] = $vParams['filter'];
+        $this->storedViewInfoBusiness->store('relVendas01_listItensVendidosPorFornecedor', $viewInfo);
+
+        return $this->doRender('Relatorios/relVendas01_totaisVendasPorFornecedor.html.twig', $vParams);
     }
 
 
