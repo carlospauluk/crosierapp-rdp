@@ -27,13 +27,11 @@ class PVAPIController extends AbstractController
 
     /** @var LoggerInterface */
     private $logger;
-    /**
-     * @var PVEntityHandler
-     */
+
+    /** @var PVEntityHandler */
     private $pvEntityHandler;
 
     /**
-     * RelCtsPagReg01APIController constructor.
      * @param LoggerInterface $logger
      * @param EntityManagerInterface $doctrine
      * @param PVEntityHandler $pvEntityHandler
@@ -61,39 +59,36 @@ class PVAPIController extends AbstractController
 
         $r = [];
 
-        $separador = '|@|';
-
         if ($enviados) {
             /** @var PV $pv */
             foreach ($enviados as $pv) {
-                $r[] = $pv->getUuid() . $separador .
-                    $pv->getClienteCod() . $separador .
-                    $pv->getCliente()->getDocumento() . $separador .
-                    $pv->getCliente()->getNome() . $separador .
-                    $pv->getVendedor() . $separador .
-                    $pv->getCondPagto() . $separador .
-                    $pv->getDeposito() . $separador .
-                    $pv->getFilial() . $separador .
-                    $pv->getLocalizador() . $separador .
-                    $pv->getStatus() . $separador .
-                    $pv->getVenctos() . $separador .
-                    $pv->getSubtotal() . $separador .
-                    $pv->getDescontos() . $separador .
-                    $pv->getTotal();
+                $r[] = '<<Cabeçalho>>';
+                $r[] = $pv->getUuid();
+                $r[] = $pv->getClienteCod();
+                $r[] = $pv->getCliente()->getDocumento();
+                $r[] = $pv->getCliente()->getNome();
+                $r[] = $pv->getVendedor();
+                $r[] = $pv->getCondPagto();
+                $r[] = $pv->getDeposito();
+                $r[] = $pv->getFilial();
+                $r[] = $pv->getLocalizador();
+                $r[] = $pv->getStatus();
+                $r[] = $pv->getVenctos();
+                $r[] = $pv->getSubtotal();
+                $r[] = $pv->getDescontos();
+                $r[] = $pv->getTotal();
 
                 foreach ($pv->getItens() as $item) {
-                    $r[] = $item->getProduto()->codigoFrom . $separador .
-                        $item->getProduto()->nome . $separador .
-                        $item->getCodFornecedor() . $separador .
-                        $item->getNomeFornecedor() . $separador .
-                        $item->getQtde() . $separador .
-                        $item->getPrecoCusto() . $separador .
-                        $item->getPrecoOrc() . $separador .
-                        $item->getPrecoVenda();
+                    $r[] = '<<Itens>>';
+                    $r[] = $item->getProduto()->codigoFrom;
+                    $r[] = $item->getProduto()->nome;
+                    $r[] = $item->getCodFornecedor();
+                    $r[] = $item->getNomeFornecedor();
+                    $r[] = $item->getQtde();
+                    $r[] = $item->getPrecoCusto();
+                    $r[] = $item->getPrecoOrc();
+                    $r[] = $item->getPrecoVenda();
                 }
-
-                $r[] = '...';
-
             }
             return new Response(implode(PHP_EOL, $r));
         }
