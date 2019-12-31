@@ -2,7 +2,7 @@
 
 import Numeral from 'numeral';
 import 'numeral/locales/pt-br.js';
-import DatatablesJs from "../crosier/DatatablesJs";
+;
 
 import toastrr from "toastr";
 import $ from "jquery";

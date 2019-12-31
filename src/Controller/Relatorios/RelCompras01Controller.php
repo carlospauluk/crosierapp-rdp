@@ -44,7 +44,7 @@ class RelCompras01Controller extends FormListController
      * @return Response
      * @throws Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function listComprasPorProduto(Request $request): Response
     {
@@ -91,7 +91,7 @@ class RelCompras01Controller extends FormListController
      * @return Response
      * @throws Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function listPreVendaItens(int $pv): Response
     {

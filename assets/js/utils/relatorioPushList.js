@@ -2,7 +2,7 @@
 
 
 
-import DatatablesJs from "../crosier/DatatablesJs";
+;
 import Moment from 'moment';
 
 let listId = "#relatorioPushList";

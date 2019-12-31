@@ -18,6 +18,8 @@ Encore
         // copies to {output}/static
         {from: './assets/static', to: 'static'}
     ]))
+    // o summmernote tem esta dependência, mas não é necessária
+    .addPlugin(new webpack.IgnorePlugin(/^codemirror$/))
     .enableSassLoader()
     /*
      * ENTRY CONFIG
@@ -28,8 +30,6 @@ Encore
      * Each entry will result in one JavaScript file (e.g. app.js)
      * and one CSS file (e.g. app.css) if you JavaScript imports CSS.
      */
-    // .createSharedEntry('bse_layout', './assets/js/bse/layout.js')
-    // .addEntry('dashboard', './assets/js/dashboard.js')
     .addEntry('dashboard_chartVendasTotalPorFornecedor', './assets/js/dashboard_chartVendasTotalPorFornecedor.js')
     .addEntry('dashboard_chartVendasTotalPorVendedor', './assets/js/dashboard_chartVendasTotalPorVendedor.js')
     .addEntry('dashboard_chartEstoque', './assets/js/dashboard_chartEstoque.js')
@@ -76,8 +76,12 @@ Encore
     .enableSourceMaps(!Encore.isProduction())
     // enables hashed filenames (e.g. app.abc123.css)
     .enableVersioning(Encore.isProduction())
+    .configureBabel(() => {
+    }, {
+        useBuiltIns: 'usage',
+        corejs: 3
+    })
     .enableSingleRuntimeChunk()
-
 // enables Sass/SCSS support
 //.enableSassLoader()
 

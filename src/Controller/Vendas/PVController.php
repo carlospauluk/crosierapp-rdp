@@ -90,7 +90,7 @@ class PVController extends FormListController
      * @return Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_PV"}, statusCode=403)
+     * @IsGranted("ROLE_PV", statusCode=403)
      */
     public function list(Request $request): Response
     {
@@ -112,7 +112,7 @@ class PVController extends FormListController
      * @return Response
      * @throws \CrosierSource\CrosierLibBaseBundle\Exception\ViewException
      *
-     * @IsGranted({"ROLE_PV"}, statusCode=403)
+     * @IsGranted("ROLE_PV", statusCode=403)
      */
     public function datatablesJsList(Request $request): Response
     {
@@ -127,7 +127,7 @@ class PVController extends FormListController
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_PV"}, statusCode=403)
+     * @IsGranted("ROLE_PV", statusCode=403)
      */
     public function form(Request $request, PV $pv = null)
     {
@@ -152,7 +152,7 @@ class PVController extends FormListController
      * @return RedirectResponse
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_PV"}, statusCode=403)
+     * @IsGranted("ROLE_PV", statusCode=403)
      */
     public function enviarParaEKT(Request $request, PV $pv): RedirectResponse
     {
@@ -181,7 +181,7 @@ class PVController extends FormListController
      * @return JsonResponse
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_PV"}, statusCode=403)
+     * @IsGranted("ROLE_PV", statusCode=403)
      */
     public function findClienteByStr(Request $request): JsonResponse
     {
@@ -207,7 +207,7 @@ class PVController extends FormListController
      * @param PVItem|null $pvItem
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      * @throws \Exception
-     * @IsGranted({"ROLE_PV"}, statusCode=403)
+     * @IsGranted("ROLE_PV", statusCode=403)
      */
     public function formItem(Request $request, PV $pv, PVItem $pvItem = null)
     {
@@ -231,7 +231,7 @@ class PVController extends FormListController
      * @param PVItem $pvItem
      * @return Response
      * @throws \CrosierSource\CrosierLibBaseBundle\Exception\ViewException
-     * @IsGranted({"ROLE_PV"}, statusCode=403)
+     * @IsGranted("ROLE_PV", statusCode=403)
      */
     public function removerItem(PVItem $pvItem): Response
     {

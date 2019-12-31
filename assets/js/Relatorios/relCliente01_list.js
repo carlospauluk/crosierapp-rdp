@@ -2,8 +2,6 @@
 
 import Moment from 'moment';
 
-import DatatablesJs from "../crosier/DatatablesJs";
-
 let listId = "#relCliente01_list";
 
 function getDatatablesColumns() {

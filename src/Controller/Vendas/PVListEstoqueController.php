@@ -106,7 +106,7 @@ class PVListEstoqueController extends FormListController
      * @param PV $pv
      * @return Response
      * @throws \Exception
-     * @IsGranted({"ROLE_PV"}, statusCode=403)
+     * @IsGranted("ROLE_PV", statusCode=403)
      */
     public function list(Request $request, PV $pv): Response
     {
@@ -143,7 +143,7 @@ class PVListEstoqueController extends FormListController
      * @return Response
      * @throws \CrosierSource\CrosierLibBaseBundle\Exception\ViewException
      *
-     * @IsGranted({"ROLE_PV"}, statusCode=403)
+     * @IsGranted("ROLE_PV", statusCode=403)
      */
     public function datatablesJsList(Request $request): Response
     {
@@ -156,7 +156,7 @@ class PVListEstoqueController extends FormListController
      * @param Request $request
      * @return JsonResponse
      *
-     * @IsGranted({"ROLE_PV"}, statusCode=403)
+     * @IsGranted("ROLE_PV", statusCode=403)
      */
     public function adicionarNoPV(Request $request): JsonResponse
     {

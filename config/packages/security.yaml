@@ -13,25 +13,28 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main_%env(CROSIERAPP_ID)%:
-            access_denied_handler: CrosierSource\CrosierLibBaseBundle\Security\AccessDeniedHandler
+            anonymous: ~
 
-            anonymous: true
+            remember_me:
+                name: 'RMMBRM'
+                secret:   "%env(CROSIERCORE_APPSECRET)%"
+                lifetime: 6048000 # 10 semanas
+                domain: "%env(CROSIER_MAINDOMAIN)%"
+                samesite: lax
+                httponly: false
 
             guard:
                 authenticators:
-                    - App\Security\CrosierCoreAuthenticator
-                    - App\Security\APIAuthenticator
+                - App\Security\CrosierCoreAuthenticator
+                - App\Security\APIAuthenticator
 
+                # redirect anonymous users to the login page
                 entry_point: App\Security\CrosierCoreAuthenticator
 
             logout:
                 path: logout
 
-            remember_me:
-                secret:   "%env(CROSIERCORE_APPSECRET)%"
-                lifetime: 6048000 # 10 semanas
-                domain: "%env(CROSIER_MAINDOMAIN)%"
-                samesite: lax
+
 
             switch_user: true
 

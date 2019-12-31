@@ -59,7 +59,7 @@ class RelVendas01Controller extends FormListController
      * @return Response
      * @throws Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function listItensVendidosPorFornecedor(Request $request): Response
     {
@@ -135,7 +135,10 @@ class RelVendas01Controller extends FormListController
      * @param Request $request
      * @return JsonResponse
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_ADMIN", statusCode=403)
+     *
+     *
+     * @throws ViewException
      */
     public function graficoTotalPorFornecedor(Request $request): JsonResponse
     {
@@ -164,7 +167,7 @@ class RelVendas01Controller extends FormListController
      * @param Request $request
      * @return Response
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function relatorioTotalPorFornecedor(Request $request): Response
     {
@@ -238,7 +241,7 @@ class RelVendas01Controller extends FormListController
      * @return JsonResponse
      * @throws NonUniqueResultException
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function graficoTotalPorVendedor(Request $request): JsonResponse
     {
@@ -268,7 +271,7 @@ class RelVendas01Controller extends FormListController
      * @return Response
      * @throws Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function listPreVendasPorVendedor(Request $request): Response
     {
@@ -346,7 +349,7 @@ class RelVendas01Controller extends FormListController
      * @return Response
      * @throws Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function listPreVendasPorProduto(Request $request): Response
     {
@@ -422,7 +425,7 @@ class RelVendas01Controller extends FormListController
      * @return Response
      * @throws Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function listPreVendaItens(int $pv): Response
     {

@@ -62,7 +62,7 @@ class RelCompFor01Controller extends FormListController
      * @return Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function list(Request $request): Response
     {
@@ -108,7 +108,7 @@ class RelCompFor01Controller extends FormListController
      * @param Request $request
      * @return JsonResponse
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function totalPorFornecedor(Request $request): JsonResponse
     {
@@ -131,7 +131,7 @@ class RelCompFor01Controller extends FormListController
      * @return Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function listItensCompradosPorFornecedor(Request $request): Response
     {

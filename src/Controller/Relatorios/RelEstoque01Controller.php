@@ -84,7 +84,7 @@ class RelEstoque01Controller extends FormListController
      * @return Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function list(Request $request): Response
     {
@@ -136,7 +136,7 @@ class RelEstoque01Controller extends FormListController
      * @return Response
      * @throws ViewException
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function datatablesJsList(Request $request): Response
     {
@@ -158,7 +158,7 @@ class RelEstoque01Controller extends FormListController
      * @return Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function listReposicao(Request $request): Response
     {
@@ -224,7 +224,7 @@ class RelEstoque01Controller extends FormListController
      * @return Response
      * @throws ViewException
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function listReposicao_datatablesJsList(Request $request): Response
     {
@@ -265,7 +265,7 @@ class RelEstoque01Controller extends FormListController
      * @param Request $request
      * @return JsonResponse
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function graficoTotalEstoquePorFilial(Request $request): JsonResponse
     {
@@ -285,7 +285,7 @@ class RelEstoque01Controller extends FormListController
      * @throws ViewException
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function imprimirListaReposicao(Request $request): void
     {
@@ -346,7 +346,7 @@ class RelEstoque01Controller extends FormListController
      * @param Request $request
      * @return JsonResponse
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function adicionarNoCarrinho(Request $request): JsonResponse
     {
@@ -401,7 +401,7 @@ class RelEstoque01Controller extends FormListController
      * @return Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function removerDoCarrinhoEExibir(string $codProduto): Response
     {
@@ -423,7 +423,7 @@ class RelEstoque01Controller extends FormListController
      * @return Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function limparCarrinho(): Response
     {
@@ -439,7 +439,7 @@ class RelEstoque01Controller extends FormListController
      * @return Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function exibirCarrinho(Request $request): Response
     {
@@ -486,7 +486,7 @@ class RelEstoque01Controller extends FormListController
      * @return Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function salvarCarrinho(Request $request): Response
     {
@@ -519,7 +519,7 @@ class RelEstoque01Controller extends FormListController
      * @Route("/relEstoque01/gerarPedidoCompra/", name="relEstoque01_gerarPedidoCompra")
      * @param array $carrinho
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function gerarPedidoCompra(array $carrinho): void
     {
@@ -549,7 +549,7 @@ class RelEstoque01Controller extends FormListController
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      * @throws ViewException
      */
     public function adicionarTudoNoCarrinho(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse

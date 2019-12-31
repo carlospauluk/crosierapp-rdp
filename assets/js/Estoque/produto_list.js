@@ -2,8 +2,6 @@
 
 import Moment from 'moment';
 
-import DatatablesJs from "../crosier/DatatablesJs";
-
 import Numeral from 'numeral';
 import 'numeral/locales/pt-br.js';
 

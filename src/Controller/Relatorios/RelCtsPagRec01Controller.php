@@ -55,7 +55,7 @@ class RelCtsPagRec01Controller extends FormListController
      * @return Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_RELFINAN"}, statusCode=403)
+     * @IsGranted("ROLE_RELFINAN", statusCode=403)
      *
      */
     public function list(Request $request): Response
@@ -219,7 +219,7 @@ class RelCtsPagRec01Controller extends FormListController
      * @return Response
      * @throws ViewException
      *
-     * @IsGranted({"ROLE_RELFINAN"}, statusCode=403)
+     * @IsGranted("ROLE_RELFINAN", statusCode=403)
      */
     public function datatablesJsList(Request $request): Response
     {
@@ -234,7 +234,7 @@ class RelCtsPagRec01Controller extends FormListController
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      *
-     * @IsGranted({"ROLE_RELFINAN"}, statusCode=403)
+     * @IsGranted("ROLE_RELFINAN", statusCode=403)
      */
     public function graficoCtsPagRec01(Request $request): JsonResponse
     {

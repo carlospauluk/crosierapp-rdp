@@ -62,7 +62,7 @@ class RelCliente01Controller extends FormListController
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function list(Request $request): Response
     {
@@ -93,7 +93,7 @@ class RelCliente01Controller extends FormListController
      * @return Response
      * @throws \CrosierSource\CrosierLibBaseBundle\Exception\ViewException
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function datatablesJsList(Request $request): Response
     {
@@ -108,7 +108,7 @@ class RelCliente01Controller extends FormListController
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \Exception
      *
-     * @IsGranted({"ROLE_RELVENDAS"}, statusCode=403)
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
     public function form(Request $request, RelCliente01 $cliente = null)
     {
