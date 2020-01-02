@@ -40,3 +40,7 @@ yarn-error.log
 /files/curl_uploadRel_HOM.php
 /files/curl_uploadRel_PROD.php
 
+
+/assets/static/fos_js_routes.json
+/src/Entity/uppercaseFields.json
+

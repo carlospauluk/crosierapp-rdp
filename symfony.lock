@@ -3,7 +3,7 @@
         "version": "v1.2.0"
     },
     "crosiersource/crosierlib-base": {
-        "version": "dev-master"
+        "version": "9999999-dev"
     },
     "doctrine/annotations": {
         "version": "1.0",

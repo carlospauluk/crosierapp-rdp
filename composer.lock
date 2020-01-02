@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "9dae134acc8d047e88f5fd719b463894",
+    "content-hash": "54f6afa77a1a8d98f3881da45ca9a396",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -52,11 +52,12 @@
         },
         {
             "name": "crosiersource/crosierlib-base",
-            "version": "dev-master",
+            "version": "9999999-dev",
             "dist": {
                 "type": "path",
                 "url": "../crosierlib-base",
-                "reference": "9f1bba59ac2dc69e532cb26140ee6cf7161fbc29"
+                "reference": "6908b197d4d1831bae9a33eb9bca9c9265cddf52",
+                "shasum": null
             },
             "require": {
                 "ext-bcmath": "*",
@@ -3060,7 +3061,7 @@
         },
         {
             "name": "sensio/framework-extra-bundle",
-            "version": "dev-master",
+            "version": "v5.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sensiolabs/SensioFrameworkExtraBundle.git",
@@ -7701,6 +7702,7 @@
                 "code",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-code",
             "time": "2019-12-10T19:21:15+00:00"
         },
         {
@@ -7755,6 +7757,7 @@
                 "events",
                 "zf2"
             ],
+            "abandoned": "laminas/laminas-eventmanager",
             "time": "2018-04-25T15:33:34+00:00"
         }
     ],
@@ -7992,7 +7995,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "sensio/framework-extra-bundle": 20,
         "crosiersource/crosierlib-base": 20
     },
     "prefer-stable": false,
