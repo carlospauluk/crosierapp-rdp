@@ -104,6 +104,7 @@ class PVType extends AbstractType
                 'label' => 'Dt Emissão',
                 'widget' => 'single_text',
                 'required' => true,
+                'html5' => false,
                 'format' => 'dd/MM/yyyy HH:mm:ss',
                 'attr' => [
                     'class' => 'crsr-datetime focusOnReady'
