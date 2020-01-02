@@ -18,6 +18,8 @@ Encore
         // copies to {output}/static
         {from: './assets/static', to: 'static'}
     ]))
+    // o summmernote tem esta dependência, mas não é necessária
+    .addPlugin(new webpack.IgnorePlugin(/^codemirror$/))
     .enableSassLoader()
     /*
      * ENTRY CONFIG
@@ -75,12 +77,12 @@ Encore
     .enableSourceMaps(!Encore.isProduction())
     // enables hashed filenames (e.g. app.abc123.css)
     .enableVersioning(Encore.isProduction())
-    .configureBabel(() => {}, {
+    .configureBabel(() => {
+    }, {
         useBuiltIns: 'usage',
         corejs: 3
     })
     .enableSingleRuntimeChunk()
-
 // enables Sass/SCSS support
 //.enableSassLoader()
 

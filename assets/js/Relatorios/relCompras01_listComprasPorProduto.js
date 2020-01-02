@@ -2,7 +2,7 @@
 
 import $ from "jquery";
 
-import 'datatables';
+
 
 import 'daterangepicker';
 

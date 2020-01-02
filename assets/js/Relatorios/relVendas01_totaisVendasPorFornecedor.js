@@ -4,7 +4,7 @@ import Moment from 'moment';
 
 import $ from "jquery";
 
-import 'datatables';
+
 
 import 'daterangepicker';
 
