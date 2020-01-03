@@ -267,6 +267,7 @@ class PVType extends AbstractType
                 $builder->add('venctos_dt0' . $i, DateType::class, [
                     'widget' => 'single_text',
                     'mapped' => false,
+                    'html5' => false,
                     'format' => 'dd/MM/yyyy',
                     'data' => $dtVencto,
                     'attr' => [
