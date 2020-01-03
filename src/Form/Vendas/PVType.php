@@ -134,7 +134,7 @@ class PVType extends AbstractType
             ]);
 
 
-            $clienteChoices = [null];
+            $clienteChoices = null;
             $clienteVal = null;
             if ($pv->getCliente()) {
                 $clienteChoices = [$pv->getCliente()];
