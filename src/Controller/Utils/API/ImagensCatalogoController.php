@@ -16,7 +16,6 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  *
  *
- * @package App\Controller\Utils
  * @author Carlos Eduardo Pauluk
  */
 class ImagensCatalogoController extends BaseController
@@ -57,6 +56,7 @@ class ImagensCatalogoController extends BaseController
     public function obterImagemParaUsuario(Request $request): RedirectResponse
     {
         $urlFoto = $_SERVER['CROSIERCORE_URL'] . '/build/static/images/notfound.png';
+
         try {
             $usuario = $request->get('usuario');
             /** @var AppConfigRepository $repoAppConfig */
@@ -69,12 +69,15 @@ class ImagensCatalogoController extends BaseController
             $response = $client->request('GET', $urlAPICatalogo)->getBody()->getContents();
             $json = json_decode($response, true);
             $foto = $json['fotos'][0] ?? null;
-            $urlFoto = $foto ? $_SERVER['URL_FOTOS_CATALOGO'] . $json['fotos'][0];
+            if ($foto) {
+                $urlFoto = $_SERVER['URL_FOTOS_CATALOGO'] . $foto;
+            }
         } catch (\Exception $e) {
             $this->getLogger()->error('Erro ao obterImagemParaUsuario');
             $this->getLogger()->error('usuario: ' . $usuario);
             $this->getLogger()->error($e->getMessage());
         }
+
         return $this->redirect($urlFoto);
     }
 
