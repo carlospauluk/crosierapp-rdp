@@ -31,10 +31,10 @@ class ImagensCatalogoController extends BaseController
             $recnum = $request->get('recnum');
             /** @var AppConfigRepository $repoAppConfig */
             $repoAppConfig = $this->getDoctrine()->getRepository(AppConfig::class);
-            $appConfig = $repoAppConfig->findOneBy(['appUUID' => 'b10ef8c0-841f-4688-9ee2-30e39639be8a', 'chave' => 'recnumImagemParaUsuario_' . $usuario]);
+            $appConfig = $repoAppConfig->findOneBy(['appUUID' => $_SERVER['CROSIERAPP_UUID'], 'chave' => 'recnumImagemParaUsuario_' . $usuario]);
             if (!$appConfig) {
                 $appConfig = new AppConfig();
-                $appConfig->setAppUUID('b10ef8c0-841f-4688-9ee2-30e39639be8a');
+                $appConfig->setAppUUID($_SERVER['CROSIERAPP_UUID']);
                 $appConfig->setChave('recnumImagemParaUsuario_' . $usuario);
             }
             $appConfig->setValor($recnum);
@@ -62,7 +62,7 @@ class ImagensCatalogoController extends BaseController
             /** @var AppConfigRepository $repoAppConfig */
             $repoAppConfig = $this->getDoctrine()->getRepository(AppConfig::class);
             /** @var AppConfig $appConfig */
-            $appConfig = $repoAppConfig->findOneBy(['appUUID' => 'b10ef8c0-841f-4688-9ee2-30e39639be8a', 'chave' => 'recnumImagemParaUsuario_' . $usuario]);
+            $appConfig = $repoAppConfig->findOneBy(['appUUID' => $_SERVER['CROSIERAPP_UUID'], 'chave' => 'recnumImagemParaUsuario_' . $usuario]);
             $recnum = $appConfig->getValor() ?? '99999';
             $client = new Client();
             $urlAPICatalogo = $_SERVER['URL_API_CATALOGO'] . $recnum;
