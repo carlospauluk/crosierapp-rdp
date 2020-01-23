@@ -61,7 +61,7 @@ class RelEstoque01Business
     {
         /** @var Connection $conn */
         $conn = $this->doctrine->getConnection();
-
+        $this->ids = [];
         $this->ids['depto'] = $conn->fetchAssoc('SELECT id FROM est_depto WHERE uuid = \'54d9b263-1ac1-11ea-aa1a-02f5eec21cc2\'')['id'];
         $this->ids['grupo'] = $conn->fetchAssoc('SELECT id FROM est_grupo WHERE uuid = \'b111cb42-1ac1-11ea-aa1a-02f5eec21cc2\'')['id'];
         $this->ids['subgrupo'] = $conn->fetchAssoc('SELECT id FROM est_subgrupo WHERE uuid = \'ee784eec-1ac1-11ea-aa1a-02f5eec21cc2\'')['id'];
