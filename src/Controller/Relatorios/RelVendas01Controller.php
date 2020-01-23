@@ -109,14 +109,14 @@ class RelVendas01Controller extends FormListController
         $vParams['proxPeriodoF'] = $prox['dtFim'];
 
 
-        $lojas = $repo->getLojas();
+        $lojas = $this->repoRelVendas01->getLojas();
         array_unshift($lojas, ['id' => '', 'text' => 'TODAS']);
         $vParams['lojas'] = json_encode($lojas);
-        $grupos = $repo->getGrupos();
+        $grupos = $this->repoRelVendas01->getGrupos();
         array_unshift($grupos, ['id' => '', 'text' => 'TODOS']);
         $vParams['grupos'] = json_encode($grupos);
 
-        $vParams['fornecedores'] = json_encode($repo->getFornecedores());
+        $vParams['fornecedores'] = json_encode($this->repoRelVendas01->getFornecedores());
 
         $vParams['dados'] = $r;
         $vParams['total'] = $total;
