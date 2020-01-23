@@ -52,8 +52,6 @@ class RelEstoque01Business
         $this->doctrine = $doctrine;
         $this->appConfigEntityHandler = $appConfigEntityHandler;
         $this->logger = $logger;
-
-        $this->prepararCampos();
     }
 
 
@@ -72,6 +70,7 @@ class RelEstoque01Business
      */
     public function processarArquivosNaFila(): void
     {
+        $this->prepararCampos();
         $pastaFila = $_SERVER['PASTA_UPLOAD_RELESTOQUE01'] . 'fila/';
         $files = scandir($pastaFila, 0);
         foreach ($files as $file) {
@@ -214,7 +213,6 @@ class RelEstoque01Business
      */
     private function handleNaEstProduto(array $campos): string
     {
-
         try {
 
             foreach ($campos as $k => $v) {
