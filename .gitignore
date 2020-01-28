@@ -40,6 +40,12 @@ yarn-error.log
 /files/curl_uploadRel_HOM.php
 /files/curl_uploadRel_PROD.php
 
+/files/upload/relCliente01/*
+/files/upload/relCompFor01/*
+/files/upload/relCompras01/*
+/files/upload/relCtsPagRec01/*
+/files/upload/relEstoque01/*
+/files/upload/relVendas01/*
 
 /assets/static/fos_js_routes.json
 /src/Entity/uppercaseFields.json

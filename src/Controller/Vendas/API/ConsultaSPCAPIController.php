@@ -3,6 +3,7 @@
 namespace App\Controller\Vendas\API;
 
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
+use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -80,36 +81,16 @@ class ConsultaSPCAPIController extends AbstractController
             ]
         ]);
 
-        /**
-         * DADOS
-         * nome-comercial|@|razao-social
-         *
-         * ALERTA-DOCUMENTO
-         * QUANTIDADE-TOTAL:n
-         * 1|@|tipos-documentos-alerta|data-inclusao|@|data-ocorrencia|@|entidade-origem|@|motivo|@|observacao
-         * 2|@|tipos-documentos-alerta|data-inclusao|@|data-ocorrencia|@|entidade-origem|@|motivo|@|observacao
-         * 3|@|tipos-documentos-alerta|data-inclusao|@|data-ocorrencia|@|entidade-origem|@|motivo|@|observacao
-         * ...
-         *
-         * SPC
-         * QUANTIDADE-TOTAL:n
-         * 1|data-inclusao|@|data-vencimento|@|nome-entidade|@|contrato|@|comprador-fiador-avalista|@|valor
-         * 2|data-inclusao|@|data-vencimento|@|nome-entidade|@|contrato|@|comprador-fiador-avalista|@|valor
-         * 3|data-inclusao|@|data-vencimento|@|nome-entidade|@|contrato|@|comprador-fiador-avalista|@|valor
-         * ...
-         *
-         */
-
         $sep = '|@|';
 
         $r = [];
-        $r[] = 'DADOS';
-        $r[] = $result->consumidor->{'consumidor-pessoa-juridica'}->{'nome-comercial'} . $sep . $result->consumidor->{'consumidor-pessoa-juridica'}->{'razao-social'};
+        $r[] = 'Consulta para ' . $result->consumidor->{'consumidor-pessoa-juridica'}->{'nome-comercial'} . ' (' . $result->consumidor->{'consumidor-pessoa-juridica'}->{'razao-social'} . ')';
         $r[] = '';
 
-        $r[] = 'ALERTA-DOCUMENTO';
-        $r[] = 'QUANTIDADE-TOTAL:' . $result->{'alerta-documento'}->resumo->{'quantidade-total'} ?? 0;
         if ($result->{'alerta-documento'}->resumo->{'quantidade-total'} ?? false) {
+
+            $r[] = '>>> Alerta(s) para ' . $result->{'alerta-documento'}->resumo->{'quantidade-total'} . ' documento(s):';
+
             if ($result->{'alerta-documento'}->resumo->{'quantidade-total'} === 1) {
                 $detAlertaDocumento = $result->{'alerta-documento'}->{'detalhe-alerta-documento'};
                 $documentos = '';
@@ -120,59 +101,67 @@ class ConsultaSPCAPIController extends AbstractController
                 } else {
                     $documentos .= $detAlertaDocumento->{'tipo-documento-alerta'}->nome;
                 }
-                $r[] =
-                    '1' . $sep .
-                    $documentos . $sep .
-                    ($detAlertaDocumento->{'data-inclusao'} ?? '') . $sep .
-                    ($detAlertaDocumento->{'data-ocorrencia'} ?? '') . $sep .
-                    ($detAlertaDocumento->{'entidade-origem'} ?? '') . $sep .
-                    ($detAlertaDocumento->{'motivo'} ?? '') . $sep .
-                    ($detAlertaDocumento->{'observacao'} ?? '');
+                $documentos = substr($documentos, 0, -1);
+
+                $r[] = '1) ' . ($detAlertaDocumento->{'motivo'} ?? '') . ' de ' . $documentos .
+                    ' (Dt Ocorrência: ' . DateTimeUtils::parseDateStr(($detAlertaDocumento->{'data-ocorrencia'} ?? ''))->format('d/m/Y') . ') ' .
+                    ' (Incluído em ' . DateTimeUtils::parseDateStr(($detAlertaDocumento->{'data-inclusao'} ?? ''))->format('d/m/Y') . ') ';
             } else {
                 $i = 1;
                 foreach ($result->{'alerta-documento'}->{'detalhe-alerta-documento'} as $detAlertaDocumento) {
-                    $r[] =
-                        $i++ . $sep .
-                        ($detAlertaDocumento->{'data-inclusao'} ?? '') . $sep .
-                        ($detAlertaDocumento->{'data-ocorrencia'} ?? '') . $sep .
-                        ($detAlertaDocumento->{'entidade-origem'} ?? '') . $sep .
-                        ($detAlertaDocumento->{'motivo'} ?? '') . $sep .
-                        ($detAlertaDocumento->{'observacao'} ?? '');
+                    $documentos = '';
+                    if (is_array($detAlertaDocumento->{'tipo-documento-alerta'})) {
+                        foreach ($detAlertaDocumento->{'tipo-documento-alerta'} as $tipoDocumento) {
+                            $documentos .= $tipoDocumento->nome . ',';
+                        }
+                    } else {
+                        $documentos .= $detAlertaDocumento->{'tipo-documento-alerta'}->nome;
+                    }
+                    $documentos = substr($documentos, 0, -1);
+
+                    $r[] = $i++ . ') ' . ($detAlertaDocumento->{'motivo'} ?? '') . ' de ' . $documentos .
+                        ' (Dt Ocorrência: ' . DateTimeUtils::parseDateStr(($detAlertaDocumento->{'data-ocorrencia'} ?? ''))->format('d/m/Y') . ') ' .
+                        ' (Incluído em ' . DateTimeUtils::parseDateStr(($detAlertaDocumento->{'data-inclusao'} ?? ''))->format('d/m/Y') . ') ';
                 }
             }
         }
 
-        $r[] = 'SPC';
-        $r[] = 'QUANTIDADE-TOTAL:' . $result->{'spc'}->resumo->{'quantidade-total'} ?? 0;
-        $r[] = 'VALOR-TOTAL:' . $result->{'spc'}->resumo->{'valor-total'} ?? 0;
-        if ($result->{'spc'}->resumo->{'quantidade-total'} ?? false) {
-            if ($result->{'spc'}->resumo->{'quantidade-total'} === 1) {
+        $r[] = '';
+        $r[] = '>>> CONSULTA SPC';
+
+        $totalOcorrencias = ($result->{'spc'}->resumo->{'quantidade-total'} ?? 0);
+
+
+        if ($totalOcorrencias) {
+            $valorTotalOcorrencias = $result->{'spc'}->resumo->{'valor-total'} ?? 0;
+            $r[] = $totalOcorrencias . ' ocorrência(s) encontrada(s) no valor total de R$ ' . number_format($valorTotalOcorrencias, 2, ',', '.');
+
+            if ($totalOcorrencias === 1) {
                 $detSpc = $result->{'spc'}->{'detalhe-spc'};
                 $r[] =
-                    '1' . $sep .
-                    ($detSpc->{'data-inclusao'} ?? '') . $sep .
-                    ($detSpc->{'data-vencimento'} ?? '') . $sep .
-                    ($detSpc->{'nome-entidade'} ?? '') . $sep .
-                    ($detSpc->{'contrato'} ?? '') . $sep .
-                    ($detSpc->{'comprador-fiador-avalista'} ?? '') . $sep .
-                    ($detSpc->{'valor'} ?? 0);
+                    '1) Incluído por ' . ($detSpc->{'nome-entidade'} ?? '') .
+                    ' em ' . DateTimeUtils::parseDateStr($detSpc->{'data-inclusao'})->format('d/m/Y') .
+                    ' (como ' . $detSpc->{'comprador-fiador-avalista'} . '). ' .
+                    'Contrato: ' . ($detSpc->{'contrato'} ?? '') .
+                    'Vencto: ' . DateTimeUtils::parseDateStr($detSpc->{'data-vencimento'})->format('d/m/Y') .
+                    'Valor: ' . number_format($detSpc->{'valor'}, 2, ',', '.');
+
             } else {
                 $i = 1;
                 foreach ($result->{'spc'}->{'detalhe-spc'} as $detSpc) {
                     $r[] =
-                        $i++ . $sep .
-                        ($detSpc->{'data-inclusao'} ?? '') . $sep .
-                        ($detSpc->{'data-vencimento'} ?? '') . $sep .
-                        ($detSpc->{'nome-entidade'} ?? '') . $sep .
-                        ($detSpc->{'contrato'} ?? '') . $sep .
-                        ($detSpc->{'comprador-fiador-avalista'} ?? '') . $sep .
-                        ($detSpc->{'valor'} ?? 0);
+                        $i++ . ') Incluído por ' . ($detSpc->{'nome-entidade'} ?? '') .
+                        ' em ' . DateTimeUtils::parseDateStr($detSpc->{'data-inclusao'})->format('d/m/Y') .
+                        ' (como ' . $detSpc->{'comprador-fiador-avalista'} . '). ' .
+                        'Contrato: ' . ($detSpc->{'contrato'} ?? '') . '. ' .
+                        'Vencto: ' . DateTimeUtils::parseDateStr($detSpc->{'data-vencimento'})->format('d/m/Y') . '. ' .
+                        'Valor: ' . number_format($detSpc->{'valor'}, 2, ',', '.');
                 }
             }
         }
 
 
-        return new Response(implode('<br>',$r));
+        return new Response(implode('<br>', $r));
     }
 
 }
