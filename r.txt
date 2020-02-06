@@ -1,0 +1,27 @@
+Consulta para JOB INFORMATICA (JOB DE VOLTA REDONDA COMERCIO E REPRESENTACAO LTDA)
+
+>>> CONSULTA DE DOCUMENTOS: alerta(s) para 1 documento(s):
+
+1) Roubo/Furto de TALÃO DE CHEQUE (Dt Ocorrência: 07/04/2000)  (Incluído em 14/09/2011) 
+
+
+>>> CONSULTA SPC: 2 ocorrência(s) encontrada(s) no valor total de R$ 5.001.200,00
+
+1) Incluído por CDL - ADAMANTINA / SP em 23/10/2018 (como COMPRADOR). Contrato: 12456410649855. Vencto: 22/10/2018. Valor: 5.000.000,00
+2) Incluído por CDL - ADAMANTINA / SP em 23/10/2018 (como COMPRADOR). Contrato: 1010. Vencto: 01/10/2018. Valor: 1.200,00
+
+
+>>> CONSULTA PROTESTOS: 9 ocorrência(s) encontrada(s) no valor total de R$ 12.319,36
+
+1) Cartório: 7o CARTORIO DA CIDADE em GOTHAM CITY-SP em 07/02/2020. Valor: 765,22
+2) Cartório: 7o CARTORIO DA CIDADE em GOTHAM CITY-SP em 06/02/2020. Valor: 2.050,00
+3) Cartório: 7o CARTORIO DA CIDADE em GOTHAM CITY-SP em 05/02/2020. Valor: 2.100,00
+4) Cartório: 7o CARTORIO DA CIDADE em GOTHAM CITY-SP em 04/02/2020. Valor: 2.150,00
+5) Cartório: 7o CARTORIO DA CIDADE em GOTHAM CITY-SP em 03/02/2020. Valor: 2.200,00
+6) Cartório: 5o CARTORIO DA CIDADE em GOTHAM CITY-SP em 18/05/2018. Valor: 333,11
+7) Cartório: 2o CARTORIO DA CIDADE em GOTHAM CITY-SP em 17/05/2018. Valor: 160,55
+8) Cartório: 1o CARTORIO DA CIDADE em GOTHAM CITY-SP em 16/05/2018. Valor: 1.560,50
+9) Cartório: 20o CARTORIO DA CIDADE em GOTHAM CITY-SP em 10/12/2016. Valor: 999,98
+
+
+>>> CONSULTA DE CHEQUES: Nenhuma ocorrềncia.

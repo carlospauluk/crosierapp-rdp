@@ -245,7 +245,9 @@ class ConsultaSPCAPIController extends AbstractController
             $r[] = '>>> CONSULTA DE CHEQUES: Nenhuma ocorrềncia.';
         }
 
-        return new Response(implode(chr(13), $r));
+        $imp = implode("\n", $r);
+
+        return new Response($imp);
     }
 
 }
