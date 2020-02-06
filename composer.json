@@ -19,6 +19,7 @@
     "ext-intl": "*",
     "ext-json": "*",
     "ext-simplexml": "*",
+    "ext-soap": "*",
     "ext-zip": "*",
     "vich/uploader-bundle": "^1.9",
     "phpoffice/phpspreadsheet": "^1.9",
