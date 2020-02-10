@@ -131,7 +131,7 @@ class PVListEstoqueController extends FormListController
             new FilterInput('', 'tituloIsNotEmpty', 'HIDDEN'),
         ];
 
-        $params['listAuxDatas'] = json_encode(['crosierAppVendestUrl' => $_SERVER['CROSIERAPPVENDEST_URL']]);
+        $params['listAuxDatas'] = json_encode(['crosierappradx_url' => $_SERVER['CROSIERAPPRADX_URL']]);
 
         return $this->doList($request, $params);
     }

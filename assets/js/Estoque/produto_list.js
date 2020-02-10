@@ -10,7 +10,7 @@ import $ from "jquery";
 Numeral.locale('pt-br');
 
 let listId = "#produto_list";
-let crosierAppVendestUrl = $('#listAuxDatas').data('json').crosierAppVendestUrl;
+let crosierappradx_url = $('#listAuxDatas').data('json').crosierappradx_url;
 
 function getDatatablesColumns() {
     return [
@@ -26,7 +26,7 @@ function getDatatablesColumns() {
             render: function (data, type, row) {
                 let s = '<div class="float-left">' + (data.titulo ? data.titulo : '<span style="font-size: small; font-style: italic; color: grey">' + data.nome + '</span>') + '</div>';
                 if (data.imagem1) {
-                    s += '<div class="float-right"><img src="' + crosierAppVendestUrl + '/images/produtos/' + data.deptoId + '/' + data.grupoId + '/' + data.subgrupoId + '/' + data.imagem1 + '" width="50px"/></div>';
+                    s += '<div class="float-right"><img src="' + crosierappradx_url + '/images/produtos/' + data.deptoId + '/' + data.grupoId + '/' + data.subgrupoId + '/' + data.imagem1 + '" width="50px"/></div>';
                 }
                 return s;
             },
@@ -76,7 +76,7 @@ function getDatatablesColumns() {
             title: '',
             render: function (data, type, row) {
                 let colHtml = "";
-                let routeedit = crosierAppVendestUrl + '/est/produto/form/' + data.id;
+                let routeedit = crosierappradx_url + '/est/produto/form/' + data.id;
                 colHtml += DatatablesJs.makeEditButton(routeedit);
                 colHtml += '<br /><span class="badge badge-pill badge-info">' + Moment(data.updated).format('DD/MM/YYYY HH:mm:ss') + '</span> ';
                 return colHtml;

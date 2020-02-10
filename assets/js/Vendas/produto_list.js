@@ -11,7 +11,7 @@ Numeral.locale('pt-br');
 
 let listId = "#ven_pv_produtoList";
 
-let crosierAppVendestUrl = $('#listAuxDatas').data('json').crosierAppVendestUrl;
+let crosierappradx_url = $('#listAuxDatas').data('json').crosierappradx_url;
 
 function getDatatablesColumns() {
     return [
@@ -47,7 +47,7 @@ function getDatatablesColumns() {
 
                 let s = '<div class="float-left">' + (data.titulo ? data.titulo : '<span style="font-size: small; font-style: italic; color: grey">' + data.nome + '</span>') + '</div>';
                 if (data.imagem1) {
-                    s += '<div class="float-right"><img src="' + crosierAppVendestUrl + '/images/produtos/' + data.deptoId + '/' + data.grupoId + '/' + data.subgrupoId + '/' + data.imagem1 + '" width="50px"/></div>';
+                    s += '<div class="float-right"><img src="' + crosierappradx_url + '/images/produtos/' + data.deptoId + '/' + data.grupoId + '/' + data.subgrupoId + '/' + data.imagem1 + '" width="50px"/></div>';
                 }
                 return s;
             }

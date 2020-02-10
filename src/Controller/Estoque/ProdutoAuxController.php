@@ -89,7 +89,7 @@ class ProdutoAuxController extends FormListController
             'listRoute' => 'est_produto_list',
             'listRouteAjax' => 'est_produto_datatablesJsList',
             'listPageTitle' => 'Produtos',
-            'formUrl' => $_SERVER['CROSIERAPPVENDEST_URL'] . '/est/produto/form',
+            'formUrl' => $_SERVER['CROSIERAPPRADX_URL'] . '/est/produto/form',
             'listId' => 'produto_list'
         ];
         $params['filterInputs'] = [
@@ -101,7 +101,7 @@ class ProdutoAuxController extends FormListController
             new FilterInput('Qtde Imagens', 'qtdeImagens', 'INTEGER'),
             new FilterInput('', 'tituloIsNotEmpty', 'HIDDEN'),
         ];
-        $params['listAuxDatas'] = json_encode(['crosierAppVendestUrl' => $_SERVER['CROSIERAPPVENDEST_URL']]);
+        $params['listAuxDatas'] = json_encode(['crosierappradx_url' => $_SERVER['CROSIERAPPRADX_URL']]);
         return $this->doList($request, $params);
     }
 

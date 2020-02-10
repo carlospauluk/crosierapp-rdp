@@ -290,7 +290,7 @@ class RelEstoque01Business
     }
 
     /**
-     * Copiado do crosierapp-vendest (App\EntityHandler\Estoque\ProdutoAtributoEntityHandler)
+     * Copiado do crosierapp-radx (App\EntityHandler\Estoque\ProdutoAtributoEntityHandler)
      *
      * @param int $produtoToId
      */
