@@ -1,0 +1,323 @@
+{
+  "campos": {
+    "depto_codigo": {
+      "tipo": "int"
+    },
+    "depto_nome": {
+      "label": "Depto",
+      "tipo": "string"
+    },
+    "grupo_codigo": {
+      "tipo": "int"
+    },
+    "grupo_nome": {
+      "label": "Grupo",
+      "tipo": "string"
+    },
+    "subgrupo_codigo": {
+      "tipo": "int"
+    },
+    "subgrupo_nome": {
+      "label": "Subgrupo",
+      "tipo": "string"
+    },
+    "fornecedor_nome": {
+      "label": "Fornecedor",
+      "tipo": "string"
+    },
+    "fornecedor_documento": {
+      "tipo": "string",
+      "mask": "cpfcnpj"
+    },
+    "titulo": {
+      "label": "Título",
+      "obs": "Título completo do produto",
+      "tipo": "string"
+    },
+    "caracteristicas": {
+      "label": "Características",
+      "tipo": "html"
+    },
+    "ean": {
+      "label": "EAN",
+      "obs": "European Article Number",
+      "tipo": "string"
+    },
+    "referencia": {
+      "label": "Referência",
+      "tipo": "string"
+    },
+    "ncm": {
+      "label": "NCM",
+      "obs": "Nomenclatura Comum do Mercosul",
+      "tipo": "string"
+    },
+    "composicao": {
+      "label": "Composição",
+      "obs": "Informa se esse faz parte de uma composição de produtos",
+      "tipo": "bool"
+    },
+    "porcent_preench": {
+      "label": "Preench (%)",
+      "obs": "Resultado do cálculo do total de preenchimento deste produto",
+      "tipo": "decimal2"
+    },
+    "porcent_preench_campos_faltantes": {
+      "label": "Quais campos ainda precisam ser informados para que o preench chegue em 100%",
+      "tipo": "string"
+    },
+    "codigo_erp": {
+      "label": "Código From",
+      "obs": "Código antigo do produto (de outro sistema)",
+      "tipo": "string"
+    },
+    "preco_custo": {
+      "label": "Preço Custo",
+      "tipo": "preco"
+    },
+    "preco_tabela": {
+      "label": "Preço Tabela",
+      "tipo": "preco"
+    },
+    "preco_site": {
+      "label": "Preço Site",
+      "tipo": "preco"
+    },
+    "preco_atacado": {
+      "label": "Preço Atacado",
+      "tipo": "preco"
+    },
+    "preco_acessorios": {
+      "label": "Preço Acessórios",
+      "tipo": "preco"
+    },
+    "especif_tec": {
+      "label": "Especificações Técnicas",
+      "tipo": "html"
+    },
+    "itens_inclusos": {
+      "label": "Itens Inclusos",
+      "tipo": "html"
+    },
+    "compativel_com": {
+      "label": "Compatível com",
+      "tipo": "html"
+    },
+    "ano": {
+      "label": "Ano",
+      "tipo": "tags"
+    },
+    "erp_dt_ult_saida": {
+      "label": "Dt Últ Saída",
+      "tipo": "date"
+    },
+    "erp_dt_ult_entrada": {
+      "label": "Dt Últ Entrada",
+      "tipo": "date"
+    },
+    "erp_codigo": {
+      "label": "Código ERP",
+      "tipo": "string"
+    },
+    "dimensoes": {
+      "label": "Dimensões",
+      "formato": "A,decimal2,cm|L,decimal2,cm|C,decimal2,cm",
+      "obs": "(altura x largura x comprimento)",
+      "tipo": "compo"
+    },
+    "peso": {
+      "label": "Peso",
+      "sufixo": "kg",
+      "tipo": "decimal3"
+    },
+    "video_url": {
+      "label": "Vídeo",
+      "prefixo": "URL",
+      "formato": "notuppercase",
+      "tipo": "string"
+    },
+    "integr_ecommerce": {
+      "label": "Integr E-commerce",
+      "obs": "Informa se o produto está integrado ao ecommerce",
+      "tipo": "bool"
+    },
+    "dt_integr_ecommerce": {
+      "label": "Integr E-commerce",
+      "obs": "Data em que o produto foi integrado ao ecommerce",
+      "tipo": "date"
+    },
+    "st": {
+      "label": "ST",
+      "sufixo": "%",
+      "obs": "Substituição Tributária",
+      "tipo": "decimal2"
+    },
+    "icms": {
+      "label": "ICMS",
+      "sufixo": "%",
+      "tipo": "decimal2"
+    },
+    "ipi": {
+      "label": "IPI",
+      "sufixo": "%",
+      "tipo": "decimal2"
+    },
+    "pis": {
+      "label": "PIS",
+      "sufixo": "%",
+      "tipo": "decimal2"
+    },
+    "cofins": {
+      "label": "COFINS",
+      "sufixo": "%",
+      "tipo": "decimal2"
+    },
+    "marca": {
+      "label": "Marca",
+      "tipo": "string"
+    },
+    "montadora": {
+      "label": "Montadora",
+      "tipo": "tags"
+    },
+    "modelos": {
+      "label": "Modelos",
+      "tipo": "tags"
+    },
+    "montadora_2": {
+      "label": "Montadora (2)",
+      "tipo": "tags"
+    },
+    "modelos_2": {
+      "label": "Modelos (2)",
+      "tipo": "tags"
+    },
+    "montadora_3": {
+      "label": "Montadora (3)",
+      "tipo": "tags"
+    },
+    "modelos_3": {
+      "label": "Modelos (3)",
+      "tipo": "tags"
+    },
+    "qtde_estoque_acessorios": {
+      "label": "Estoque Acessórios",
+      "obs": "Informa o estoque atual na loja Acessórios",
+      "tipo": "decimal3"
+    },
+    "qtde_estoque_matriz": {
+      "label": "Estoque Matriz",
+      "obs": "Informa o estoque atual na loja Matriz",
+      "tipo": "decimal3"
+    },
+    "qtde_estoque_total": {
+      "label": "Estoque Total",
+      "obs": "Informa o total em estoque",
+      "tipo": "decimal3"
+    },
+    "qtde_estoque_min": {
+      "label": "Estoque Mínimo",
+      "tipo": "decimal3"
+    },
+    "promocao_de": {
+      "label": "De",
+      "obs": "Valor original para configuração de promoção",
+      "tipo": "preco"
+    },
+    "promocao_por": {
+      "label": "Por",
+      "obs": "Valor do produto na promoção",
+      "tipo": "preco"
+    },
+    "promocao_dt_ini": {
+      "label": "Validade Inicial",
+      "tipo": "datetime"
+    },
+    "promocao_dt_fim": {
+      "label": "Validade Final",
+      "tipo": "datetime"
+    },
+    "promocao_qtde_parcelas": {
+      "label": "Qtde Parcelas",
+      "tipo": "int"
+    },
+    "promocao_parcelas_dt_ini": {
+      "label": "Validade Inicial",
+      "tipo": "datetime"
+    },
+    "promocao_parcelas_dt_fim": {
+      "label": "Validade Final",
+      "tipo": "datetime"
+    },
+    "qtde_imagens": {
+      "label": "Qtde Imagens",
+      "obs": "Atualizado dinamicamente conforme as imagens são adicionadas/removidas",
+      "tipo": "int"
+    },
+    "imagem1": {
+      "label": "Imagem 1",
+      "obs": "Link para a primeira imagem",
+      "tipo": "string"
+    }
+  },
+  "abas": {
+    "Produto": [],
+    "Descritivos": [
+      "caracteristicas",
+      "especif_tec",
+      "itens_inclusos",
+      "compativel_com"
+    ],
+    "Complementos": [
+      "ano",
+      "marca",
+      "montadora",
+      "modelos",
+      "montadora_2",
+      "modelos_2",
+      "montadora_3",
+      "modelos_3",
+      "dimensoes",
+      "peso",
+      "integr_ecommerce"
+    ],
+    "Fotos": [
+      "video_url"
+    ],
+    "Preços": [
+      "preco_tabela",
+      "preco_site",
+      "preco_atacado",
+      "preco_acessorios"
+    ],
+    "ERP": [
+      "codigo_erp",
+      "erp_dt_ult_saida",
+      "erp_dt_ult_entrada"
+    ],
+    "Fiscal": [
+      "ncm",
+      "preco_custo",
+      "st",
+      "icms",
+      "ipi",
+      "pis",
+      "cofins"
+    ],
+    "Estoques": [
+      "qtde_estoque_matriz",
+      "qtde_estoque_acessorios",
+      "qtde_estoque_total",
+      "qtde_estoque_min"
+    ],
+    "Promoção": [
+      "promocao_de",
+      "promocao_por",
+      "promocao_dt_ini",
+      "promocao_dt_fim",
+      "promocao_qtde_parcelas",
+      "promocao_parcelas_dt_ini",
+      "promocao_parcelas_dt_fim"
+    ]
+  }
+}

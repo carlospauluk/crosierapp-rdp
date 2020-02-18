@@ -4,6 +4,7 @@
 namespace App\Business\Estoque;
 
 
+use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
 use Doctrine\DBAL\Connection;
@@ -48,10 +49,25 @@ class ProdutoBusiness
     }
 
 
-    public function gerarExcel(): array
+    /**
+     * @param bool $apenasProdutosComTitulo
+     * @return array
+     * @throws ViewException
+     */
+    public function gerarExcel(bool $apenasProdutosComTitulo): array
     {
 
         try {
+            /** @var Connection $conn */
+            $conn = $this->doctrine->getConnection();
+
+            $sqlTitulo = $apenasProdutosComTitulo ? 'AND p.titulo IS NOT NULL AND trim(p.titulo) != \'\'' : '';
+
+            $qryProdutos = $conn->query('SELECT p.*, u.label as unidade FROM vw_rdp_est_produto p, est_unidade_produto u WHERE p.unidade_produto_id = u.id ' . $sqlTitulo . ' ORDER BY id');
+
+            $qryAtributosProduto = $conn->prepare('SELECT a.id, a.label, a.tipo, a.config, a.descricao, pa.valor FROM est_atributo a, est_produto_atributo pa WHERE pa.atributo_id = a.id AND pa.produto_id = :produto_id ORDER BY pa.ordem');
+
+
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
 
@@ -106,13 +122,6 @@ class ProdutoBusiness
             $titulos[] = 'Estoque Acessórios';
             $titulos[] = 'Estoque Total';
 
-            /** @var Connection $conn */
-            $conn = $this->doctrine->getConnection();
-
-            $qryProdutos = $conn->query('SELECT p.*, u.label as unidade FROM vw_rdp_est_produto p, est_unidade_produto u WHERE p.unidade_produto_id = u.id AND p.titulo IS NOT NULL AND trim(p.titulo) != \'\' ORDER BY id ');
-
-
-            $qryAtributosProduto = $conn->prepare('SELECT a.id, a.label, a.tipo, a.config, a.descricao, pa.valor FROM est_atributo a, est_produto_atributo pa WHERE pa.atributo_id = a.id AND pa.produto_id = :produto_id ORDER BY pa.ordem');
 
             $linha = 2;
             $qtdeProdutos = 0;
@@ -210,8 +219,10 @@ class ProdutoBusiness
             $params['arquivo'] = $_SERVER['CROSIERAPPRDP_URL'] . $_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL_DOWNLOAD'] . $nomeArquivo;
             $params['qtdeProdutos'] = $qtdeProdutos;
             return $params;
-        } catch (Exception $e) {
-            throw new \RuntimeException('Erro ao gerar arquivo xlsx');
+        } catch (Exception | DBALException $e) {
+            $this->logger->error('Erro ao gerar arquivo xlsx');
+            $this->logger->error($e->getMessage());
+            throw new ViewException('Erro ao gerar arquivo xlsx');
         }
     }
 
