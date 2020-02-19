@@ -73,7 +73,8 @@
     },
     "preco_custo": {
       "label": "Preço Custo",
-      "tipo": "preco"
+      "tipo": "preco",
+      "disabled": true
     },
     "preco_tabela": {
       "label": "Preço Tabela",
