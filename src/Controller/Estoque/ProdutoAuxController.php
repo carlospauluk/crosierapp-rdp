@@ -197,7 +197,7 @@ class ProdutoAuxController extends FormListController
             /** @var Connection $conn */
             $conn = $this->getDoctrine()->getConnection();
 
-            $produtos = $conn->fetchAll('SELECT p.*, u.label as unidade FROM vw_rdp_est_produto p, est_unidade_produto u WHERE p.unidade_produto_id = u.id ORDER BY id ');
+            $produtos = $conn->fetchAll('SELECT p.*, u.label as unidade FROM vw_rdp_est_produto p, est_unidade_produto u WHERE p.id = 183 AND p.unidade_produto_id = u.id ORDER BY id ');
 
             // $json_metadata = $conn->fetchAssoc('SELECT valor FROM cfg_app_config WHERE chave = :chave', ['chave' => 'est_produto_json_metadata']);
 
@@ -248,6 +248,14 @@ class ProdutoAuxController extends FormListController
             $atrs[41] = 'promocao_parcelas_dt_ini';
             $atrs[20] = 'video';
 
+            $unidades = [
+                1 => 'PC',
+                3 => 'JG',
+                4 => 'KIT',
+                5 => 'MT',
+                6 => 'PAR'
+            ];
+
 
             foreach ($produtos as $produto) {
                 $qtdeProdutos++;
@@ -278,8 +286,11 @@ class ProdutoAuxController extends FormListController
                 $json_data['imagem1'] = $produto['imagem1'];
                 $json_data['preco_tabela'] = $produto['preco_tabela'];
                 $json_data['preco_custo'] = $produto['preco_custo'];
+                $json_data['unidade'] = $unidades[$produto['unidade_produto_id']];
 
-                $qryAtributosProduto->bindValue('produto_id', $produto['id']);
+                $qryAtributosProduto->bindParam('produto_id', $produto['id']);
+                $qryAtributosProduto->execute();
+
                 $atributos = $qryAtributosProduto->fetchAll();
 
                 foreach ($atributos as $atributo) {

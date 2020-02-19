@@ -1,5 +1,16 @@
 {
   "campos": {
+    "unidade": {
+      "label": "Unidade",
+      "tipo": "select",
+      "opcoes": [
+        "PC",
+        "KIT",
+        "PAR",
+        "MT",
+        "JG"
+      ]
+    },
     "depto_codigo": {
       "tipo": "int"
     },
@@ -32,6 +43,7 @@
     "titulo": {
       "label": "Título",
       "obs": "Título completo do produto",
+      "notuppercase": true,
       "tipo": "string"
     },
     "caracteristicas": {
@@ -78,7 +90,8 @@
     },
     "preco_tabela": {
       "label": "Preço Tabela",
-      "tipo": "preco"
+      "tipo": "preco",
+      "disabled": true
     },
     "preco_site": {
       "label": "Preço Site",
@@ -86,11 +99,13 @@
     },
     "preco_atacado": {
       "label": "Preço Atacado",
-      "tipo": "preco"
+      "tipo": "preco",
+      "disabled": true
     },
     "preco_acessorios": {
       "label": "Preço Acessórios",
-      "tipo": "preco"
+      "tipo": "preco",
+      "disabled": true
     },
     "especif_tec": {
       "label": "Especificações Técnicas",
@@ -110,15 +125,18 @@
     },
     "erp_dt_ult_saida": {
       "label": "Dt Últ Saída",
-      "tipo": "date"
+      "tipo": "date",
+      "disabled": true
     },
     "erp_dt_ult_entrada": {
       "label": "Dt Últ Entrada",
-      "tipo": "date"
+      "tipo": "date",
+      "disabled": true
     },
     "erp_codigo": {
       "label": "Código ERP",
-      "tipo": "string"
+      "tipo": "string",
+      "disabled": true
     },
     "dimensoes": {
       "label": "Dimensões",
@@ -204,21 +222,25 @@
     "qtde_estoque_acessorios": {
       "label": "Estoque Acessórios",
       "obs": "Informa o estoque atual na loja Acessórios",
-      "tipo": "decimal3"
+      "tipo": "decimal3",
+      "disabled": true
     },
     "qtde_estoque_matriz": {
       "label": "Estoque Matriz",
       "obs": "Informa o estoque atual na loja Matriz",
-      "tipo": "decimal3"
+      "tipo": "decimal3",
+      "disabled": true
     },
     "qtde_estoque_total": {
       "label": "Estoque Total",
       "obs": "Informa o total em estoque",
-      "tipo": "decimal3"
+      "tipo": "decimal3",
+      "disabled": true
     },
     "qtde_estoque_min": {
       "label": "Estoque Mínimo",
-      "tipo": "decimal3"
+      "tipo": "decimal3",
+      "disabled": true
     },
     "promocao_de": {
       "label": "De",
@@ -262,7 +284,9 @@
     }
   },
   "abas": {
-    "Produto": [],
+    "Produto": [
+      "unidade"
+    ],
     "Descritivos": [
       "caracteristicas",
       "especif_tec",
