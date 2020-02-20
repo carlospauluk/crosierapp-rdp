@@ -27,9 +27,9 @@ function getDatatablesColumns() {
                 let s = '<div class="float-left">' +
                     (data.jsonData.titulo ? data.jsonData.titulo : '<span style="font-size: small; font-style: italic; color: grey">' + data.nome + '</span>') +
                     '</div>';
-                if (data.imagem1) {
+                if (data.jsonData.imagem1) {
                     s += '<div class="float-right">' +
-                        '<img src="' + crosierappradx_url + '/images/produtos/' + data.jsonData.depto_id + '/' + data.jsonData.grupo_id + '/' + data.jsonData.subgrupo_id + '/' + data.jsonData.imagem1 + '" width="50px"/></div>';
+                        '<img src="' + crosierappradx_url + '/images/produtos/' + data.jsonData.depto_id + '/' + data.jsonData.grupo_id + '/' + data.subgrupoId + '/' + data.jsonData.imagem1 + '" width="50px"/></div>';
                 }
                 return s;
             },

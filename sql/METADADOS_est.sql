@@ -1,45 +1,25 @@
 DROP VIEW vw_rdp_est_produto;
 CREATE VIEW vw_rdp_est_produto AS
 
-SELECT p.id,
-       p.uuid,
-       p.depto_id,
-       IF(json_type(p.json_data->"$.depto_codigo") = 'NULL', null, p.json_data->>"$.depto_codigo")                 as depto_codigo,
-       IF(json_type(p.json_data->"$.depto_nome") = 'NULL', null, p.json_data->>"$.depto_nome")                     as depto_nome,
-       p.grupo_id,
-       IF(json_type(p.json_data->"$.grupo_codigo") = 'NULL', null, p.json_data->>"$.grupo_codigo")                 as grupo_codigo,
-       IF(json_type(p.json_data->"$.grupo_nome") = 'NULL', null, p.json_data->>"$.grupo_nome")                     as grupo_nome,
-       p.subgrupo_id,
-       IF(json_type(p.json_data->"$.subgrupo_codigo") = 'NULL', null, p.json_data->>"$.subgrupo_codigo")           as subgrupo_codigo,
-       IF(json_type(p.json_data->"$.subgrupo_nome") = 'NULL', null, p.json_data->>"$.subgrupo_nome")               as subgrupo_nome,
-       p.fornecedor_id,
-       IF(json_type(p.json_data->"$.fornecedor_documento") = 'NULL', null, p.json_data->>"$.fornecedor_documento") as fornecedor_documento,
-       IF(json_type(p.json_data->"$.fornecedor_nome") = 'NULL', null, p.json_data->>"$.fornecedor_nome")           as fornecedor_nome,
-       p.nome,
-       IF(json_type(p.json_data->"$.titulo") = 'NULL', null, p.json_data->>"$.titulo")                             as titulo,
-       p.status,
-       p.composicao,
-       p.inserted,
-       p.updated,
-       p.version,
-       p.estabelecimento_id,
-       p.user_inserted_id,
-       p.user_updated_id,
-       p.unidade_produto_id,
-       p.json_data,
+SELECT p.*,
+       CAST(IFNULL(atribEstoqueMatriz.valor, '0.0') AS DECIMAL(15,3))     as saldo_estoque_matriz,
+       CAST(IFNULL(atribEstoqueAcessorios.valor, '0.0') AS DECIMAL(15,3)) as saldo_estoque_acessorios,
+       CAST(IFNULL(atribEstoqueTotal.valor, '0.0') AS DECIMAL(15,3))      as saldo_estoque_total,
+       img1.image_name              as imagem1,
+       (SELECT count(id) FROM est_produto_imagem imgs WHERE imgs.produto_id = p.id) as qtde_imagens
+FROM est_produto p
+         LEFT JOIN est_produto_atributo atribEstoqueMatriz
+                   ON (p.id = atribEstoqueMatriz.produto_id AND atribEstoqueMatriz.atributo_id IN (SELECT id
+                                                                                                   FROM est_atributo
+                                                                                                   WHERE uuid = '3edb71db-375d-4d37-b36d-8287f291606b'))
+         LEFT JOIN est_produto_atributo atribEstoqueAcessorios
+                   ON (p.id = atribEstoqueAcessorios.produto_id AND atribEstoqueAcessorios.atributo_id IN (SELECT id
+                                                                                                           FROM est_atributo
+                                                                                                           WHERE uuid = 'c37e9985-53f2-47f4-833a-52ace1f84e60'))
+         LEFT JOIN est_produto_atributo atribEstoqueTotal
+                   ON (p.id = atribEstoqueTotal.produto_id AND atribEstoqueTotal.atributo_id IN (SELECT id
+                                                                                                 FROM est_atributo
+                                                                                                 WHERE uuid = '8f25a3e6-cf93-4111-be2b-a46dedc30107'))
+         LEFT JOIN est_produto_imagem img1 ON (img1.produto_id = p.id AND img1.ordem = 1)
 
-       CAST(IFNULL(p.json_data->>"$.qtde_estoque_matriz", '0.0') AS DECIMAL(15, 3))                                   as qtde_estoque_matriz,
-       CAST(IFNULL(p.json_data->>"$.qtde_estoque_acessorios", '0.0') AS DECIMAL(15, 3))                               as qtde_estoque_acessorios,
-       CAST(IFNULL(p.json_data->>"$.qtde_estoque_total", '0.0') AS DECIMAL(15, 3))                                    as qtde_estoque_total,
-       CAST(IFNULL(p.json_data->>"$.preco_tabela", '0.0') AS DECIMAL(15, 3))                                          as preco_tabela,
-       CAST(IFNULL(p.json_data->>"$.preco_custo", '0.0') AS DECIMAL(15, 3))                                           as preco_custo,
-
-       CAST(IFNULL(p.json_data->>"$.porcent_preench", '0.0') AS DECIMAL(15, 2))                                       as porcent_preench,
-
-       p.json_data->>"$.imagem1"                                                                                      as imagem1,
-       p.json_data->>"$.qtde_imagens"                                                                                 as qtde_imagens
-
-FROM est_produto p;
-
-
-
+;

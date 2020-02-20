@@ -9,27 +9,28 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ORM\Entity(readOnly=true, repositoryClass="App\Repository\Estoque\ProdutoRepository")
- * @ORM\Table(name="vw_rdp_est_produto")
+ * @ORM\Entity(repositoryClass="App\Repository\Estoque\ProdutoRepository")
+ * @ORM\Table(name="est_produto")
  *
  * @author Carlos Eduardo Pauluk
  */
 class Produto implements EntityId
 {
+
     use EntityIdTrait;
 
     /**
-     *
-     * @ORM\Column(name="depto_nome", type="string")
+     * @ORM\Column(name="uuid", type="string", nullable=false, length=36)
+     * @NotUppercase()
      * @Groups("entity")
      *
      * @var string|null
      */
-    public ?string $nomeDepto;
+    public ?string $UUID;
 
     /**
      *
-     * @ORM\Column(name="nome", type="string")
+     * @ORM\Column(name="nome", type="string", nullable=false)
      * @Groups("entity")
      *
      * @var null|string
@@ -38,17 +39,18 @@ class Produto implements EntityId
 
     /**
      *
-     * @ORM\Column(name="titulo", type="string")
+     *
+     * @ORM\Column(name="subgrupo_id", type="integer")
      * @Groups("entity")
-     * @NotUppercase()
-     * @var null|string
+     *
+     * @var null|int
      */
-    public ?string $titulo;
+    public ?int $subgrupoId;
 
     /**
      * ATIVO,INATIVO
      *
-     * @ORM\Column(name="status", type="string")
+     * @ORM\Column(name="status", type="string", nullable=true)
      * @Groups("entity")
      *
      * @var null|string
@@ -56,62 +58,15 @@ class Produto implements EntityId
     public ?string $status;
 
     /**
-     * Porcentagem de preenchimento dos atributos deste produto.
+     * S,N
      *
-     * @ORM\Column(name="porcent_preench", type="float")
+     * @ORM\Column(name="composicao", type="string", nullable=true)
      * @Groups("entity")
      *
-     * @var float|null
+     * @var null|string
      */
-    public ?float $porcentPreench;
+    public ?string $composicao = 'N';
 
-    /**
-     *
-     * @ORM\Column(name="qtde_estoque_matriz", type="float")
-     * @Groups("entity")
-     *
-     * @var float|null
-     */
-    public ?float $qtdeEstoqueMatriz;
-
-    /**
-     *
-     * @ORM\Column(name="qtde_estoque_acessorios", type="float")
-     * @Groups("entity")
-     *
-     * @var float|null
-     */
-    public ?float $qtdeEstoqueAcessorios;
-
-    /**
-     *
-     * @ORM\Column(name="qtde_estoque_total", type="float")
-     * @Groups("entity")
-     *
-     * @var float|null
-     */
-    public ?float $qtdeEstoqueTotal;
-
-    /**
-     * Redundante: apenas para auxiliar acesso.
-     *
-     * @ORM\Column(name="imagem1", type="string")
-     * @NotUppercase()
-     * @Groups("entity")
-     *
-     * @var string|null
-     */
-    public ?string $imagem1;
-
-    /**
-     * Redundante: apenas para auxiliar acesso.
-     *
-     * @ORM\Column(name="qtde_imagens", type="integer")
-     * @Groups("entity")
-     *
-     * @var int|null
-     */
-    public ?int $qtdeImagens;
 
     /**
      *
@@ -122,8 +77,5 @@ class Produto implements EntityId
      */
     public ?array $jsonData = null;
 
-    private function __construct()
-    {
-    }
 
 }
