@@ -24,16 +24,19 @@ function getDatatablesColumns() {
             data: 'e',
             title: 'Título',
             render: function (data, type, row) {
-                let s = '<div class="float-left">' + (data.titulo ? data.titulo : '<span style="font-size: small; font-style: italic; color: grey">' + data.nome + '</span>') + '</div>';
+                let s = '<div class="float-left">' +
+                    (data.jsonData.titulo ? data.jsonData.titulo : '<span style="font-size: small; font-style: italic; color: grey">' + data.nome + '</span>') +
+                    '</div>';
                 if (data.imagem1) {
-                    s += '<div class="float-right"><img src="' + crosierappradx_url + '/images/produtos/' + data.deptoId + '/' + data.grupoId + '/' + data.subgrupoId + '/' + data.imagem1 + '" width="50px"/></div>';
+                    s += '<div class="float-right">' +
+                        '<img src="' + crosierappradx_url + '/images/produtos/' + data.jsonData.depto_id + '/' + data.jsonData.grupo_id + '/' + data.jsonData.subgrupo_id + '/' + data.jsonData.imagem1 + '" width="50px"/></div>';
                 }
                 return s;
             },
         },
         {
-            name: 'e.nomeDepto',
-            data: 'e.nomeDepto',
+            name: 'e.jsonData.depto_nome',
+            data: 'e.jsonData.depto_nome',
             title: 'Depto',
             render: function (data, type, row) {
                 return data;
@@ -48,22 +51,22 @@ function getDatatablesColumns() {
             }
         },
         {
-            name: 'e.porcentPreench',
-            data: 'e.porcentPreench',
+            name: 'e.jsonData.porcent_preench',
+            data: 'e.jsonData.porcent_preench',
             title: 'Status Cad',
             render: function (data, type, row) {
                 return Numeral(parseFloat(data) * 100).format('0,0') + '%';
             }
         },
         {
-            name: 'e.qtdeImagens',
-            data: 'e.qtdeImagens',
+            name: 'e.jsonData.qtde_imagens',
+            data: 'e.jsonData.qtde_imagens',
             title: 'Qtde Imagens',
             className: 'text-center'
         },
         {
-            name: 'e.saldoEstoqueTotal',
-            data: 'e.saldoEstoqueTotal',
+            name: 'e.jsonData.qtde_estoque_total',
+            data: 'e.jsonData.qtde_estoque_total',
             title: 'Estoque Total',
             render: function (data, type, row) {
                 return Numeral(parseFloat(data)).format('0,0[000]');

@@ -26,6 +26,7 @@ SELECT p.id,
        p.user_inserted_id,
        p.user_updated_id,
        p.unidade_produto_id,
+       p.json_data,
 
        CAST(IFNULL(p.json_data->>"$.qtde_estoque_matriz", '0.0') AS DECIMAL(15, 3))                                   as qtde_estoque_matriz,
        CAST(IFNULL(p.json_data->>"$.qtde_estoque_acessorios", '0.0') AS DECIMAL(15, 3))                               as qtde_estoque_acessorios,

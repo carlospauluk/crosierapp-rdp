@@ -202,7 +202,7 @@ class ProdutoAuxController extends FormListController
 
             // $json_metadata = $conn->fetchAssoc('SELECT valor FROM cfg_app_config WHERE chave = :chave', ['chave' => 'est_produto_json_metadata']);
 
-            $qryAtributosProduto = $conn->prepare('SELECT a.id, a.label, a.tipo, a.config, a.descricao, pa.valor FROM est_atributo a, est_produto_atributo pa WHERE pa.atributo_id = a.id AND pa.produto_id = :produto_id ORDER BY pa.ordem');
+            $qryAtributosProduto = $conn->prepare('SELECT a.id, a.label, a.tipo, a.config, a.descricao, pa.valor FROM est_atributo a LEFT JOIN est_produto_atributo pa ON pa.atributo_id = a.id WHERE pa.produto_id = :produto_id ORDER BY pa.ordem');
 
             $linha = 2;
             $qtdeProdutos = 0;
@@ -285,8 +285,6 @@ class ProdutoAuxController extends FormListController
                 $json_data['qtde_estoque_total'] = $produto['saldo_estoque_total'];
                 $json_data['qtde_imagens'] = $produto['qtde_imagens'];
                 $json_data['imagem1'] = $produto['imagem1'];
-                $json_data['preco_tabela'] = $produto['preco_tabela'];
-                $json_data['preco_custo'] = $produto['preco_custo'];
                 $json_data['unidade'] = $unidades[$produto['unidade_produto_id']];
 
                 $qryAtributosProduto->bindParam('produto_id', $produto['id']);
@@ -309,7 +307,8 @@ class ProdutoAuxController extends FormListController
 
         } catch (\Exception | DBALException $e) {
             $conn->rollBack();
-            throw new \RuntimeException();
+            $this->logger->error($e->getTraceAsString());
+            throw new \RuntimeException($e->getMessage());
         }
 
     }
