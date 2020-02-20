@@ -196,8 +196,9 @@ class ProdutoAuxController extends FormListController
         try {
             /** @var Connection $conn */
             $conn = $this->getDoctrine()->getConnection();
+            $conn->beginTransaction();
 
-            $produtos = $conn->fetchAll('SELECT p.*, u.label as unidade FROM vw_rdp_est_produto p, est_unidade_produto u WHERE p.id = 183 AND p.unidade_produto_id = u.id ORDER BY id ');
+            $produtos = $conn->fetchAll('SELECT p.*, u.label as unidade FROM vw_rdp_est_produto p, est_unidade_produto u WHERE p.unidade_produto_id = u.id ORDER BY id ');
 
             // $json_metadata = $conn->fetchAssoc('SELECT valor FROM cfg_app_config WHERE chave = :chave', ['chave' => 'est_produto_json_metadata']);
 
@@ -208,13 +209,13 @@ class ProdutoAuxController extends FormListController
 
             $atrs[10] = 'ano';
             $atrs[6] = 'caracteristicas';
-            $atrs[13] = 'codigo_erp';
+            $atrs[13] = 'erp_codigo';
             $atrs[26] = 'cofins';
             $atrs[9] = 'compativel_com';
             $atrs[36] = 'promocao_de';
             $atrs[14] = 'dimensoes';
-            $atrs[12] = 'erp_dt_ult_ent';
-            $atrs[11] = 'erp_dt_ult_sai';
+            $atrs[12] = 'erp_dt_ult_entrada';
+            $atrs[11] = 'erp_dt_ult_saida';
             $atrs[7] = 'especif_tec';
             $atrs[33] = 'qtde_estoque_acessorios';
             $atrs[34] = 'qtde_estoque_matriz';
@@ -277,7 +278,7 @@ class ProdutoAuxController extends FormListController
                 $json_data['referencia'] = $produto['referencia'];
                 $json_data['ncm'] = $produto['ncm'];
                 $json_data['composicao'] = $produto['composicao'];
-                $json_data['codigo_erp'] = $produto['codigo_from'];
+                $json_data['erp_codigo'] = $produto['codigo_from'];
                 $json_data['porcent_preench'] = $produto['porcent_preench'];
                 $json_data['qtde_estoque_matriz'] = $produto['saldo_estoque_matriz'];
                 $json_data['qtde_estoque_acessorios'] = $produto['saldo_estoque_acessorios'];
@@ -303,10 +304,11 @@ class ProdutoAuxController extends FormListController
                 $this->logger->info($linha++ . ' escrita(s)');
             }
 
-
+            $conn->commit();
             return new Response('OK');
 
-        } catch (DBALException $e) {
+        } catch (\Exception | DBALException $e) {
+            $conn->rollBack();
             throw new \RuntimeException();
         }
 

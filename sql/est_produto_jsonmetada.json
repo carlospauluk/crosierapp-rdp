@@ -78,11 +78,6 @@
       "label": "Quais campos ainda precisam ser informados para que o preench chegue em 100%",
       "tipo": "string"
     },
-    "codigo_erp": {
-      "label": "Código From",
-      "obs": "Código antigo do produto (de outro sistema)",
-      "tipo": "string"
-    },
     "preco_custo": {
       "label": "Preço Custo",
       "tipo": "preco",
@@ -123,6 +118,11 @@
       "label": "Ano",
       "tipo": "tags"
     },
+    "erp_codigo": {
+      "label": "Código ERP",
+      "tipo": "string",
+      "disabled": true
+    },
     "erp_dt_ult_saida": {
       "label": "Dt Últ Saída",
       "tipo": "date",
@@ -131,11 +131,6 @@
     "erp_dt_ult_entrada": {
       "label": "Dt Últ Entrada",
       "tipo": "date",
-      "disabled": true
-    },
-    "erp_codigo": {
-      "label": "Código ERP",
-      "tipo": "string",
       "disabled": true
     },
     "dimensoes": {
@@ -316,7 +311,7 @@
       "preco_acessorios"
     ],
     "ERP": [
-      "codigo_erp",
+      "erp_codigo",
       "erp_dt_ult_saida",
       "erp_dt_ult_entrada"
     ],
