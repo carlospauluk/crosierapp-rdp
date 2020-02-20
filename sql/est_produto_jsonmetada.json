@@ -147,7 +147,7 @@
     "video_url": {
       "label": "Vídeo",
       "prefixo": "URL",
-      "formato": "notuppercase",
+      "notuppercase": true,
       "tipo": "string"
     },
     "integr_ecommerce": {
