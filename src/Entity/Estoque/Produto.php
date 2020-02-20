@@ -113,6 +113,15 @@ class Produto implements EntityId
      */
     public ?int $qtdeImagens;
 
+    /**
+     *
+     * @ORM\Column(name="json_data", type="json")
+     * @var null|array
+     * @NotUppercase()
+     * @Groups("entity")
+     */
+    public ?array $jsonData = null;
+
     private function __construct()
     {
     }
