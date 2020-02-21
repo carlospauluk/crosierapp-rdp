@@ -40,6 +40,26 @@ class Produto implements EntityId
     /**
      *
      *
+     * @ORM\Column(name="depto_id", type="integer")
+     * @Groups("entity")
+     *
+     * @var null|int
+     */
+    public ?int $deptoId;
+
+    /**
+     *
+     *
+     * @ORM\Column(name="grupo_id", type="integer")
+     * @Groups("entity")
+     *
+     * @var null|int
+     */
+    public ?int $grupoId;
+
+    /**
+     *
+     *
      * @ORM\Column(name="subgrupo_id", type="integer")
      * @Groups("entity")
      *
