@@ -203,8 +203,8 @@ class ProdutoBusiness
                 $r[] = $atributosProduto['ipi'] ?? '';
                 $r[] = $atributosProduto['pis'] ?? '';
                 $r[] = $atributosProduto['cofins'] ?? '';
-                $r[] = $atributosProduto['dt_ult_saida'] ?? '';
-                $r[] = $atributosProduto['dt_ult_entrada'] ?? '';
+                $r[] = $atributosProduto['erp_dt_ult_saida'] ?? '';
+                $r[] = $atributosProduto['erp_dt_ult_entrada'] ?? '';
 
                 $r[] = $atributosProduto['qtde_estoque_matriz'] ?? '';
                 $r[] = $atributosProduto['qtde_estoque_acessorios'] ?? '';
