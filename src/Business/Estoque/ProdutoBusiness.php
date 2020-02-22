@@ -200,7 +200,7 @@ class ProdutoBusiness
                 $r[] = $atributosProduto['preco_custo'] ?? '';
                 $r[] = $atributosProduto['st'] ?? '';
                 $r[] = $atributosProduto['icms'] ?? '';
-                $r[] = $atributosProduto['ipi'] ?? '';
+                $r[] = $atributosProduto['ipi'] ?: '';
                 $r[] = $atributosProduto['pis'] ?? '';
                 $r[] = $atributosProduto['cofins'] ?? '';
                 $r[] = $atributosProduto['erp_dt_ult_saida'] ?? '';
