@@ -62,7 +62,7 @@ class ProdutoBusiness
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
 
-            $sqlTitulo = $apenasProdutosComTitulo ? 'AND p.titulo IS NOT NULL AND trim(p.titulo) != \'\'' : '';
+            $sqlTitulo = $apenasProdutosComTitulo ? 'AND p.json_data->>"$.titulo" IS NOT NULL AND trim(p.json_data->>"$.titulo") != \'\'' : '';
 
             $qryProdutos = $conn->query('SELECT p.* FROM est_produto p WHERE true ' . $sqlTitulo . ' ORDER BY id');
 
@@ -140,12 +140,13 @@ class ProdutoBusiness
             /** @var Produto $produto */
             while ($produto = $qryProdutos->fetch()) {
                 $qtdeProdutos++;
+                $atributosProduto = [];
 
-                foreach ($jsonMetadata as $nomeDoCampo => $jsonMetadatum) {
-                    $val = $produto->jsonData[$jsonMetadatum[$nomeDoCampo]] ?? '';
-                    if ($jsonMetadatum['tipo'] === 'compo') {
+                foreach ($jsonMetadata['campos'] as $nomeDoCampo => $metadata) {
+                    $val = json_decode($produto['json_data'], true)[$nomeDoCampo] ?? '';
+                    if ($metadata['tipo'] === 'compo') {
                         $subcampos = explode('|', $val);
-                        $subCampo_configs = explode('|', $jsonMetadatum['formato']);
+                        $subCampo_configs = explode('|', $metadata['formato']);
                         foreach ($subcampos as $k => $subcampo) {
                             $cfg = explode(',', $subCampo_configs[$k]);
                             $atributosProduto[$nomeDoCampo . '_' . $cfg[0]] = $subcampo;
@@ -160,23 +161,23 @@ class ProdutoBusiness
 
                 $r[] = DateTimeUtils::parseDateStr($produto['updated'])->format('d/m/Y H:i:s');
                 $r[] = $produto['id'];
-                $r[] = $produto['unidade'];
-                $r[] = bcmul((float)$produto['porcent_preench'], 100, 2);
+                $r[] = $atributosProduto['unidade'];
+                $r[] = bcmul((float)$atributosProduto['porcent_preench'], 100, 2);
                 $r[] = $produto['nome'];
-                $r[] = $produto['titulo'];
-                $r[] = $produto['depto_codigo'] . ' - ' . $produto['depto_nome'];
-                $r[] = $produto['grupo_codigo'] . ' - ' . $produto['grupo_nome'];
-                $r[] = $produto['subgrupo_codigo'] . ' - ' . $produto['subgrupo_nome'];
-                $r[] = $produto['fornecedor_nome'];
+                $r[] = $atributosProduto['titulo'];
+                $r[] = $atributosProduto['depto_codigo'] . ' - ' . $atributosProduto['depto_nome'];
+                $r[] = $atributosProduto['grupo_codigo'] . ' - ' . $atributosProduto['grupo_nome'];
+                $r[] = $atributosProduto['subgrupo_codigo'] . ' - ' . $atributosProduto['subgrupo_nome'];
+                $r[] = $atributosProduto['fornecedor_nome'];
                 $r[] = $atributosProduto['preco_tabela'] ?? '';
                 $r[] = $atributosProduto['preco_site'] ?? '';
                 $r[] = $atributosProduto['preco_atacado'] ?? '';
                 $r[] = $atributosProduto['preco_acessorios'] ?? '';
-                $r[] = $produto['caracteristicas'] ? 'Sim' : 'Não';
+                $r[] = $atributosProduto['caracteristicas'] ? 'Sim' : 'Não';
                 $r[] = ($atributosProduto['especif_tec'] ?? null) ? 'Sim' : 'Não';
                 $r[] = ($atributosProduto['itens_inclusos'] ?? null) ? 'Sim' : 'Não';
-                $r[] = $produto['ean'];
-                $r[] = $produto['referencia'];
+                $r[] = $atributosProduto['ean'];
+                $r[] = $atributosProduto['referencia'];
                 $r[] = $atributosProduto['marca'] ?? '';
                 $r[] = $atributosProduto['video_url'] ?? '';
                 $r[] = ($atributosProduto['compativel_com'] ?? null) ? 'Sim' : 'Não';
@@ -192,10 +193,10 @@ class ProdutoBusiness
                 $r[] = $atributosProduto['dimensoes_L'] ?? '';
                 $r[] = $atributosProduto['dimensoes_C'] ?? '';
                 $r[] = $atributosProduto['peso'] ?? '';
-                $r[] = $produto['qtde_imagens'] ?? '';
+                $r[] = $atributosProduto['qtde_imagens'] ?? '';
                 $r[] = $atributosProduto['integr_ecommerce'] ?? '';
-                $r[] = $produto['erp_codigo'];
-                $r[] = $produto['ncm'];
+                $r[] = $atributosProduto['erp_codigo'];
+                $r[] = $atributosProduto['ncm'];
                 $r[] = $atributosProduto['preco_custo'] ?? '';
                 $r[] = $atributosProduto['st'] ?? '';
                 $r[] = $atributosProduto['icms'] ?? '';

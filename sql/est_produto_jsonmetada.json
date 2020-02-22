@@ -197,32 +197,39 @@
     },
     "marca": {
       "label": "Marca",
+      "notuppercase": true,
       "tipo": "string"
     },
     "montadora": {
       "label": "Montadora",
+      "notuppercase": true,
       "tipo": "tags",
       "soma_preench": 5
     },
     "modelos": {
       "label": "Modelos",
+      "notuppercase": true,
       "tipo": "tags",
       "soma_preench": 5
     },
     "montadora_2": {
       "label": "Montadora (2)",
+      "notuppercase": true,
       "tipo": "tags"
     },
     "modelos_2": {
       "label": "Modelos (2)",
+      "notuppercase": true,
       "tipo": "tags"
     },
     "montadora_3": {
       "label": "Montadora (3)",
+      "notuppercase": true,
       "tipo": "tags"
     },
     "modelos_3": {
       "label": "Modelos (3)",
+      "notuppercase": true,
       "tipo": "tags"
     },
     "qtde_estoque_acessorios": {
