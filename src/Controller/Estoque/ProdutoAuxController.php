@@ -69,12 +69,10 @@ class ProdutoAuxController extends FormListController
     {
         return [
             new FilterData(['id'], 'EQ', 'id', $params),
-            new FilterData(['codigoFrom'], 'EQ', 'codigoFrom', $params),
-            new FilterData(['nome', 'titulo'], 'LIKE', 'nomeTitulo', $params),
-            new FilterData(['nomeDepto'], 'LIKE', 'nomeDepto', $params),
-            new FilterData(['porcentPreench'], 'BETWEEN_PORCENT', 'porcentPreench', $params),
-            new FilterData(['qtdeImagens'], 'EQ', 'qtdeImagens', $params),
-            new FilterData(['titulo'], 'IS_NOT_EMPTY', 'tituloIsNotEmpty', $params),
+            new FilterData(['erp_codigo'], 'JSON_LIKE', 'codigoFrom', $params),
+            new FilterData(['nome'], 'LIKE', 'nome', $params),
+            new FilterData(['titulo'], 'JSON_LIKE', 'titulo', $params),
+            new FilterData(['depto_nome'], 'JSON_LIKE', 'nomeDepto', $params)
         ];
     }
 
@@ -102,9 +100,9 @@ class ProdutoAuxController extends FormListController
         $params['filterInputs'] = [
             new FilterInput('Código', 'id'),
             new FilterInput('Código (ERP)', 'codigoFrom'),
-            new FilterInput('Nome/Título/Código', 'nomeTitulo'),
+            new FilterInput('Nome', 'nome'),
+            new FilterInput('Título', 'titulo'),
             new FilterInput('Depto', 'nomeDepto'),
-            new FilterInput('Status Cad', 'porcentPreench', 'BETWEEN_INTEGER', null, ['sufixo' => '%']),
             new FilterInput('Qtde Imagens', 'qtdeImagens', 'INTEGER'),
             new FilterInput('', 'tituloIsNotEmpty', 'HIDDEN'),
         ];

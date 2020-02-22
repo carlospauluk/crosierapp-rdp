@@ -44,16 +44,19 @@
       "label": "Título",
       "obs": "Título completo do produto",
       "notuppercase": true,
-      "tipo": "string"
+      "tipo": "string",
+      "soma_preench": 20
     },
     "caracteristicas": {
       "label": "Características",
-      "tipo": "html"
+      "tipo": "html",
+      "soma_preench": 15
     },
     "ean": {
       "label": "EAN",
       "obs": "European Article Number",
-      "tipo": "string"
+      "tipo": "string",
+      "soma_preench": 5
     },
     "referencia": {
       "label": "Referência",
@@ -62,7 +65,8 @@
     "ncm": {
       "label": "NCM",
       "obs": "Nomenclatura Comum do Mercosul",
-      "tipo": "string"
+      "tipo": "string",
+      "soma_preench": 5
     },
     "composicao": {
       "label": "Composição",
@@ -104,11 +108,13 @@
     },
     "especif_tec": {
       "label": "Especificações Técnicas",
-      "tipo": "html"
+      "tipo": "html",
+      "soma_preench": 15
     },
     "itens_inclusos": {
       "label": "Itens Inclusos",
-      "tipo": "html"
+      "tipo": "html",
+      "soma_preench": 15
     },
     "compativel_com": {
       "label": "Compatível com",
@@ -116,7 +122,8 @@
     },
     "ano": {
       "label": "Ano",
-      "tipo": "tags"
+      "tipo": "tags",
+      "soma_preench": 5
     },
     "erp_codigo": {
       "label": "Código ERP",
@@ -137,12 +144,14 @@
       "label": "Dimensões",
       "formato": "A,decimal2,cm|L,decimal2,cm|C,decimal2,cm",
       "obs": "(altura x largura x comprimento)",
-      "tipo": "compo"
+      "tipo": "compo",
+      "soma_preench": 5
     },
     "peso": {
       "label": "Peso",
       "sufixo": "kg",
-      "tipo": "decimal3"
+      "tipo": "decimal3",
+      "soma_preench": 5
     },
     "video_url": {
       "label": "Vídeo",
@@ -192,11 +201,13 @@
     },
     "montadora": {
       "label": "Montadora",
-      "tipo": "tags"
+      "tipo": "tags",
+      "soma_preench": 5
     },
     "modelos": {
       "label": "Modelos",
-      "tipo": "tags"
+      "tipo": "tags",
+      "soma_preench": 5
     },
     "montadora_2": {
       "label": "Montadora (2)",
