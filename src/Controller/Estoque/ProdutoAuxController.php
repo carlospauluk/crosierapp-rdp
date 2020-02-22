@@ -182,7 +182,7 @@ class ProdutoAuxController extends FormListController
 
     /**
      *
-     * @Route("/est/produto/migrar", name="est_produto_migrar")
+     *
      * @param Request $request
      * @return Response
      *
@@ -191,6 +191,7 @@ class ProdutoAuxController extends FormListController
      */
     public function migrar(Request $request): Response
     {
+        // @Route("/est/produto/migrar", name="est_produto_migrar")
         try {
             /** @var Connection $conn */
             $conn = $this->getDoctrine()->getConnection();

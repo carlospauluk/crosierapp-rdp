@@ -4,7 +4,10 @@
 namespace App\Business\Estoque;
 
 
+use App\Entity\Estoque\Produto;
+use CrosierSource\CrosierLibBaseBundle\Entity\Config\AppConfig;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
+use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
 use Doctrine\DBAL\Connection;
@@ -24,11 +27,9 @@ use Psr\Log\LoggerInterface;
 class ProdutoBusiness
 {
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var EntityManagerInterface */
-    private $doctrine;
+    private EntityManagerInterface $doctrine;
 
     /**
      * @required
@@ -63,10 +64,7 @@ class ProdutoBusiness
 
             $sqlTitulo = $apenasProdutosComTitulo ? 'AND p.titulo IS NOT NULL AND trim(p.titulo) != \'\'' : '';
 
-            $qryProdutos = $conn->query('SELECT p.*, u.label as unidade FROM vw_rdp_est_produto p, est_unidade_produto u WHERE p.unidade_produto_id = u.id ' . $sqlTitulo . ' ORDER BY id');
-
-            $qryAtributosProduto = $conn->prepare('SELECT a.id, a.label, a.tipo, a.config, a.descricao, pa.valor FROM est_atributo a, est_produto_atributo pa WHERE pa.atributo_id = a.id AND pa.produto_id = :produto_id ORDER BY pa.ordem');
-
+            $qryProdutos = $conn->query('SELECT p.* FROM est_produto p WHERE true ' . $sqlTitulo . ' ORDER BY id');
 
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
@@ -129,22 +127,31 @@ class ProdutoBusiness
 
             $dados[] = $titulos;
 
+            /** @var AppConfigRepository $repoAppConfig */
+            $repoAppConfig = $this->doctrine->getRepository(AppConfig::class);
+            $jsonMetadata = json_decode($repoAppConfig->findOneBy(
+                [
+                    'appUUID' => $_SERVER['CROSIERAPPRADX_UUID'],
+                    'chave' => 'est_produto_json_metadata'
+                ]
+            )->getValor(), true);
+
+
+            /** @var Produto $produto */
             while ($produto = $qryProdutos->fetch()) {
                 $qtdeProdutos++;
 
-                $atributosProduto = [];
-                $qryAtributosProduto->bindValue('produto_id', $produto['id']);
-                $qryAtributosProduto->execute();
-                while ($atributo = $qryAtributosProduto->fetch()) {
-                    if ($atributo['tipo'] === 'COMPO') {
-                        $subcampos = explode('|', $atributo['valor']);
-                        $subCampo_configs = explode('|', $atributo['config']);
-                        foreach ($subcampos as $key => $subcampo) {
-                            $labelSubCampoConfigs = explode(',', $subCampo_configs[$key]);
-                            $atributosProduto[$atributo['label'] . '_' . $labelSubCampoConfigs[0]] = $subcampo;
+                foreach ($jsonMetadata as $nomeDoCampo => $jsonMetadatum) {
+                    $val = $produto->jsonData[$jsonMetadatum[$nomeDoCampo]] ?? '';
+                    if ($jsonMetadatum['tipo'] === 'compo') {
+                        $subcampos = explode('|', $val);
+                        $subCampo_configs = explode('|', $jsonMetadatum['formato']);
+                        foreach ($subcampos as $k => $subcampo) {
+                            $cfg = explode(',', $subCampo_configs[$k]);
+                            $atributosProduto[$nomeDoCampo . '_' . $cfg[0]] = $subcampo;
                         }
                     } else {
-                        $atributosProduto[$atributo['label']] = $atributo['valor'];
+                        $atributosProduto[$nomeDoCampo] = $val;
                     }
                 }
 
@@ -161,57 +168,52 @@ class ProdutoBusiness
                 $r[] = $produto['grupo_codigo'] . ' - ' . $produto['grupo_nome'];
                 $r[] = $produto['subgrupo_codigo'] . ' - ' . $produto['subgrupo_nome'];
                 $r[] = $produto['fornecedor_nome'];
-                $r[] = $atributosProduto['Preço Tabela'] ?? '';
-                $r[] = $atributosProduto['Preço Site'] ?? '';
-                $r[] = $atributosProduto['Preço Atacado'] ?? '';
-                $r[] = $atributosProduto['Preço Acessórios'] ?? '';
+                $r[] = $atributosProduto['preco_tabela'] ?? '';
+                $r[] = $atributosProduto['preco_site'] ?? '';
+                $r[] = $atributosProduto['preco_atacado'] ?? '';
+                $r[] = $atributosProduto['preco_acessorios'] ?? '';
                 $r[] = $produto['caracteristicas'] ? 'Sim' : 'Não';
-                $r[] = ($atributosProduto['Especificações Técnicas'] ?? null) ? 'Sim' : 'Não';
-                $r[] = ($atributosProduto['Itens Inclusos'] ?? null) ? 'Sim' : 'Não';
+                $r[] = ($atributosProduto['especif_tec'] ?? null) ? 'Sim' : 'Não';
+                $r[] = ($atributosProduto['itens_inclusos'] ?? null) ? 'Sim' : 'Não';
                 $r[] = $produto['ean'];
                 $r[] = $produto['referencia'];
-                $r[] = $atributosProduto['Marca'] ?? '';
-                $r[] = $atributosProduto['Vídeo'] ?? '';
-                $r[] = ($atributosProduto['Compatível com'] ?? null) ? 'Sim' : 'Não';
-                $r[] = $atributosProduto['Ano'] ?? '';
-                $r[] = $atributosProduto['Montadora'] ?? '';
-                $r[] = $atributosProduto['Modelos'] ?? '';
-                $r[] = $atributosProduto['Montadora (2)'] ?? '';
-                $r[] = $atributosProduto['Modelos (2)'] ?? '';
-                $r[] = $atributosProduto['Montadora (3)'] ?? '';
-                $r[] = $atributosProduto['Modelos (3)'] ?? '';
+                $r[] = $atributosProduto['marca'] ?? '';
+                $r[] = $atributosProduto['video_url'] ?? '';
+                $r[] = ($atributosProduto['compativel_com'] ?? null) ? 'Sim' : 'Não';
+                $r[] = $atributosProduto['ano'] ?? '';
+                $r[] = $atributosProduto['montadora'] ?? '';
+                $r[] = $atributosProduto['modelos'] ?? '';
+                $r[] = $atributosProduto['montadora_2'] ?? '';
+                $r[] = $atributosProduto['modelos_2'] ?? '';
+                $r[] = $atributosProduto['montadora_3'] ?? '';
+                $r[] = $atributosProduto['modelos_3'] ?? '';
                 $r[] = $produto['status'];
-                $r[] = $atributosProduto['Dimensões_A'] ?? '';
-                $r[] = $atributosProduto['Dimensões_L'] ?? '';
-                $r[] = $atributosProduto['Dimensões_C'] ?? '';
-                $r[] = $atributosProduto['Peso'] ?? '';
+                $r[] = $atributosProduto['dimensoes_A'] ?? '';
+                $r[] = $atributosProduto['dimensoes_L'] ?? '';
+                $r[] = $atributosProduto['dimensoes_C'] ?? '';
+                $r[] = $atributosProduto['peso'] ?? '';
                 $r[] = $produto['qtde_imagens'] ?? '';
-                $r[] = $atributosProduto['Integr E-commerce'] ?? '';
-                $r[] = $produto['codigo_from'];
+                $r[] = $atributosProduto['integr_ecommerce'] ?? '';
+                $r[] = $produto['erp_codigo'];
                 $r[] = $produto['ncm'];
-                $r[] = $atributosProduto['Preço Custo'] ?? '';
-                $r[] = $atributosProduto['ST'] ?? '';
-                $r[] = $atributosProduto['ICMS'] ?? '';
-                $r[] = $atributosProduto['IPI'] ?? '';
-                $r[] = $atributosProduto['PIS'] ?? '';
-                $r[] = $atributosProduto['COFINS'] ?? '';
-                $r[] = $atributosProduto['Dt Últ Saída'] ?? '';
-                $r[] = $atributosProduto['Dt Últ Entrada'] ?? '';
+                $r[] = $atributosProduto['preco_custo'] ?? '';
+                $r[] = $atributosProduto['st'] ?? '';
+                $r[] = $atributosProduto['icms'] ?? '';
+                $r[] = $atributosProduto['ipi'] ?? '';
+                $r[] = $atributosProduto['pis'] ?? '';
+                $r[] = $atributosProduto['cofins'] ?? '';
+                $r[] = $atributosProduto['dt_ult_saida'] ?? '';
+                $r[] = $atributosProduto['dt_ult_entrada'] ?? '';
 
-                $r[] = $atributosProduto['Estoque "Matriz"'] ?? '';
-                $r[] = $atributosProduto['Estoque "Acessórios"'] ?? '';
-                $r[] = $atributosProduto['Estoque Total'] ?? '';
+                $r[] = $atributosProduto['qtde_estoque_matriz'] ?? '';
+                $r[] = $atributosProduto['qtde_estoque_acessorios'] ?? '';
+                $r[] = $atributosProduto['qtde_estoque_total'] ?? '';
 
                 $dados[] = $r;
                 $this->logger->info($linha++ . ' escrita(s)');
             }
 
             $sheet->fromArray($dados);
-            //        foreach ($todos as $produto) {
-            //
-            //        }
-
-            // array_map('unlink', glob($_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL'] . '*.xlsx'));
             $writer = new Xlsx($spreadsheet);
             $nomeArquivo = StringUtils::guidv4() . '_produtos.xlsx';
             $outputFile = $_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL'] . $nomeArquivo;
@@ -481,8 +483,9 @@ class ProdutoBusiness
      * @param array $produto
      * @param int $atributoId
      * @param int $ordem
+     * @param string $aba
      * @return bool
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     private function insereAtributoSeProdutoAindaNaoTem(array $produto, int $atributoId, int $ordem, string $aba): bool
     {
