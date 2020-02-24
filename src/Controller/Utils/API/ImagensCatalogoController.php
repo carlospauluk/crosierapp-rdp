@@ -5,6 +5,7 @@ namespace App\Controller\Utils\API;
 
 use App\Entity\Estoque\Produto;
 use App\Entity\Estoque\ProdutoImagem;
+use App\EntityHandler\Estoque\ProdutoEntityHandler;
 use App\EntityHandler\Estoque\ProdutoImagemEntityHandler;
 use App\Repository\Estoque\ProdutoRepository;
 use CrosierSource\CrosierLibBaseBundle\Controller\BaseController;
@@ -132,7 +133,19 @@ class ImagensCatalogoController extends BaseController
                         $produtoImagem->setImageFile($file);
                         // $produtoImagem->setImageName($foto);
                         $produtoImagem->setProduto($produto);
-                        $produtoImagemEntityHandler->save($produtoImagem);
+                        /** @var ProdutoImagem $produtoImagem */
+                        $produtoImagem = $produtoImagemEntityHandler->save($produtoImagem);
+
+
+                        $json_data = json_encode([
+                          'qtde_imagens' => $produto->imagens->count() + 1,
+                          'imagem1' => $produtoImagem->getImageName()
+                        ]);
+
+                        $json_data = 'JSON_MERGE_PATCH(json_data,\'' . $json_data . '\')';
+                        
+                        $conn->exec('UPDATE est_produto SET json_data = ' . $json_data . ' WHERE id = ' . $produto->getId());
+
                         $this->getLogger()->info('OK');
                     }
                 } catch (\Exception $e) {
