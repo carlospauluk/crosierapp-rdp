@@ -193,6 +193,7 @@ class ProdutoAuxController extends FormListController
     {
         // @Route("/est/produto/migrar", name="est_produto_migrar")
         try {
+            $this->logger->error('not an error');
             /** @var Connection $conn */
             $conn = $this->getDoctrine()->getConnection();
             $conn->beginTransaction();
