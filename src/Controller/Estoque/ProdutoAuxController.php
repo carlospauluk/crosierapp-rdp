@@ -198,7 +198,7 @@ class ProdutoAuxController extends FormListController
             $conn = $this->getDoctrine()->getConnection();
             $conn->beginTransaction();
 
-            $produtos = $conn->fetchAll('SELECT p.*, u.label as unidade FROM vw_rdp_est_produto p, est_unidade_produto u WHERE p.id = 57 AND p.unidade_produto_id = u.id ORDER BY id ');
+            $produtos = $conn->fetchAll('SELECT p.*, u.label as unidade FROM vw_rdp_est_produto p, est_unidade_produto u WHERE p.unidade_produto_id = u.id ORDER BY id ');
 
             // $json_metadata = $conn->fetchAssoc('SELECT valor FROM cfg_app_config WHERE chave = :chave', ['chave' => 'est_produto_json_metadata']);
 
