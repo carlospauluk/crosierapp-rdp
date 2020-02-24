@@ -181,7 +181,7 @@ class ProdutoAuxController extends FormListController
 
 
     /**
-     *
+     * @Route("/est/produto/migrar", name="est_produto_migrar")
      *
      * @param Request $request
      * @return Response
@@ -197,11 +197,13 @@ class ProdutoAuxController extends FormListController
             $conn = $this->getDoctrine()->getConnection();
             $conn->beginTransaction();
 
-            $produtos = $conn->fetchAll('SELECT p.*, u.label as unidade FROM vw_rdp_est_produto p, est_unidade_produto u WHERE p.unidade_produto_id = u.id ORDER BY id ');
+            $produtos = $conn->fetchAll('SELECT p.*, u.label as unidade FROM vw_rdp_est_produto p, est_unidade_produto u WHERE p.id = 57 AND p.unidade_produto_id = u.id ORDER BY id ');
 
             // $json_metadata = $conn->fetchAssoc('SELECT valor FROM cfg_app_config WHERE chave = :chave', ['chave' => 'est_produto_json_metadata']);
 
-            $qryAtributosProduto = $conn->prepare('SELECT a.id, a.label, a.tipo, a.config, a.descricao, pa.valor FROM est_atributo a LEFT JOIN est_produto_atributo pa ON pa.atributo_id = a.id WHERE pa.produto_id = :produto_id ORDER BY pa.ordem');
+            $qryAtributosProduto = $conn->prepare('SELECT a.id, a.label, a.tipo, a.config, a.descricao, pa.valor 
+                FROM est_atributo a LEFT JOIN est_produto_atributo pa ON pa.atributo_id = a.id 
+                WHERE pa.produto_id = :produto_id ORDER BY pa.ordem');
 
             $linha = 2;
             $qtdeProdutos = 0;

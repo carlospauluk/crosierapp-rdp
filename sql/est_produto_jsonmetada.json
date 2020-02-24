@@ -12,21 +12,21 @@
       ]
     },
     "depto_codigo": {
-      "tipo": "int"
+      "tipo": "string"
     },
     "depto_nome": {
       "label": "Depto",
       "tipo": "string"
     },
     "grupo_codigo": {
-      "tipo": "int"
+      "tipo": "string"
     },
     "grupo_nome": {
       "label": "Grupo",
       "tipo": "string"
     },
     "subgrupo_codigo": {
-      "tipo": "int"
+      "tipo": "string"
     },
     "subgrupo_nome": {
       "label": "Subgrupo",

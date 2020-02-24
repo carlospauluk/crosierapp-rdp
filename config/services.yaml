@@ -26,3 +26,10 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Utils\Estoque\VichUploaderProdutoDirectoryNamer:
+        public: false
+
+    app.utils.estoque.vich_uploader_produto_directory_namer:
+        alias: App\Utils\Estoque\VichUploaderProdutoDirectoryNamer
+        public: true
