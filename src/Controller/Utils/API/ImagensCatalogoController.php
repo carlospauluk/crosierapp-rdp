@@ -111,6 +111,7 @@ class ImagensCatalogoController extends BaseController
             $conn = $this->getDoctrine()->getConnection();
             $todos = $conn->fetchAll('SELECT id, json_data->>"$.erp_codigo" as recnum FROM est_produto');
             $client = new Client();
+            $this->getLogger()->error('SOH ATIVANDO O LOG');
             foreach ($todos as $r) {
                 try {
                     $urlAPICatalogo = $_SERVER['URL_API_CATALOGO'] . $r['recnum'];
@@ -118,10 +119,11 @@ class ImagensCatalogoController extends BaseController
                     $json = json_decode($response, true);
                     $foto = $json['fotos'][0] ?? null;
                     if ($foto) {
+                        $this->getLogger()->info('Baixando foto para produtoId = ' . $r['id']);
                         /** @var Produto $produto */
                         $produto = $repoProduto->find($r['id']);
                         $urlFoto = $_SERVER['URL_FOTOS_CATALOGO'] . $foto;
-
+                        $this->getLogger()->info('url = ' . $urlFoto);
                         file_put_contents(sys_get_temp_dir() . '/' . $foto, file_get_contents($urlFoto));
 
                         $file = new UploadedFile(sys_get_temp_dir() . '/' . $foto, $foto, null, null, true);
@@ -131,7 +133,7 @@ class ImagensCatalogoController extends BaseController
                         // $produtoImagem->setImageName($foto);
                         $produtoImagem->setProduto($produto);
                         $produtoImagemEntityHandler->save($produtoImagem);
-                        @unlink(sys_get_temp_dir() . '/' . $foto);
+                        $this->getLogger()->info('OK');
                     }
                 } catch (\Exception $e) {
                     $this->getLogger()->error('Erro ao obter imagem em ' . $urlAPICatalogo);
