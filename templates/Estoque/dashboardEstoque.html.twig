@@ -103,20 +103,13 @@
                                             <tr>
                                                 <td>%</td>
                                                 <td class="text-right">Qtde Produtos</td>
-                                                <td class="text-right"></td>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            {% for i, qtde in porcentPreench %}
+                                            {% for pp in porcentPreench %}
                                                 <tr>
-                                                    <td>Entre {{ i }}% e {{ i+9 }}%</td>
-                                                    <td class="text-right">{{ qtde }}</td>
-                                                    <td class="text-right">
-                                                        <a role="button" class="btn btn-sm btn-outline-info"
-                                                           href="{{ url('est_produto_list', {'filter' : {'porcentPreench' : {'i': i, 'f' : i+10}}}) }}">
-                                                            <i class="fas fa-th-list"></i>
-                                                        </a>
-                                                    </td>
+                                                    <td>{{ pp.msg }}</td>
+                                                    <td class="text-right">{{ pp.qtde }}</td>
                                                 </tr>
                                             {% endfor %}
                                             </tbody>

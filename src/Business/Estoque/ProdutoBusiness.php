@@ -62,9 +62,9 @@ class ProdutoBusiness
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
 
-            $sqlTitulo = $apenasProdutosComTitulo ? 'AND p.json_data->>"$.titulo" IS NOT NULL AND trim(p.json_data->>"$.titulo") != \'\'' : '';
+            $sqlTitulo = $apenasProdutosComTitulo ? 'AND IFNULL(p.json_data->>"$.titulo",\'null\') != \'null\'' : '';
 
-            $qryProdutos = $conn->query('SELECT p.* FROM est_produto p WHERE true ' . $sqlTitulo . ' ORDER BY id');
+            $produtos = $conn->fetchAll('SELECT p.* FROM est_produto p WHERE true ' . $sqlTitulo . ' ORDER BY id');
 
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
@@ -138,7 +138,7 @@ class ProdutoBusiness
 
 
             /** @var Produto $produto */
-            while ($produto = $qryProdutos->fetch()) {
+            foreach ($produtos as $produto) {
                 $qtdeProdutos++;
                 $atributosProduto = [];
 

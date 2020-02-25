@@ -143,40 +143,37 @@ class ProdutoAuxController extends FormListController
      * @IsGranted("ROLE_ESTOQUE", statusCode=403)
      * @throws \Exception
      */
-    public function dashboardEstoque(Request $request): Response
+    public function dashboardEstoque(Request $request, Connection $conn): Response
     {
         $hoje = (new \DateTime())->format('d/m/Y');
 
-        /** @var ProdutoRepository $repoProdutos */
-        $repoProdutos = $this->getDoctrine()->getRepository(Produto::class);
-
-        $deptos = $repoProdutos->findDeptos();
+        $deptos = $conn->fetchAll('SELECT distinct(json_data->>"$.depto_nome") as deptoNome FROM est_produto ORDER BY json_data->>"$.depto_nome"');
 
         foreach ($deptos as $depto) {
-            $qtde = $repoProdutos->count(['nomeDepto' => $depto['deptoNome']]);
-            $params['deptos'][$depto['deptoNome']] = $qtde;
+            $qtde = $conn->fetchAssoc('SELECT count(*) as qtde FROM est_produto WHERE json_data->>"$.depto_nome" = :depto_nome', ['depto_nome' => $depto['deptoNome']]);
+            $params['deptos'][$depto['deptoNome']] = $qtde['qtde'];
         }
 
+        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 0 e 10%\' as msg, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0 AND 0.10999999999');
+        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 11 e 20%\' as msg, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.11 AND 0.20999999999');
+        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 21 e 30%\' as msg, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.21 AND 0.30999999999');
+        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 31 e 40%\' as msg, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.31 AND 0.40999999999');
+        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 41 e 50%\' as msg, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.41 AND 0.50999999999');
+        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 51 e 60%\' as msg, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.51 AND 0.60999999999');
+        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 61 e 70%\' as msg, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.61 AND 0.70999999999');
+        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 71 e 80%\' as msg, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.71 AND 0.80999999999');
+        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 81 e 90%\' as msg, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.81 AND 0.90999999999');
+        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 91 e 100%\' as msg, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.91 AND 1.0');
 
-        $qtde = $repoProdutos->doCountByFiltersSimpl([['porcentPreench', 'EQ', 0]]);
-        $params['porcentPreench'][0] = $qtde;
-        for ($i = 1; $i < 100; $i += 10) {
-            $qtde = $repoProdutos->doCountByFiltersSimpl([['porcentPreench', 'BETWEEN', [$i / 100, ($i + 9) / 100]]]);
-            $params['porcentPreench'][$i] = $qtde;
-        }
+        $qtdeProdutosComTitulo = $conn->fetchAssoc('SELECT count(*) as qtde FROM est_produto WHERE json_data->>"$.titulo" != \'null\' AND trim(json_data->>"$.titulo") != \'\'');
+        $params['qtdeProdutosComTitulo'] = $qtdeProdutosComTitulo['qtde'];
 
-
-        $qtdeProdutosComTitulo = $repoProdutos->doCountByFiltersSimpl([['titulo', 'IS_NOT_EMPTY']]);
-        $params['qtdeProdutosComTitulo'] = $qtdeProdutosComTitulo;
-
-
-        $qtdeProdutosComTituloESemFoto = $repoProdutos->doCountByFiltersSimpl([['titulo', 'IS_NOT_EMPTY'], ['qtdeImagens', 'EQ', 0]]);
-        $params['qtdeProdutosComTituloESemFoto'] = $qtdeProdutosComTituloESemFoto;
+        $qtdeProdutosComTituloESemFoto = $conn->fetchAssoc('SELECT count(*) as qtde FROM est_produto WHERE json_data->>"$.titulo" != \'null\' AND trim(json_data->>"$.titulo") != \'\' AND IFNULL(json_data->>"$.qtde_imagens", 0) = 0');
+        $params['qtdeProdutosComTituloESemFoto'] = $qtdeProdutosComTituloESemFoto['qtde'];
 
         $params['hoje'] = $hoje;
 
         return $this->doRender('/Estoque/dashboardEstoque.html.twig', $params);
-
     }
 
 
