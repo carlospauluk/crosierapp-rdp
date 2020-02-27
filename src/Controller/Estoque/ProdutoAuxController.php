@@ -138,10 +138,11 @@ class ProdutoAuxController extends FormListController
      *
      * @Route("/est/produto/dashboard", name="est_produto_dashboard")
      * @param Request $request
+     * @param Connection $conn
      * @return Response
      *
+     * @throws DBALException
      * @IsGranted("ROLE_ESTOQUE", statusCode=403)
-     * @throws \Exception
      */
     public function dashboardEstoque(Request $request, Connection $conn): Response
     {

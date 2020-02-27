@@ -3,7 +3,8 @@
     "unidade": {
       "label": "Unidade",
       "tipo": "select",
-      "opcoes": [
+      "class": "s2allownew",
+      "sugestoes": [
         "PC",
         "KIT",
         "PAR",
@@ -198,38 +199,46 @@
     "marca": {
       "label": "Marca",
       "notuppercase": true,
-      "tipo": "string"
+      "tipo": "select",
+      "class": "s2allownew notuppercase",
+      "sugestoes": []
     },
     "montadora": {
       "label": "Montadora",
       "notuppercase": true,
       "tipo": "tags",
+      "sugestoes": [],
       "soma_preench": 5
     },
     "modelos": {
       "label": "Modelos",
       "notuppercase": true,
       "tipo": "tags",
+      "sugestoes": [],
       "soma_preench": 5
     },
     "montadora_2": {
       "label": "Montadora (2)",
       "notuppercase": true,
+      "sugestoes": [],
       "tipo": "tags"
     },
     "modelos_2": {
       "label": "Modelos (2)",
       "notuppercase": true,
+      "sugestoes": [],
       "tipo": "tags"
     },
     "montadora_3": {
       "label": "Montadora (3)",
       "notuppercase": true,
+      "sugestoes": [],
       "tipo": "tags"
     },
     "modelos_3": {
       "label": "Modelos (3)",
       "notuppercase": true,
+      "sugestoes": [],
       "tipo": "tags"
     },
     "qtde_estoque_acessorios": {
@@ -298,7 +307,8 @@
   },
   "abas": {
     "Produto": [
-      "unidade"
+      "unidade",
+      "marca"
     ],
     "Descritivos": [
       "caracteristicas",
@@ -308,7 +318,6 @@
     ],
     "Complementos": [
       "ano",
-      "marca",
       "montadora",
       "modelos",
       "montadora_2",
