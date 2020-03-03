@@ -62,6 +62,28 @@ class ProdutoAuxController extends FormListController
     }
 
     /**
+     *
+     * @Route("/est/produto/exportarCSV/", name="est_produto_exportarCSV")
+     * @param Request $request
+     * @return Response
+     * @IsGranted("ROLE_ESTOQUE", statusCode=403)
+     */
+    public function exportarCSV(Request $request): Response
+    {
+        $params = [];
+        try {
+            $apenasProdutosComTitulo = filter_var($request->get('apenasProdutosComTitulo') ?? true, FILTER_VALIDATE_BOOLEAN);
+            $nomeArquivo = 'produtos.xlsx';
+            $outputFile = $_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL'] . $nomeArquivo;
+            @unlink($outputFile);
+            $params = $this->produtoBusiness->gerarCSV($apenasProdutosComTitulo);
+        } catch (ViewException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+        return $this->doRender('Estoque/excelProdutos.html.twig', $params);
+    }
+
+    /**
      * @param array $params
      * @return array
      */

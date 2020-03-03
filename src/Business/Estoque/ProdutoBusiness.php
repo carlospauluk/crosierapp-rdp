@@ -51,13 +51,14 @@ class ProdutoBusiness
 
 
     /**
+     * Gera os dados tanto para Excel quanto para CSV.
+     *
      * @param bool $apenasProdutosComTitulo
      * @return array
      * @throws ViewException
      */
-    public function gerarExcel(bool $apenasProdutosComTitulo): array
+    private function gerarDadosParaArquivo(bool $apenasProdutosComTitulo): array
     {
-
         try {
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
@@ -65,9 +66,6 @@ class ProdutoBusiness
             $sqlTitulo = $apenasProdutosComTitulo ? 'AND IFNULL(p.json_data->>"$.titulo",\'null\') != \'null\'' : '';
 
             $produtos = $conn->fetchAll('SELECT p.* FROM est_produto p WHERE true ' . $sqlTitulo . ' ORDER BY id');
-
-            $spreadsheet = new Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
 
             $titulos[] = 'Atualizado';
             $titulos[] = 'Código';
@@ -214,18 +212,73 @@ class ProdutoBusiness
                 $this->logger->info($linha++ . ' escrita(s)');
             }
 
+            return $dados;
+        } catch (Exception | DBALException $e) {
+            $this->logger->error('Erro ao gerar arquivo xlsx');
+            $this->logger->error($e->getMessage());
+            throw new ViewException('Erro ao gerar arquivo xlsx');
+        }
+    }
+
+    /**
+     * @param bool $apenasProdutosComTitulo
+     * @return array
+     * @throws ViewException
+     */
+    public function gerarExcel(bool $apenasProdutosComTitulo): array
+    {
+
+        try {
+            $dados = $this->gerarDadosParaArquivo($apenasProdutosComTitulo);
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
             $sheet->fromArray($dados);
             $writer = new Xlsx($spreadsheet);
             $nomeArquivo = StringUtils::guidv4() . '_produtos.xlsx';
             $outputFile = $_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL'] . $nomeArquivo;
             $writer->save($outputFile);
             $params['arquivo'] = $_SERVER['CROSIERAPPRDP_URL'] . $_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL_DOWNLOAD'] . $nomeArquivo;
-            $params['qtdeProdutos'] = $qtdeProdutos;
+            $params['qtdeProdutos'] = count($dados) - 1;
             return $params;
-        } catch (Exception | DBALException $e) {
+        } catch (\Exception $e) {
+            if ($e instanceof ViewException) {
+                throw $e;
+            }
             $this->logger->error('Erro ao gerar arquivo xlsx');
             $this->logger->error($e->getMessage());
             throw new ViewException('Erro ao gerar arquivo xlsx');
+        }
+    }
+
+    /**
+     * @param bool $apenasProdutosComTitulo
+     * @return array
+     * @throws ViewException
+     */
+    public function gerarCSV(bool $apenasProdutosComTitulo): array
+    {
+        try {
+            $dados = $this->gerarDadosParaArquivo($apenasProdutosComTitulo);
+
+            $nomeArquivo = StringUtils::guidv4() . '_produtos.csv';
+            $outputFile = $_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL'] . $nomeArquivo;
+
+            $fp = fopen($outputFile, 'w');
+            foreach ($dados as $linha) {
+                fputcsv($fp, $linha);
+            }
+            fclose($fp);
+
+            $params['arquivo'] = $_SERVER['CROSIERAPPRDP_URL'] . $_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL_DOWNLOAD'] . $nomeArquivo;
+            $params['qtdeProdutos'] = count($dados) - 1;
+            return $params;
+        } catch (\Exception $e) {
+            if ($e instanceof ViewException) {
+                throw $e;
+            }
+            $this->logger->error('Erro ao gerar arquivo CSV');
+            $this->logger->error($e->getMessage());
+            throw new ViewException('Erro ao gerar arquivo CSV');
         }
     }
 
