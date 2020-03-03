@@ -20,14 +20,14 @@ function getDatatablesColumns() {
             title: 'Código'
         },
         {
-            name: 'e.titulo',
+            name: 'e.jsonData.titulo',
             data: 'e',
             title: 'Título',
             render: function (data, type, row) {
                 let s = '<div class="float-left">' +
-                    (data.jsonData.titulo ? data.jsonData.titulo : '<span style="font-size: small; font-style: italic; color: grey">' + data.nome + '</span>') +
+                    (data.jsonData && data.jsonData.titulo ? data.jsonData.titulo : '<span style="font-size: small; font-style: italic; color: grey">' + data.nome + '</span>') +
                     '</div>';
-                if (data.jsonData.imagem1) {
+                if (data.jsonData && data.jsonData.imagem1) {
                     s += '<div class="float-right">' +
                         '<img src="' + crosierappradx_url + '/images/produtos/' + data.deptoId + '/' + data.grupoId + '/' + data.subgrupoId + '/' + data.jsonData.imagem1 + '" width="50px"/></div>';
                 }

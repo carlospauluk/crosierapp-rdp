@@ -21,6 +21,7 @@
     "ext-simplexml": "*",
     "ext-soap": "*",
     "ext-zip": "*",
+    "ext-zlib": "*",
     "vich/uploader-bundle": "^1.9",
     "phpoffice/phpspreadsheet": "^1.9",
     "dompdf/dompdf": "^0.8.3",
