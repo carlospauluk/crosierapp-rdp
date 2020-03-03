@@ -28,17 +28,13 @@ use Symfony\Contracts\Cache\ItemInterface;
 class RelEstoque01Business
 {
 
-    /** @var EntityManagerInterface */
-    private $doctrine;
+    private EntityManagerInterface $doctrine;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var AppConfigEntityHandler */
-    private $appConfigEntityHandler;
+    private AppConfigEntityHandler $appConfigEntityHandler;
 
-    /** @var array */
-    private $ids;
+    private array $ids;
 
     /**
      * @param EntityManagerInterface $doctrine
@@ -60,6 +56,7 @@ class RelEstoque01Business
         /** @var Connection $conn */
         $conn = $this->doctrine->getConnection();
         $this->ids = [];
+        // Aqui é pego o depto, grupo e subgrupo 'INDEFINIDO', pois não temos vinculação a princípio.
         $this->ids['depto'] = $conn->fetchAssoc('SELECT id FROM est_depto WHERE uuid = \'54d9b263-1ac1-11ea-aa1a-02f5eec21cc2\'')['id'];
         $this->ids['grupo'] = $conn->fetchAssoc('SELECT id FROM est_grupo WHERE uuid = \'b111cb42-1ac1-11ea-aa1a-02f5eec21cc2\'')['id'];
         $this->ids['subgrupo'] = $conn->fetchAssoc('SELECT id FROM est_subgrupo WHERE uuid = \'ee784eec-1ac1-11ea-aa1a-02f5eec21cc2\'')['id'];
@@ -75,7 +72,6 @@ class RelEstoque01Business
         $files = scandir($pastaFila, 0);
         foreach ($files as $file) {
             if (!in_array($file, array('.', '..'))) {
-
                 try {
                     $this->processarArquivo($file);
                     $this->marcarDtHrAtualizacao();
@@ -106,17 +102,10 @@ class RelEstoque01Business
 
         $conn->beginTransaction();
 
-
         $t = 0;
         $linha = null;
         try {
-
-            $qryProdutos = $conn->query('SELECT * FROM est_produto');
-
-            while ($produto = $qryProdutos->fetch()) {
-                $estProdutos[$produto['codigo_from']] = $produto['id'];
-            }
-
+            $camposAgrupados = [];
             $conn->executeUpdate('SET FOREIGN_KEY_CHECKS=0;TRUNCATE TABLE rdp_rel_estoque01;');
             for ($i = 1; $i < $totalRegistros; $i++) {
                 $linha = $linhas[$i];
@@ -126,8 +115,8 @@ class RelEstoque01Business
                 $linha = $linha[-1] === '|' ? substr($linha, 0, -1) : $linha;
 
                 $campos = explode('|', $linha);
-                if (count($campos) !== 11) {
-                    throw new ViewException('Qtde de campos difere de 11 para a linha "' . $linha . '" (qtde: ' . count($campos) . ')');
+                if (count($campos) !== 13) {
+                    throw new ViewException('Qtde de campos difere de 13 para a linha "' . $linha . '" (qtde: ' . count($campos) . ')');
                 }
 
                 if ($campos[8] ?: false) {
@@ -139,7 +128,7 @@ class RelEstoque01Business
                     $campos[$c] = trim($campos[$c]) !== '' ? "'" . trim(str_replace("'", "''", $campos[$c])) . "'" : 'null';
                 }
 
-                // CODIGO|DESCRICAO|CUSTO_MEDIO|PRECO_VENDA|FILIAL|QTDE_MINIMA|QTDE_MAXIMA|QTDE_ATUAL|DATA_ULT_SAIDA|CODIGO_FORNECEDOR|FORNECEDOR
+                // CODIGO|DESCRICAO|CUSTO_MEDIO|PRECO_VENDA|FILIAL|QTDE_MINIMA|QTDE_MAXIMA|QTDE_ATUAL|DATA_ULT_SAIDA|CODIGO_FORNECEDOR|FORNECEDOR|RECNUM|COD_EDI
 
                 $sql = sprintf(
                     'INSERT INTO rdp_rel_estoque01 (
@@ -155,12 +144,14 @@ class RelEstoque01Business
                             deficit,  
                             dt_ult_saida,  
                             cod_fornec,   
-                            nome_fornec,   
+                            nome_fornec,
+                               recnum,
+                               cod_edi,
                             estabelecimento_id,inserted,updated,user_inserted_id,user_updated_id
                         )
-                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
+                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
                     $campos[0],
-                    $campos[1],
+                    mb_convert_encoding($campos[1], 'ISO-8859-1', 'UTF-8'),
                     $campos[2],
                     $campos[3],
                     $campos[4],
@@ -170,24 +161,60 @@ class RelEstoque01Business
                     'DEFAULT',
                     $campos[8],
                     $campos[9],
-                    $campos[10]
+                    mb_convert_encoding($campos[10], 'ISO-8859-1', 'UTF-8'),
+                    $campos[11],
+                    mb_convert_encoding($campos[12], 'ISO-8859-1', 'UTF-8'),
                 );
 
                 try {
                     $t += $conn->executeUpdate($sql);
-                    $this->logger->info($t . ' inseridos');
                 } catch (\Exception $e) {
-                    $this->logger->info('Erro ao inserir a linha "' . $linha . '"');
-                    $this->logger->info('Continuando.');
+                    $this->logger->info('Erro ao inserir a linha "' . $linha . '". Continuando...');
                 }
 
-                if (!isset($estProdutos[str_replace("'", '', $campos[0])])) {
-                    $produtoId = $this->handleNaEstProduto($campos);
-                    $estProdutos[str_replace("'", '', $campos[0])] = $produtoId;
-                }
 
+                try {
+                    $dtUltSaida = $campos[8] ? DateTimeUtils::parseDateStr($campos[8])->format('Y-m-d') : null;
+                } catch (\Exception $e) {
+                    $dtUltSaida = null;
+                }
+                $linhaExploded = explode('|', $linha);
+                $codigo = trim($linhaExploded[0]);
+                $camposAgrupados[$codigo] = isset($camposAgrupados[$codigo]) ? array_replace($camposAgrupados[$codigo], $linhaExploded) : $linhaExploded;
+                $filial = trim($camposAgrupados[$codigo][4]);
+                switch ($filial) {
+                    case 'MATRIZ':
+                        $camposAgrupados[$codigo]['qtde_estoque_matriz'] = $linhaExploded[7];
+                        $camposAgrupados[$codigo]['dt_ult_saida_matriz'] = $dtUltSaida;
+                        $camposAgrupados[$codigo]['erp_dt_ult_saida'] = $dtUltSaida; // está duplicado mesmo
+                        $camposAgrupados[$codigo]['preco_custo'] = $linhaExploded[2];
+                        $camposAgrupados[$codigo]['preco_tabela'] = $linhaExploded[3];
+                        break;
+                    case 'DELPOZO-PG':
+                        $camposAgrupados[$codigo]['qtde_estoque_delpozo'] = $linhaExploded[7];
+                        $camposAgrupados[$codigo]['dt_ult_saida_delpozo'] = $dtUltSaida;
+                        break;
+                    case 'ACESSORIOS':
+                        $camposAgrupados[$codigo]['qtde_estoque_acessorios'] = $linhaExploded[7];
+                        $camposAgrupados[$codigo]['dt_ult_saida_acessorios'] = $dtUltSaida;
+                        break;
+                    case 'TELEMACO':
+                        $camposAgrupados[$codigo]['qtde_estoque_telemaco'] = $linhaExploded[7];
+                        $camposAgrupados[$codigo]['dt_ult_saida_telemaco'] = $dtUltSaida;
+                        break;
+                    default:
+                        $this->logger->warning('FILIAL não reconhecida para atualização de qtde_estoque: ' . $linhaExploded[4]);
+                }
+                $this->logger->info('rdp_rel_estoque01: ' . $i . '/' . $totalRegistros);
             }
-            $this->logger->info($t . ' registros inseridos');
+
+            $totalCamposAgrupados = count($camposAgrupados);
+            $i = 0;
+            foreach ($camposAgrupados as $campoAgrupado) {
+                $this->handleNaEstProduto($campoAgrupado);
+                $this->logger->info('est_produto: ' . ++$i . '/' . $totalCamposAgrupados);
+            }
+
             $conn->commit();
             $this->logger->info('commit');
         } catch (\Throwable $e) {
@@ -216,72 +243,104 @@ class RelEstoque01Business
         try {
 
             foreach ($campos as $k => $v) {
-                // remove o que foi adicionado anteriormente
-                $campos[$k] = str_replace("'", '', $v);
+                $campos[$k] = trim(str_replace("'", '', $v));
             }
 
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
 
-            $this->logger->info('Produto novo na est_produto (' . $campos[0] . '). Inserindo...');
-            $produto['uuid'] = StringUtils::guidv4();
-            $produto['depto_id'] = $this->ids['depto'];
-            $produto['depto_codigo'] = '00';
-            $produto['depto_nome'] = 'INDEFINIDO';
-            $produto['grupo_id'] = $this->ids['grupo'];
-            $produto['grupo_codigo'] = '00';
-            $produto['grupo_nome'] = 'INDEFINIDO';
-            $produto['subgrupo_id'] = $this->ids['subgrupo'];
-            $produto['subgrupo_codigo'] = '00';
-            $produto['subgrupo_nome'] = 'INDEFINIDO';
+            $produto = $conn->fetchAssoc('SELECT * FROM est_produto WHERE json_data->>"$.erp_codigo" = :cod', ['cod' => $campos[0]]);
+            $updating = true;
+            $json_data_ORIG = null;
+            if (!$produto) {
+                $updating = false;
+                $produto = [];
+                $json_data = [];
+                $produto['uuid'] = StringUtils::guidv4();
+                $produto['depto_id'] = $this->ids['depto'];
+                $json_data['depto_codigo'] = '00';
+                $json_data['depto_nome'] = 'INDEFINIDO';
+                $produto['grupo_id'] = $this->ids['grupo'];
+                $json_data['grupo_codigo'] = '00';
+                $json_data['grupo_nome'] = 'INDEFINIDO';
+                $produto['subgrupo_id'] = $this->ids['subgrupo'];
+                $json_data['subgrupo_codigo'] = '00';
+                $json_data['subgrupo_nome'] = 'INDEFINIDO';
+                $json_data['erp_codigo'] = $campos[0];
 
-            $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE codigo = ?', [$campos[9]]);
-            if (!$fornecedor) {
-                unset($dadosFornecedor, $fornecedor);
-                $dadosFornecedor = [];
-                $dadosFornecedor['codigo'] = $campos[9];
-                $dadosFornecedor['nome'] = $campos[10];
-                $dadosFornecedor['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
-                $dadosFornecedor['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
-                $dadosFornecedor['version'] = 0;
-                $dadosFornecedor['estabelecimento_id'] = 1;
-                $dadosFornecedor['user_inserted_id'] = 1;
-                $dadosFornecedor['user_updated_id'] = 1;
-                $conn->insert('est_fornecedor', $dadosFornecedor);
-                $fornecedorId = $conn->lastInsertId();
-                $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE id = ?', [$fornecedorId]);
+                $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE codigo = ?', [$campos[9]]);
+                if (!$fornecedor) {
+                    unset($dadosFornecedor, $fornecedor);
+                    $dadosFornecedor = [];
+                    $dadosFornecedor['codigo'] = $campos[9];
+                    $dadosFornecedor['nome'] = $campos[10];
+                    $dadosFornecedor['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+                    $dadosFornecedor['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+                    $dadosFornecedor['version'] = 0;
+                    $dadosFornecedor['estabelecimento_id'] = 1;
+                    $dadosFornecedor['user_inserted_id'] = 1;
+                    $dadosFornecedor['user_updated_id'] = 1;
+                    $conn->insert('est_fornecedor', $dadosFornecedor);
+                    $fornecedorId = $conn->lastInsertId();
+                    $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE id = ?', [$fornecedorId]);
+                }
+
+                $produto['fornecedor_id'] = $fornecedor['id'];
+                $json_data['fornecedor_nome'] = $fornecedor['nome'];
+                $json_data['fornecedor_documento'] = $fornecedor['documento'];
+
+                $produto['nome'] = $campos[1];
+                $produto['status'] = 'INATIVO';
+                $produto['composicao'] = 'N';
+                $produto['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+
+                $produto['version'] = 0;
+                $produto['estabelecimento_id'] = 1;
+                $produto['user_inserted_id'] = 1;
+                $produto['user_updated_id'] = 1;
+            } else {
+                $json_data = json_decode($produto['json_data'], true);
+                $json_data_ORIG = json_decode($produto['json_data'], true);
             }
 
-            $produto['fornecedor_id'] = $fornecedor['id'];
-            $produto['fornecedor_nome'] = $fornecedor['nome'];
-            $produto['fornecedor_documento'] = $fornecedor['documento'];
+            $json_data['recnum'] = $campos[11];
+            $json_data['cod_edi'] = utf8_encode($campos[12]);
 
-            $produto['nome'] = $campos[1];
-            $produto['titulo'] = null;
-            $produto['caracteristicas'] = null;
-            $produto['ean'] = null;
-            $produto['referencia'] = null;
-            $produto['ncm'] = null;
-            $produto['status'] = 'INATIVO';
-            $produto['composicao'] = 'N';
-            $produto['obs'] = null;
-            $produto['codigo_from'] = $campos[0];
-            $produto['porcent_preench'] = null;
-            $produto['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+            $json_data['preco_custo'] = $campos[2];
+            $json_data['preco_tabela'] = $campos[3];
+
+            $json_data['qtde_estoque_matriz'] = $campos['qtde_estoque_matriz'] ?? null;
+            $json_data['dt_ult_saida_matriz'] = $campos['dt_ult_saida_matriz'] ?? null;
+            $json_data['erp_dt_ult_saida'] = $campos['erp_dt_ult_saida'] ?? null; // está duplicado mesmo
+            $json_data['qtde_estoque_delpozo'] = $campos['qtde_estoque_delpozo'] ?? null;
+            $json_data['dt_ult_saida_delpozo'] = $campos['dt_ult_saida_delpozo'] ?? null;
+            $json_data['qtde_estoque_acessorios'] = $campos['qtde_estoque_acessorios'] ?? null;
+            $json_data['dt_ult_saida_acessorios'] = $campos['dt_ult_saida_acessorios'] ?? null;
+            $json_data['qtde_estoque_telemaco'] = $campos['qtde_estoque_telemaco'] ?? null;
+            $json_data['dt_ult_saida_telemaco'] = $campos['dt_ult_saida_telemaco'] ?? null;
+
+            $produto['json_data'] = json_encode($json_data);
+
+            if (!$produto['json_data']) {
+                $this->logger->error('Erro ao gerar json_data para CODIGO = ' . $campos[0] . '. Continuando...');
+                $produto['json_data'] = null;
+            }
+
             $produto['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
-            $produto['version'] = 0;
-            $produto['estabelecimento_id'] = 1;
-            $produto['user_inserted_id'] = 1;
-            $produto['user_updated_id'] = 1;
-            $produto['unidade_produto_id'] = 1;
 
-            $conn->insert('est_produto', $produto);
+            if (!$updating) {
+                $conn->insert('est_produto', $produto);
+                $id = $conn->lastInsertId();
+            } else {
+                $id = $produto['id'];
+                if (strcmp($produto['json_data'], json_encode($json_data_ORIG)) !== 0) {
+                    $conn->update('est_produto', $produto, ['id' => $id]);
+                } else {
+                    $this->logger->info('Nada mudou para CODIGO = ' . $campos[0] . '. Continuando...');
+                }
 
-            // Já copia as configurações de atributos de um produto já montado
-            $id = $conn->lastInsertId();
-            $this->colarConfigs($id);
+            }
             return $id;
-
         } catch (\Throwable | DBALException $e) {
             $this->logger->error('Erro ao handleNaEstProduto');
             $this->logger->error($e->getMessage());

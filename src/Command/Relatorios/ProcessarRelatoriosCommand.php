@@ -3,7 +3,7 @@
 namespace App\Command\Relatorios;
 
 use App\Business\Estoque\ProdutoBusiness;
-use App\Business\Relatorios\RelCliente01Business;
+use App\Business\Relatorios\RelClientes01Business;
 use App\Business\Relatorios\RelCompFor01Business;
 use App\Business\Relatorios\RelCompras01Business;
 use App\Business\Relatorios\RelCtsPagRec01Business;
@@ -21,26 +21,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ProcessarRelatoriosCommand extends Command
 {
 
-    /** @var RelCtsPagRec01Business */
-    private $relCtsPagRec01Business;
+    private RelCtsPagRec01Business $relCtsPagRec01Business;
 
-    /** @var RelVendas01Business */
-    private $relVendas01Business;
+    private RelVendas01Business $relVendas01Business;
 
-    /** @var RelCompFor01Business */
-    private $relCompFor01Business;
+    private RelCompFor01Business $relCompFor01Business;
 
-    /** @var RelEstoque01Business */
-    private $relEstoque01Business;
+    private RelEstoque01Business $relEstoque01Business;
 
-    /** @var ProdutoBusiness */
-    private $produtoBusiness;
+    private ProdutoBusiness $produtoBusiness;
 
-    /** @var RelCompras01Business */
-    private $relCompras01Business;
+    private RelCompras01Business $relCompras01Business;
 
-    /** @var RelCliente01Business */
-    private $relCliente01Business;
+    private RelClientes01Business $relCliente01Business;
 
     /**
      * @required
@@ -98,9 +91,9 @@ class ProcessarRelatoriosCommand extends Command
 
     /**
      * @required
-     * @param RelCliente01Business $relCliente01Business
+     * @param RelClientes01Business $relCliente01Business
      */
-    public function setRelCliente01Business(RelCliente01Business $relCliente01Business): void
+    public function setRelCliente01Business(RelClientes01Business $relCliente01Business): void
     {
         $this->relCliente01Business = $relCliente01Business;
     }
@@ -135,7 +128,6 @@ class ProcessarRelatoriosCommand extends Command
                 break;
             case 'RELESTOQUE01':
                 $this->relEstoque01Business->processarArquivosNaFila();
-                $this->produtoBusiness->atualizarCamposEstoqueProdutoPelaRelEstoque01();
                 break;
             case 'RELCOMPRAS01':
                 $this->relCompras01Business->processarArquivosNaFila();
@@ -144,8 +136,9 @@ class ProcessarRelatoriosCommand extends Command
                 $this->relCliente01Business->processarArquivosNaFila();
                 break;
             default:
-                throw new \RuntimeException('tipoRelatorio desconhecido');
+                throw new \RuntimeException('tipoRelatorio desconhecido: ' . $tipoRelatorio);
         }
+        return 1;
     }
 
 }

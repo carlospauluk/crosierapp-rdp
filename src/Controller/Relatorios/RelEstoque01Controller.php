@@ -31,11 +31,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class RelEstoque01Controller extends FormListController
 {
 
-    /** @var SessionInterface */
-    private $session;
+    private SessionInterface $session;
 
-    /** @var RelEstoque01Business */
-    private $relEstoque01Business;
+    private RelEstoque01Business $relEstoque01Business;
 
     /**
      * @required

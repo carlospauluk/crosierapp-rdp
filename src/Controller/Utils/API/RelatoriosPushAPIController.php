@@ -7,10 +7,12 @@ use App\EntityHandler\Utils\RelatorioPushEntityHandler;
 use CrosierSource\CrosierLibBaseBundle\APIClient\CrosierEntityIdAPIClient;
 use CrosierSource\CrosierLibBaseBundle\Controller\BaseController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
+use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -21,16 +23,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class RelatoriosPushAPIController extends BaseController
 {
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var RelatorioPushEntityHandler */
-    private $relatorioPushEntityHandler;
+    private RelatorioPushEntityHandler $relatorioPushEntityHandler;
 
-    /** @var CrosierEntityIdAPIClient */
-    private $crosierEntityIdAPIClient;
+    private CrosierEntityIdAPIClient $crosierEntityIdAPIClient;
 
 
     /**
@@ -70,27 +67,50 @@ class RelatoriosPushAPIController extends BaseController
     {
         $this->logger->debug('Iniciando o upload...');
         $output = ['uploaded' => false];
-        if ($request->files->get('file') && $request->get('userDestinatarioId')) {
-            /** @var RelatorioPush $relatorioPush */
-            $relatorioPush = new RelatorioPush();
-            /** @var UploadedFile $file */
-            $file =$request->files->get('file');
-            $relatorioPush->setTipoArquivo($file->getMimeType());
-            $relatorioPush->setFile($file);
-            $relatorioPush->setDtEnvio(new \DateTime());
-            $relatorioPush->setUserDestinatarioId($request->get('userDestinatarioId'));
-            $relatorioPush->setDescricao($relatorioPush->getFile()->getClientOriginalName());
-            $this->relatorioPushEntityHandler->save($relatorioPush);
-            $this->push($relatorioPush);
-            $output['uploaded'] = true;
-        } else {
-            $this->logger->debug('file ou userDestinatarioId não informados');
-            $this->logger->debug('file: ' . $request->files->get('file'));
-            $this->logger->debug('userDestinatarioId: ' . $request->get('userDestinatarioId'));
 
+        $userDestinatarioId = $request->get('userDestinatarioId');
+        if (!$userDestinatarioId) {
+            $output['msg'] = 'userDestinatarioId N/D';
+            return new JsonResponse($output);
         }
-        return new JsonResponse($output);
 
+        $filename = $request->get('filename');
+        if (!$filename) {
+            $output['msg'] = 'filename N/D';
+            return new JsonResponse($output);
+        }
+
+        $rFile = $request->get('file');
+        if (!$rFile) {
+            $output['msg'] = 'file N/D';
+            return new JsonResponse($output);
+        }
+        $fileData = gzdecode(base64_decode($rFile));
+
+        $uuid = StringUtils::guidv4();
+        $extensao = pathinfo($filename, PATHINFO_EXTENSION);
+
+        $tmpFile = sys_get_temp_dir() . '/' . $uuid . '.' . $extensao;
+        file_put_contents($tmpFile, $fileData);
+
+        $mimeType = MimeTypes::getDefault()->guessMimeType($tmpFile);
+
+        $file = new UploadedFile($tmpFile, $filename, $mimeType, null, true);
+
+        /** @var RelatorioPush $relatorioPush */
+        $relatorioPush = new RelatorioPush();
+
+
+        $relatorioPush->setTipoArquivo($file->getMimeType());
+        $relatorioPush->setFile($file);
+        $relatorioPush->setDtEnvio(new \DateTime());
+        $relatorioPush->setUserDestinatarioId($request->get('userDestinatarioId'));
+        $relatorioPush->setDescricao($relatorioPush->getFile()->getClientOriginalName());
+        $this->relatorioPushEntityHandler->save($relatorioPush);
+        $this->push($relatorioPush);
+        $output['uploaded'] = true;
+
+        return new JsonResponse($output);
     }
 
     public function push(RelatorioPush $relatorioPush): void

@@ -10,8 +10,8 @@ use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ConnectionException;
-use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  *
@@ -21,14 +21,11 @@ use Doctrine\ORM\EntityManagerInterface;
 class RelVendas01Business
 {
 
-    /** @var EntityManagerInterface */
-    private $doctrine;
+    private EntityManagerInterface $doctrine;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var AppConfigEntityHandler */
-    private $appConfigEntityHandler;
+    private AppConfigEntityHandler $appConfigEntityHandler;
 
     /**
      * @param EntityManagerInterface $doctrine
@@ -93,11 +90,12 @@ class RelVendas01Business
                     continue;
                 }
                 $campos = explode('|', $linha);
-                if (count($campos) !== 21) {
-                    throw new ViewException('Qtde de campos difere de 21 para a linha "' . $linha . '"');
+                if (count($campos) !== 23) {
+                    throw new ViewException('Qtde de campos difere de 23 para a linha "' . $linha . '"');
                 }
 
                 $campos[3] = DateTimeUtils::parseDateStr($campos[3])->format('Y-m-d');
+                $campos[22] = $campos[22] ? DateTimeUtils::parseDateStr($campos[22])->format('Y-m-d') : '';
 
                 $cMax = count($campos);
                 for ($c = 0; $c < $cMax; $c++) {
@@ -128,9 +126,11 @@ class RelVendas01Business
                             rentabilidade_pv,
                             cliente_pv,
                             grupo,
+                            numero_nf,
+                            dt_nf,
                             estabelecimento_id,inserted,updated,user_inserted_id,user_updated_id
                         )
-                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
+                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
                     $campos[0], // `prevenda`,
                     $campos[1], // `num_item`,
                     $campos[2], // `qtde`,
@@ -151,7 +151,9 @@ class RelVendas01Business
                     $campos[17],// `total_venda_pv`
                     $campos[18],// `rentabilidade_pv`
                     $campos[19],// `cliente_pv`
-                    $campos[20] // `grupo`
+                    $campos[20], // `grupo`,
+                    $campos[21], // `numero_nf`,
+                    $campos[22] // `dt_nf`,
                 );
 
                 try {
@@ -165,7 +167,7 @@ class RelVendas01Business
             $this->logger->info($t . ' registros inseridos');
             $conn->commit();
             $this->logger->info('commit');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->error('processarArquivo() - erro ');
             $this->logger->error($e->getMessage());
             try {

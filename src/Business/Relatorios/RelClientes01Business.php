@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
  *
  * @package App\Business\Relatorios
  */
-class RelCliente01Business
+class RelClientes01Business
 {
 
     private EntityManagerInterface $doctrine;

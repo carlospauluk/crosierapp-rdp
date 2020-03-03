@@ -22,14 +22,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class PVAPIController extends AbstractController
 {
 
-    /** @var EntityManagerInterface */
-    private $doctrine;
+    private EntityManagerInterface $doctrine;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var PVEntityHandler */
-    private $pvEntityHandler;
+    private PVEntityHandler $pvEntityHandler;
 
     /**
      * @param LoggerInterface $logger
