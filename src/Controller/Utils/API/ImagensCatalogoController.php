@@ -110,7 +110,7 @@ class ImagensCatalogoController extends BaseController
             $repoProduto = $this->getDoctrine()->getRepository(Produto::class);
             /** @var Connection $conn */
             $conn = $this->getDoctrine()->getConnection();
-            $todos = $conn->fetchAll('SELECT id, json_data->>"$.erp_codigo" as recnum FROM est_produto');
+            $todos = $conn->fetchAll('SELECT id, json_data->>"$.recnum" as recnum FROM est_produto');
             $client = new Client();
             $this->getLogger()->error('SOH ATIVANDO O LOG');
             foreach ($todos as $r) {

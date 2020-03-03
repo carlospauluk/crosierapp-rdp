@@ -17,7 +17,7 @@ if (!isset($argv[2])) {
 }
 $recnum = $argv[2];
 
-if (!isset($argv[3]) || !in_array($argv[3], ['DEV', 'HOM', 'PROD'])) {
+if (!isset($argv[3]) || !in_array($argv[3], array('DEV', 'HOM', 'PROD'))) {
     die('Ambiente não informado (DEV,HOM,PROD).' . PHP_EOL);
 }
 $ambiente = $argv[3];
