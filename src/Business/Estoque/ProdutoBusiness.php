@@ -265,7 +265,7 @@ class ProdutoBusiness
 
             $fp = fopen($outputFile, 'w');
             foreach ($dados as $linha) {
-                fputcsv($fp, $linha);
+                fputcsv($fp, $linha,';');
             }
             fclose($fp);
 

@@ -73,7 +73,7 @@ class ProdutoAuxController extends FormListController
         $params = [];
         try {
             $apenasProdutosComTitulo = filter_var($request->get('apenasProdutosComTitulo') ?? true, FILTER_VALIDATE_BOOLEAN);
-            $nomeArquivo = 'produtos.xlsx';
+            $nomeArquivo = 'produtos.csv';
             $outputFile = $_SERVER['PASTA_ESTOQUE_PRODUTOS_EXCEL'] . $nomeArquivo;
             @unlink($outputFile);
             $params = $this->produtoBusiness->gerarCSV($apenasProdutosComTitulo);
