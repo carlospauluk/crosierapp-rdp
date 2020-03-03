@@ -309,6 +309,9 @@ class RelEstoque01Business
             $json_data['preco_custo'] = $campos[2];
             $json_data['preco_tabela'] = $campos[3];
 
+            $json_data['qtde_imagens'] = $json_data['qtde_imagens'] ?? 0;
+            $json_data['imagem1'] = $json_data['imagem1'] ?? '';
+
             $json_data['qtde_estoque_matriz'] = $campos['qtde_estoque_matriz'] ?? null;
             $json_data['dt_ult_saida_matriz'] = $campos['dt_ult_saida_matriz'] ?? null;
             $json_data['erp_dt_ult_saida'] = $campos['erp_dt_ult_saida'] ?? null; // está duplicado mesmo

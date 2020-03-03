@@ -54,7 +54,7 @@ class RelVendas01Business
                 try {
                     $this->processarArquivo($file);
                     $this->marcarDtHrAtualizacao();
-                    $this->logger->info('Arquivo processado com sucesso.');
+                    $this->logger->info('Arquivo de vendas processado com sucesso.');
                     rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELVENDAS01'] . 'ok/' . $file);
                     $this->logger->info('Arquivo movido para pasta "ok".');
                 } catch (\Exception $e) {
@@ -179,8 +179,6 @@ class RelVendas01Business
         }
 
         return $t;
-
-
     }
 
     /**
