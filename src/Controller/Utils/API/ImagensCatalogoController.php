@@ -5,7 +5,6 @@ namespace App\Controller\Utils\API;
 
 use App\Entity\Estoque\Produto;
 use App\Entity\Estoque\ProdutoImagem;
-use App\EntityHandler\Estoque\ProdutoEntityHandler;
 use App\EntityHandler\Estoque\ProdutoImagemEntityHandler;
 use App\Repository\Estoque\ProdutoRepository;
 use CrosierSource\CrosierLibBaseBundle\Controller\BaseController;
@@ -14,13 +13,13 @@ use CrosierSource\CrosierLibBaseBundle\EntityHandler\Config\AppConfigEntityHandl
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use Doctrine\DBAL\Connection;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Vich\UploaderBundle\Naming\UniqidNamer;
 
 /**
  *
@@ -99,23 +98,52 @@ class ImagensCatalogoController extends BaseController
     /**
      *
      * @Route("/downloadCatalogo", name="downloadCatalogo")
+     * @param Request $request
      * @param ProdutoImagemEntityHandler $produtoImagemEntityHandler
+     * @param AppConfigEntityHandler $appConfigEntityHandler
      * @return Response
      */
-    public function downloadCatalogo(ProdutoImagemEntityHandler $produtoImagemEntityHandler): Response
+    public function downloadCatalogo(Request $request, ProdutoImagemEntityHandler $produtoImagemEntityHandler, AppConfigEntityHandler $appConfigEntityHandler): Response
     {
-
         try {
+            /** @var AppConfigRepository $repoAppConfig */
+            $repoAppConfig = $this->getDoctrine()->getRepository(AppConfig::class);
+            $rImagensNoCatalogo = $repoAppConfig->findAppConfigByChave('imagensNoCatalogo') ?? new AppConfig('imagensNoCatalogo', $_SERVER['CROSIERAPP_UUID']);
+            $imagensNoCatalogo = json_decode($rImagensNoCatalogo->getValor(), true);
+            $imagensNoCatalogo['baixadas'] = $imagensNoCatalogo['baixadas'] ?? [];
+            $imagensNoCatalogo['naoConsta'] = $imagensNoCatalogo['naoConsta'] ?? [];
+            $imagensNoCatalogo['erros'] = $imagensNoCatalogo['erros'] ?? [];
+
+            $ids = array_merge([-1], $imagensNoCatalogo['baixadas'], $imagensNoCatalogo['erros'], $imagensNoCatalogo['naoConsta']);
+
             /** @var ProdutoRepository $repoProduto */
             $repoProduto = $this->getDoctrine()->getRepository(Produto::class);
             /** @var Connection $conn */
             $conn = $this->getDoctrine()->getConnection();
-            $todos = $conn->fetchAll('SELECT id, json_data->>"$.recnum" as recnum FROM est_produto');
+            $limit = (int)($request->get('limit') ?? 500);
+            $todos = $conn->fetchAll('SELECT id, json_data->>"$.recnum" as recnum FROM est_produto WHERE id NOT IN (' . implode(',',$ids) . ') ORDER BY id LIMIT ' . $limit);
             $client = new Client();
             $this->getLogger()->error('SOH ATIVANDO O LOG');
             foreach ($todos as $r) {
+
+                if (!$r['recnum'] ?? false) {
+                    $this->getLogger()->info('id = ' . $r['id'] . ' sem recnum');
+                    $imagensNoCatalogo['erros'][] = $r['id'];
+                    continue;
+                }
+
+                if (in_array($r['id'], $imagensNoCatalogo['baixadas'])) {
+                    $this->getLogger()->info('id = ' . $r['id'] . '( recnum = ' . $r['recnum'] . ') já foi baixada');
+                    continue;
+                }
+                if (in_array($r['id'], $imagensNoCatalogo['naoConsta'])) {
+                    $this->getLogger()->info('id = ' . $r['id'] . '( recnum = ' . $r['recnum'] . ') não possui imagem no catálogo');
+                    continue;
+                }
+
+                $urlAPICatalogo = $_SERVER['URL_API_CATALOGO'] . $r['recnum'];
                 try {
-                    $urlAPICatalogo = $_SERVER['URL_API_CATALOGO'] . $r['recnum'];
+                    $this->getLogger()->info('Tentando baixar para o recnum ' . $r['recnum']);
                     $response = $client->request('GET', $urlAPICatalogo)->getBody()->getContents();
                     $json = json_decode($response, true);
                     $foto = $json['fotos'][0] ?? null;
@@ -136,28 +164,74 @@ class ImagensCatalogoController extends BaseController
                         /** @var ProdutoImagem $produtoImagem */
                         $produtoImagem = $produtoImagemEntityHandler->save($produtoImagem);
 
-
                         $json_data = json_encode([
-                          'qtde_imagens' => $produto->imagens->count() + 1,
-                          'imagem1' => $produtoImagem->getImageName()
+                            'qtde_imagens' => $produto->imagens->count(),
+                            'imagem1' => $produtoImagem->getImageName()
                         ]);
 
                         $json_data = 'JSON_MERGE_PATCH(json_data,\'' . $json_data . '\')';
-                        
-                        $conn->exec('UPDATE est_produto SET json_data = ' . $json_data . ' WHERE id = ' . $produto->getId());
 
+                        $conn->exec('UPDATE est_produto SET json_data = ' . $json_data . ' WHERE id = ' . $produto->getId());
+                        $imagensNoCatalogo['baixadas'][] = $r['id'];
                         $this->getLogger()->info('OK');
+                    } else {
+                        $this->getLogger()->info('NÃO CONSTA ' . $r['recnum']);
+                        $imagensNoCatalogo['naoConsta'][] = $r['id'];
                     }
                 } catch (\Exception $e) {
+                    if ($e instanceof ClientException) {
+                        if ($e->getCode() === 404) {
+                            $this->getLogger()->info('NÃO CONSTA ' . $r['recnum']);
+                            $imagensNoCatalogo['naoConsta'][] = $r['id'];
+                        } else {
+                            $imagensNoCatalogo['erros'][] = $r['id'];
+                        }
+                    }
                     $this->getLogger()->error('Erro ao obter imagem em ' . $urlAPICatalogo);
                     $this->getLogger()->error($e->getMessage());
+
                 }
             }
+            $rImagensNoCatalogo->setValor(json_encode($imagensNoCatalogo));
+            $appConfigEntityHandler->save($rImagensNoCatalogo);
+
+            $html = '';
+            $html .= '<a href="#baixadas">Baixadas</a><br>';
+            $html .= '<a href="#naoConsta">Não constam</a><br>';
+            $html .= '<a href="#erros">Erros</a><br>';
+
+            $t = 0;
+
+            $html .= '<h1 id="baixadas">Imagens baixadas do catálogo</h1>';
+            foreach ($imagensNoCatalogo['baixadas'] as $k => $v) {
+                $html .= ($k+1) . ') <a href="' . $_SERVER['CROSIERAPPRADX_URL'] . '/est/produto/form/' . $v . '">' . $_SERVER['CROSIERAPPRADX_URL'] . '/est/produto/form/' . $v . '</a><br>';
+                $t++;
+            }
+            $html .= '<hr>';
+
+            $html .= '<h1 id="naoConsta">Imagens que não constam no catálogo</h1>';
+            foreach ($imagensNoCatalogo['naoConsta'] as $k => $v) {
+                $html .= ($k+1) . ') <a href="' . $_SERVER['CROSIERAPPRADX_URL'] . '/est/produto/form/' . $v . '">' . $_SERVER['CROSIERAPPRADX_URL'] . '/est/produto/form/' . $v . '</a><br>';
+                $t++;
+            }
+            $html .= '<hr>';
+
+            $html .= '<h1 id="erros">Erros</h1>';
+            foreach ($imagensNoCatalogo['erros'] as $k => $v) {
+                $html .= ($k+1) . ') <a href="' . $_SERVER['CROSIERAPPRADX_URL'] . '/est/produto/form/' . $v . '">' . $_SERVER['CROSIERAPPRADX_URL'] . '/est/produto/form/' . $v . '</a><br>';
+                $t++;
+            }
+            $html .= '<hr>';
+            $html .= $t . ' processadas';
+
         } catch (\Exception $e) {
             $this->getLogger()->error('Erro ao downloadCatalogo');
             $this->getLogger()->error($e->getMessage());
         }
-        return new Response('OK');
+
+
+
+        return new Response($html);
     }
 
 
