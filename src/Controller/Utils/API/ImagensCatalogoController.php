@@ -106,6 +106,7 @@ class ImagensCatalogoController extends BaseController
     public function downloadCatalogo(Request $request, ProdutoImagemEntityHandler $produtoImagemEntityHandler, AppConfigEntityHandler $appConfigEntityHandler): Response
     {
         try {
+            $html = 'NADA';
             /** @var AppConfigRepository $repoAppConfig */
             $repoAppConfig = $this->getDoctrine()->getRepository(AppConfig::class);
             $rImagensNoCatalogo = $repoAppConfig->findAppConfigByChave('imagensNoCatalogo') ?? new AppConfig('imagensNoCatalogo', $_SERVER['CROSIERAPP_UUID']);
