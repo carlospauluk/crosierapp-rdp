@@ -112,10 +112,11 @@ class ImagensCatalogoController extends BaseController
             $rImagensNoCatalogo = $repoAppConfig->findAppConfigByChave('imagensNoCatalogo') ?? new AppConfig('imagensNoCatalogo', $_SERVER['CROSIERAPP_UUID']);
             $imagensNoCatalogo = json_decode($rImagensNoCatalogo->getValor(), true);
             $imagensNoCatalogo['baixadas'] = $imagensNoCatalogo['baixadas'] ?? [];
+            $imagensNoCatalogo['baixadas2'] = $imagensNoCatalogo['baixadas2'] ?? [];
             $imagensNoCatalogo['naoConsta'] = $imagensNoCatalogo['naoConsta'] ?? [];
             $imagensNoCatalogo['erros'] = $imagensNoCatalogo['erros'] ?? [];
 
-            $ids = array_merge([-1], /*$imagensNoCatalogo['baixadas'], */ $imagensNoCatalogo['erros'], $imagensNoCatalogo['naoConsta']);
+            $ids = array_merge([-1], $imagensNoCatalogo['baixadas2'], $imagensNoCatalogo['erros'], $imagensNoCatalogo['naoConsta']);
 
             /** @var ProdutoRepository $repoProduto */
             $repoProduto = $this->getDoctrine()->getRepository(Produto::class);
@@ -127,11 +128,6 @@ class ImagensCatalogoController extends BaseController
             $this->getLogger()->error('SOH ATIVANDO O LOG');
             foreach ($todos as $r) {
 
-                if (in_array($r['id'], $imagensNoCatalogo['naoConsta'])) {
-                    $this->getLogger()->info('id = ' . $r['id'] . '( recnum = ' . $r['recnum'] . ') não possui imagem no catálogo');
-                    continue;
-                }
-
                 $urlAPICatalogo = $_SERVER['URL_API_CATALOGO'] . $r['recnum'];
                 try {
                     $this->getLogger()->info('Tentando baixar para o recnum ' . $r['recnum']);
@@ -142,8 +138,16 @@ class ImagensCatalogoController extends BaseController
                         /** @var Produto $produto */
                         $produto = $repoProduto->find($r['id']);
 
+                        if (count($json['fotos']) < 1) {
+                            if (!in_array($r['id'], $imagensNoCatalogo['naoConsta'])) {
+                                $imagensNoCatalogo['naoConsta'][] = $r['id'];
+                            }
+                            continue;
+                        }
+
                         if (count($json['fotos']) <= $produto->imagens->count()) {
                             $this->getLogger()->info('id = ' . $r['id'] . '( recnum = ' . $r['recnum'] . ') já foi baixada');
+                            $imagensNoCatalogo['baixadas2'][] = $r['id'];
                             continue;
                         }
 
@@ -178,9 +182,9 @@ class ImagensCatalogoController extends BaseController
                         $json_data = 'JSON_MERGE_PATCH(json_data,\'' . $json_data . '\')';
 
                         $conn->exec('UPDATE est_produto SET json_data = ' . $json_data . ' WHERE id = ' . $produto->getId());
-                        if (!in_array($r['id'], $imagensNoCatalogo['baixadas'])) {
-                            $imagensNoCatalogo['baixadas'][] = $r['id'];
-                        }
+
+                        $imagensNoCatalogo['baixadas2'][] = $r['id'];
+
                         $this->getLogger()->info('OK >>> ' . $i . ' imagens baixadas');
                     } else {
                         $this->getLogger()->info('NÃO CONSTA ' . $r['recnum']);
@@ -211,7 +215,7 @@ class ImagensCatalogoController extends BaseController
             $t = 0;
 
             $html .= '<h1 id="baixadas">Imagens baixadas do catálogo</h1>';
-            foreach ($imagensNoCatalogo['baixadas'] as $k => $v) {
+            foreach ($imagensNoCatalogo['baixadas2'] as $k => $v) {
                 $html .= ($k + 1) . ') <a href="' . $_SERVER['CROSIERAPPRADX_URL'] . '/est/produto/form/' . $v . '">' . $_SERVER['CROSIERAPPRADX_URL'] . '/est/produto/form/' . $v . '</a><br>';
                 $t++;
             }
