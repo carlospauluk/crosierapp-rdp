@@ -10,7 +10,11 @@
         "PAR",
         "MT",
         "JG"
-      ]
+      ],
+      "info_integr_ecommerce": {
+        "tipo_campo_ecommerce": "caracteristica",
+        "sugestoes_ids": {}
+      }
     },
     "depto_codigo": {
       "tipo": "string"
@@ -124,7 +128,11 @@
     "ano": {
       "label": "Ano",
       "tipo": "tags",
-      "soma_preench": 5
+      "soma_preench": 5,
+      "info_integr_ecommerce": {
+        "sugestoes_ids": {},
+        "tipo_campo_ecommerce": "caracteristica"
+      }
     },
     "erp_codigo": {
       "label": "Código ERP",
@@ -208,38 +216,62 @@
       "notuppercase": true,
       "tipo": "tags",
       "sugestoes": [],
-      "soma_preench": 5
+      "soma_preench": 5,
+      "info_integr_ecommerce": {
+        "sugestoes_ids": {},
+        "tipo_campo_ecommerce": "caracteristica"
+      }
     },
     "modelos": {
       "label": "Modelos",
       "notuppercase": true,
       "tipo": "tags",
       "sugestoes": [],
-      "soma_preench": 5
+      "soma_preench": 5,
+      "info_integr_ecommerce": {
+        "sugestoes_ids": {},
+        "tipo_campo_ecommerce": "caracteristica"
+      }
     },
     "montadora_2": {
       "label": "Montadora (2)",
       "notuppercase": true,
       "sugestoes": [],
-      "tipo": "tags"
+      "tipo": "tags",
+      "info_integr_ecommerce": {
+        "sugestoes_ids": [],
+        "tipo_campo_ecommerce": "caracteristica"
+      }
     },
     "modelos_2": {
       "label": "Modelos (2)",
       "notuppercase": true,
       "sugestoes": [],
-      "tipo": "tags"
+      "tipo": "tags",
+      "info_integr_ecommerce": {
+        "sugestoes_ids": [],
+        "tipo_campo_ecommerce": "caracteristica"
+      }
     },
     "montadora_3": {
       "label": "Montadora (3)",
       "notuppercase": true,
       "sugestoes": [],
-      "tipo": "tags"
+      "tipo": "tags",
+      "info_integr_ecommerce": {
+        "sugestoes_ids": [],
+        "tipo_campo_ecommerce": "caracteristica"
+      }
     },
     "modelos_3": {
       "label": "Modelos (3)",
       "notuppercase": true,
       "sugestoes": [],
-      "tipo": "tags"
+      "tipo": "tags",
+      "info_integr_ecommerce": {
+        "sugestoes_ids": [],
+        "tipo_campo_ecommerce": "caracteristica"
+      }
     },
     "qtde_estoque_acessorios": {
       "label": "Estoque Acessórios",
