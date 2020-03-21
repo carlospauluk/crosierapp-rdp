@@ -20,7 +20,7 @@ function getDatatablesColumns() {
             title: 'Código'
         },
         {
-            name: 'e.jsonData.titulo',
+            name: 'e.titulo',
             data: 'e',
             title: 'Título',
             render: function (data, type, row) {
@@ -35,8 +35,8 @@ function getDatatablesColumns() {
             },
         },
         {
-            name: 'e.jsonData.depto_nome',
-            data: 'e.jsonData.depto_nome',
+            name: 'e.deptoNome',
+            data: 'e.deptoNome',
             title: 'Depto',
             render: function (data, type, row) {
                 return data;
@@ -51,22 +51,22 @@ function getDatatablesColumns() {
             }
         },
         {
-            name: 'e.jsonData.porcent_preench',
-            data: 'e.jsonData.porcent_preench',
+            name: 'e.porcentPreench',
+            data: 'e.porcentPreench',
             title: 'Status Cad',
             render: function (data, type, row) {
                 return Numeral(parseFloat(data) * 100).format('0,0') + '%';
             }
         },
         {
-            name: 'e.jsonData.qtde_imagens',
-            data: 'e.jsonData.qtde_imagens',
+            name: 'e.qtdeImagens',
+            data: 'e.qtdeImagens',
             title: 'Qtde Imagens',
             className: 'text-center'
         },
         {
-            name: 'e.jsonData.qtde_estoque_total',
-            data: 'e.jsonData.qtde_estoque_total',
+            name: 'e.qtdeEstoqueTotal',
+            data: 'e.qtdeEstoqueTotal',
             title: 'Estoque Total',
             render: function (data, type, row) {
                 return Numeral(parseFloat(data)).format('0,0[000]');

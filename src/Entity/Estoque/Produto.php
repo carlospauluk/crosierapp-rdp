@@ -138,6 +138,49 @@ class Produto implements EntityId
      */
     public $imagens;
 
+    // ---------- CAMPOS GENERATEDS (para exibição na list e poder dar ORDER BY)
+
+    /**
+     * @ORM\Column(name="qtde_imagens", type="integer")
+     * @Groups("entity")
+     *
+     * @var null|int
+     */
+    public ?int $qtdeImagens = null;
+
+    /**
+     * @ORM\Column(name="qtde_estoque_total", type="integer")
+     * @Groups("entity")
+     *
+     * @var null|int
+     */
+    public ?int $qtdeEstoqueTotal = null;
+
+    /**
+     * @ORM\Column(name="depto_nome", type="string")
+     * @Groups("entity")
+     *
+     * @var null|string
+     */
+    public ?string $deptoNome = null;
+
+    /**
+     * @ORM\Column(name="titulo", type="string")
+     * @Groups("entity")
+     *
+     * @var null|string
+     */
+    public ?string $titulo = null;
+
+    /**
+     * @ORM\Column(name="porcent_preench", type="decimal")
+     * @Groups("entity")
+     *
+     * @var null|float
+     */
+    public ?float $porcentPreench = null;
+
+
     public function __construct()
     {
         $this->imagens = new ArrayCollection();

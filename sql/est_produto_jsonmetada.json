@@ -13,6 +13,7 @@
       ],
       "info_integr_ecommerce": {
         "tipo_campo_ecommerce": "caracteristica",
+        "ecommerce_id": "",
         "sugestoes_ids": {}
       }
     },
@@ -70,8 +71,7 @@
     "ncm": {
       "label": "NCM",
       "obs": "Nomenclatura Comum do Mercosul",
-      "tipo": "string",
-      "soma_preench": 5
+      "tipo": "string"
     },
     "composicao": {
       "label": "Composição",
@@ -131,7 +131,28 @@
       "soma_preench": 5,
       "info_integr_ecommerce": {
         "sugestoes_ids": {},
-        "tipo_campo_ecommerce": "caracteristica"
+        "tipo_campo_ecommerce": "caracteristica",
+        "ecommerce_id": ""
+      }
+    },
+    "ano_2": {
+      "label": "Ano (2)",
+      "tipo": "tags",
+      "soma_preench": 5,
+      "info_integr_ecommerce": {
+        "sugestoes_ids": {},
+        "tipo_campo_ecommerce": "caracteristica",
+        "ecommerce_id": ""
+      }
+    },
+    "ano_3": {
+      "label": "Ano (3)",
+      "tipo": "tags",
+      "soma_preench": 5,
+      "info_integr_ecommerce": {
+        "sugestoes_ids": {},
+        "tipo_campo_ecommerce": "caracteristica",
+        "ecommerce_id": ""
       }
     },
     "erp_codigo": {
@@ -209,7 +230,12 @@
       "notuppercase": true,
       "tipo": "select",
       "class": "s2allownew notuppercase",
-      "sugestoes": []
+      "sugestoes": [],
+      "info_integr_ecommerce": {
+        "sugestoes_ids": {},
+        "tipo_campo_ecommerce": "marca",
+        "ecommerce_id": ""
+      }
     },
     "montadora": {
       "label": "Montadora",
@@ -219,7 +245,8 @@
       "soma_preench": 5,
       "info_integr_ecommerce": {
         "sugestoes_ids": {},
-        "tipo_campo_ecommerce": "caracteristica"
+        "tipo_campo_ecommerce": "caracteristica",
+        "ecommerce_id": ""
       }
     },
     "modelos": {
@@ -230,7 +257,8 @@
       "soma_preench": 5,
       "info_integr_ecommerce": {
         "sugestoes_ids": {},
-        "tipo_campo_ecommerce": "caracteristica"
+        "tipo_campo_ecommerce": "caracteristica",
+        "ecommerce_id": ""
       }
     },
     "montadora_2": {
@@ -239,8 +267,9 @@
       "sugestoes": [],
       "tipo": "tags",
       "info_integr_ecommerce": {
-        "sugestoes_ids": [],
-        "tipo_campo_ecommerce": "caracteristica"
+        "sugestoes_ids": {},
+        "tipo_campo_ecommerce": "caracteristica",
+        "ecommerce_id": ""
       }
     },
     "modelos_2": {
@@ -249,8 +278,9 @@
       "sugestoes": [],
       "tipo": "tags",
       "info_integr_ecommerce": {
-        "sugestoes_ids": [],
-        "tipo_campo_ecommerce": "caracteristica"
+        "sugestoes_ids": {},
+        "tipo_campo_ecommerce": "caracteristica",
+        "ecommerce_id": ""
       }
     },
     "montadora_3": {
@@ -259,8 +289,9 @@
       "sugestoes": [],
       "tipo": "tags",
       "info_integr_ecommerce": {
-        "sugestoes_ids": [],
-        "tipo_campo_ecommerce": "caracteristica"
+        "sugestoes_ids": {},
+        "tipo_campo_ecommerce": "caracteristica",
+        "ecommerce_id": ""
       }
     },
     "modelos_3": {
@@ -269,8 +300,9 @@
       "sugestoes": [],
       "tipo": "tags",
       "info_integr_ecommerce": {
-        "sugestoes_ids": [],
-        "tipo_campo_ecommerce": "caracteristica"
+        "sugestoes_ids": {},
+        "tipo_campo_ecommerce": "caracteristica",
+        "ecommerce_id": ""
       }
     },
     "qtde_estoque_acessorios": {
@@ -352,8 +384,10 @@
       "ano",
       "montadora",
       "modelos",
+      "ano_2",
       "montadora_2",
       "modelos_2",
+      "ano_3",
       "montadora_3",
       "modelos_3",
       "dimensoes",
