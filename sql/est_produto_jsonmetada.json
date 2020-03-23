@@ -138,7 +138,6 @@
     "ano_2": {
       "label": "Ano (2)",
       "tipo": "tags",
-      "soma_preench": 5,
       "info_integr_ecommerce": {
         "sugestoes_ids": {},
         "tipo_campo_ecommerce": "caracteristica",
@@ -148,7 +147,6 @@
     "ano_3": {
       "label": "Ano (3)",
       "tipo": "tags",
-      "soma_preench": 5,
       "info_integr_ecommerce": {
         "sugestoes_ids": {},
         "tipo_campo_ecommerce": "caracteristica",
