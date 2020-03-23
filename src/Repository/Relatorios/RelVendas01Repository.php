@@ -53,7 +53,7 @@ class RelVendas01Repository extends FilterRepository
         $dtFim->setTime(23, 59, 59, 99999);
 
 
-        $sql = 'SELECT nome_fornec, sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE dt_emissao BETWEEN :dtIni and :dtFim ';
+        $sql = 'SELECT nome_fornec, sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE dt_nf BETWEEN :dtIni and :dtFim ';
         $sql .= $grupos ? 'AND grupo IN (:grupos) ' : '';
         $sql .= $lojas ? 'AND loja IN (:lojas) ' : '';
         $sql .= ' GROUP BY nome_fornec ORDER BY total_venda';
@@ -97,7 +97,7 @@ class RelVendas01Repository extends FilterRepository
             $dtIni->setTime(0, 0, 0, 0);
             $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
             $dtFim->setTime(23, 59, 59, 99999);
-            $sqlTotal = 'SELECT sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE dt_emissao BETWEEN :dtIni and :dtFim ';
+            $sqlTotal = 'SELECT sum(total_preco_venda) as total_venda FROM rdp_rel_vendas01 WHERE dt_nf BETWEEN :dtIni and :dtFim ';
             $sqlTotal .= $grupos ? 'AND grupo IN (:grupos) ' : '';
             $sqlTotal .= $lojas ? 'AND loja IN (:lojas) ' : '';
             $params['dtIni'] = $dtIni->format('Y-m-d');
@@ -143,7 +143,7 @@ class RelVendas01Repository extends FilterRepository
 
         $sql .= 'sum(qtde) as qtde_total, sum(total_preco_custo) as tpc, sum(total_preco_venda) as tpv, (((sum(total_preco_venda) / sum(total_preco_custo)) - 1) * 100.0) as rent 
                     FROM rdp_rel_vendas01
-                     WHERE nome_fornec = :nomeFornec AND dt_emissao BETWEEN :dtIni AND :dtFim ';
+                     WHERE nome_fornec = :nomeFornec AND dt_nf BETWEEN :dtIni AND :dtFim ';
 
         if ($grupos) {
             $sql .= ' AND grupo IN (:grupos)';
@@ -218,7 +218,7 @@ class RelVendas01Repository extends FilterRepository
                     SELECT cod_vendedor, nome_vendedor, prevenda, total_venda_pv, total_custo_pv 
                     FROM rdp_rel_vendas01 
                     WHERE 
-                        dt_emissao BETWEEN :dtIni AND :dtFim
+                        dt_nf BETWEEN :dtIni AND :dtFim
                         ' . $sql_AND_grupo . $sql_AND_loja . '
                     GROUP BY cod_vendedor, nome_vendedor, prevenda, total_venda_pv, total_custo_pv) a 
             GROUP BY cod_vendedor, nome_vendedor ORDER BY total_venda';
@@ -280,7 +280,7 @@ class RelVendas01Repository extends FilterRepository
                     SELECT cod_vendedor, nome_vendedor, prevenda, total_venda_pv, total_custo_pv 
                     FROM rdp_rel_vendas01 
                     WHERE 
-                        dt_emissao BETWEEN :dtIni AND :dtFim
+                        dt_nf BETWEEN :dtIni AND :dtFim
                         ' . $sql_AND_grupo . $sql_AND_loja . '
                     GROUP BY cod_vendedor, nome_vendedor, prevenda, total_venda_pv, total_custo_pv) a 
             ';
@@ -318,7 +318,7 @@ class RelVendas01Repository extends FilterRepository
 
         $sql = 'SELECT nome_fornec, sum(total_venda_pv) as tpv
                     FROM rdp_rel_vendas01
-                     WHERE dt_emissao BETWEEN :dtIni AND :dtFim GROUP BY nome_fornec ORDER BY tpv LIMIT 1';
+                     WHERE dt_nf BETWEEN :dtIni AND :dtFim GROUP BY nome_fornec ORDER BY tpv LIMIT 1';
 
         $rsm = new ResultSetMapping();
         $rsm->addScalarResult('nome_fornec', 'nome_fornec');
@@ -466,9 +466,9 @@ class RelVendas01Repository extends FilterRepository
         $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
         $dtFim->setTime(23, 59, 59, 99999);
 
-        $sql = 'SELECT prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv, total_custo_pv, (((total_venda_pv / total_custo_pv) - 1) * 100.0) as rent, cliente_pv
+        $sql = 'SELECT prevenda, dt_nf, cod_vendedor, nome_vendedor, total_venda_pv, total_custo_pv, (((total_venda_pv / total_custo_pv) - 1) * 100.0) as rent, cliente_pv
                     FROM rdp_rel_vendas01
-                     WHERE CONCAT(cod_prod, \' - \', desc_prod) = :produto AND dt_emissao BETWEEN :dtIni AND :dtFim ';
+                     WHERE CONCAT(cod_prod, \' - \', desc_prod) = :produto AND dt_nf BETWEEN :dtIni AND :dtFim ';
 
         if ($grupos) {
             $sql .= 'AND grupo IN (:grupos) ';
@@ -477,11 +477,11 @@ class RelVendas01Repository extends FilterRepository
             $sql .= 'AND loja IN (:lojas) ';
         }
 
-        $sql .= 'GROUP BY prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv, total_custo_pv, cliente_pv ORDER BY dt_emissao, total_venda_pv';
+        $sql .= 'GROUP BY prevenda, dt_nf, cod_vendedor, nome_vendedor, total_venda_pv, total_custo_pv, cliente_pv ORDER BY dt_nf, total_venda_pv';
 
         $rsm = new ResultSetMapping();
         $rsm->addScalarResult('prevenda', 'prevenda');
-        $rsm->addScalarResult('dt_emissao', 'dt_emissao');
+        $rsm->addScalarResult('dt_nf', 'dt_nf');
         $rsm->addScalarResult('cod_vendedor', 'cod_vendedor');
         $rsm->addScalarResult('nome_vendedor', 'nome_vendedor');
         $rsm->addScalarResult('total_custo_pv', 'total_custo_pv');
@@ -530,15 +530,15 @@ class RelVendas01Repository extends FilterRepository
             $sql_AND_loja .= ' AND loja IN (:lojas)';
         }
 
-        $sql = 'SELECT prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv, total_custo_pv, (((total_venda_pv / total_custo_pv) - 1) * 100.0) as rent, cliente_pv
+        $sql = 'SELECT prevenda, dt_nf, cod_vendedor, nome_vendedor, total_venda_pv, total_custo_pv, (((total_venda_pv / total_custo_pv) - 1) * 100.0) as rent, cliente_pv
                     FROM rdp_rel_vendas01
-                     WHERE cod_vendedor = :codVendedor AND dt_emissao BETWEEN :dtIni AND :dtFim 
+                     WHERE cod_vendedor = :codVendedor AND dt_nf BETWEEN :dtIni AND :dtFim 
                      ' . $sql_AND_grupo . $sql_AND_loja . '
-                     GROUP BY prevenda, dt_emissao, cod_vendedor, nome_vendedor, total_venda_pv, total_custo_pv, cliente_pv ORDER BY dt_emissao, total_venda_pv';
+                     GROUP BY prevenda, dt_nf, cod_vendedor, nome_vendedor, total_venda_pv, total_custo_pv, cliente_pv ORDER BY dt_nf, total_venda_pv';
 
         $rsm = new ResultSetMapping();
         $rsm->addScalarResult('prevenda', 'prevenda');
-        $rsm->addScalarResult('dt_emissao', 'dt_emissao');
+        $rsm->addScalarResult('dt_nf', 'dt_nf');
         $rsm->addScalarResult('cod_vendedor', 'cod_vendedor');
         $rsm->addScalarResult('nome_vendedor', 'nome_vendedor');
         $rsm->addScalarResult('total_custo_pv', 'total_custo_pv');
@@ -594,13 +594,13 @@ class RelVendas01Repository extends FilterRepository
      */
     public function totaisPreVenda(int $pv)
     {
-        $sql = 'SELECT dt_emissao, cliente_pv, grupo, loja, cod_vendedor, nome_vendedor, total_custo_pv, total_venda_pv, rentabilidade_pv, sum(total_preco_venda) as subtotal
+        $sql = 'SELECT dt_nf, cliente_pv, grupo, loja, cod_vendedor, nome_vendedor, total_custo_pv, total_venda_pv, rentabilidade_pv, sum(total_preco_venda) as subtotal
                     FROM rdp_rel_vendas01
                      WHERE prevenda = :prevenda
-                     GROUP BY dt_emissao, cliente_pv, grupo, loja, cod_vendedor, nome_vendedor, total_custo_pv, total_venda_pv, rentabilidade_pv';
+                     GROUP BY dt_nf, cliente_pv, grupo, loja, cod_vendedor, nome_vendedor, total_custo_pv, total_venda_pv, rentabilidade_pv';
 
         $rsm = new ResultSetMapping();
-        $rsm->addScalarResult('dt_emissao', 'dt_emissao');
+        $rsm->addScalarResult('dt_nf', 'dt_nf');
         $rsm->addScalarResult('cliente_pv', 'cliente_pv');
         $rsm->addScalarResult('grupo', 'grupo');
         $rsm->addScalarResult('loja', 'loja');

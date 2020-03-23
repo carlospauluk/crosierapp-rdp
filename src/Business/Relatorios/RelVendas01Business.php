@@ -95,7 +95,7 @@ class RelVendas01Business
                 }
 
                 $campos[3] = DateTimeUtils::parseDateStr($campos[3])->format('Y-m-d');
-                $campos[22] = $campos[22] ? DateTimeUtils::parseDateStr($campos[22])->format('Y-m-d') : '';
+                $campos[22] = $campos[22] ? DateTimeUtils::parseDateStr($campos[22])->format('Y-m-d') : $campos[3];
 
                 $cMax = count($campos);
                 for ($c = 0; $c < $cMax; $c++) {

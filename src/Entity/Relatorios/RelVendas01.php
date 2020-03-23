@@ -26,7 +26,7 @@ class RelVendas01 implements EntityId
      *
      * @var int|null
      */
-    private $preVenda;
+    public ?int $preVenda = null;
 
     /**
      *
@@ -35,7 +35,7 @@ class RelVendas01 implements EntityId
      *
      * @var int|null
      */
-    private $numItem;
+    public ?int $numItem = null;
 
     /**
      *
@@ -44,7 +44,7 @@ class RelVendas01 implements EntityId
      *
      * @var int|null
      */
-    private $qtde;
+    public ?int $qtde = null;
 
     /**
      *
@@ -53,7 +53,7 @@ class RelVendas01 implements EntityId
      *
      * @var \DateTime|null
      */
-    private $dtEmissao;
+    public ?\DateTime $dtEmissao = null;
 
 
     /**
@@ -63,7 +63,7 @@ class RelVendas01 implements EntityId
      *
      * @var string|null
      */
-    private $ano;
+    public ?string $ano = null;
 
     /**
      *
@@ -72,7 +72,7 @@ class RelVendas01 implements EntityId
      *
      * @var string|null
      */
-    private $mes;
+    public ?string $mes = null;
 
     /**
      *
@@ -81,7 +81,7 @@ class RelVendas01 implements EntityId
      *
      * @var int|null
      */
-    private $codFornecedor;
+    public ?int $codFornecedor = null;
 
     /**
      *
@@ -90,7 +90,7 @@ class RelVendas01 implements EntityId
      *
      * @var string|null
      */
-    private $nomeFornecedor;
+    public ?string $nomeFornecedor = null;
 
     /**
      *
@@ -99,7 +99,7 @@ class RelVendas01 implements EntityId
      *
      * @var string|null
      */
-    private $codProduto;
+    public ?string $codProduto = null;
 
     /**
      *
@@ -108,7 +108,7 @@ class RelVendas01 implements EntityId
      *
      * @var string|null
      */
-    private $descProduto;
+    public ?string $descProduto = null;
 
 
     /**
@@ -118,7 +118,7 @@ class RelVendas01 implements EntityId
      *
      * @var float|null
      */
-    private $totalPrecoVenda;
+    public ?float $totalPrecoVenda = null;
 
     /**
      *
@@ -127,7 +127,7 @@ class RelVendas01 implements EntityId
      *
      * @var float|null
      */
-    private $totalPrecoCusto;
+    public ?float $totalPrecoCusto = null;
 
     /**
      *
@@ -136,7 +136,7 @@ class RelVendas01 implements EntityId
      *
      * @var float|null
      */
-    private $rentabilidade;
+    public ?float $rentabilidade = null;
 
     /**
      *
@@ -145,7 +145,7 @@ class RelVendas01 implements EntityId
      *
      * @var int|null
      */
-    private $codVendedor;
+    public ?int $codVendedor = null;
 
     /**
      *
@@ -154,7 +154,7 @@ class RelVendas01 implements EntityId
      *
      * @var string|null
      */
-    private $nomeVendedor;
+    public ?string $nomeVendedor = null;
 
     /**
      *
@@ -163,7 +163,7 @@ class RelVendas01 implements EntityId
      *
      * @var string|null
      */
-    private $loja;
+    public ?string $loja = null;
 
     /**
      *
@@ -172,7 +172,7 @@ class RelVendas01 implements EntityId
      *
      * @var float|null
      */
-    private $totalCustoPV;
+    public ?float $totalCustoPV = null;
 
     /**
      *
@@ -181,7 +181,7 @@ class RelVendas01 implements EntityId
      *
      * @var float|null
      */
-    private $totalVendaPV;
+    public ?float $totalVendaPV = null;
 
     /**
      *
@@ -190,7 +190,7 @@ class RelVendas01 implements EntityId
      *
      * @var float|null
      */
-    private $rentabilidadePV;
+    public ?float $rentabilidadePV = null;
 
     /**
      *
@@ -199,7 +199,7 @@ class RelVendas01 implements EntityId
      *
      * @var string|null
      */
-    private $clientePV;
+    public ?string $clientePV = null;
 
     /**
      *
@@ -208,386 +208,25 @@ class RelVendas01 implements EntityId
      *
      * @var string|null
      */
-    private $grupo;
-
-
-    /**
-     * @return int|null
-     */
-    public function getPreVenda(): ?int
-    {
-        return $this->preVenda;
-    }
+    public ?string $grupo = null;
 
     /**
-     * @param int|null $preVenda
-     * @return RelVendas01
+     *
+     * @ORM\Column(name="numero_nf", type="string")
+     * @Groups("entity")
+     *
+     * @var string|null
      */
-    public function setPreVenda(?int $preVenda): RelVendas01
-    {
-        $this->preVenda = $preVenda;
-        return $this;
-    }
+    public ?string $numeroNF = null;
 
     /**
-     * @return int|null
+     *
+     * @ORM\Column(name="dt_nf", type="date")
+     * @Groups("entity")
+     *
+     * @var \DateTime|null
      */
-    public function getNumItem(): ?int
-    {
-        return $this->numItem;
-    }
-
-    /**
-     * @param int|null $numItem
-     * @return RelVendas01
-     */
-    public function setNumItem(?int $numItem): RelVendas01
-    {
-        $this->numItem = $numItem;
-        return $this;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getQtde(): ?int
-    {
-        return $this->qtde;
-    }
-
-    /**
-     * @param int|null $qtde
-     * @return RelVendas01
-     */
-    public function setQtde(?int $qtde): RelVendas01
-    {
-        $this->qtde = $qtde;
-        return $this;
-    }
-
-    /**
-     * @return \DateTime|null
-     */
-    public function getDtEmissao(): ?\DateTime
-    {
-        return $this->dtEmissao;
-    }
-
-    /**
-     * @param \DateTime|null $dtEmissao
-     * @return RelVendas01
-     */
-    public function setDtEmissao(?\DateTime $dtEmissao): RelVendas01
-    {
-        $this->dtEmissao = $dtEmissao;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getAno(): ?string
-    {
-        return $this->ano;
-    }
-
-    /**
-     * @param string|null $ano
-     * @return RelVendas01
-     */
-    public function setAno(?string $ano): RelVendas01
-    {
-        $this->ano = $ano;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getMes(): ?string
-    {
-        return $this->mes;
-    }
-
-    /**
-     * @param string|null $mes
-     * @return RelVendas01
-     */
-    public function setMes(?string $mes): RelVendas01
-    {
-        $this->mes = $mes;
-        return $this;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getCodFornecedor(): ?int
-    {
-        return $this->codFornecedor;
-    }
-
-    /**
-     * @param int|null $codFornecedor
-     * @return RelVendas01
-     */
-    public function setCodFornecedor(?int $codFornecedor): RelVendas01
-    {
-        $this->codFornecedor = $codFornecedor;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getNomeFornecedor(): ?string
-    {
-        return $this->nomeFornecedor;
-    }
-
-    /**
-     * @param string|null $nomeFornecedor
-     * @return RelVendas01
-     */
-    public function setNomeFornecedor(?string $nomeFornecedor): RelVendas01
-    {
-        $this->nomeFornecedor = $nomeFornecedor;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getCodProduto(): ?string
-    {
-        return $this->codProduto;
-    }
-
-    /**
-     * @param string|null $codProduto
-     * @return RelVendas01
-     */
-    public function setCodProduto(?string $codProduto): RelVendas01
-    {
-        $this->codProduto = $codProduto;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getDescProduto(): ?string
-    {
-        return $this->descProduto;
-    }
-
-    /**
-     * @param string|null $descProduto
-     * @return RelVendas01
-     */
-    public function setDescProduto(?string $descProduto): RelVendas01
-    {
-        $this->descProduto = $descProduto;
-        return $this;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getTotalPrecoVenda(): ?float
-    {
-        return $this->totalPrecoVenda;
-    }
-
-    /**
-     * @param float|null $totalPrecoVenda
-     * @return RelVendas01
-     */
-    public function setTotalPrecoVenda(?float $totalPrecoVenda): RelVendas01
-    {
-        $this->totalPrecoVenda = $totalPrecoVenda;
-        return $this;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getTotalPrecoCusto(): ?float
-    {
-        return $this->totalPrecoCusto;
-    }
-
-    /**
-     * @param float|null $totalPrecoCusto
-     * @return RelVendas01
-     */
-    public function setTotalPrecoCusto(?float $totalPrecoCusto): RelVendas01
-    {
-        $this->totalPrecoCusto = $totalPrecoCusto;
-        return $this;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getRentabilidade(): ?float
-    {
-        return $this->rentabilidade;
-    }
-
-    /**
-     * @param float|null $rentabilidade
-     * @return RelVendas01
-     */
-    public function setRentabilidade(?float $rentabilidade): RelVendas01
-    {
-        $this->rentabilidade = $rentabilidade;
-        return $this;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getCodVendedor(): ?int
-    {
-        return $this->codVendedor;
-    }
-
-    /**
-     * @param int|null $codVendedor
-     * @return RelVendas01
-     */
-    public function setCodVendedor(?int $codVendedor): RelVendas01
-    {
-        $this->codVendedor = $codVendedor;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getNomeVendedor(): ?string
-    {
-        return $this->nomeVendedor;
-    }
-
-    /**
-     * @param string|null $nomeVendedor
-     * @return RelVendas01
-     */
-    public function setNomeVendedor(?string $nomeVendedor): RelVendas01
-    {
-        $this->nomeVendedor = $nomeVendedor;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getLoja(): ?string
-    {
-        return $this->loja;
-    }
-
-    /**
-     * @param string|null $loja
-     * @return RelVendas01
-     */
-    public function setLoja(?string $loja): RelVendas01
-    {
-        $this->loja = $loja;
-        return $this;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getTotalCustoPV(): ?float
-    {
-        return $this->totalCustoPV;
-    }
-
-    /**
-     * @param float|null $totalCustoPV
-     * @return RelVendas01
-     */
-    public function setTotalCustoPV(?float $totalCustoPV): RelVendas01
-    {
-        $this->totalCustoPV = $totalCustoPV;
-        return $this;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getTotalVendaPV(): ?float
-    {
-        return $this->totalVendaPV;
-    }
-
-    /**
-     * @param float|null $totalVendaPV
-     * @return RelVendas01
-     */
-    public function setTotalVendaPV(?float $totalVendaPV): RelVendas01
-    {
-        $this->totalVendaPV = $totalVendaPV;
-        return $this;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getRentabilidadePV(): ?float
-    {
-        return $this->rentabilidadePV;
-    }
-
-    /**
-     * @param float|null $rentabilidadePV
-     * @return RelVendas01
-     */
-    public function setRentabilidadePV(?float $rentabilidadePV): RelVendas01
-    {
-        $this->rentabilidadePV = $rentabilidadePV;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getClientePV(): ?string
-    {
-        return $this->clientePV;
-    }
-
-    /**
-     * @param string|null $clientePV
-     * @return RelVendas01
-     */
-    public function setClientePV(?string $clientePV): RelVendas01
-    {
-        $this->clientePV = $clientePV;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getGrupo(): ?string
-    {
-        return $this->grupo;
-    }
-
-    /**
-     * @param string|null $grupo
-     * @return RelVendas01
-     */
-    public function setGrupo(?string $grupo): RelVendas01
-    {
-        $this->grupo = $grupo;
-        return $this;
-    }
+    public ?\DateTime $dtNF;
 
 
 }

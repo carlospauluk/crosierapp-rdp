@@ -27,11 +27,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class RelVendas01Controller extends FormListController
 {
 
-    /** @var SessionInterface */
-    private $session;
+    private SessionInterface $session;
 
-    /** @var RelVendas01Repository */
-    private $repoRelVendas01;
+    private RelVendas01Repository $repoRelVendas01;
 
     /**
      * @required
@@ -168,6 +166,7 @@ class RelVendas01Controller extends FormListController
      * @return Response
      *
      * @IsGranted("ROLE_RELVENDAS", statusCode=403)
+     * @throws ViewException
      */
     public function relatorioTotalPorFornecedor(Request $request): Response
     {
@@ -440,7 +439,7 @@ class RelVendas01Controller extends FormListController
 
         try {
             $vParams['total'] = $repo->totaisPreVenda($pv);
-            $vParams['total']['dt_emissao'] = DateTimeUtils::parseDateStr($vParams['total']['dt_emissao']);
+            $vParams['total']['dt_nf'] = DateTimeUtils::parseDateStr($vParams['total']['dt_nf']);
         } catch (ViewException $e) {
             $this->addFlash('error', $e->getMessage());
         }
