@@ -33,8 +33,10 @@ $(document).ready(function () {
     let $btnRelatorioVendasPorFornecedor = $('#btnRelatorioVendasPorFornecedor');
 
 
+
     $btnFiltrar.on('click', function () {
         drawChart();
+
     });
 
     $filter_lojas.select2({
@@ -47,8 +49,7 @@ $(document).ready(function () {
         $filter_lojas.val($filter_lojas.data('val').split(',')).trigger('change');
     }
     $filter_lojas.on('change', function () {
-        let url = Routing.generate('relVendas01_relatorioTotalPorFornecedor') + '?filter[dts]=' + $filter_dts.val() + '&filter[lojas]=' + $filter_lojas.val() + '&filter[grupos]=' + $filter_grupos.val();
-        $btnRelatorioVendasPorFornecedor.attr('href', url);
+        corrige_btnRelatorioVendasPorFornecedor();
     });
 
 
@@ -59,8 +60,7 @@ $(document).ready(function () {
         $filter_grupos.val($filter_grupos.data('val').split(',')).trigger('change');
     }
     $filter_grupos.on('change', function () {
-        let url = Routing.generate('relVendas01_relatorioTotalPorFornecedor') + '?filterDts=' + $filter_dts.val() + '&lojas=' + $filter_lojas.val() + '&grupos=' + $filter_grupos.val();
-        $btnRelatorioVendasPorFornecedor.attr('href', url);
+        corrige_btnRelatorioVendasPorFornecedor();
     });
 
 
@@ -117,8 +117,7 @@ $(document).ready(function () {
 
         }
     ).on('apply.daterangepicker', function (ev, picker) {
-        let url = Routing.generate('relVendas01_relatorioTotalPorFornecedor') + '?filterDts=' + $filter_dts.val() + '&lojas=' + $filter_lojas.val() + '&grupos=' + $filter_grupos.val();
-        $btnRelatorioVendasPorFornecedor.attr('href', url);
+        corrige_btnRelatorioVendasPorFornecedor();
     }).on('blur', function (ev, picker) {
 
     });
@@ -183,6 +182,12 @@ $(document).ready(function () {
 
 
         // });
+    }
+
+
+    function corrige_btnRelatorioVendasPorFornecedor() {
+        let url = Routing.generate('relVendas01_relatorioTotalPorFornecedor') + '?filter[dts]=' + $filter_dts.val() + '&filter[lojas]=' + $filter_lojas.val() + '&filter[grupos]=' + $filter_grupos.val();
+        $btnRelatorioVendasPorFornecedor.attr('href', url);
     }
 
 });
