@@ -98,6 +98,7 @@ class RelVendas01Business
                 $campos[22] = $campos[22] ? DateTimeUtils::parseDateStr($campos[22])->format('Y-m-d') : $campos[3];
 
                 if ((float)$campos[10] < (float)$campos[11]) {
+                    $this->logger->info('NÃO IMPORTAR: total_venda_pv < total_custo_pv! (' . (float)$campos[10] . ' < ' . (float)$campos[11] . ')');
                     continue;
                 }
 
