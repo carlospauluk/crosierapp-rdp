@@ -36,7 +36,7 @@ $(document).ready(function () {
 
 
         $.getJSON(
-            Routing.generate('relEstoque01_graficoTotalEstoquePorFilial'),
+            Routing.generate('est_graficoTotalEstoquePorFilial'),
             function (results) {
 
                 const data = new google.visualization.DataTable();
@@ -78,13 +78,13 @@ $(document).ready(function () {
                 function selectHandler() {
                     let selection = chart.getSelection();
                     if (selection && selection[0] && selection[0].row !== 'undefined') {
-                        let descFilial = data.getFormattedValue(selection[0].row, 0);
-                        if (descFilial) {
+                        let filial = data.getFormattedValue(selection[0].row, 0);
+                        if (filial) {
                             window.location = Routing.generate('relEstoque01_list',
                                 {
                                     'filter':
                                         {
-                                            'descFilial': descFilial,
+                                            'filial': filial,
                                         }
                                 });
                         }

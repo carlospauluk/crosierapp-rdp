@@ -1,0 +1,160 @@
+{% extends '@CrosierLibBase/index.html.twig' %}
+
+{% block page_content %}
+
+
+    <div class="card" style="margin-bottom: 50px;">
+        <div class="card-header">
+
+            <div class="d-flex flex-wrap align-items-center">
+
+                <div class="mr-1">
+                    <h3>Estoque</h3>
+                    <h6>Itens para Reposição</h6>
+                </div>
+
+                <div class="d-sm-flex flex-nowrap ml-auto">
+
+                    <button type="button" data-url="{{ url('relEstoque01_imprimirListaReposicao', {'filter': filter}) }}"
+                            class="btn btn-warning ml-1" title="Imprimir Lista de Reposição"
+                            id="btnImprimirListaReposicao" name="btnImprimirListaReposicao" value="btnImprimirListaReposicao">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            <form name="form_listReposicao_filter" id="form_listReposicao_filter">
+                <div class="row">
+                    <div class="col-md-2 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_apenasARepor" class="required">Apenas a repor</label>
+                            <select id="filter_apenasARepor" name="filter[apenasARepor]"
+                                    class="form-control autoSelect2">
+                                <option value="null" {{ filter.apenasARepor is not defined }}>...</option>
+                                <option value="true" {{ filter.apenasARepor|default(null) == true ? 'selected' : '' }}>Sim</option>
+                                <option value="false" {{ filter.apenasARepor|default(null) == false ? 'selected' : '' }}>Não</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_fornecedor" class="required">Fornecedor</label>
+                            <select id="filter_fornecedor" name="filter[fornecedor]"
+                                    data-options="{{ fornecedores }}"
+                                    class="form-control autoSelect2"
+                                    data-val="{{ filter['fornecedor']|default('') }}">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_dtUltSaidaApartirDe" class="required">Dt Últ Saída</label>
+                            <input type="text" id="filter_dtUltSaidaApartirDe" name="filter[dtUltSaidaApartirDe]"
+                                   class="crsr-date form-control" maxlength="10"
+                                   value="{{ filter['dtUltSaidaApartirDe']|default('') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_filial" class="required">Filial</label>
+                            <select id="filter_filial" name="filter[filial]"
+                                    data-options="{{ filiais }}"
+                                    class="form-control autoSelect2"
+                                    data-val="{{ filter['filial']|default('') }}">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-1 col-sm-12 text-right">
+                        <div class="form-group">
+                            <label for="btnFiltrar" class="required">&nbsp;</label>
+                            <button type="submit" class="btn btn-block btn-primary" id="btnFiltrar">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+
+            <div class="row">
+                <div class="col">
+                    {% include '@CrosierLibBase/Util/flashesOnAlerts.html.twig' %}
+                </div>
+            </div>
+
+            <div class="table-responsive-sm">
+
+                <form name="form_listReposicao" id="form_listReposicao">
+
+
+                    <table class="table table-sm table-striped table-hover crsr-datatable">
+
+                        <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Produto</th>
+                            <th scope="col">Fornecedor</th>
+                            <th scope="col">Dt Últ Saída</th>
+                            <th scope="col">Qtde Atual</th>
+                            <th scope="col">Qtde Mínima</th>
+                            <th scope="col">Qtde Reposição</th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for produto in produtos %}
+                            {% set deficit = produto.jsonData['deficit_estoque_' ~ filter.filial|lower]|default(0) %}
+                            <tr>
+                                <td>
+                                    <a role="button" href="#"
+                                       data-target="#confirmationModal" data-toggle="modal"
+                                       data-url="{{ url('est_pedidoCompra_adicionar', {'produto': produto.id, 'filial': filter.filial, 'qtdeSugerida': deficit}) }}"
+                                       class="btn btn-outline-primary btn-sm text-nowrap"
+                                       title="Adicionar ao carrinho">
+                                        <i class="fas fa-truck"></i> Adicionar</a>
+                                </td>
+                                <td>{{ produto.id }} - {{ produto.nome }}</td>
+                                <td>{{ produto.fornecedor.id }} - {{ produto.fornecedor.nome }}</td>
+                                <td>{{ produto.jsonData['dt_ult_saida_' ~ filter.filial|lower]|default('')|date('d/m/Y') }}</td>
+                                <td class="text-right">
+                                    {{ produto.jsonData['qtde_estoque_' ~ filter.filial|lower]|default(0)|number_format(3,',','.') }}
+                                </td>
+                                <td class="text-right">
+                                    {{ produto.jsonData['qtde_estoque_min_' ~ filter.filial|lower]|number_format(3,',','.') }}
+                                </td>
+                                <td class="text-right" style="color: white; background-color: {{ produto.jsonData['deficit_estoque_' ~ filter.filial|lower]|default(0) < 0 ? 'indianred' : 'dodgerblue' }}">
+                                    {{ deficit|number_format(3,',','.') }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+
+                    </table>
+
+
+                </form>
+
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    {{ produtos|length }} registro(s) retornado(s) (Máx: 1000)
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+
+{% endblock %}
+
+
+    {% block down_scripts %}
+        <script src="{{ asset('build/Estoque/pedidoCompra_listReposicao.js') }}"></script>
+    {% endblock %}

@@ -11,7 +11,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Estoque\ProdutoRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\Estoque\ProdutoRepository", readOnly=true)
  * @ORM\Table(name="est_produto")
  *
  * @author Carlos Eduardo Pauluk
@@ -29,15 +29,6 @@ class Produto implements EntityId
      * @var string|null
      */
     public ?string $UUID = null;
-
-    /**
-     *
-     * @ORM\Column(name="nome", type="string", nullable=false)
-     * @Groups("entity")
-     *
-     * @var null|string
-     */
-    public ?string $nome = null;
 
     /**
      *
@@ -71,33 +62,21 @@ class Produto implements EntityId
 
     /**
      *
+     * @ORM\ManyToOne(targetEntity="App\Entity\Estoque\Fornecedor")
+     * @ORM\JoinColumn(name="fornecedor_id", nullable=false)
      *
-     * @ORM\Column(name="depto_id", type="integer")
-     * @Groups("entity")
-     *
-     * @var null|int
+     * @var $fornecedor null|Fornecedor
      */
-    public ?int $deptoId = null;
+    public ?Fornecedor $fornecedor = null;
 
     /**
      *
-     *
-     * @ORM\Column(name="grupo_id", type="integer")
+     * @ORM\Column(name="nome", type="string", nullable=false)
      * @Groups("entity")
      *
-     * @var null|int
+     * @var null|string
      */
-    public ?int $grupoId = null;
-
-    /**
-     *
-     *
-     * @ORM\Column(name="subgrupo_id", type="integer")
-     * @Groups("entity")
-     *
-     * @var null|int
-     */
-    public ?int $subgrupoId = null;
+    public ?string $nome = null;
 
     /**
      * ATIVO,INATIVO
@@ -119,6 +98,23 @@ class Produto implements EntityId
      */
     public ?string $composicao = 'N';
 
+    /**
+     *
+     * @ORM\OneToMany(targetEntity="ProdutoImagem", mappedBy="produto", cascade={"all"}, orphanRemoval=true)
+     * @var ProdutoImagem[]|ArrayCollection|null
+     * @ORM\OrderBy({"ordem" = "ASC"})
+     *
+     */
+    public $imagens;
+
+    /**
+     *
+     * @ORM\OneToMany(targetEntity="ProdutoComposicao", mappedBy="produtoPai", cascade={"all"}, orphanRemoval=true, fetch="EXTRA_LAZY")
+     * @var ProdutoComposicao[]|ArrayCollection|null
+     * @ORM\OrderBy({"ordem" = "ASC"})
+     *
+     */
+    public $composicoes;
 
     /**
      *
@@ -129,14 +125,31 @@ class Produto implements EntityId
      */
     public ?array $jsonData = null;
 
+    public function __construct()
+    {
+        $this->imagens = new ArrayCollection();
+        $this->composicoes = new ArrayCollection();
+    }
+
+
     /**
-     *
-     * @ORM\OneToMany(targetEntity="ProdutoImagem", mappedBy="produto", cascade={"all"}, orphanRemoval=true)
-     * @var ProdutoImagem[]|ArrayCollection|null
-     * @ORM\OrderBy({"ordem" = "ASC"})
-     *
+     * @return ProdutoImagem[]|ArrayCollection|null
      */
-    public $imagens;
+    public function getImagens()
+    {
+        return $this->imagens;
+    }
+
+    /**
+     * @param ProdutoImagem[]|ArrayCollection|null $imagens
+     * @return Produto
+     */
+    public function setImagens($imagens): Produto
+    {
+        $this->imagens = $imagens;
+        return $this;
+    }
+
 
     // ---------- CAMPOS GENERATEDS (para exibição na list e poder dar ORDER BY)
 
@@ -180,11 +193,72 @@ class Produto implements EntityId
      */
     public ?float $porcentPreench = null;
 
+    /**
+     * @ORM\Column(name="qtde_estoque_matriz", type="decimal")
+     * @Groups("entity")
+     *
+     * @var null|float
+     */
+    public ?float $qtdeEstoqueMatriz = null;
 
-    public function __construct()
-    {
-        $this->imagens = new ArrayCollection();
-    }
+    /**
+     * @ORM\Column(name="qtde_estoque_min_matriz", type="decimal")
+     * @Groups("entity")
+     *
+     * @var null|float
+     */
+    public ?float $qtdeEstoqueMinMatriz = null;
+
+    /**
+     * @ORM\Column(name="deficit_estoque_matriz", type="decimal")
+     * @Groups("entity")
+     *
+     * @var null|float
+     */
+    public ?float $deficitEstoqueMatriz = null;
+
+    /**
+     *
+     * @ORM\Column(name="dt_ult_saida_matriz", type="datetime")
+     * @Groups("entity")
+     *
+     * @var null|\DateTime
+     */
+    public ?\DateTime $dtUltSaidaMatriz = null;
+
+    /**
+     * @ORM\Column(name="qtde_estoque_acessorios", type="decimal")
+     * @Groups("entity")
+     *
+     * @var null|float
+     */
+    public ?float $qtdeEstoqueAcessorios = null;
+
+    /**
+     * @ORM\Column(name="qtde_estoque_min_acessorios", type="decimal")
+     * @Groups("entity")
+     *
+     * @var null|float
+     */
+    public ?float $qtdeEstoqueMinAcessorios = null;
+
+    /**
+     * @ORM\Column(name="deficit_estoque_acessorios", type="decimal")
+     * @Groups("entity")
+     *
+     * @var null|float
+     */
+    public ?float $deficitEstoqueAcessorios = null;
+
+    /**
+     *
+     * @ORM\Column(name="dt_ult_saida_acessorios", type="datetime")
+     * @Groups("entity")
+     *
+     * @var null|\DateTime
+     */
+    public ?\DateTime $dtUltSaidaAcessorios = null;
+
 
 
 }

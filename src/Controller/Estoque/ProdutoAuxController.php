@@ -14,6 +14,7 @@ use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -333,6 +334,24 @@ class ProdutoAuxController extends FormListController
             throw new \RuntimeException($e->getMessage());
         }
 
+    }
+
+
+    /**
+     *
+     * @Route("/est/graficoTotalEstoquePorFilial/", name="est_graficoTotalEstoquePorFilial")
+     * @param Request $request
+     * @return JsonResponse
+     *
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
+     * @throws ViewException
+     */
+    public function graficoTotalEstoquePorFilial(Request $request): JsonResponse
+    {
+        /** @var ProdutoRepository $produtoRepository */
+        $produtoRepository = $this->getDoctrine()->getRepository(Produto::class);
+        $r = $produtoRepository->totalEstoquePorFilial();
+        return new JsonResponse($r);
     }
 
 

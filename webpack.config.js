@@ -48,7 +48,7 @@ Encore
     .addEntry('Relatorios/relCompFor01_list', './assets/js/Relatorios/relCompFor01_list.js')
 
     .addEntry('Relatorios/relEstoque01_list', './assets/js/Relatorios/relEstoque01_list.js')
-    .addEntry('Relatorios/relEstoque01_list_reposicao', './assets/js/Relatorios/relEstoque01_list_reposicao.js')
+
 
     .addEntry('Relatorios/relCompras01_listComprasPorProduto', './assets/js/Relatorios/relCompras01_listComprasPorProduto.js')
 
@@ -60,6 +60,10 @@ Encore
 
 
     .addEntry('Estoque/produto_list', './assets/js/Estoque/produto_list.js')
+    .addEntry('Estoque/pedidoCompra_form', './assets/js/Estoque/pedidoCompra_form.js')
+    .addEntry('Estoque/pedidoCompraItem_form', './assets/js/Estoque/pedidoCompraItem_form.js')
+    .addEntry('Estoque/pedidoCompra_list', './assets/js/Estoque/pedidoCompra_list.js')
+    .addEntry('Estoque/pedidoCompra_listReposicao', './assets/js/Estoque/pedidoCompra_listReposicao.js')
 
 
 

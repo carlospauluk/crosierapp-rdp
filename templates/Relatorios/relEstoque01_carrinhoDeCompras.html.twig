@@ -19,7 +19,7 @@
                     <div class="d-sm-flex flex-nowrap ml-auto">
 
                         <a role="button" href="#" data-target="#confirmationModal" data-toggle="modal"
-                           data-url="{{ url('relEstoque01_carrinho_limparCarrinho') }}"
+                           data-url="{{ url('est_pedidoCompra_limparCarrinho') }}"
                            class="btn btn-warning ml-1"
                            title="Remover todos os itens do carrinho">
                             <i class="far fa-trash-alt"></i> Esvaziar carrinho</a>
@@ -37,7 +37,7 @@
 
             <div class="card-body">
 
-                <form action="{{ url('relEstoque01_carrinho_salvar') }}" method="post" id="formCarrinho" name="formCarrinho">
+                <form action="{{ url('est_pedidoCompra_salvar') }}" method="post" id="formCarrinho" name="formCarrinho">
 
                     <div class="form-group">
 
@@ -117,7 +117,7 @@
                                     </td>
                                     <td class="text-right">
                                         <a role="button"
-                                           data-url="{{ url('relEstoque01_carrinho_removerEExibir', {'codProduto': item.codProduto|url_encode}) }}"
+                                           data-url="{{ url('est_pedidoCompra_removerEExibir', {'codProduto': item.codProduto|url_encode}) }}"
                                            data-target="#confirmationModal" data-toggle="modal"
                                            class="btn btn-outline-primary btn-sm text-nowrap"
                                            title="Adicionar ao carrinho">

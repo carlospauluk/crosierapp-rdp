@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 
+use App\Entity\Estoque\Produto;
 use App\Entity\Relatorios\RelCtsPagRec01;
 use App\Entity\Relatorios\RelEstoque01;
 use App\Entity\Relatorios\RelVendas01;
+use App\Repository\Estoque\ProdutoRepository;
 use App\Repository\Relatorios\RelEstoque01Repository;
 use CrosierSource\CrosierLibBaseBundle\Business\Config\StoredViewInfoBusiness;
 use CrosierSource\CrosierLibBaseBundle\Controller\BaseController;
@@ -88,10 +90,10 @@ class DefaultController extends BaseController
 
 
 
-        /** @var RelEstoque01Repository $repoEstoque01 */
-        $repoEstoque01 =  $this->getDoctrine()->getRepository(RelEstoque01::class);
-        $params['reposicaoEstoqueTotais']['filiais'] = $repoEstoque01->getReposicaoEstoqueTotalPorFilial();
-        $svi = $this->storedViewInfoBusiness->retrieve('relEstoque01_listReposicao');
+//        /** @var ProdutoRepository $repoEstoque01 */
+//        $repoEstoque01 =  $this->getDoctrine()->getRepository(Produto::class);
+        $params['reposicaoEstoqueTotais']['filiais'] = [['desc_filial' => 'ACESSORIOS'], ['desc_filial' => 'MATRIZ']];
+//        $svi = $this->storedViewInfoBusiness->retrieve('est_pedidoCompra_listReposicao');
         $params['reposicaoEstoqueTotais']['filter'] = $svi['formPesquisar']['filter'] ?? null;
 
 

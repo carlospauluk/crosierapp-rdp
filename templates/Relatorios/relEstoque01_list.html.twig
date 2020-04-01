@@ -3,14 +3,14 @@
 {% block btns %}
     {{ parent() }}
 
-    <a role="button" href="{{ url('relEstoque01_carrinho_exibir', {'filter': filter}) }}"
+    <a role="button" href="{{ url('est_pedidoCompra_exibir', {'filter': filter}) }}"
        class="btn btn-dark ml-1">
         <i class="fas fa-truck"></i> Ver Carrinho <span class="badge badge-light">{{ qtdeProdutosNoCarrinho }}</span>
     </a>
 
     {% if filter.codFornecedor|default('') != '' %}
         <a role="button" href="#" data-target="#confirmationModal" data-toggle="modal"
-           data-url="{{ url('relEstoque01_carrinho_adicionarTudoNoCarrinho', {'filter': filter}) }}"
+           data-url="{{ url('est_pedidoCompra_adicionarTudoNoCarrinho', {'filter': filter}) }}"
            class="btn btn-primary ml-1"
            title="Adicionar todos os produtos do fornecedor listado ao carrinho">
             <i class="fas fa-folder-plus"></i> Adicionar Tudo</a>
@@ -71,9 +71,9 @@
     <div class="form-group">
         <label for="filter_filial">Filial</label>
         <select id="filter_filial"
-                name="filter[descFilial]" class="form-control ml-2 autoSelect2"
+                name="filter[filial]" class="form-control ml-2 autoSelect2"
                 data-options="{{ filiais }}"
-                data-val="{{ filter.descFilial|default('') }}"></select>
+                data-val="{{ filter.filial|default('') }}"></select>
     </div>
 
     <div class="form-group">

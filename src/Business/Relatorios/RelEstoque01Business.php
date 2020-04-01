@@ -3,8 +3,6 @@
 namespace App\Business\Relatorios;
 
 
-use App\Entity\Relatorios\RelEstoque01;
-use App\Repository\Relatorios\RelEstoque01Repository;
 use CrosierSource\CrosierLibBaseBundle\Entity\Config\AppConfig;
 use CrosierSource\CrosierLibBaseBundle\EntityHandler\Config\AppConfigEntityHandler;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
@@ -15,10 +13,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ConnectionException;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  *
@@ -34,7 +29,9 @@ class RelEstoque01Business
 
     private AppConfigEntityHandler $appConfigEntityHandler;
 
-    private array $ids;
+    private array $deptoIndefinido;
+    private array $grupoIndefinido;
+    private array $subgrupoIndefinido;
 
     /**
      * @param EntityManagerInterface $doctrine
@@ -55,11 +52,11 @@ class RelEstoque01Business
     {
         /** @var Connection $conn */
         $conn = $this->doctrine->getConnection();
-        $this->ids = [];
-        // Aqui é pego o depto, grupo e subgrupo 'INDEFINIDO', pois não temos vinculação a princípio.
-        $this->ids['depto'] = $conn->fetchAssoc('SELECT id FROM est_depto WHERE uuid = \'54d9b263-1ac1-11ea-aa1a-02f5eec21cc2\'')['id'];
-        $this->ids['grupo'] = $conn->fetchAssoc('SELECT id FROM est_grupo WHERE uuid = \'b111cb42-1ac1-11ea-aa1a-02f5eec21cc2\'')['id'];
-        $this->ids['subgrupo'] = $conn->fetchAssoc('SELECT id FROM est_subgrupo WHERE uuid = \'ee784eec-1ac1-11ea-aa1a-02f5eec21cc2\'')['id'];
+
+        $this->deptoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_depto WHERE codigo = \'00\'');
+        $this->grupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_grupo WHERE codigo = \'00\'');
+        $this->subgrupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_subgrupo WHERE codigo = \'00\'');
+
     }
 
     /**
@@ -96,17 +93,13 @@ class RelEstoque01Business
         $pastaFila = $_SERVER['PASTA_UPLOAD_RELESTOQUE01'] . 'fila/';
         $conteudo = file_get_contents($pastaFila . $arquivo);
         $linhas = explode(PHP_EOL, $conteudo);
-        $totalRegistros = count($linhas);
-        /** @var Connection $conn */
-        $conn = $this->doctrine->getConnection();
-
-        $conn->beginTransaction();
+        $totalRegistros = count($linhas) - 2;
 
         $t = 0;
         $linha = null;
         try {
             $camposAgrupados = [];
-            $conn->executeUpdate('SET FOREIGN_KEY_CHECKS=0;TRUNCATE TABLE rdp_rel_estoque01;');
+
             for ($i = 1; $i < $totalRegistros; $i++) {
                 $linha = $linhas[$i];
                 if (!trim($linha)) {
@@ -125,98 +118,44 @@ class RelEstoque01Business
 
                 $cMax = count($campos);
                 for ($c = 0; $c < $cMax; $c++) {
-                    $campos[$c] = trim($campos[$c]) !== '' ? "'" . trim(str_replace("'", "''", $campos[$c])) . "'" : 'null';
+                    $campos[$c] = trim($campos[$c]) !== '' ? trim(str_replace("'", "''", $campos[$c])) : null;
                 }
 
-                // CODIGO|DESCRICAO|CUSTO_MEDIO|PRECO_VENDA|FILIAL|QTDE_MINIMA|QTDE_MAXIMA|QTDE_ATUAL|DATA_ULT_SAIDA|CODIGO_FORNECEDOR|FORNECEDOR|RECNUM|COD_EDI
+                $codigo = $campos[0];
+                $filial = $campos[4];
 
-                $sql = sprintf(
-                    'INSERT INTO rdp_rel_estoque01 (
-                            id,                            
-                            cod_prod,      
-                            desc_prod,     
-                            custo_medio,   
-                            preco_venda,   
-                            desc_filial,   
-                            qtde_minima,   
-                            qtde_maxima,   
-                            qtde_atual,  
-                            deficit,  
-                            dt_ult_saida,  
-                            cod_fornec,   
-                            nome_fornec,
-                               recnum,
-                               cod_edi,
-                            estabelecimento_id,inserted,updated,user_inserted_id,user_updated_id
-                        )
-                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
-                    $campos[0],
-                    mb_convert_encoding($campos[1], 'ISO-8859-1', 'UTF-8'),
-                    $campos[2],
-                    $campos[3],
-                    $campos[4],
-                    $campos[5],
-                    $campos[6],
-                    $campos[7],
-                    'DEFAULT',
-                    $campos[8],
-                    $campos[9],
-                    mb_convert_encoding($campos[10], 'ISO-8859-1', 'UTF-8'),
-                    $campos[11],
-                    mb_convert_encoding($campos[12], 'ISO-8859-1', 'UTF-8'),
-                );
+                $camposAgrupados[$codigo] = $camposAgrupados[$codigo] ??
+                    [
+                        'codigoProduto' => $codigo,
+                        'nome' => mb_convert_encoding($campos[1], 'ISO-8859-1', 'UTF-8'),
+                        'custoMedio' => $campos[2],
+                        'precoVenda' => $campos[3],
+                        'filial' => $filial,
+                        'qtdeMaxima' => $campos[6],
+                        'codigoFornecedor' => $campos[9],
+                        'nomeFornecedor' => mb_convert_encoding($campos[10], 'ISO-8859-1', 'UTF-8'),
+                        'recnum' => $campos[11],
+                        'codedi' => mb_convert_encoding($campos[12], 'ISO-8859-1', 'UTF-8')
+                    ];
 
-                try {
-                    $t += $conn->executeUpdate($sql);
-                } catch (\Exception $e) {
-                    $this->logger->info('Erro ao inserir a linha "' . $linha . '". Continuando...');
-                }
+                $camposAgrupados[$codigo]['qtde_estoque_min_' . strtolower($filial)] = $campos[5];
+                $camposAgrupados[$codigo]['qtde_estoque_' . strtolower($filial)] = $campos[7];
+                $camposAgrupados[$codigo]['deficit_estoque_' . strtolower($filial)] = bcsub($campos[7], $campos[5], 3);
+                $camposAgrupados[$codigo]['dt_ult_saida_' . strtolower($filial)] = $campos[8];
 
-
-                try {
-                    $dtUltSaida = $campos[8] ? DateTimeUtils::parseDateStr($campos[8])->format('Y-m-d') : null;
-                } catch (\Exception $e) {
-                    $dtUltSaida = null;
-                }
-                $linhaExploded = explode('|', $linha);
-                $codigo = trim($linhaExploded[0]);
-                $camposAgrupados[$codigo] = isset($camposAgrupados[$codigo]) ? array_replace($camposAgrupados[$codigo], $linhaExploded) : $linhaExploded;
-                $filial = trim($camposAgrupados[$codigo][4]);
-                switch ($filial) {
-                    case 'MATRIZ':
-                        $camposAgrupados[$codigo]['qtde_estoque_matriz'] = $linhaExploded[7];
-                        $camposAgrupados[$codigo]['dt_ult_saida_matriz'] = $dtUltSaida;
-                        $camposAgrupados[$codigo]['erp_dt_ult_saida'] = $dtUltSaida; // está duplicado mesmo
-                        $camposAgrupados[$codigo]['preco_custo'] = $linhaExploded[2];
-                        $camposAgrupados[$codigo]['preco_tabela'] = $linhaExploded[3];
-                        break;
-                    case 'DELPOZO-PG':
-                        $camposAgrupados[$codigo]['qtde_estoque_delpozo'] = $linhaExploded[7];
-                        $camposAgrupados[$codigo]['dt_ult_saida_delpozo'] = $dtUltSaida;
-                        break;
-                    case 'ACESSORIOS':
-                        $camposAgrupados[$codigo]['qtde_estoque_acessorios'] = $linhaExploded[7];
-                        $camposAgrupados[$codigo]['dt_ult_saida_acessorios'] = $dtUltSaida;
-                        break;
-                    case 'TELEMACO':
-                        $camposAgrupados[$codigo]['qtde_estoque_telemaco'] = $linhaExploded[7];
-                        $camposAgrupados[$codigo]['dt_ult_saida_telemaco'] = $dtUltSaida;
-                        break;
-                    default:
-                        $this->logger->warning('FILIAL não reconhecida para atualização de qtde_estoque: ' . $linhaExploded[4]);
-                }
-                $this->logger->info('rdp_rel_estoque01: ' . $i . '/' . $totalRegistros);
+                $this->logger->info('camposAgrupados: ' . str_pad($i, 9, '0', STR_PAD_LEFT) . '/' . $totalRegistros);
             }
+
+            /** @var Connection $conn */
+            $conn = $this->doctrine->getConnection();
 
             $totalCamposAgrupados = count($camposAgrupados);
             $i = 0;
-            foreach ($camposAgrupados as $campoAgrupado) {
-                $this->handleNaEstProduto($campoAgrupado);
+            foreach ($camposAgrupados as $dadosProduto) {
+                $this->handleNaEstProduto($dadosProduto);
                 $this->logger->info('est_produto: ' . ++$i . '/' . $totalCamposAgrupados);
             }
 
-            $conn->commit();
-            $this->logger->info('commit');
         } catch (\Throwable $e) {
             $this->logger->error('processarArquivo() - erro ');
             $this->logger->info('Erro ao inserir a linha "' . $linha . '"');
@@ -242,14 +181,10 @@ class RelEstoque01Business
     {
         try {
 
-            foreach ($campos as $k => $v) {
-                $campos[$k] = trim(str_replace("'", '', $v));
-            }
-
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
 
-            $produto = $conn->fetchAssoc('SELECT * FROM est_produto WHERE json_data->>"$.erp_codigo" = :cod', ['cod' => $campos[0]]);
+            $produto = $conn->fetchAssoc('SELECT * FROM est_produto WHERE json_data->>"$.erp_codigo" = :cod', ['cod' => $campos['codigoProduto']]);
             $updating = true;
             $json_data_ORIG = null;
             if (!$produto) {
@@ -257,23 +192,23 @@ class RelEstoque01Business
                 $produto = [];
                 $json_data = [];
                 $produto['uuid'] = StringUtils::guidv4();
-                $produto['depto_id'] = $this->ids['depto'];
+                $produto['depto_id'] = $this->deptoIndefinido['id'];
                 $json_data['depto_codigo'] = '00';
                 $json_data['depto_nome'] = 'INDEFINIDO';
-                $produto['grupo_id'] = $this->ids['grupo'];
+                $produto['grupo_id'] = $this->grupoIndefinido['id'];
                 $json_data['grupo_codigo'] = '00';
                 $json_data['grupo_nome'] = 'INDEFINIDO';
-                $produto['subgrupo_id'] = $this->ids['subgrupo'];
+                $produto['subgrupo_id'] = $this->subgrupoIndefinido['id'];;
                 $json_data['subgrupo_codigo'] = '00';
                 $json_data['subgrupo_nome'] = 'INDEFINIDO';
-                $json_data['erp_codigo'] = $campos[0];
+                $json_data['erp_codigo'] = $campos['codigoProduto'];
 
-                $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE codigo = ?', [$campos[9]]);
+                $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE codigo = ?', [$campos['codigoFornecedor']]);
                 if (!$fornecedor) {
                     unset($dadosFornecedor, $fornecedor);
                     $dadosFornecedor = [];
-                    $dadosFornecedor['codigo'] = $campos[9];
-                    $dadosFornecedor['nome'] = $campos[10];
+                    $dadosFornecedor['codigo'] = $campos['codigoFornecedor'];
+                    $dadosFornecedor['nome'] = $campos['nomeFornecedor'];
                     $dadosFornecedor['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
                     $dadosFornecedor['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
                     $dadosFornecedor['version'] = 0;
@@ -289,7 +224,7 @@ class RelEstoque01Business
                 $json_data['fornecedor_nome'] = $fornecedor['nome'];
                 $json_data['fornecedor_documento'] = $fornecedor['documento'];
 
-                $produto['nome'] = $campos[1];
+                $produto['nome'] = $campos['nome'];
                 $produto['status'] = 'INATIVO';
                 $produto['composicao'] = 'N';
                 $produto['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
@@ -303,29 +238,40 @@ class RelEstoque01Business
                 $json_data_ORIG = json_decode($produto['json_data'], true);
             }
 
-            $json_data['recnum'] = $campos[11];
-            $json_data['cod_edi'] = utf8_encode($campos[12]);
+            $json_data['recnum'] = $campos['recnum'];
+            $codedi = str_replace('#@#', ',', utf8_encode($campos['codedi']));
+            $json_data['cod_edi'] = $codedi;
 
-            $json_data['preco_custo'] = $campos[2];
-            $json_data['preco_tabela'] = $campos[3];
+
+            $json_data['qtde_estoque_max'] = $campos['qtdeMaxima'];
+
+            $json_data['preco_custo'] = $campos['custoMedio'];
+            $json_data['preco_tabela'] = $campos['precoVenda'];
 
             $json_data['qtde_imagens'] = $json_data['qtde_imagens'] ?? 0;
             $json_data['imagem1'] = $json_data['imagem1'] ?? '';
 
-            $json_data['qtde_estoque_matriz'] = $campos['qtde_estoque_matriz'] ?? null;
+            $json_data['qtde_estoque_matriz'] = isset($campos['qtde_estoque_matriz']) ? (float)$campos['qtde_estoque_matriz'] : null;
+            $json_data['qtde_estoque_min_matriz'] = isset($campos['qtde_estoque_min_matriz']) ? (float)$campos['qtde_estoque_min_matriz'] : null;
+            $json_data['deficit_estoque_matriz'] = isset($campos['deficit_estoque_matriz']) ? (float)$campos['deficit_estoque_matriz'] : null;
             $json_data['dt_ult_saida_matriz'] = $campos['dt_ult_saida_matriz'] ?? null;
-            $json_data['erp_dt_ult_saida'] = $campos['erp_dt_ult_saida'] ?? null; // está duplicado mesmo
+
+            $json_data['qtde_estoque_acessorios'] = isset($campos['qtde_estoque_acessorios']) ? (float)$campos['qtde_estoque_acessorios'] : null;
+            $json_data['qtde_estoque_min_acessorios'] = isset($campos['qtde_estoque_min_acessorios']) ? (float)$campos['qtde_estoque_min_acessorios'] : null;
+            $json_data['deficit_estoque_acessorios'] = isset($campos['deficit_estoque_acessorios']) ? (float)$campos['deficit_estoque_acessorios'] : null;
+            $json_data['dt_ult_saida_acessorios'] = $campos['dt_ult_saida_acessorios'] ?? null;
+
             $json_data['qtde_estoque_delpozo'] = $campos['qtde_estoque_delpozo'] ?? null;
             $json_data['dt_ult_saida_delpozo'] = $campos['dt_ult_saida_delpozo'] ?? null;
-            $json_data['qtde_estoque_acessorios'] = $campos['qtde_estoque_acessorios'] ?? null;
-            $json_data['dt_ult_saida_acessorios'] = $campos['dt_ult_saida_acessorios'] ?? null;
+
+
             $json_data['qtde_estoque_telemaco'] = $campos['qtde_estoque_telemaco'] ?? null;
             $json_data['dt_ult_saida_telemaco'] = $campos['dt_ult_saida_telemaco'] ?? null;
 
-            $produto['json_data'] = json_encode($json_data);
+            $produto['json_data'] = utf8_encode(json_encode($json_data));
 
             if (!$produto['json_data']) {
-                $this->logger->error('Erro ao gerar json_data para CODIGO = ' . $campos[0] . '. Continuando...');
+                $this->logger->error('Erro ao gerar json_data para CODIGO = ' . $campos['codigoProduto'] . '. Continuando...');
                 $produto['json_data'] = null;
             }
 
@@ -337,9 +283,10 @@ class RelEstoque01Business
             } else {
                 $id = $produto['id'];
                 if (strcmp($produto['json_data'], json_encode($json_data_ORIG)) !== 0) {
-                    $conn->update('est_produto', $produto, ['id' => $id]);
+                    // somente o campo json_data está sendo atualizado
+                    $conn->update('est_produto', ['json_data' => $produto['json_data'] ], ['id' => $id]);
                 } else {
-                    $this->logger->info('Nada mudou para CODIGO = ' . $campos[0] . '. Continuando...');
+                    $this->logger->info('Nada mudou para CODIGO = ' . $campos['codigoProduto'] . '. Continuando...');
                 }
 
             }
@@ -373,49 +320,6 @@ class RelEstoque01Business
             $this->logger->error($e->getMessage());
             throw new ViewException('Erro ao marcar dt/hr atualização');
         }
-    }
-
-    /**
-     * @param array $carrinhoDeCompra
-     * @return string
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function gerarPedidoCompra(array $carrinhoDeCompra): string
-    {
-        /** @var RelEstoque01Repository $repoEstoque */
-        $repoEstoque = $this->doctrine->getRepository(RelEstoque01::class);
-
-        $linhas = [
-            'COD_PRODUTO|DESC_PRODUTO|FILIAL|COD_FORNEC|NOME_FORNEC|CUSTO_MEDIO|PRECO_VENDA|QTDE|TOTAL_CUSTO_MEDIO|COD_COMPRADOR|NOME_COMPRADOR'
-        ];
-
-        $nomeFornecedor = $repoEstoque->getNomeFornecedorByCodigo((int)$carrinhoDeCompra['fornecedor']);
-
-        $comprador = explode(' - ', $carrinhoDeCompra['comprador']);
-
-
-        /** @var RelEstoque01 $item */
-        foreach ($carrinhoDeCompra['itens'] as $item) {
-            $regs = [
-                $item->getCodProduto(),
-                $item->getDescProduto(),
-                $item->getDescFilial(),
-                $item->getCodFornecedor(),
-                $item->getNomeFornecedor(),
-                $item->getCustoMedio(),
-                $item->getPrecoVenda(),
-                $item->getDeficit(),
-                $item->getTotalCustoMedio(),
-                $comprador[0],
-                $comprador[1]
-            ];
-            $linhas[] = implode('|', $regs);
-        }
-        $nomeArquivo = (new \DateTime('now'))->format('Y-m-d_H-i-s-U') . '.txt';
-        $pasta = $_SERVER['PASTA_PEDIDOSCOMPRA'];
-
-        file_put_contents($pasta . $nomeArquivo, implode(PHP_EOL, $linhas));
-        return $nomeArquivo;
     }
 
 

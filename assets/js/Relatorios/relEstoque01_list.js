@@ -21,7 +21,7 @@ function getDatatablesColumns() {
             title: '#',
             render: function (data, type, row) {
                 return '<a role="button" href="#" ' +
-                    'data-target="#confirmationModal" data-toggle="modal" data-jsfunction="Carrinho.adicionar" data-jsfunction-args="' + data.codProduto + '|' + data.descFilial + '" ' +
+                    'data-target="#confirmationModal" data-toggle="modal" data-jsfunction="Carrinho.adicionar" data-jsfunction-args="' + data.codProduto + '|' + data.filial + '" ' +
                     'class="btn btn-outline-primary btn-sm text-nowrap" ' +
                     'title="Adicionar ao carrinho">' +
                     '<i class="fas fa-truck"></i> Adicionar</a> ';
@@ -89,7 +89,7 @@ class Carrinho {
         args = args.split('|');
 
         $.getJSON(
-            Routing.generate('relEstoque01_carrinho_adicionar', {'codProduto': args[0], 'filial': args[1]}),
+            Routing.generate('est_pedidoCompra_adicionar', {'codProduto': args[0], 'filial': args[1]}),
             function (results) {
                 if (results.produto) {
                     toastrr.success(results.msg);
