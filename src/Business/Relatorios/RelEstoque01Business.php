@@ -269,7 +269,7 @@ class RelEstoque01Business
             $json_data['qtde_estoque_telemaco'] = $campos['qtde_estoque_telemaco'] ?? null;
             $json_data['dt_ult_saida_telemaco'] = $campos['dt_ult_saida_telemaco'] ?? null;
 
-            $produto['json_data'] = utf8_encode(json_encode($json_data));
+            $produto['json_data'] = json_encode($json_data);
 
             if (!$produto['json_data']) {
                 $this->logger->error('Erro ao gerar json_data para CODIGO = ' . $campos['codigoProduto'] . '. Continuando...');
