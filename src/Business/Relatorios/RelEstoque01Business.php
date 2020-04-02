@@ -160,7 +160,7 @@ class RelEstoque01Business
             $totalCamposAgrupados = count($camposAgrupados);
             $i = 0;
             foreach ($camposAgrupados as $erp_codigo => $dadosProduto) {
-                $this->handleNaEstProduto($produtos[$erp_codigo] ?? null, $dadosProduto);
+                $this->handleNaEstProduto($dadosProduto, $produtos[$erp_codigo] ?? null);
                 $this->logger->info('est_produto: ' . ++$i . '/' . $totalCamposAgrupados);
             }
 
@@ -180,12 +180,12 @@ class RelEstoque01Business
      * @param array $campos
      * @return string
      */
-    private function handleNaEstProduto(array $produto, array $campos): string
+    private function handleNaEstProduto(array $campos, ?array $produto = null): string
     {
         try {
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
-            
+
             $updating = true;
             $json_data_ORIG = null;
             if (!$produto) {
