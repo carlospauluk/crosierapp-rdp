@@ -230,7 +230,7 @@ class PedidoCompraController extends FormListController
 
             if ($this->session->has('pedidoCompra')) {
                 $pedidoCompra = $this->session->get('pedidoCompra');
-                if ($pedidoCompra->status !== 'INICIADO') {
+                if ($pedidoCompra->status !== 'INICIADO' || ($pedidoCompra->fornecedor->getId() !== $produto->fornecedor->getId())) {
                     $pedidoCompra = $this->getNovoPedidoCompra($produto->fornecedor, $filial);
                     $pedidoCompra = $this->getEntityHandler()->save($pedidoCompra);
                 } else {

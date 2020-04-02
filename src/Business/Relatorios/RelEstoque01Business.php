@@ -149,10 +149,19 @@ class RelEstoque01Business
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
 
+            $rProdutos = $conn->fetchAll('SELECT * FROM est_produto');
+            $produtos = [];
+            foreach ($rProdutos as $rProduto) {
+                $rProdutoJsonData = json_decode($rProduto['json_data'], true);
+                if ($rProdutoJsonData['erp_codigo'] ?? null) {
+                    $produtos[$rProdutoJsonData['erp_codigo']] = $rProduto;
+                }
+            }
+
             $totalCamposAgrupados = count($camposAgrupados);
             $i = 0;
-            foreach ($camposAgrupados as $dadosProduto) {
-                $this->handleNaEstProduto($dadosProduto);
+            foreach ($camposAgrupados as $erp_codigo => $dadosProduto) {
+                $this->handleNaEstProduto($produtos[$erp_codigo] ?? null, $dadosProduto);
                 $this->logger->info('est_produto: ' . ++$i . '/' . $totalCamposAgrupados);
             }
 
@@ -177,14 +186,9 @@ class RelEstoque01Business
      * @param array $campos
      * @return string
      */
-    private function handleNaEstProduto(array $campos): string
+    private function handleNaEstProduto(array $produto, array $campos): string
     {
         try {
-
-            /** @var Connection $conn */
-            $conn = $this->doctrine->getConnection();
-
-            $produto = $conn->fetchAssoc('SELECT * FROM est_produto WHERE json_data->>"$.erp_codigo" = :cod', ['cod' => $campos['codigoProduto']]);
             $updating = true;
             $json_data_ORIG = null;
             if (!$produto) {
@@ -203,6 +207,8 @@ class RelEstoque01Business
                 $json_data['subgrupo_nome'] = 'INDEFINIDO';
                 $json_data['erp_codigo'] = $campos['codigoProduto'];
 
+                /** @var Connection $conn */
+                $conn = $this->doctrine->getConnection();
                 $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE codigo = ?', [$campos['codigoFornecedor']]);
                 if (!$fornecedor) {
                     unset($dadosFornecedor, $fornecedor);
