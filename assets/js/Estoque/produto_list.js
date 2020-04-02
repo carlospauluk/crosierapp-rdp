@@ -29,7 +29,7 @@ function getDatatablesColumns() {
                     '</div>';
                 if (data.jsonData && data.jsonData.imagem1) {
                     s += '<div class="float-right">' +
-                        '<img src="' + crosierappradx_url + '/images/produtos/' + data.deptoId + '/' + data.grupoId + '/' + data.subgrupoId + '/' + data.jsonData.imagem1 + '" width="50px"/></div>';
+                        '<img src="' + crosierappradx_url + '/images/produtos/' + data.depto.id + '/' + data.grupo.id + '/' + data.subgrupo.id + '/' + data.jsonData.imagem1 + '" width="50px"/></div>';
                 }
                 return s;
             },
