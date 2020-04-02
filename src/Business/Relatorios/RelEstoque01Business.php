@@ -10,7 +10,6 @@ use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ConnectionException;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -169,11 +168,6 @@ class RelEstoque01Business
             $this->logger->error('processarArquivo() - erro ');
             $this->logger->info('Erro ao inserir a linha "' . $linha . '"');
             $this->logger->error($e->getMessage());
-            try {
-                $conn->rollBack();
-            } catch (ConnectionException $e) {
-                throw new ViewException($e->getMessage());
-            }
             throw new \RuntimeException($e->getMessage());
         }
 
@@ -189,6 +183,9 @@ class RelEstoque01Business
     private function handleNaEstProduto(array $produto, array $campos): string
     {
         try {
+            /** @var Connection $conn */
+            $conn = $this->doctrine->getConnection();
+            
             $updating = true;
             $json_data_ORIG = null;
             if (!$produto) {
@@ -207,8 +204,6 @@ class RelEstoque01Business
                 $json_data['subgrupo_nome'] = 'INDEFINIDO';
                 $json_data['erp_codigo'] = $campos['codigoProduto'];
 
-                /** @var Connection $conn */
-                $conn = $this->doctrine->getConnection();
                 $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE codigo = ?', [$campos['codigoFornecedor']]);
                 if (!$fornecedor) {
                     unset($dadosFornecedor, $fornecedor);
