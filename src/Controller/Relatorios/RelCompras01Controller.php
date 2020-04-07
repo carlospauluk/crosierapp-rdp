@@ -3,8 +3,10 @@
 namespace App\Controller\Relatorios;
 
 
+use App\Entity\Estoque\Produto;
 use App\Entity\Relatorios\RelCompras01;
 use App\Entity\Relatorios\RelVendas01;
+use App\Repository\Estoque\ProdutoRepository;
 use App\Repository\Relatorios\RelCompras01Repository;
 use App\Repository\Relatorios\RelVendas01Repository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
@@ -76,9 +78,9 @@ class RelCompras01Controller extends FormListController
         $this->storedViewInfoBusiness->store('relCompras01_listComprasPorProduto', $viewInfo);
 
 
-        /** @var RelVendas01Repository $repo */
-        $repoVendas = $this->getDoctrine()->getRepository(RelVendas01::class);
-        $vParams['produto'] = $vParams['filter']['codProduto'] . ' - ' . $repoVendas->getProdutoByCodigo($vParams['filter']['codProduto']);
+        /** @var ProdutoRepository $repoProduto */
+        $repoProduto = $this->getDoctrine()->getRepository(Produto::class);
+        $vParams['produto'] = $vParams['filter']['codProduto'] . ' - ' . $repoProduto->getProdutoByCodigo($vParams['filter']['codProduto']);
 
         return $this->doRender('Relatorios/relCompras01_listComprasPorProduto.html.twig', $vParams);
     }

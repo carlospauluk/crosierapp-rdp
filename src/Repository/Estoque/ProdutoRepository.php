@@ -3,7 +3,6 @@
 namespace App\Repository\Estoque;
 
 
-use App\Entity\Estoque\Fornecedor;
 use App\Entity\Estoque\Produto;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\FilterRepository;
@@ -63,6 +62,14 @@ class ProdutoRepository extends FilterRepository
         } catch (DBALException $e) {
             throw new ViewException('Erro ao gerar totalEstoquePorFilial()');
         }
+    }
+
+
+    public function getProdutoByCodigo($codigo)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 'SELECT * FROM est_produto WHERE json_data->>"$.erp_codigo" = :codigo';
+        return $conn->fetchAssoc($sql, ['codigo' => $codigo]);
     }
 
 }

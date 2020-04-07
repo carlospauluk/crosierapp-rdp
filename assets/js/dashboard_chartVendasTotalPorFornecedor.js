@@ -130,7 +130,7 @@ $(document).ready(function () {
         // Pace.ignore(function () {
 
         $.getJSON(
-            Routing.generate('relVendas01_graficoTotalPorFornecedor') + '/?filterDts=' + $filter_dts.val() + '&lojas=' + $filter_lojas.val() + '&grupos=' + $filter_grupos.val(),
+            Routing.generate('ven_venda_graficoTotalPorFornecedor') + '?filterDts=' + $filter_dts.val() + '&lojas=' + $filter_lojas.val() + '&grupos=' + $filter_grupos.val(),
 
             function (results) {
 
@@ -186,7 +186,7 @@ $(document).ready(function () {
 
 
     function corrige_btnRelatorioVendasPorFornecedor() {
-        let url = Routing.generate('relVendas01_relatorioTotalPorFornecedor') + '?filter[dts]=' + $filter_dts.val() + '&filter[lojas]=' + $filter_lojas.val() + '&filter[grupos]=' + $filter_grupos.val();
+        let url = Routing.generate('ven_venda_relatorioTotalPorFornecedor') + '?filter[dts]=' + $filter_dts.val() + '&filter[lojas]=' + $filter_lojas.val() + '&filter[grupos]=' + $filter_grupos.val();
         $btnRelatorioVendasPorFornecedor.attr('href', url);
     }
 

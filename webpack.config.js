@@ -49,23 +49,17 @@ Encore
 
     .addEntry('Relatorios/relEstoque01_list', './assets/js/Relatorios/relEstoque01_list.js')
 
-
     .addEntry('Relatorios/relCompras01_listComprasPorProduto', './assets/js/Relatorios/relCompras01_listComprasPorProduto.js')
 
     .addEntry('Relatorios/relCliente01_list', './assets/js/Relatorios/relCliente01_list.js')
 
-    .addEntry('Vendas/pv_list', './assets/js/Vendas/pv_list.js')
-    .addEntry('Vendas/pv_form', './assets/js/Vendas/pv_form.js')
     .addEntry('Vendas/produto_list', './assets/js/Vendas/produto_list.js')
-
 
     .addEntry('Estoque/produto_list', './assets/js/Estoque/produto_list.js')
     .addEntry('Estoque/pedidoCompra_form', './assets/js/Estoque/pedidoCompra_form.js')
     .addEntry('Estoque/pedidoCompraItem_form', './assets/js/Estoque/pedidoCompraItem_form.js')
     .addEntry('Estoque/pedidoCompra_list', './assets/js/Estoque/pedidoCompra_list.js')
     .addEntry('Estoque/pedidoCompra_listReposicao', './assets/js/Estoque/pedidoCompra_listReposicao.js')
-
-
 
 
 

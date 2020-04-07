@@ -101,7 +101,7 @@ $(document).ready(function () {
         Pace.ignore(function () {
 
             $.getJSON(
-                Routing.generate('relCompFor01_graficoTotalPorFornecedor') + '/?filterDts=' + $filter_relCompFor01_dts.val(),
+                Routing.generate('relCompFor01_graficoTotalPorFornecedor') + '?filterDts=' + $filter_relCompFor01_dts.val(),
                 function (results) {
 
                     const data = new google.visualization.DataTable();

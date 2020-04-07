@@ -3,13 +3,14 @@
 namespace App\Business\Relatorios;
 
 
+use App\EntityHandler\Vendas\VendaEntityHandler;
 use CrosierSource\CrosierLibBaseBundle\Entity\Config\AppConfig;
 use CrosierSource\CrosierLibBaseBundle\EntityHandler\Config\AppConfigEntityHandler;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ConnectionException;
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -27,18 +28,30 @@ class RelVendas01Business
 
     private AppConfigEntityHandler $appConfigEntityHandler;
 
+    private VendaEntityHandler $vendaEntityHandler;
+
+    private RelEstoque01Business $relEstoque01Business;
+
+    private array $produtos;
+
     /**
      * @param EntityManagerInterface $doctrine
      * @param LoggerInterface $logger
      * @param AppConfigEntityHandler $appConfigEntityHandler
+     * @param VendaEntityHandler $vendaEntityHandler
+     * @param RelEstoque01Business $relEstoque01Business
      */
     public function __construct(EntityManagerInterface $doctrine,
                                 LoggerInterface $logger,
-                                AppConfigEntityHandler $appConfigEntityHandler)
+                                AppConfigEntityHandler $appConfigEntityHandler,
+                                VendaEntityHandler $vendaEntityHandler,
+                                RelEstoque01Business $relEstoque01Business)
     {
         $this->doctrine = $doctrine;
         $this->appConfigEntityHandler = $appConfigEntityHandler;
+        $this->vendaEntityHandler = $vendaEntityHandler;
         $this->logger = $logger;
+        $this->relEstoque01Business = $relEstoque01Business;
     }
 
     /**
@@ -68,122 +81,260 @@ class RelVendas01Business
     /**
      * @param string $arquivo
      * @return int
-     * @throws ViewException
      */
     public function processarArquivo(string $arquivo): int
     {
         $pastaFila = $_SERVER['PASTA_UPLOAD_RELVENDAS01'] . 'fila/';
         $conteudo = file_get_contents($pastaFila . $arquivo);
         $linhas = explode(PHP_EOL, $conteudo);
-        $totalRegistros = count($linhas);
+        $totalRegistros = count($linhas) - 2;
         /** @var Connection $conn */
         $conn = $this->doctrine->getConnection();
 
-        $conn->beginTransaction();
-
         $t = 0;
         $linha = null;
+
+        $relVendas01 = [];
+
         try {
             for ($i = 1; $i < $totalRegistros; $i++) {
                 $linha = $linhas[$i];
                 if (!trim($linha)) {
                     continue;
                 }
-                $campos = explode('|', $linha);
-                if (count($campos) !== 23) {
-                    throw new ViewException('Qtde de campos difere de 23 para a linha "' . $linha . '"');
+
+                $camposSplit = explode('|', $linha);
+                if (count($camposSplit) !== 28) {
+                    throw new ViewException('Qtde de campos difere de 28 para a linha "' . $linha . '"');
                 }
 
-                $campos[3] = DateTimeUtils::parseDateStr($campos[3])->format('Y-m-d');
-                $campos[22] = $campos[22] ? DateTimeUtils::parseDateStr($campos[22])->format('Y-m-d') : $campos[3];
+                $cMax = count($camposSplit);
+                for ($c = 0; $c < $cMax; $c++) {
+                    $camposSplit[$c] = trim($camposSplit[$c]) !== '' ? trim(str_replace("'", "''", $camposSplit[$c])) : null;
+                }
 
-                if ((float)$campos[17] < (float)$campos[16]) {
-                    $this->logger->info('NÃO IMPORTAR: total_venda_pv < total_custo_pv! (' . (float)$campos[10] . ' < ' . (float)$campos[11] . ')');
+                $prevenda = $camposSplit[0];
+
+                $campos = [];
+                $campos['PREVENDA'] = $prevenda;
+                $campos['ITEM'] = $camposSplit[1];
+                $campos['QTDE'] = $camposSplit[2];
+                $campos['EMISSAO'] = $camposSplit[3] ? DateTimeUtils::parseDateStr($camposSplit[3])->format('Y-m-d') : null;
+                $campos['ANO'] = $camposSplit[4];
+                $campos['MES'] = $camposSplit[5];
+                $campos['COD_FORNEC'] = $camposSplit[6];
+                $campos['CNPJFORNEC'] = preg_replace("/[^0-9]/", "", $camposSplit[7]);
+                $campos['NOME_FORNEC'] = $camposSplit[8];
+                $campos['COD_PROD'] = $camposSplit[9];
+                $campos['DESC_PROD'] = $camposSplit[10];
+                $campos['TOTAL_PRECO_VENDA'] = $camposSplit[11];
+                $campos['TOTAL_PRECO_CUSTO'] = $camposSplit[12];
+                $campos['RENTABILIDADE_ITEM'] = $camposSplit[13];
+                $campos['COD_VENDEDOR'] = $camposSplit[14];
+                $campos['NOME_VENDEDOR'] = $camposSplit[15];
+                $campos['LOJA'] = $camposSplit[16];
+                $campos['TOTAL_CUSTO_PV'] = $camposSplit[17];
+                $campos['TOTAL_VENDA_PV'] = $camposSplit[18];
+                $campos['RENTABILIDADE_PV'] = $camposSplit[19];
+                $campos['CODCLI'] = $camposSplit[20];
+                $campos['CNPJCLI'] = preg_replace("/[^0-9]/", "", $camposSplit[21]);
+                $campos['CLIENTE_PV'] = $camposSplit[22];
+                $campos['GRUPO'] = $camposSplit[23];
+                $campos['NOTA'] = $camposSplit[24];
+                $campos['DATA_NOTA'] = $camposSplit[25] ? DateTimeUtils::parseDateStr($camposSplit[25])->format('Y-m-d') : $campos['EMISSAO'];
+                $campos['MARGEM_LIQUIDA'] = $camposSplit[26];
+                $campos['NOVA_COMISSAO'] = $camposSplit[27];
+
+                if ((float)$campos['RENTABILIDADE_PV'] === -100.0) {
+                    $this->logger->info('NÃO IMPORTAR. Regra "RENTABILIDADE PV" = -100.00');
                     continue;
                 }
 
-                $cMax = count($campos);
-                for ($c = 0; $c < $cMax; $c++) {
-                    $campos[$c] = trim($campos[$c]) !== '' ? "'" . trim(str_replace("'", "''", $campos[$c])) . "'" : 'null';
-                }
 
-                $sql = sprintf(
-                    'INSERT INTO rdp_rel_vendas01 (
-                            id,                            
-                            prevenda,
-                            num_item,
-                            qtde,
-                            dt_emissao,
-                            ano,
-                            mes,
-                            cod_fornec,
-                            nome_fornec,
-                            cod_prod,
-                            desc_prod,
-                            total_preco_venda,
-                            total_preco_custo,
-                            rentabilidade,
-                            cod_vendedor,
-                            nome_vendedor,
-                            loja,            
-                            total_custo_pv,
-                            total_venda_pv,
-                            rentabilidade_pv,
-                            cliente_pv,
-                            grupo,
-                            numero_nf,
-                            dt_nf,
-                            estabelecimento_id,inserted,updated,user_inserted_id,user_updated_id
-                        )
-                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
-                    $campos[0], // `prevenda`,
-                    $campos[1], // `num_item`,
-                    $campos[2], // `qtde`,
-                    $campos[3], // `dt_emissao`,
-                    $campos[4], // `ano`,
-                    $campos[5], // `mes`
-                    $campos[6], // `cod_fornec`
-                    $campos[7], // `nome_fornec`
-                    $campos[8], // `cod_prod`
-                    $campos[9], // `desc_prod`
-                    $campos[10],// `total_preco_venda`
-                    $campos[11],// `total_preco_custo`
-                    $campos[12],// `rentabilidade`
-                    $campos[13],// `cod_vendedor`
-                    $campos[14],// `nome_vendedor`
-                    $campos[15],// `loja`
-                    $campos[16],// `total_custo_pv`
-                    $campos[17],// `total_venda_pv`
-                    $campos[18],// `rentabilidade_pv`
-                    $campos[19],// `cliente_pv`
-                    $campos[20], // `grupo`,
-                    $campos[21], // `numero_nf`,
-                    $campos[22] // `dt_nf`,
-                );
+                $relVendas01[$prevenda][] = $campos;
+                $this->logger->info('camposAgrupados: ' . str_pad($i, 9, '0', STR_PAD_LEFT) . '/' . $totalRegistros);
+            }
 
-                try {
-                    $t += $conn->executeUpdate($sql);
-                    $this->logger->info($t . ' inseridos');
-                } catch (\Exception $e) {
-                    $this->logger->info('Erro ao inserir a linha "' . $linha . '"');
-                    $this->logger->info('Continuando.');
+            $rVenVendas = $conn->fetchAll('select v.id, v.cliente_id, v.valor_total, v.json_data, count(*) as qtde_itens from ven_venda v left join ven_venda_item i on v.id = i.venda_id group by v.id');
+            $venVendas = [];
+            foreach ($rVenVendas as $rVenVenda) {
+                $jsonData = json_decode($rVenVenda['json_data'], true);
+                if ($jsonData['prevenda_ekt'] ?? null) {
+                    $venVendas[$jsonData['prevenda_ekt']] = $rVenVenda;
                 }
             }
-            $this->logger->info($t . ' registros inseridos');
-            $conn->commit();
-            $this->logger->info('commit');
+
+            $totalRelVendas01 = count($relVendas01);
+            $i = 0;
+
+            $this->buildProdutosArray();
+            foreach ($relVendas01 as $num_pv_ekt => $relVenda01) {
+                if (isset($venVendas[$num_pv_ekt])) {
+                    $venVenda = $venVendas[$num_pv_ekt];
+                    // se mudou o sub_total ou o cliente ou a qtde de itens, apaga do ven_venda e deixa reinserir
+                    $venVendaJsonData = json_decode($venVenda['json_data'], true);
+                    if ((float)$venVenda['valor_total'] !== (float)$relVenda01[0]['TOTAL_VENDA_PV'] ||
+                        (int)$venVendaJsonData['cod_cliente_ekt'] !== (int)$relVenda01[0]['CODCLI'] ||
+                        count($relVenda01) !== (int)$venVenda['qtde_itens']) {
+                        $conn->delete('ven_venda', ['id' => $venVendas[$num_pv_ekt]['id']]);
+                    } else {
+                        $this->logger->info('ven_venda: ' . str_pad(++$i, 9, '0', STR_PAD_LEFT) . '/' . $totalRelVendas01);
+                        continue;
+                    }
+                }
+
+                $this->handleVenda($relVenda01);
+                $this->logger->info('ven_venda: ' . str_pad(++$i, 9, '0', STR_PAD_LEFT) . '/' . $totalRelVendas01);
+            }
+            $this->logger->info('FIM. OK!');
         } catch (\Throwable $e) {
             $this->logger->error('processarArquivo() - erro ');
             $this->logger->error($e->getMessage());
-            try {
-                $conn->rollBack();
-            } catch (ConnectionException $e) {
-                throw new ViewException($e->getMessage());
-            }
             throw new \RuntimeException($e->getMessage());
         }
 
         return $t;
+    }
+
+    /**
+     * @param array $dadosVendaEkt
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function handleVenda(array $dadosVendaEkt): void
+    {
+        /** @var Connection $conn */
+        $conn = $this->doctrine->getConnection();
+
+        $cabecalho = $dadosVendaEkt[0];
+
+        $venda = [];
+
+        $cliente = $conn->fetchAssoc('SELECT id FROM crm_cliente WHERE documento = ?', [$cabecalho['CNPJCLI']]);
+        if (!$cliente) {
+
+            try {
+                $dadosCliente = [];
+                $dadosCliente['documento'] = $cabecalho['CNPJCLI'];
+                $dadosCliente['nome'] = utf8_encode($cabecalho['CLIENTE_PV']);
+                $dadosCliente['json_data'] = json_encode(['cod_cliente_ekt' => $cabecalho['CODCLI']]);
+                $dadosCliente['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+                $dadosCliente['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+                $dadosCliente['version'] = 0;
+                $dadosCliente['estabelecimento_id'] = 1;
+                $dadosCliente['user_inserted_id'] = 1;
+                $dadosCliente['user_updated_id'] = 1;
+                $conn->insert('crm_cliente', $dadosCliente);
+                $cliente['id'] = $conn->lastInsertId();
+            } catch (DBALException $e) {
+                $this->logger->error('Erro ao salvar o cliente');
+            }
+        }
+
+        $venda['cliente_id'] = $cliente['id'] ?? null;
+
+        $venda['dt_venda'] = $cabecalho['EMISSAO'];
+
+        $venda['valor_total'] = $cabecalho['TOTAL_VENDA_PV'];
+
+        $jsonData = [];
+        $jsonData['prevenda_ekt'] = $cabecalho['PREVENDA'];
+        $jsonData['cod_cliente_ekt'] = $cabecalho['CODCLI'];
+        $jsonData['cliente_cnpj'] = $cabecalho['CNPJCLI'];
+        $jsonData['cliente_nome'] = utf8_encode($cabecalho['CLIENTE_PV']);
+        $jsonData['vendedor_codigo'] = $cabecalho['COD_VENDEDOR'];
+        $jsonData['vendedor_nome'] = $cabecalho['NOME_VENDEDOR'];
+        $jsonData['loja'] = $cabecalho['LOJA'];
+        $jsonData['grupo'] = $cabecalho['GRUPO'];
+        $jsonData['nota'] = $cabecalho['NOTA'];
+        $jsonData['dt_nota'] = $cabecalho['DATA_NOTA'];
+        $jsonData['margem_liquida'] = $cabecalho['MARGEM_LIQUIDA'];
+        $jsonData['nova_comissao'] = $cabecalho['NOVA_COMISSAO'];
+        $jsonData['total_custo_pv'] = $cabecalho['TOTAL_CUSTO_PV'];
+        $jsonData['rentabilidade_pv'] = $cabecalho['RENTABILIDADE_PV'];
+
+        $venda['json_data'] = json_encode($jsonData);
+
+        $venda['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+        $venda['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+        $venda['version'] = 0;
+        $venda['estabelecimento_id'] = 1;
+        $venda['user_inserted_id'] = 1;
+        $venda['user_updated_id'] = 1;
+
+        $conn->insert('ven_venda', $venda);
+        $vendaId = $conn->lastInsertId();
+
+        foreach ($dadosVendaEkt as $i => $item) {
+
+            $vendaItem = [];
+            $vendaItem['venda_id'] = $vendaId;
+
+            $produto = $this->produtos[$item['COD_PROD']];
+            if (!$produto) {
+                $arrProduto = [
+                    'codigoProduto' => $item['COD_PROD'],
+                    'codigoFornecedor' => $item['COD_FORNEC'],
+                    'cpfcnpjFornecedor' => $item['CNPJFORNEC'],
+                    'nomeFornecedor' => $item['NOME_FORNEC'],
+                    'nome' => $item['DESC_PROD']
+                ];
+
+                $produto['id'] = $this->relEstoque01Business->handleNaEstProduto($arrProduto);
+                $this->buildProdutosArray();
+            }
+
+            $vendaItem['produto_id'] = $produto['id'];
+            $vendaItem['ordem'] = $i + 1;
+            $vendaItem['qtde'] = $item['QTDE'];
+            $vendaItem['descricao'] = $produto['nome'];
+            $vendaItem['preco_venda'] = $item['TOTAL_PRECO_VENDA'];
+
+            $vendaItem['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+            $vendaItem['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+            $vendaItem['version'] = 0;
+            $vendaItem['estabelecimento_id'] = 1;
+            $vendaItem['user_inserted_id'] = 1;
+            $vendaItem['user_updated_id'] = 1;
+
+            $jsonData = [];
+            $jsonData['erp_codigo'] = $item['COD_PROD'];
+            $jsonData['total_preco_custo'] = $item['TOTAL_PRECO_CUSTO'];
+            $jsonData['rentabilidade_item'] = $item['RENTABILIDADE_ITEM'];
+            $produtoJsonData = json_decode($produto['json_data'], true);
+            $jsonData['fornecedor_id'] = $produto['fornecedor_id'] ?? null;
+            $jsonData['fornecedor_documento'] = $produtoJsonData['fornecedor_documento'] ?? null;
+            $jsonData['fornecedor_nome'] = $produtoJsonData['fornecedor_nome'] ?? null;
+            $jsonData['produto_nome'] = $produto['nome'] ?? null;
+            $jsonData['produto_depto_id'] = $produto['depto_id'] ?? null;
+            $jsonData['produto_depto_nome'] = $produtoJsonData['depto_nome'] ?? null;
+            $jsonData['produto_grupo_id'] = $produto['grupo_id'] ?? null;
+            $jsonData['produto_grupo_nome'] = $produto['grupo_nome'] ?? null;
+            $jsonData['produto_subgrupo_id'] = $produto['subgrupo_id'] ?? null;
+            $jsonData['produto_subgrupo_nome'] = $produto['subgrupo_nome'] ?? null;
+            $jsonData['produto_preco_tabela'] = $produto['subgrupo_nome'] ?? null;
+            $jsonData['produto_recnum'] = $produtoJsonData['recnum'] ?? null;
+            $jsonData['produto_cod_edi'] = $produtoJsonData['cod_edi'] ?? null;
+            $jsonData['produto_erp_codigo'] = $produtoJsonData['erp_codigo'] ?? null;
+
+
+            $vendaItem['json_data'] = json_encode($jsonData);
+
+            $conn->insert('ven_venda_item', $vendaItem);
+        }
+    }
+
+    /**
+     * Constrói o array/cachê dos produtos
+     */
+    private function buildProdutosArray() {
+        /** @var Connection $conn */
+        $conn = $this->doctrine->getConnection();
+        $rProdutos = $conn->fetchAll('SELECT *, json_data->>"$.erp_codigo" as erp_codigo FROM est_produto');
+
+        $this->produtos = [];
+        foreach ($rProdutos as $rProduto) {
+            $this->produtos[$rProduto['erp_codigo']] = $rProduto;
+        }
     }
 
     /**

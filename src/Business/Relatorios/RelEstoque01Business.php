@@ -180,7 +180,7 @@ class RelEstoque01Business
      * @param array $campos
      * @return string
      */
-    private function handleNaEstProduto(array $campos, ?array $produto = null): string
+    public function handleNaEstProduto(array $campos, ?array $produto = null): string
     {
         try {
             /** @var Connection $conn */
@@ -210,6 +210,7 @@ class RelEstoque01Business
                     $dadosFornecedor = [];
                     $dadosFornecedor['codigo'] = $campos['codigoFornecedor'];
                     $dadosFornecedor['nome'] = $campos['nomeFornecedor'];
+                    $dadosFornecedor['documento'] = $campos['cpfcnpjFornecedor'] ?? null;
                     $dadosFornecedor['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
                     $dadosFornecedor['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
                     $dadosFornecedor['version'] = 0;
@@ -239,15 +240,17 @@ class RelEstoque01Business
                 $json_data_ORIG = json_decode($produto['json_data'], true);
             }
 
-            $json_data['recnum'] = $campos['recnum'];
-            $codedi = str_replace('#@#', ',', utf8_encode($campos['codedi']));
-            $json_data['cod_edi'] = $codedi;
+            $json_data['recnum'] = $campos['recnum'] ?? null;
+            if ($campos['codedi'] ?? null) {
+                $codedi = str_replace('#@#', ',', utf8_encode($campos['codedi']));
+                $json_data['cod_edi'] = $codedi;
+            }
 
 
-            $json_data['qtde_estoque_max'] = $campos['qtdeMaxima'];
+            $json_data['qtde_estoque_max'] = $campos['qtdeMaxima'] ?? null;
 
-            $json_data['preco_custo'] = $campos['custoMedio'];
-            $json_data['preco_tabela'] = $campos['precoVenda'];
+            $json_data['preco_custo'] = $campos['custoMedio'] ?? null;
+            $json_data['preco_tabela'] = $campos['precoVenda'] ?? null;
 
             $json_data['qtde_imagens'] = $json_data['qtde_imagens'] ?? 0;
             $json_data['imagem1'] = $json_data['imagem1'] ?? '';

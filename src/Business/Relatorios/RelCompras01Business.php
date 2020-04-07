@@ -8,10 +8,9 @@ use CrosierSource\CrosierLibBaseBundle\EntityHandler\Config\AppConfigEntityHandl
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ConnectionException;
-use Psr\Log\LoggerInterface;
+use Doctrine\DBAL\Driver\Connection;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  *
@@ -21,26 +20,30 @@ use Doctrine\ORM\EntityManagerInterface;
 class RelCompras01Business
 {
 
-    /** @var EntityManagerInterface */
-    private $doctrine;
+    private EntityManagerInterface $doctrine;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var AppConfigEntityHandler */
-    private $appConfigEntityHandler;
+    private AppConfigEntityHandler $appConfigEntityHandler;
+
+    private RelEstoque01Business $relEstoque01Business;
+
+    private array $produtos;
 
     /**
      * @param EntityManagerInterface $doctrine
      * @param LoggerInterface $logger
+     * @param RelEstoque01Business $relEstoque01Business
      * @param AppConfigEntityHandler $appConfigEntityHandler
      */
     public function __construct(EntityManagerInterface $doctrine,
                                 LoggerInterface $logger,
+                                RelEstoque01Business $relEstoque01Business,
                                 AppConfigEntityHandler $appConfigEntityHandler)
     {
         $this->doctrine = $doctrine;
         $this->appConfigEntityHandler = $appConfigEntityHandler;
+        $this->relEstoque01Business = $relEstoque01Business;
         $this->logger = $logger;
     }
 
@@ -53,7 +56,6 @@ class RelCompras01Business
         $files = scandir($pastaFila, 0);
         foreach ($files as $file) {
             if (!in_array($file, array('.', '..'))) {
-
                 try {
                     $this->processarArquivo($file);
                     $this->marcarDtHrAtualizacao();
@@ -71,7 +73,6 @@ class RelCompras01Business
     /**
      * @param string $arquivo
      * @return int
-     * @throws ViewException
      */
     public function processarArquivo(string $arquivo): int
     {
@@ -82,108 +83,222 @@ class RelCompras01Business
         /** @var Connection $conn */
         $conn = $this->doctrine->getConnection();
 
-        $conn->beginTransaction();
-
         $t = 0;
         $linha = null;
         try {
-            $conn->executeUpdate('DELETE FROM rdp_rel_compras01');
+            $relCompras01 = [];
             for ($i = 1; $i < $totalRegistros; $i++) {
                 $linha = $linhas[$i];
                 if (!trim($linha)) {
                     continue;
                 }
-                $campos = explode('|', $linha);
-                if (count($campos) !== 22) {
+                $camposSplit = explode('|', $linha);
+                if (count($camposSplit) !== 23) {
                     throw new ViewException('Qtde de campos difere de 22 para a linha "' . $linha . '"');
                 }
 
-                $campos[3] = DateTimeUtils::parseDateStr($campos[3])->format('Y-m-d');
-                $campos[21] = DateTimeUtils::parseDateStr($campos[21])->format('Y-m-d');
-
-                $cMax = count($campos);
+                $cMax = count($camposSplit);
                 for ($c = 0; $c < $cMax; $c++) {
-                    $campos[$c] = trim($campos[$c]) !== '' ? "'" . trim(str_replace("'", "''", $campos[$c])) . "'" : 'null';
+                    $camposSplit[$c] = trim($camposSplit[$c]) !== '' ? trim(str_replace("'", "''", $camposSplit[$c])) : null;
                 }
 
-                $sql = sprintf(
-                    'INSERT INTO rdp_rel_compras01 (
-                            id,                            
-                            pv_compra,
-                            num_item,
-                            qtde,
-                            dt_emissao,
-                            ano,
-                            mes,
-                            cod_fornec,
-                            nome_fornec,
-                            cod_prod,
-                            desc_prod,
-                            total_preco_venda,
-                            total_preco_custo,
-                            rentabilidade,
-                            cod_vendedor,
-                            nome_vendedor,
-                            loja,            
-                            total_custo_pv,
-                            total_venda_pv,
-                            rentabilidade_pv,
-                            cliente_pv,
-                            grupo,
-                            dt_prev_entrega,
-                            estabelecimento_id,inserted,updated,user_inserted_id,user_updated_id
-                        )
-                    VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 1, now(), now(), 1, 1)',
-                    $campos[0], // `pv_compra`,
-                    $campos[1], // `num_item`,
-                    $campos[2], // `qtde`,
-                    $campos[3], // `dt_emissao`,
-                    $campos[4], // `ano`,
-                    $campos[5], // `mes`
-                    $campos[6], // `cod_fornec`
-                    $campos[7], // `nome_fornec`
-                    $campos[8], // `cod_prod`
-                    $campos[9], // `desc_prod`
-                    $campos[10],// `total_preco_venda`
-                    $campos[11],// `total_preco_custo`
-                    $campos[12],// `rentabilidade`
-                    $campos[13],// `cod_vendedor`
-                    $campos[14],// `nome_vendedor`
-                    $campos[15],// `loja`
-                    $campos[16],// `total_custo_pv`
-                    $campos[17],// `total_venda_pv`
-                    $campos[18],// `rentabilidade_pv`
-                    $campos[19],// `cliente_pv`
-                    $campos[20], // `grupo`
-                    $campos[21] // `dt_prev_entrega`
-                );
+                $pvCompra = $camposSplit[0];
 
-                try {
-                    $t += $conn->executeUpdate($sql);
-                    $this->logger->info($t . ' inseridos');
-                } catch (\Exception $e) {
-                    $this->logger->info('Erro ao inserir a linha "' . $linha . '"');
-                    $this->logger->info($e->getMessage());
-                    $this->logger->info('Continuando.');
+                $campos = [];
+                $campos['PV_COMPRA'] = $pvCompra;
+                $campos['ITEM'] = $camposSplit[1];
+                $campos['QTDE'] = $camposSplit[2];
+                $campos['EMISSAO'] = $camposSplit[3] ? DateTimeUtils::parseDateStr($camposSplit[3])->format('Y-m-d') : null;
+                // $campos['ANO'] = $camposSplit[4];
+                // $campos['MES'] = $camposSplit[5];
+                $campos['CNPJ_FORNEC'] = preg_replace("/[^0-9]/", "", $camposSplit[6]);
+                $campos['COD_FORNEC'] = $camposSplit[7];
+                $campos['NOME_FORNEC'] = $camposSplit[8];
+                $campos['COD_PROD'] = $camposSplit[9];
+                $campos['DESC_PROD'] = $camposSplit[10];
+                // $campos['TOTAL_PRECO_VENDA'] = $camposSplit[11];
+                $campos['TOTAL_PRECO_CUSTO'] = $camposSplit[12];
+                // $campos['RENTABILIDADE_ITEM'] = $camposSplit[13];
+                $campos['COD_VENDEDOR'] = $camposSplit[14];
+                $campos['NOME_VENDEDOR'] = $camposSplit[15];
+                $campos['LOJA'] = $camposSplit[16];
+                $campos['TOTAL_CUSTO_PV'] = $camposSplit[17];
+                // $campos['TOTAL_VENDA_PV'] = $camposSplit[18];
+                // $campos['RENTABILIDADE_PV'] = $camposSplit[19];
+                // $campos['CLIENTE_PV'] = $camposSplit[20];
+                $campos['GRUPO'] = $camposSplit[21];
+                $campos['PREVISAO_ENTREGA'] = $camposSplit[22] ? DateTimeUtils::parseDateStr($camposSplit[22])->format('Y-m-d') : null;
+
+                $relCompras01[$pvCompra][] = $campos;
+                $this->logger->info('camposAgrupados: ' . str_pad($i, 9, '0', STR_PAD_LEFT) . '/' . $totalRegistros);
+            }
+
+            $rPedidosCompra = $conn->fetchAll(
+                'select p.id, p.fornecedor_id, p.total, p.json_data, count(*) as qtde_itens from est_pedidocompra p left join est_pedidocompra_item i on p.id = i.pedidocompra_id group by p.id');
+            $pedidosCompra = [];
+            foreach ($rPedidosCompra as $rPedidoCompra) {
+                $jsonData = json_decode($rPedidoCompra['json_data'], true);
+                if ($jsonData['pv_compra_ekt'] ?? null) {
+                    $pedidosCompra[$jsonData['pv_compra_ekt']] = $rPedidoCompra;
                 }
             }
-            $this->logger->info($t . ' registros inseridos');
-            $conn->commit();
-            $this->logger->info('commit');
+
+            $totalRelPedidosCompra01 = count($rPedidosCompra);
+            $i = 0;
+
+            $this->buildProdutosArray();
+            foreach ($relCompras01 as $pv_compra => $relCompra01) {
+                if (isset($pedidosCompra[$pv_compra])) {
+                    $pedidoCompra = $pedidosCompra[$pv_compra];
+                    $pedidoCompraJsonData = json_decode($pedidoCompra['json_data'], true);
+                    if ((float)$pedidoCompra['total'] !== (float)$relCompra01[0]['TOTAL_CUSTO_PV'] ||
+                        (int)$pedidoCompraJsonData['fornecedor_cnpj'] !== (int)$relCompra01[0]['CNPJ_FORNEC'] ||
+                        count($relCompra01) !== (int)$pedidoCompra['qtde_itens']) {
+                        $conn->delete('est_pedidocompra', ['id' => $pedidosCompra[$pv_compra]['id']]);
+                    } else {
+                        $this->logger->info('est_pedidocompra: ' . str_pad(++$i, 9, '0', STR_PAD_LEFT) . '/' . $totalRelPedidosCompra01);
+                        continue;
+                    }
+                }
+
+                $this->handlePedidoCompra($relCompra01);
+                $this->logger->info('est_pedidocompra: ' . str_pad(++$i, 9, '0', STR_PAD_LEFT) . '/' . $totalRelPedidosCompra01);
+            }
+            $this->logger->info('FIM. OK!');
+
+
         } catch (\Exception $e) {
             $this->logger->error('processarArquivo() - erro ');
             $this->logger->error($e->getMessage());
-            try {
-                $conn->rollBack();
-            } catch (ConnectionException $e) {
-                throw new ViewException($e->getMessage());
-            }
             throw new \RuntimeException($e->getMessage());
         }
 
         return $t;
+    }
+
+    /**
+     * @param array $dadosEkt
+     * @throws \Exception
+     */
+    private function handlePedidoCompra(array $dadosEkt): void
+    {
+        /** @var Connection $conn */
+        $conn = $this->doctrine->getConnection();
+
+        $cabecalho = $dadosEkt[0];
+
+        $pedidoCompra = [];
+
+        $fornecedor = $conn->fetchAssoc('SELECT id FROM est_fornecedor WHERE documento = ?', [$cabecalho['CNPJ_FORNEC']]);
+        if (!$fornecedor) {
+            $dadosFornecedor = [];
+            $dadosFornecedor['documento'] = $cabecalho['CNPJ_FORNEC'];
+            $dadosFornecedor['nome'] = utf8_encode($cabecalho['NOME_FORNEC']);
+            $dadosFornecedor['json_data'] = json_encode(['cod_fornecedor_ekt' => $cabecalho['COD_FORNEC']]);
+            $dadosFornecedor['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+            $dadosFornecedor['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+            $dadosFornecedor['version'] = 0;
+            $dadosFornecedor['estabelecimento_id'] = 1;
+            $dadosFornecedor['user_inserted_id'] = 1;
+            $dadosFornecedor['user_updated_id'] = 1;
+            $conn->insert('est_fornecedor', $dadosFornecedor);
+            $fornecedor['id'] = $conn->lastInsertId();
+        }
+
+        $pedidoCompra['fornecedor_id'] = $fornecedor['id'] ?? null;
+
+        $pedidoCompra['dt_emissao'] = $cabecalho['EMISSAO'];
+        $pedidoCompra['dt_prev_entrega'] = $cabecalho['PREVISAO_ENTREGA'];
+        $pedidoCompra['total'] = $cabecalho['TOTAL_CUSTO_PV'];
+
+        $pedidoCompra['status'] = 'FINALIZADO';
+
+        $jsonData = [];
+        $jsonData['pv_compra_ekt'] = $cabecalho['PV_COMPRA'];
+        $jsonData['fornecedor_codigo'] = $cabecalho['COD_FORNEC'];
+        $jsonData['fornecedor_cnpj'] = $cabecalho['CNPJ_FORNEC'];
+        $jsonData['fornecedor_nome'] = utf8_encode($cabecalho['NOME_FORNEC']);
+        $jsonData['loja'] = $cabecalho['LOJA'];
+        $jsonData['grupo'] = $cabecalho['GRUPO'];
+
+        $pedidoCompra['json_data'] = json_encode($jsonData);
+
+        $pedidoCompra['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+        $pedidoCompra['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+        $pedidoCompra['version'] = 0;
+        $pedidoCompra['estabelecimento_id'] = 1;
+        $pedidoCompra['user_inserted_id'] = 1;
+        $pedidoCompra['user_updated_id'] = 1;
+
+        $conn->insert('est_pedidocompra', $pedidoCompra);
+        $pedidoCompraId = $conn->lastInsertId();
+
+        foreach ($dadosEkt as $i => $item) {
+
+            $pedidoCompraItem = [];
+            $pedidoCompraItem['pedidocompra_id'] = $pedidoCompraId;
+
+            $produto = $this->produtos[$item['COD_PROD']];
+            if (!$produto) {
+                $arrProduto = [
+                    'codigoProduto' => $item['COD_PROD'],
+                    'codigoFornecedor' => $item['COD_FORNEC'],
+                    'cpfcnpjFornecedor' => $item['CNPJFORNEC'],
+                    'nomeFornecedor' => $item['NOME_FORNEC'],
+                    'nome' => $item['DESC_PROD']
+                ];
+
+                $produto['id'] = $this->relEstoque01Business->handleNaEstProduto($arrProduto);
+                $this->buildProdutosArray();
+            }
 
 
+            $pedidoCompraItem['ordem'] = $i + 1;
+            $pedidoCompraItem['qtde'] = $item['QTDE'];
+            $pedidoCompraItem['descricao'] = $produto['nome'];
+            $pedidoCompraItem['preco_custo'] = $item['TOTAL_PRECO_CUSTO'];
+
+            $pedidoCompraItem['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+            $pedidoCompraItem['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+            $pedidoCompraItem['version'] = 0;
+            $pedidoCompraItem['estabelecimento_id'] = 1;
+            $pedidoCompraItem['user_inserted_id'] = 1;
+            $pedidoCompraItem['user_updated_id'] = 1;
+
+            $jsonData = [];
+            $jsonData['erp_codigo'] = $item['COD_PROD'];
+            $produtoJsonData = json_decode($produto['json_data'], true);
+            $jsonData['produto_id'] = $produto['id'];
+            $jsonData['produto_nome'] = $produto['nome'] ?? null;
+            $jsonData['produto_depto_id'] = $produto['depto_id'] ?? null;
+            $jsonData['produto_depto_nome'] = $produtoJsonData['depto_nome'] ?? null;
+            $jsonData['produto_grupo_id'] = $produto['grupo_id'] ?? null;
+            $jsonData['produto_grupo_nome'] = $produto['grupo_nome'] ?? null;
+            $jsonData['produto_subgrupo_id'] = $produto['subgrupo_id'] ?? null;
+            $jsonData['produto_subgrupo_nome'] = $produto['subgrupo_nome'] ?? null;
+            $jsonData['produto_preco_tabela'] = $produto['subgrupo_nome'] ?? null;
+            $jsonData['produto_recnum'] = $produtoJsonData['recnum'] ?? null;
+            $jsonData['produto_cod_edi'] = $produtoJsonData['cod_edi'] ?? null;
+            $jsonData['produto_erp_codigo'] = $produtoJsonData['erp_codigo'] ?? null;
+
+            $pedidoCompraItem['json_data'] = json_encode($jsonData);
+            $conn->insert('est_pedidocompra_item', $pedidoCompraItem);
+        }
+    }
+
+    /**
+     * Constrói o array/cachê dos produtos
+     */
+    private function buildProdutosArray()
+    {
+        /** @var Connection $conn */
+        $conn = $this->doctrine->getConnection();
+        $rProdutos = $conn->fetchAll('SELECT *, json_data->>"$.erp_codigo" as erp_codigo FROM est_produto');
+
+        $this->produtos = [];
+        foreach ($rProdutos as $rProduto) {
+            $this->produtos[$rProduto['erp_codigo']] = $rProduto;
+        }
     }
 
     /**

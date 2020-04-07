@@ -3,9 +3,9 @@
 namespace App\Controller\Relatorios;
 
 
-use App\Entity\Relatorios\RelCompFor01;
-use App\Entity\Relatorios\RelVendas01;
+use App\Entity\Estoque\PedidoCompra;
 use App\EntityHandler\Relatorios\RelCompFor01EntityHandler;
+use App\Repository\Estoque\PedidoCompraRepository;
 use App\Repository\Relatorios\RelCompFor01Repository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Entity\Base\DiaUtil;
@@ -117,9 +117,9 @@ class RelCompFor01Controller extends FormListController
         $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
         $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
 
-        /** @var RelCompFor01Repository $repoRelCompFor01 */
-        $repoRelCompFor01 = $this->getDoctrine()->getRepository(RelCompFor01::class);
-        $r = $repoRelCompFor01->totalComprasPorFornecedor($dtIni, $dtFim);
+        /** @var PedidoCompraRepository $repoPedidoCompra */
+        $repoPedidoCompra = $this->getDoctrine()->getRepository(PedidoCompra::class);
+        $r = $repoPedidoCompra->totalComprasPorFornecedor($dtIni, $dtFim);
         return new JsonResponse($r);
     }
 

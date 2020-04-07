@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repository\Vendas;
+namespace App\Repository\CRM;
 
-use App\Entity\Vendas\PVItem;
+use App\Entity\CRM\Cliente;
 use CrosierSource\CrosierLibBaseBundle\Repository\FilterRepository;
 
 /**
@@ -10,13 +10,13 @@ use CrosierSource\CrosierLibBaseBundle\Repository\FilterRepository;
  * @author Carlos Eduardo Pauluk
  *
  */
-class PVItemRepository extends FilterRepository
+class ClienteRepository extends FilterRepository
 {
 
     public function getEntityClass(): string
     {
-        return PVItem::class;
+        return Cliente::class;
     }
 
-}
 
+}

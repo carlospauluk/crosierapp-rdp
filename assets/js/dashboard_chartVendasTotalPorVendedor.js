@@ -119,7 +119,7 @@ $(document).ready(function () {
         // Pace.ignore(function () {
 
         $.getJSON(
-            Routing.generate('relVendas01_graficoTotalPorVendedor') + '/?filterDts=' + $filter_dts.val() + '&lojas=' + $filter_lojas.val() + '&grupos=' + $filter_grupos.val(),
+            Routing.generate('ven_venda_graficoTotalPorVendedor') + '?filterDts=' + $filter_dts.val() + '&lojas=' + $filter_lojas.val() + '&grupos=' + $filter_grupos.val(),
             function (results) {
                 let rentabilidadeGeral = Numeral(parseFloat(results.rentabilidadeGeral)).format('0,0.00');
 

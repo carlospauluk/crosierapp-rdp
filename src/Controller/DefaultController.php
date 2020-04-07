@@ -3,12 +3,8 @@
 namespace App\Controller;
 
 
-use App\Entity\Estoque\Produto;
 use App\Entity\Relatorios\RelCtsPagRec01;
-use App\Entity\Relatorios\RelEstoque01;
-use App\Entity\Relatorios\RelVendas01;
-use App\Repository\Estoque\ProdutoRepository;
-use App\Repository\Relatorios\RelEstoque01Repository;
+use App\Entity\Vendas\Venda;
 use CrosierSource\CrosierLibBaseBundle\Business\Config\StoredViewInfoBusiness;
 use CrosierSource\CrosierLibBaseBundle\Controller\BaseController;
 use CrosierSource\CrosierLibBaseBundle\Entity\Config\AppConfig;
@@ -25,8 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class DefaultController extends BaseController
 {
 
-    /** @var StoredViewInfoBusiness */
-    protected $storedViewInfoBusiness;
+    protected StoredViewInfoBusiness $storedViewInfoBusiness;
 
     /**
      * @required
@@ -36,7 +31,6 @@ class DefaultController extends BaseController
     {
         $this->storedViewInfoBusiness = $storedViewInfoBusiness;
     }
-
 
 
     /**
@@ -65,11 +59,11 @@ class DefaultController extends BaseController
         array_unshift($localizadores, ['id' => '', 'text' => 'TODOS']);
         $params['localizadores'] = json_encode($localizadores);
 
-        $lojas = $this->getDoctrine()->getRepository(RelVendas01::class)->getLojas();
+        $lojas = $this->getDoctrine()->getRepository(Venda::class)->getLojas();
         array_unshift($lojas, ['id' => '', 'text' => 'TODAS']);
         $params['lojas'] = json_encode($lojas);
 
-        $grupos = $this->getDoctrine()->getRepository(RelVendas01::class)->getGrupos();
+        $grupos = $this->getDoctrine()->getRepository(Venda::class)->getGrupos();
         array_unshift($grupos, ['id' => '', 'text' => 'TODOS']);
         $params['grupos'] = json_encode($grupos);
 
@@ -86,8 +80,6 @@ class DefaultController extends BaseController
         $params['filter']['contasPagRec']['localizador'] = urlencode($session->get('dashboard.filter.contasPagRec.localizador')) ?? $localizadores[0]['id'];
 
         $params['filter']['relCompFor01']['dts'] = $session->get('dashboard.filter.relCompFor01.dts') ?? ($primeiroDia_mesPassado . ' - ' . $ultimoDia_mesPassado);
-
-
 
 
 //        /** @var ProdutoRepository $repoEstoque01 */
