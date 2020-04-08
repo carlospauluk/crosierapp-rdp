@@ -205,7 +205,7 @@ class RelEstoque01Business
                 $json_data['subgrupo_nome'] = 'INDEFINIDO';
                 $json_data['erp_codigo'] = $campos['codigoProduto'];
 
-                $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE documento = ?', [$campos['cpfcnpjFornecedor']]);
+                $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE json_data->>"$.codigo" = ?', [$campos['codigoFornecedor']]);
                 if (!$fornecedor) {
                     unset($dadosFornecedor, $fornecedor);
                     $dadosFornecedor = [];
