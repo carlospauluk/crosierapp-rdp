@@ -205,11 +205,10 @@ class RelEstoque01Business
                 $json_data['subgrupo_nome'] = 'INDEFINIDO';
                 $json_data['erp_codigo'] = $campos['codigoProduto'];
 
-                $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE codigo = ?', [$campos['codigoFornecedor']]);
+                $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE json_data->>"$.codigo" = ?', [$campos['codigoFornecedor']]);
                 if (!$fornecedor) {
                     unset($dadosFornecedor, $fornecedor);
                     $dadosFornecedor = [];
-                    $dadosFornecedor['codigo'] = $campos['codigoFornecedor'];
                     $dadosFornecedor['nome'] = $campos['nomeFornecedor'];
                     $dadosFornecedor['documento'] = $campos['cpfcnpjFornecedor'] ?? null;
                     $dadosFornecedor['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
@@ -218,6 +217,10 @@ class RelEstoque01Business
                     $dadosFornecedor['estabelecimento_id'] = 1;
                     $dadosFornecedor['user_inserted_id'] = 1;
                     $dadosFornecedor['user_updated_id'] = 1;
+
+                    $dadosFornecedor_jsonData['codigo'] = $campos['codigoFornecedor'];
+                    $dadosFornecedor['json_data'] = json_encode($dadosFornecedor_jsonData);
+
                     $conn->insert('est_fornecedor', $dadosFornecedor);
                     $fornecedorId = $conn->lastInsertId();
                     $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE id = ?', [$fornecedorId]);

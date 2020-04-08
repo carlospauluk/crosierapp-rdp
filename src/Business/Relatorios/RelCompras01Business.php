@@ -94,7 +94,7 @@ class RelCompras01Business
                 }
                 $camposSplit = explode('|', $linha);
                 if (count($camposSplit) !== 23) {
-                    throw new ViewException('Qtde de campos difere de 22 para a linha "' . $linha . '"');
+                    throw new ViewException('Qtde de campos difere de 23 para a linha "' . $linha . '"');
                 }
 
                 $cMax = count($camposSplit);

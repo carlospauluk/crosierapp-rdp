@@ -300,7 +300,7 @@ class RelVendas01Business
             $jsonData['erp_codigo'] = $item['COD_PROD'];
             $jsonData['total_preco_custo'] = $item['TOTAL_PRECO_CUSTO'];
             $jsonData['rentabilidade_item'] = $item['RENTABILIDADE_ITEM'];
-            
+
             $produtoJsonData = json_decode($produto['json_data'] ?? '{}', true);
             $jsonData['fornecedor_id'] = $produto['fornecedor_id'] ?? null;
             $jsonData['fornecedor_documento'] = $produtoJsonData['fornecedor_documento'] ?? null;
