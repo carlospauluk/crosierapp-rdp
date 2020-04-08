@@ -355,8 +355,10 @@ class PedidoCompraController extends FormListController
         $dtUltSaidaApartirDe = null;
         if ($queryParams['filter']['dtUltSaidaApartirDe'] ?? null) {
             $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr($request->get('filter')['dtUltSaidaApartirDe']);
-            $queryParams['filter']['dtUltSaidaApartirDe'] = $dtUltSaidaApartirDe->format('d/m/Y');
+        } else {
+            $dtUltSaidaApartirDe = (new \DateTime())->sub(new \DateInterval('P1Y')); // 1 ano atrás
         }
+        $queryParams['filter']['dtUltSaidaApartirDe'] = $dtUltSaidaApartirDe->format('d/m/Y');
 
         $params['filter'] = $queryParams['filter'];
         $params['filter']['apenasARepor'] = filter_var($params['filter']['apenasARepor'] ?? true, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
