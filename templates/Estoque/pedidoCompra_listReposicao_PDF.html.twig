@@ -2,6 +2,7 @@
 <head>
 
     <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
           integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
@@ -94,8 +95,8 @@
             <th scope="col">Produto</th>
             <th scope="col">Fornecedor</th>
             <th scope="col">Dt Últ Saída</th>
-            <th scope="col">Qt Mín</th>
             <th scope="col">Qt Atual</th>
+            <th scope="col">Qt Mín</th>
             <th scope="col">Qt<br/> Reposição</th>
         </tr>
         </thead>
@@ -103,20 +104,28 @@
 
         {% set i=0 %}
 
-            {% set strip = true %}
-            {% for item in dados %}
-                {% set i=i+1 %}
-                {% set strip = not strip %}
-                <tr style="background-color: {{ strip ? 'lightgrey' : 'white' }}">
-                    <th scope="row">{{ i }}</th>
-                    <td>{{ item.codProduto }} - {{ item.descProduto }}</td>
-                    <td>{{ item.nomeFornecedor }}</td>
-                    <td>{{ item.dtUltSaida|date('d/m/Y') }}</td>
-                    <td class="text-right">{{ item.qtdeMinima|number_format(2,',','.') }}</td>
-                    <td class="text-right">{{ item.qtdeAtual|number_format(2,',','.') }}</td>
-                    <td class="text-right">{{ item.deficit|number_format(2,',','.') }}</td>
-                </tr>
-            {% endfor %}
+        {% set strip = true %}
+        {% for produto in dados %}
+            {% set i=i+1 %}
+            {% set strip = not strip %}
+
+
+            {% set deficit = produto.jsonData['deficit_estoque_' ~ filial|lower]|default(0) %}
+            {% set qtde_estoque = produto.jsonData['qtde_estoque_' ~ filial|lower]|default(0) %}
+            {% set qtde_estoque_min = produto.jsonData['qtde_estoque_min_' ~ filial|lower] %}
+            {% set dt_ult_saida = produto.jsonData['dt_ult_saida_' ~ filial|lower]|default('') %}
+            <tr style="background-color: {{ strip ? 'lightgrey' : 'white' }}">
+                <th scope="row">{{ i }}</th>
+                <td>{{ produto.id }} - {{ produto.nome }}</td>
+                <td>{{ produto.fornecedor.id }} - {{ produto.fornecedor.nome }}</td>
+                <td>{{ dt_ult_saida|date('d/m/Y') }}</td>
+                <td class="text-right">{{ qtde_estoque|number_format(3,',','.') }}</td>
+                <td class="text-right">{{ qtde_estoque_min|number_format(3,',','.') }}</td>
+                <td class="text-right" style="color: white; background-color: {{ deficit < 0 ? 'indianred' : 'dodgerblue' }}">
+                    {{ deficit|number_format(3,',','.') }}
+                </td>
+            </tr>
+        {% endfor %}
 
         </tbody>
     </table>

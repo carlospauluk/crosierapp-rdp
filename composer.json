@@ -24,7 +24,7 @@
     "ext-zlib": "*",
     "vich/uploader-bundle": "^1.9",
     "phpoffice/phpspreadsheet": "^1.9",
-    "dompdf/dompdf": "^0.8.3",
+    "dompdf/dompdf": "^0.8.5",
     "friendsofsymfony/jsrouting-bundle": "^2.2",
     "sensio/framework-extra-bundle": "^5.1",
     "nelmio/cors-bundle": "2.0.*",

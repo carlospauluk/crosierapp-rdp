@@ -15,11 +15,11 @@
 
                 <div class="d-sm-flex flex-nowrap ml-auto">
 
-                    <button type="button" data-url="{{ url('est_pedidoCompra_listReposicao', {'filter': filter}) }}"
-                            class="btn btn-warning ml-1" title="Imprimir Lista de Reposição"
-                            id="btnImprimirListaReposicao" name="btnImprimirListaReposicao" value="btnImprimirListaReposicao">
+                    <a role="button" href="{{ url('est_pedidoCompra_imprimirListReposicao') }}" target="_blank"
+                       class="btn btn-warning ml-1" title="Imprimir Lista de Reposição"
+                       id="btnImprimirListaReposicao">
                         <i class="fas fa-print"></i> Imprimir
-                    </button>
+                    </a>
 
                 </div>
             </div>

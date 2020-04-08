@@ -21,6 +21,8 @@ use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\EntityIdUtils\EntityIdUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use CrosierSource\CrosierLibBaseBundle\Utils\ViewUtils\Select2JsUtils;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -389,6 +391,86 @@ class PedidoCompraController extends FormListController
         $this->storedViewInfoBusiness->set('est_pedidoCompra_listReposicao', $queryParams);
 
         return $this->doRender('Estoque/pedidoCompra_listReposicao.html.twig', $params);
+    }
+
+
+    /**
+     *
+     * @Route("/est/pedidoCompra/imprimirListReposicao/", name="est_pedidoCompra_imprimirListReposicao")
+     *
+     * @param Request $request
+     * @param $dados
+     * @return void
+     *
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
+     * @throws \Exception
+     */
+    public function imprimirListaReposicao(): void
+    {
+        $svi = $this->storedViewInfoBusiness->retrieve('est_pedidoCompra_listReposicao');
+        $queryParams['filter'] = $svi['filter'] ?? null;
+
+        $filial = $queryParams['filter']['filial'] ?? null;
+        $fornecedorId = $queryParams['filter']['fornecedor'] ?? null;
+        /** @var FornecedorRepository $repoFornecedor */
+        $repoFornecedor = $this->getDoctrine()->getRepository(Fornecedor::class);
+        $fornecedor = null;
+        if ($fornecedorId) {
+            /** @var Fornecedor $fornecedor */
+            $fornecedor = $repoFornecedor->find($fornecedorId);
+        }
+
+        $dtUltSaidaApartirDe = null;
+        if ($queryParams['filter']['dtUltSaidaApartirDe'] ?? null) {
+            $dtUltSaidaApartirDe = DateTimeUtils::parseDateStr($queryParams['filter']['dtUltSaidaApartirDe']);
+        } else {
+            $dtUltSaidaApartirDe = (new \DateTime())->sub(new \DateInterval('P1Y')); // 1 ano atrás
+        }
+        $queryParams['filter']['dtUltSaidaApartirDe'] = $dtUltSaidaApartirDe->format('d/m/Y');
+
+        $queryParams['filter']['apenasARepor'] = filter_var($queryParams['filter']['apenasARepor'] ?? true, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+        /** @var PedidoCompraRepository $repoPedidoCompra */
+        $repoPedidoCompra = $this->getDoctrine()->getRepository(PedidoCompra::class);
+        $dados = $repoPedidoCompra->findReposicoesEstoque($filial, $fornecedor, $dtUltSaidaApartirDe, $queryParams['filter']['apenasARepor']);
+
+        $parameters['dados'] = $dados;
+        $parameters['filial'] = $svi['filter']['filial'];
+        $parameters['hoje'] = (new \DateTime())->format('d/m/Y H:i');
+
+        gc_collect_cycles();
+        gc_disable();
+
+        // Configure Dompdf according to your needs
+        $pdfOptions = new Options();
+        $pdfOptions->set('defaultFont', 'Arial');
+        $pdfOptions->set('enable_remote', true);
+        $pdfOptions->set('isHtml5ParserEnabled', true);
+        $pdfOptions->setIsRemoteEnabled(true);
+
+        // Instantiate Dompdf with our options
+        $dompdf = new Dompdf($pdfOptions);
+
+        // Retrieve the HTML generated in our twig file
+        $html = $this->renderView('Estoque/pedidoCompra_listReposicao_PDF.html.twig', $parameters);
+        // Load HTML to Dompdf
+        $dompdf->loadHtml($html);
+
+
+        // (Optional) Setup the paper size and orientation 'portrait' or 'portrait'
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render the HTML as PDF
+        $dompdf->render();
+
+        // Output the generated PDF to Browser (inline view)
+        $dompdf->stream('aPagarReceber_rel.pdf', [
+            'Attachment' => false
+        ]);
+
+        gc_collect_cycles();
+        gc_enable();
+
     }
 
 

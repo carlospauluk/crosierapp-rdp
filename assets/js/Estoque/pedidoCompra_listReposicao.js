@@ -18,19 +18,6 @@ Numeral.locale('pt-br');
 $(document).ready(function () {
 
     let $selTodasMovs = $('#selTodasMovs');
-    let $btnImprimirListaReposicao = $('#btnImprimirListaReposicao');
-
-
-    $btnImprimirListaReposicao.click(function () {
-        let url = $(this).data('url');
-        let form = $('<form>').attr("method", "post").attr(
-            "action", url);
-        form.append($('.movSel').clone());
-        // simuland o clique
-        form.append('<input type="hidden" name="btnImprimirListaReposicao" value="1" />');
-        $(form).appendTo('body').submit();
-
-    });
 
 
     let $datatable = $('#listReposicao');
