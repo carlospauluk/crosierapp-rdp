@@ -3,10 +3,8 @@
 namespace App\Controller\Relatorios;
 
 
-use App\Entity\Estoque\PedidoCompra;
 use App\Entity\Vendas\Venda;
 use App\EntityHandler\Relatorios\RelCompFor01EntityHandler;
-use App\Repository\Estoque\PedidoCompraRepository;
 use App\Repository\Relatorios\RelCompFor01Repository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Entity\Base\DiaUtil;
@@ -57,8 +55,6 @@ class RelCompFor01Controller extends FormListController
     {
         $this->repoRelCompFor01 = $repoRelCompFor01;
     }
-
-
 
 
     public function getFilterDatas(array $params): array
@@ -130,9 +126,7 @@ class RelCompFor01Controller extends FormListController
         $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
         $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
 
-        /** @var RelCompFor01Repository $repo */
-        $repo = $this->getDoctrine()->getRepository(PedidoCompra::class);
-        $r = $repo->totalComprasPorFornecedor($dtIni, $dtFim);
+        $r = $this->repoRelCompFor01->totalComprasPorFornecedor($dtIni, $dtFim);
         return new JsonResponse($r);
     }
 
