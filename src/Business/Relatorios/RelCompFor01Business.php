@@ -11,8 +11,8 @@ use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ConnectionException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  *
@@ -22,14 +22,11 @@ use Doctrine\ORM\EntityManagerInterface;
 class RelCompFor01Business
 {
 
-    /** @var EntityManagerInterface */
-    private $doctrine;
+    private EntityManagerInterface $doctrine;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var AppConfigEntityHandler */
-    private $appConfigEntityHandler;
+    private AppConfigEntityHandler $appConfigEntityHandler;
 
     /**
      * @param EntityManagerInterface $doctrine
@@ -98,12 +95,14 @@ class RelCompFor01Business
                     throw new ViewException('Qtde de campos difere de 11 para a linha "' . $linha . '"');
                 }
 
+                $campos[0] = trim($campos[0]) ? trim($campos[0]) : random_int(900000000000000, 999999999999999);
                 $campos[2] = DateTimeUtils::parseDateStr($campos[2])->format('Y-m-d');
 
                 $cMax = count($campos);
                 for ($c = 0; $c < $cMax; $c++) {
                     $campos[$c] = $campos[$c] ? "'" . trim(str_replace("'", "''", $campos[$c])) . "'" : 'null';
                 }
+
 
                 $sql = sprintf(
                     'INSERT INTO rdp_rel_compfor01 (
@@ -158,8 +157,6 @@ class RelCompFor01Business
         }
 
         return $t;
-
-
     }
 
     /**

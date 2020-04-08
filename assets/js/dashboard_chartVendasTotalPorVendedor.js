@@ -180,7 +180,7 @@ $(document).ready(function () {
                     let selection = chart.getSelection();
                     let vendedor = data.getFormattedValue(selection[0].row, 0);
                     if (vendedor) {
-                        window.location = Routing.generate('relVendas01_listPreVendasPorVendedor',
+                        window.location = Routing.generate('ven_venda_listPreVendasPorVendedor',
                             {
                                 filter: {
                                     'dts': $filter_dts.val(),

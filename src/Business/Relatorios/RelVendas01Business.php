@@ -269,7 +269,7 @@ class RelVendas01Business
             $vendaItem = [];
             $vendaItem['venda_id'] = $vendaId;
 
-            $produto = $this->produtos[$item['COD_PROD']];
+            $produto = $this->produtos[$item['COD_PROD']] ?? null;
             if (!$produto) {
                 $arrProduto = [
                     'codigoProduto' => $item['COD_PROD'],
@@ -286,8 +286,8 @@ class RelVendas01Business
             $vendaItem['produto_id'] = $produto['id'];
             $vendaItem['ordem'] = $i + 1;
             $vendaItem['qtde'] = $item['QTDE'];
-            $vendaItem['descricao'] = $produto['nome'];
-            $vendaItem['preco_venda'] = $item['TOTAL_PRECO_VENDA'];
+            $vendaItem['descricao'] = $produto['nome'] ?? '<<< PRODUTO SEM NOME >>>';
+            $vendaItem['preco_venda'] = bcdiv($item['TOTAL_PRECO_VENDA'], $item['QTDE'] ?? 1, 2);
 
             $vendaItem['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
             $vendaItem['updated'] = (new \DateTime())->format('Y-m-d H:i:s');

@@ -5,7 +5,7 @@
 
 {% block page_content %}
 
-    <form action="{{ url('relVendas01_listPreVendasPorProduto') }}" method="get" id="formPesquisar">
+    <form action="{{ url('ven_venda_listPreVendasPorProduto') }}" method="get" id="formPesquisar">
 
         <div class="card">
             <div class="card-header">
@@ -63,23 +63,23 @@
                                     {{ item.prevenda }}
                                 </td>
                                 <td>
-                                    {{ item.cliente_pv }}
+                                    {{ item.cliente_nome }}
                                 </td>
                                 <td class="text-center">
-                                    {{ item.dt_nf|date('d/m/Y') }}
+                                    {{ item.dt_nota|date('d/m/Y') }}
                                 </td>
                                 <td class="text-right" data-order="{{ item.total_custo_pv }}">
                                     {{ item.total_custo_pv|number_format(2,',','.') }}
                                 </td>
-                                <td class="text-right" data-order="{{ item.total_venda_pv }}">
-                                    {{ item.total_venda_pv|number_format(2,',','.') }}
+                                <td class="text-right" data-order="{{ item.valor_total }}">
+                                    {{ item.valor_total|number_format(2,',','.') }}
                                 </td>
                                 <td class="text-right" data-order="{{ item.rent }}">
                                     {{ item.rent|number_format(2,',','.') }}%
                                 </td>
                                 <td class="text-right">
                                     <a class="btn btn-outline-secondary"
-                                       href="{{ url('relVendas01_listPreVendaItens', {'pv': item.prevenda}) }}"
+                                       href="{{ url('ven_venda_listPreVendaItens', {'pv': item.prevenda}) }}"
                                        role="button">
                                         <i class="far fa-list-alt"></i> Itens
                                     </a>
@@ -117,5 +117,5 @@
 
 
 {% block down_scripts %}
-    <script src="{{ asset('build/Relatorios/relVendas01_listPreVendasPorProduto.js') }}"></script>
+    <script src="{{ asset('build/Relatorios/preVendasPorProduto.js') }}"></script>
 {% endblock %}

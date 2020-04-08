@@ -1,0 +1,129 @@
+{% extends '@CrosierLibBase/index.html.twig' %}
+
+
+
+
+{% block page_content %}
+
+    <form action="{{ url('ven_venda_listItensVendidosPorFornecedor') }}" method="get" id="formPesquisar">
+
+        <div class="card">
+            <div class="card-header">
+
+
+                <div class="d-flex flex-wrap align-items-center">
+
+                    <div>
+                        <h3>Itens Vendidos por Fornecedor</h3>
+                        <h6>{{ filter.nomeFornec }}</h6>
+                    </div>
+
+                    <div class="ml-auto justify-content-end text-right">
+
+                        Período: <b>{{ filter.dts }}</b>
+                        <br />
+                        Grupos: <b>{{ filter.grupos|join(',')|default('TODOS') }}</b>
+                        <br />
+                        Lojas: <b>{{ filter.lojas|join(',')|default('TODAS') }}</b>
+                        <br />
+
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="table-responsive-sm">
+
+
+                    <table class="table table-sm table-striped table-hover crsr-datatable" id="datatableItens">
+
+                        <thead>
+                        <tr>
+                            <th scope="col" title="">#</th>
+                            <th scope="col">Código</th>
+                            <th scope="col">Produto</th>
+                            <th scope="col">Qtde</th>
+                            <th scope="col">Total Custo</th>
+                            <th scope="col">Total Venda</th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for item in dados %}
+                            <tr>
+                                <td>
+                                    <span class="badge badge-pill badge-light">{{ loop.index }}</span>
+                                </td>
+                                <td>
+                                    {{ item.cod_prod }}
+                                </td><td>
+                                    {{ item.desc_prod }}
+                                </td>
+                                <td class="text-right">
+                                    {{ item.qtde_total }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.tpc }}">
+                                    {{ item.tpc|number_format(2,',','.') }}
+                                </td>
+                                <td class="text-right" data-order="{{ item.tpv }}">
+                                    {{ item.tpv|number_format(2,',','.') }}
+                                </td>
+                                <td class="text-right">
+                                    <a class="btn btn-outline-primary"
+                                       href="{{ url('ven_venda_listPreVendasPorProduto',
+                                           {'filter' :
+                                               {
+                                                   'dts': filter.dts,
+                                                   'produto': (item.cod_prod ~ ' - ' ~ item.desc_prod),
+                                                   'lojas': filter.lojas,
+                                                   'grupos': filter.grupos
+                                               }
+                                           }) }}"
+                                       role="button" title="Listar PVs que contém este produto">
+                                        <i class="far fa-list-alt"></i> PVs
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+
+
+                        </tbody>
+
+                        <tfoot>
+
+                        <tr style="background-color: antiquewhite; font-weight: bold">
+                            <td  colspan="3" class="text-right">
+
+                            </td>
+                            <td class="text-right">
+                                {{ total.qtde_total }}
+                            </td>
+                            <td class="text-right">
+                                {{ total.tpc|number_format(2,',','.') }}
+                            </td>
+                            <td class="text-right">
+                                {{ total.tpv|number_format(2,',','.') }}
+                            </td>
+                            <td class="text-right">
+                            </td>
+                        </tr>
+
+                        </tfoot>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </form>
+{% endblock %}
+
+
+{% block down_scripts %}
+    <script src="{{ asset('build/Relatorios/ven_venda_listItensVendidosPorFornecedor.js') }}"></script>
+{% endblock %}

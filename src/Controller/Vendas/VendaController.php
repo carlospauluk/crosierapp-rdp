@@ -4,12 +4,15 @@ namespace App\Controller\Vendas;
 
 
 use App\Entity\Vendas\Venda;
+use App\EntityHandler\Estoque\PedidoCompraEntityHandler;
+use App\EntityHandler\Vendas\VendaEntityHandler;
 use App\Repository\Vendas\VendaRepository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Entity\Base\DiaUtil;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Base\DiaUtilRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\NonUniqueResultException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,6 +37,15 @@ class VendaController extends FormListController
     public function setSession(SessionInterface $session): void
     {
         $this->session = $session;
+    }
+
+    /**
+     * @required
+     * @param VendaEntityHandler $entityHandler
+     */
+    public function setEntityHandler(VendaEntityHandler $entityHandler): void
+    {
+        $this->entityHandler = $entityHandler;
     }
 
     /**
@@ -113,7 +125,7 @@ class VendaController extends FormListController
         $viewInfo['filter'] = $vParams['filter'];
         $this->storedViewInfoBusiness->store('ven_venda_listItensVendidosPorFornecedor', $viewInfo);
 
-        return $this->doRender('Relatorios/ven_venda_listItensVendidosPorFornecedor.html.twig', $vParams);
+        return $this->doRender('Relatorios/itensVendidosPorFornecedor.html.twig', $vParams);
     }
 
 
@@ -222,7 +234,7 @@ class VendaController extends FormListController
         $viewInfo['filter'] = $vParams['filter'];
         $this->storedViewInfoBusiness->store('ven_venda_listItensVendidosPorFornecedor', $viewInfo);
 
-        return $this->doRender('Relatorios/ven_venda_totaisVendasPorFornecedor.html.twig', $vParams);
+        return $this->doRender('Relatorios/vendas_totalPorFornecedor.html.twig', $vParams);
     }
 
 
@@ -298,7 +310,7 @@ class VendaController extends FormListController
 
         $vParams['total'] = 0.0;
         foreach ($r as $pv) {
-            $vParams['total'] += $pv['total_venda_pv'];
+            $vParams['total'] += $pv['valor_total'];
         }
 
         $dtAnterior = clone $dtIni;
@@ -330,7 +342,7 @@ class VendaController extends FormListController
         $viewInfo['filter'] = $vParams['filter'];
         $this->storedViewInfoBusiness->store('ven_venda_listPreVendasPorVendedor', $viewInfo);
 
-        return $this->doRender('Relatorios/ven_venda_listPreVendasPorVendedor.html.twig', $vParams);
+        return $this->doRender('Relatorios/preVendasPorVendedor.html.twig', $vParams);
     }
 
 
@@ -376,7 +388,7 @@ class VendaController extends FormListController
 
         $vParams['total'] = 0.0;
         foreach ($r as $pv) {
-            $vParams['total'] += $pv['total_venda_pv'];
+            $vParams['total'] += $pv['valor_total'];
         }
 
         $dtAnterior = clone $dtIni;
@@ -406,7 +418,7 @@ class VendaController extends FormListController
         $viewInfo['filter'] = $vParams['filter'];
         $this->storedViewInfoBusiness->store('ven_venda_listPreVendasPorProduto', $viewInfo);
 
-        return $this->doRender('Relatorios/ven_venda_listPreVendasPorProduto.html.twig', $vParams);
+        return $this->doRender('Relatorios/preVendasPorProduto.html.twig', $vParams);
     }
 
 
@@ -421,23 +433,21 @@ class VendaController extends FormListController
      */
     public function listPreVendaItens(int $pv): Response
     {
-        /** @var VendaRepository $repo */
-        $repo = $this->getDoctrine()->getRepository(Venda::class);
+        /** @var Connection $conn */
+        $conn = $this->getEntityHandler()->getDoctrine()->getConnection();
 
-        $r = $repo->itensDoPreVenda($pv);
+        $venda = $conn->fetchAssoc('SELECT * FROM ven_venda WHERE json_data->>"$.prevenda_ekt" = :pv', ['pv' => $pv]);
 
+        $venda['json_data'] = json_decode($venda['json_data'], true);
 
-        $vParams['dados'] = $r;
-        $vParams['pv'] = $pv;
+        $itens = $conn->fetchAll('SELECT * FROM ven_venda_item WHERE venda_id = :venda_id', ['venda_id' => $venda['id']]);
 
-        try {
-            $vParams['total'] = $repo->totaisPreVenda($pv);
-            $vParams['total']['dt_nota'] = DateTimeUtils::parseDateStr($vParams['total']['dt_nota']);
-        } catch (ViewException $e) {
-            $this->addFlash('error', $e->getMessage());
+        foreach ($itens as $item) {
+            $item['json_data'] = json_decode($item['json_data'], true);
+            $venda['itens'][] = $item;
         }
 
-        return $this->doRender('Relatorios/ven_venda_listItensDoPreVenda.html.twig', $vParams);
+        return $this->doRender('Relatorios/itensDoPreVenda.html.twig', ['venda' => $venda]);
     }
 
 

@@ -44,6 +44,7 @@ class RelEstoque01Business
         $this->doctrine = $doctrine;
         $this->appConfigEntityHandler = $appConfigEntityHandler;
         $this->logger = $logger;
+        $this->prepararCampos();
     }
 
 

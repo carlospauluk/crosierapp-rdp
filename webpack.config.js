@@ -40,10 +40,10 @@ Encore
 
     .addEntry('Relatorios/relCtsPagRec01_list', './assets/js/Relatorios/relCtsPagRec01_list.js')
     .addEntry('Relatorios/relVendas01_totaisVendasPorFornecedor', './assets/js/Relatorios/relVendas01_totaisVendasPorFornecedor.js')
-    .addEntry('Relatorios/relVendas01_listItensVendidosPorFornecedor', './assets/js/Relatorios/relVendas01_listItensVendidosPorFornecedor.js')
-    .addEntry('Relatorios/relVendas01_listPreVendasPorVendedor', './assets/js/Relatorios/relVendas01_listPreVendasPorVendedor.js')
-    .addEntry('Relatorios/relVendas01_listPreVendasPorProduto', './assets/js/Relatorios/relVendas01_listPreVendasPorProduto.js')
-    .addEntry('Relatorios/relVendas01_listItensDoPreVenda', './assets/js/Relatorios/relVendas01_listItensDoPreVenda.js')
+    .addEntry('Relatorios/itensVendidosPorFornecedor', './assets/js/Relatorios/itensVendidosPorFornecedor.js')
+    .addEntry('Relatorios/preVendasPorVendedor', './assets/js/Relatorios/preVendasPorVendedor.js')
+    .addEntry('Relatorios/preVendasPorProduto', './assets/js/Relatorios/preVendasPorProduto.js')
+    .addEntry('Relatorios/itensDoPreVenda', './assets/js/Relatorios/itensDoPreVenda.js')
     .addEntry('Relatorios/relCompFor01_listItensCompradosPorFornecedor', './assets/js/Relatorios/relCompFor01_listItensCompradosPorFornecedor.js')
     .addEntry('Relatorios/relCompFor01_list', './assets/js/Relatorios/relCompFor01_list.js')
 

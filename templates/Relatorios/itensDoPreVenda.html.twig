@@ -30,18 +30,18 @@
                 <div class="row">
                     <div class="col-md-3">
                         <label class="col-form-label form-control-label" for="pv">PV</label>
-                        <input type="number" disabled="disabled" class="form-control" value="{{ pv }}" id="pv">
+                        <input type="number" disabled="disabled" class="form-control" value="{{ venda.json_data['prevenda_ekt'] }}" id="pv">
 
                     </div>
                     <div class="col-md-4">
-                        <label class="col-form-label form-control-label" for="dt_nf">Dt NF</label>
-                        <input type="text" disabled="disabled" class="form-control" id="dt_nf"
-                               value="{{ total.dt_nf|date('d/m/Y') }}">
+                        <label class="col-form-label form-control-label" for="dt_nota">Dt NF</label>
+                        <input type="text" disabled="disabled" class="form-control" id="dt_nota"
+                               value="{{ venda.dt_nota|date('d/m/Y') }}">
                     </div>
                     <div class="col-md-5">
                         <label class="col-form-label form-control-label" for="cliente">Cliente</label>
                         <input type="text" disabled="disabled" class="form-control" id="cliente"
-                               value="{{ total.cliente_pv }}">
+                               value="{{ venda.json_data['cliente_nome']|default('') }}">
                     </div>
                 </div>
 
@@ -49,18 +49,18 @@
                     <div class="col-md-5">
                         <label class="col-form-label form-control-label" for="vendedor">Vendedor</label>
                         <input type="text" disabled="disabled" class="form-control"
-                               value="{{ total.cod_vendedor }} - {{ total.nome_vendedor }}" id="vendedor">
+                               value="{{ venda.json_data['vendedor_codigo']|default('') }} - {{ venda.json_data['vendedor_nome']|default('') }}" id="vendedor">
                     </div>
                     <div class="col-md-4">
                         <label class="col-form-label form-control-label" style="white-space: nowrap"
                                for="loja">Loja</label>
                         <input type="text" disabled="disabled" class="form-control" id="loja"
-                               value="{{ total.loja }}">
+                               value="{{ venda.json_data['loja']|default('') }}">
                     </div>
                     <div class="col-md-3">
                         <label class="col-form-label form-control-label" for="grupo">Grupo</label>
                         <input type="text" disabled="disabled" class="form-control" id="grupo"
-                               value="{{ total.grupo }}">
+                               value="{{ venda.json_data['grupo']|default('') }}">
                     </div>
                 </div>
 
@@ -86,28 +86,28 @@
                     </thead>
 
                     <tbody>
-                    {% for item in dados %}
+                    {% for item in venda.itens %}
                         <tr>
                             <td>
                                 <span class="badge badge-pill badge-light">{{ loop.index }}</span>
                             </td>
                             <td>
-                                {{ item.cod_prod }}
+                                {{ item.json_data['erp_codigo'] }}
                             </td>
                             <td>
-                                {{ item.desc_prod }}
+                                {{ item.json_data['produto_nome'] }}
                             </td>
                             <td class="text-right">
                                 {{ item.qtde }}
                             </td>
-                            <td class="text-right" data-order="{{ item.rent }}">
-                                {{ item.rent|number_format(2,',','.') }}%
+                            <td class="text-right" data-order="{{ item.json_data['rentabilidade_item'] }}">
+                                {{ item.json_data['rentabilidade_item']|number_format(2,',','.') }}%
                             </td>
-                            <td class="text-right" data-order="{{ item.total_preco_custo }}">
-                                {{ item.total_preco_custo|number_format(2,',','.') }}
+                            <td class="text-right" data-order="{{ item.json_data['total_preco_custo'] }}">
+                                {{ item.json_data['total_preco_custo']|number_format(2,',','.') }}
                             </td>
-                            <td class="text-right" data-order="{{ item.total_preco_venda }}">
-                                {{ item.total_preco_venda|number_format(2,',','.') }}
+                            <td class="text-right" data-order="{{ item.total_item }}">
+                                {{ item.total_item|number_format(2,',','.') }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -131,34 +131,12 @@
                             <div class="input-group">
                                 <input type="text" id="rentabilidade_pv" name="rentabilidade_pv"
                                        disabled="disabled" class="crsr-money form-control"
-                                       value="{{ total.rentabilidade_pv|number_format(2,',','.') }}">
+                                       value="{{ venda.json_data['rentabilidade_pv']|number_format(2,',','.') }}">
                                 <div class="input-group-append"><span class="input-group-text">%</span></div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group row">
-                        <label class="col-form-label col-sm-3" for="subtotal">Subtotal</label>
-                        <div class="col-sm-9">
-                            <div class="input-group">
-                                <div class="input-group-prepend"><span class="input-group-text">R$ </span></div>
-                                <input type="text" id="subtotal" name="subtotal"
-                                       disabled="disabled" class="crsr-money form-control"
-                                       value="{{ total.subtotal|number_format(2,',','.') }}">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-form-label col-sm-3" for="descontos">Descontos</label>
-                        <div class="col-sm-9">
-                            <div class="input-group">
-                                <div class="input-group-prepend"><span class="input-group-text">R$ </span></div>
-                                <input type="text" id="descontos" name="descontos"
-                                       disabled="disabled" class="crsr-money form-control"
-                                       value="{{ total.descontos|number_format(2,',','.') }}">
-                            </div>
-                        </div>
-                    </div>
                     <div class="form-group row" style="font-weight: bold">
                         <label class="col-form-label col-sm-3" for="total">Total</label>
                         <div class="col-sm-9">
@@ -166,7 +144,7 @@
                                 <div class="input-group-prepend"><span class="input-group-text">R$ </span></div>
                                 <input type="text" id="total" name="total"
                                        disabled="disabled" class="crsr-money form-control"
-                                       value="{{ total.total_venda_pv|number_format(2,',','.') }}">
+                                       value="{{ venda.valor_total|number_format(2,',','.') }}">
                             </div>
                         </div>
                     </div>
@@ -180,5 +158,5 @@
 
 
 {% block down_scripts %}
-    <script src="{{ asset('build/Relatorios/relVendas01_listItensDoPreVenda.js') }}"></script>
+    <script src="{{ asset('build/Relatorios/itensDoPreVenda.js') }}"></script>
 {% endblock %}

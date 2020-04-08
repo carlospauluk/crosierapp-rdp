@@ -141,7 +141,7 @@ $(document).ready(function () {
                 $.each(results, function (index, value) {
                     let v = parseFloat(value.total_venda);
                     let f = Numeral(v).format('$ 0.0,[00]');
-                    data.addRow([value.nome_fornec, {'v': v, 'f': f}]);
+                    data.addRow([value.fornecedor_nome, {'v': v, 'f': f}]);
                 });
 
                 var options = {
@@ -164,7 +164,7 @@ $(document).ready(function () {
                     let selection = chart.getSelection();
                     let nomeFornec = data.getFormattedValue(selection[0].row, 0);
                     if (nomeFornec) {
-                        window.location = Routing.generate('relVendas01_listItensVendidosPorFornecedor',
+                        window.location = Routing.generate('ven_venda_listItensVendidosPorFornecedor',
                             {
                                 'filter':
                                     {

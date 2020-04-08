@@ -76,19 +76,19 @@ $(document).ready(function () {
                 google.visualization.events.addListener(chart, 'select', selectHandler);
 
                 function selectHandler() {
-                    let selection = chart.getSelection();
-                    if (selection && selection[0] && selection[0].row !== 'undefined') {
-                        let filial = data.getFormattedValue(selection[0].row, 0);
-                        if (filial) {
-                            window.location = Routing.generate('relEstoque01_list',
-                                {
-                                    'filter':
-                                        {
-                                            'filial': filial,
-                                        }
-                                });
-                        }
-                    }
+                    // let selection = chart.getSelection();
+                    // if (selection && selection[0] && selection[0].row !== 'undefined') {
+                    //     let filial = data.getFormattedValue(selection[0].row, 0);
+                    //     if (filial) {
+                    //         window.location = Routing.generate('relEstoque01_list',
+                    //             {
+                    //                 'filter':
+                    //                     {
+                    //                         'filial': filial,
+                    //                     }
+                    //             });
+                    //     }
+                    // }
                 }
 
             }

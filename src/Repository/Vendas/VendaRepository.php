@@ -100,10 +100,10 @@ class VendaRepository extends FilterRepository
         $dtFim->setTime(23, 59, 59, 99999);
 
 
-        $sql = 'SELECT i.fornecedor_nome, sum(i.preco_venda * i.qtde) as total_venda FROM ven_venda_item i, ven_venda v WHERE v.id = i.venda_id AND v.dt_nota BETWEEN :dtIni and :dtFim ';
+        $sql = 'SELECT i.fornecedor_nome, sum(i.preco_venda * i.qtde) as total_venda FROM ven_venda_item i, ven_venda v WHERE i.fornecedor_nome IS NOT NULL AND v.id = i.venda_id AND v.dt_nota BETWEEN :dtIni and :dtFim ';
         $sql .= $grupos ? 'AND v.json_data->>"$.grupo" IN (:grupos) ' : '';
         $sql .= $lojas ? 'AND v.json_data->>"$.loja" IN (:lojas) ' : '';
-        $sql .= ' GROUP BY i.fornecedor_nome';
+        $sql .= ' GROUP BY i.fornecedor_nome ORDER BY total_venda DESC';
 
 
         $params['dtIni'] = $dtIni->format('Y-m-d');
@@ -185,29 +185,32 @@ class VendaRepository extends FilterRepository
         $sql = 'SELECT ';
 
         if (!$totalGeral) {
-            $sql .= 'cod_prod, desc_prod, ';
+            $sql .= 'i.json_data->>"$.erp_codigo" as cod_prod, i.json_data->>"$.produto_nome" as desc_prod, ';
         }
 
-        $sql .= 'sum(qtde) as qtde_total, sum(json_data->>"$.total_preco_custo") as tpc, sum(qtde * preco_venda) as tpv, (((sum(qtde * preco_venda) / sum(json_data->>"$.total_preco_custo")) - 1) * 100.0) as rent 
-                    FROM ven_venda
-                     WHERE fornecedor_nome = :nomeFornec AND dt_nota BETWEEN :dtIni AND :dtFim ';
+        $sql .= 'sum(qtde) as qtde_total, 
+                    sum(i.json_data->>"$.total_preco_custo") as tpc, 
+                    sum(qtde * preco_venda) as tpv, 
+                    (((sum(qtde * preco_venda) / sum(i.json_data->>"$.total_preco_custo")) - 1) * 100.0) as rent 
+                    FROM ven_venda_item i, ven_venda v
+                     WHERE i.venda_id = v.id AND fornecedor_nome = :nomeFornec AND dt_nota BETWEEN :dtIni AND :dtFim ';
 
         if ($grupos) {
-            $sql .= ' AND json_data->>"$.grupo" IN (:grupos)';
+            $sql .= ' AND v.json_data->>"$.grupo" IN (:grupos)';
         }
         if ($lojas) {
-            $sql .= ' AND json_data->>"$.loja" IN (:lojas)';
+            $sql .= ' AND v.json_data->>"$.loja" IN (:lojas)';
         }
 
         if (!$totalGeral) {
-            $sql .= ' GROUP BY json_data->>"$.produto_erp_codigo", json_data->>"$.produto_nome"';
+            $sql .= ' GROUP BY i.json_data->>"$.erp_codigo", i.json_data->>"$.produto_nome"';
         }
 
-        $sql .= ' ORDER BY json_data->>"$.rentabilidade_item"';
+        // $sql .= ' ORDER BY i.json_data->>"$.rentabilidade_item"';
 
         $params = [
-            'dtIni' => $dtIni,
-            'dtFim' => $dtFim,
+            'dtIni' => $dtIni->format('Y-m-d'),
+            'dtFim' => $dtFim->format('Y-m-d'),
             'nomeFornec' => $nomeFornec
         ];
 
@@ -250,24 +253,21 @@ class VendaRepository extends FilterRepository
 
         $sql = '
             SELECT 
-                CONCAT(cod_vendedor, \' - \', nome_vendedor) as nome_vendedor, 
-                SUM(total_venda_pv) as total_venda,
-                SUM(total_custo_pv) as total_custo,
-                (((SUM(total_venda_pv) / SUM(total_custo_pv)) - 1) * 100.0) as rent
+                CONCAT(vendedor_codigo, \' - \', vendedor_nome) as nome_vendedor, 
+                SUM(valor_total) as total_venda,
+                SUM(json_data->>"$.total_custo_pv") as total_custo,
+                (((SUM(valor_total) / SUM(json_data->>"$.total_custo_pv")) - 1) * 100.0) as rent
             FROM 
-                (
-                    SELECT json_data->>"$.vendedor_codigo", json_data->>"$.vendedor_nome", json_data->>"$.prevenda_ekt", valor_total, json_data->>"$.total_custo_pv" 
-                    FROM ven_venda 
+                 ven_venda 
                     WHERE 
                         dt_nota BETWEEN :dtIni AND :dtFim
                         ' . $sql_AND_grupo . $sql_AND_loja . '
-                    GROUP BY cod_vendedor, nome_vendedor, prevenda, total_venda_pv, total_custo_pv) a 
-            GROUP BY json_data->>"$.vendedor_codigo", json_data->>"$.vendedor_nome" ORDER BY valor_total';
+            GROUP BY nome_vendedor ORDER BY total_venda';
 
 
         $params = [
-            'dtIni' => $dtIni,
-            'dtFim' => $dtFim,
+            'dtIni' => $dtIni->format('Y-m-d'),
+            'dtFim' => $dtFim->format('Y-m-d'),
         ];
 
         if ($grupos) {
@@ -294,6 +294,7 @@ class VendaRepository extends FilterRepository
      * @param string|null $grupos
      * @return mixed
      * @throws NonUniqueResultException
+     * @throws DBALException
      */
     public function totalRentabilidade(\DateTime $dtIni = null, \DateTime $dtFim = null, ?string $lojas = null, ?string $grupos = null)
     {
@@ -315,18 +316,14 @@ class VendaRepository extends FilterRepository
             SELECT 
                 (((SUM(valor_total) / SUM(json_data->>"$.total_custo_pv")) - 1) * 100.0) as rent
             FROM 
-                (
-                    SELECT json_data->>"$.vendedor_codigo", json_data->>"$.vendedor_nome", json_data->>"$.prevenda_ekt", valor_total, json_data->>"$.total_custo_pv"
-                    FROM ven_venda
+                 ven_venda
                     WHERE 
                         dt_nota BETWEEN :dtIni AND :dtFim
-                        ' . $sql_AND_grupo . $sql_AND_loja . '
-                    GROUP BY json_data->>"$.vendedor_codigo", json_data->>"$.vendedor_nome", json_data->>"$.prevenda", valor_total, json_data->>"$.total_custo_pv") a 
-            ';
+                        ' . $sql_AND_grupo . $sql_AND_loja;
 
         $params = [
-            'dtIni' => $dtIni,
-            'dtFim' => $dtFim,
+            'dtIni' => $dtIni->format('Y-m-d'),
+            'dtFim' => $dtFim->format('Y-m-d'),
         ];
 
         if ($grupos) {
@@ -345,7 +342,7 @@ class VendaRepository extends FilterRepository
      * @param \DateTime|null $dtIni
      * @param \DateTime|null $dtFim
      * @return mixed
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws DBALException
      */
     public function getNomeFornecedorMaisVendido(\DateTime $dtIni, \DateTime $dtFim): ?string
     {
@@ -359,8 +356,8 @@ class VendaRepository extends FilterRepository
                      WHERE dt_nota BETWEEN :dtIni AND :dtFim GROUP BY fornecedor_nome ORDER BY tpv LIMIT 1';
 
         $params = [
-            'dtIni' => $dtIni,
-            'dtFim' => $dtFim,
+            'dtIni' => $dtIni->format('Y-m-d'),
+            'dtFim' => $dtFim->format('Y-m-d'),
         ];
 
         /** @var Connection $conn */
@@ -462,10 +459,19 @@ class VendaRepository extends FilterRepository
         $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
         $dtFim->setTime(23, 59, 59, 99999);
 
-        $sql = 'SELECT json_data->>"$.prevenda_ekt" as prevenda, dt_nota, json_data->>"$.vendedor_codigo", json_data->>"$.vendedor_nome", valor_total, json_data->>"$.total_custo_pv", 
-                    (((valor_total / json_data->>"$.total_custo_pv") - 1) * 100.0) as rent, cliente_pv
+        $sql = 'SELECT 
+                    json_data->>"$.prevenda_ekt" as prevenda, 
+                    dt_nota, 
+                    json_data->>"$.vendedor_codigo" as vendedor_codigo, 
+                    json_data->>"$.vendedor_nome" as vendedor_nome, 
+                    valor_total, 
+                    json_data->>"$.total_custo_pv" as total_custo_pv,
+                    json_data->>"$.cliente_nome" as cliente_nome,
+                    (((valor_total / json_data->>"$.total_custo_pv") - 1) * 100.0) as rent
                     FROM ven_venda
-                     WHERE id IN (SELECT venda_id FROM ven_venda_ITEM WHERE CONCAT(json_data->>"$.produto_erp_codigo", \' - \', json_data->>"$.produto_nome") = :produto) AND dt_nota BETWEEN :dtIni AND :dtFim ';
+                     WHERE id IN 
+                           (SELECT venda_id FROM ven_venda_item WHERE CONCAT(json_data->>"$.produto_erp_codigo", \' - \', json_data->>"$.produto_nome") = :produto) 
+                            AND dt_nota BETWEEN :dtIni AND :dtFim ';
 
         if ($grupos) {
             $sql .= 'AND json_data->>"$.grupo" IN (:grupos) ';
@@ -474,12 +480,12 @@ class VendaRepository extends FilterRepository
             $sql .= 'AND json_data->>"$.loja" IN (:lojas) ';
         }
 
-        $sql .= 'GROUP BY json_data->>"$.prevenda_ekt" as prevenda, dt_nota, json_data->>"$.vendedor_codigo", json_data->>"$.vendedor_nome", valor_total, json_data->>"$.total_custo_pv", 
-        json_data->>"$.cliente_cnpj" ORDER BY dt_nota,  valor_total';
+        $sql .= 'GROUP BY json_data->>"$.prevenda_ekt", dt_nota, json_data->>"$.vendedor_codigo", json_data->>"$.vendedor_nome", valor_total, json_data->>"$.total_custo_pv", cliente_nome, rent 
+         ORDER BY dt_nota,  valor_total';
 
         $params = [
-            'dtIni' => $dtIni,
-            'dtFim' => $dtFim,
+            'dtIni' => $dtIni->format('Y-m-d'),
+            'dtFim' => $dtFim->format('Y-m-d'),
             'produto' => $produto,
         ];
 
@@ -522,17 +528,24 @@ class VendaRepository extends FilterRepository
             $sql_AND_loja .= ' AND json_data->>"$.loja" IN (:lojas)';
         }
 
-        $sql = 'SELECT json_data->>"$.prevenda_ekt" as prevenda, dt_nota, json_data->>"$.vendedor_codigo", json_data->>"$.vendedor_nome", valor_total, json_data->>"$.total_custo_pv",
-       (((valor_total / json_data->>"$.total_custo_pv") - 1) * 100.0) as rent, json_data->>"$.cliente_nome"
+        $sql = 'SELECT 
+                    json_data->>"$.prevenda_ekt" as prevenda, 
+                    dt_nota, 
+                    vendedor_codigo, 
+                    vendedor_nome, 
+                    valor_total, 
+                    json_data->>"$.total_custo_pv" as total_custo_pv,
+                    (((valor_total / json_data->>"$.total_custo_pv") - 1) * 100.0) as rent, 
+                    json_data->>"$.cliente_nome" as cliente_nome
                     FROM ven_venda
-                     WHERE json_data->>"$.vendedor_codigo" = :codVendedor AND dt_nota BETWEEN :dtIni AND :dtFim 
+                     WHERE vendedor_codigo = :codVendedor AND dt_nota BETWEEN :dtIni AND :dtFim 
                      ' . $sql_AND_grupo . $sql_AND_loja . '
-                     GROUP BY prevenda, dt_nota, cod_vendedor, nome_vendedor, total_venda_pv, total_custo_pv, cliente_pv ORDER BY dt_nota, total_venda_pv';
+                    ORDER BY dt_nota, valor_total';
 
 
         $params = [
-            'dtIni' => $dtIni,
-            'dtFim' => $dtFim,
+            'dtIni' => $dtIni->format('Y-m-d'),
+            'dtFim' => $dtFim->format('Y-m-d'),
             'codVendedor' => $codVendedor
         ];
 
@@ -547,50 +560,6 @@ class VendaRepository extends FilterRepository
         $conn = $this->getEntityManager()->getConnection();
         return $conn->fetchAll($sql, $params);
     }
-
-
-    /**
-     * @param int $pv
-     * @return mixed
-     */
-    public function itensDoPreVenda(int $pv)
-    {
-        $sql = 'SELECT num_item, cod_prod, desc_prod, qtde, total_preco_custo, total_preco_venda, (((total_preco_venda / total_preco_custo) - 1) * 100.0) as rent
-                    FROM rdp_rel_vendas01
-                     WHERE prevenda = :prevenda ORDER BY num_item';
-
-        /** @var Connection $conn */
-        $conn = $this->getEntityManager()->getConnection();
-        return $conn->fetchAll($sql, ['prevenda' => $pv]);
-    }
-
-
-    /**
-     * @param int $pv
-     * @return mixed
-     * @throws ViewException
-     * @throws DBALException
-     */
-    public function totaisPreVenda(int $pv)
-    {
-        $sql = 'SELECT dt_nota, cliente_pv, grupo, loja, cod_vendedor, nome_vendedor, total_custo_pv, total_venda_pv, rentabilidade_pv, sum(total_preco_venda) as subtotal
-                    FROM rdp_rel_vendas01
-                     WHERE prevenda = :prevenda
-                     GROUP BY dt_nota, cliente_pv, grupo, loja, cod_vendedor, nome_vendedor, total_custo_pv, total_venda_pv, rentabilidade_pv';
-
-        /** @var Connection $conn */
-        $conn = $this->getEntityManager()->getConnection();
-
-        try {
-            $r = $conn->fetchAssoc($sql, ['prevenda' => $pv]);
-            $descontos = $r['subtotal'] - $r['total_venda_pv'];
-            $r['descontos'] = $descontos;
-            return $r;
-        } catch (NonUniqueResultException $e) {
-            throw new ViewException('Erro ao totalizar PV ' . $pv);
-        }
-    }
-
 
     /**
      * @return mixed[]

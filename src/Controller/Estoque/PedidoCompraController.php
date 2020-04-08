@@ -293,50 +293,6 @@ class PedidoCompraController extends FormListController
         return $pedidoCompra;
     }
 
-    /**
-     * @param array $pedidoCompraDeCompra
-     * @return string
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     * @throws \Exception
-     */
-    public function gerarPedidoCompra(array $pedidoCompraDeCompra): string
-    {
-        /** @var RelEstoque01Repository $repoEstoque */
-        $repoEstoque = $this->getDoctrine()->getRepository(RelEstoque01::class);
-
-        $linhas = [
-            'COD_PRODUTO|DESC_PRODUTO|FILIAL|COD_FORNEC|NOME_FORNEC|CUSTO_MEDIO|PRECO_VENDA|QTDE|TOTAL_CUSTO_MEDIO|COD_COMPRADOR|NOME_COMPRADOR'
-        ];
-
-        $nomeFornecedor = $repoEstoque->getNomeFornecedorByCodigo((int)$pedidoCompraDeCompra['fornecedor']);
-
-        $comprador = explode(' - ', $pedidoCompraDeCompra['comprador']);
-
-
-        /** @var RelEstoque01 $item */
-        foreach ($pedidoCompraDeCompra['itens'] as $item) {
-            $regs = [
-                $item->getCodProduto(),
-                $item->getDescProduto(),
-                $item->getfilial(),
-                $item->getCodFornecedor(),
-                $item->getNomeFornecedor(),
-                $item->getCustoMedio(),
-                $item->getPrecoVenda(),
-                $item->getDeficit(),
-                $item->getTotalCustoMedio(),
-                $comprador[0],
-                $comprador[1]
-            ];
-            $linhas[] = implode('|', $regs);
-        }
-        $nomeArquivo = (new \DateTime('now'))->format('Y-m-d_H-i-s-U') . '.txt';
-        $pasta = $_SERVER['PASTA_PEDIDOSCOMPRA'];
-
-        file_put_contents($pasta . $nomeArquivo, implode(PHP_EOL, $linhas));
-        return $nomeArquivo;
-    }
-
 
     /**
      *
@@ -403,7 +359,7 @@ class PedidoCompraController extends FormListController
         }
 
         $params['filter'] = $queryParams['filter'];
-        $params['filter']['apenasARepor'] = filter_var($params['filter']['apenasARepor'] ?? 'nada', FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        $params['filter']['apenasARepor'] = filter_var($params['filter']['apenasARepor'] ?? true, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 
         /** @var PedidoCompraRepository $repoPedidoCompra */
         $repoPedidoCompra = $this->getDoctrine()->getRepository(PedidoCompra::class);

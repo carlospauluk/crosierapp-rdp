@@ -4,6 +4,7 @@ namespace App\Controller\Relatorios;
 
 
 use App\Entity\Estoque\PedidoCompra;
+use App\Entity\Vendas\Venda;
 use App\EntityHandler\Relatorios\RelCompFor01EntityHandler;
 use App\Repository\Estoque\PedidoCompraRepository;
 use App\Repository\Relatorios\RelCompFor01Repository;
@@ -26,8 +27,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class RelCompFor01Controller extends FormListController
 {
 
-    /** @var SessionInterface */
-    private $session;
+    private SessionInterface $session;
+
+    private RelCompFor01Repository $repoRelCompFor01;
 
     /**
      * @required
@@ -46,6 +48,17 @@ class RelCompFor01Controller extends FormListController
     {
         $this->session = $session;
     }
+
+    /**
+     * @required
+     * @param RelCompFor01Repository $repoRelCompFor01
+     */
+    public function setRepoRelCompFor01(RelCompFor01Repository $repoRelCompFor01): void
+    {
+        $this->repoRelCompFor01 = $repoRelCompFor01;
+    }
+
+
 
 
     public function getFilterDatas(array $params): array
@@ -117,9 +130,9 @@ class RelCompFor01Controller extends FormListController
         $dtIni = DateTimeUtils::parseDateStr(substr($dts, 0, 10));
         $dtFim = DateTimeUtils::parseDateStr(substr($dts, 13, 10));
 
-        /** @var PedidoCompraRepository $repoPedidoCompra */
-        $repoPedidoCompra = $this->getDoctrine()->getRepository(PedidoCompra::class);
-        $r = $repoPedidoCompra->totalComprasPorFornecedor($dtIni, $dtFim);
+        /** @var RelCompFor01Repository $repo */
+        $repo = $this->getDoctrine()->getRepository(PedidoCompra::class);
+        $r = $repo->totalComprasPorFornecedor($dtIni, $dtFim);
         return new JsonResponse($r);
     }
 
@@ -135,11 +148,8 @@ class RelCompFor01Controller extends FormListController
      */
     public function listItensCompradosPorFornecedor(Request $request): Response
     {
-        $this->denyAccessUnlessGranted(['ROLE_ADMIN', 'ROLE_RELVENDAS']);
-
         $vParams = $request->query->all();
-        /** @var RelCompFor01Repository $repo */
-        $repo = $this->getDoctrine()->getRepository(RelCompFor01::class);
+
         if (!array_key_exists('filter', $vParams)) {
 
             if ($vParams['r'] ?? null) {
@@ -157,12 +167,12 @@ class RelCompFor01Controller extends FormListController
         $dtIni = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 0, 10)) ?: new \DateTime();
         $dtFim = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 13, 10)) ?: new \DateTime();
 
-        $nomeFornec = $vParams['filter']['nomeFornec'] ?? $this->getDoctrine()->getRepository(RelVendas01::class)->getNomeFornecedorMaisVendido($dtIni, $dtFim);
+        $nomeFornec = $vParams['filter']['nomeFornec'] ?? $this->getDoctrine()->getRepository(Venda::class)->getNomeFornecedorMaisVendido($dtIni, $dtFim);
         $vParams['filter']['nomeFornec'] = $nomeFornec;
 
-        $r = $repo->itensComprados($dtIni, $dtFim, $nomeFornec);
+        $r = $this->repoRelCompFor01->itensComprados($dtIni, $dtFim, $nomeFornec);
 
-        $total = $repo->itensComprados($dtIni, $dtFim, $nomeFornec, true)[0];
+        $total = $this->repoRelCompFor01->itensComprados($dtIni, $dtFim, $nomeFornec, true)[0];
 
         $dtAnterior = clone $dtIni;
         $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');
@@ -179,7 +189,7 @@ class RelCompFor01Controller extends FormListController
         $vParams['proxPeriodoF'] = $prox['dtFim'];
 
 
-        $vParams['fornecedores'] = json_encode($this->getDoctrine()->getRepository(RelVendas01::class)->getFornecedores());
+        $vParams['fornecedores'] = json_encode($this->getDoctrine()->getRepository(Venda::class)->getFornecedores());
 
         $vParams['dados'] = $r;
         $vParams['total'] = $total;
