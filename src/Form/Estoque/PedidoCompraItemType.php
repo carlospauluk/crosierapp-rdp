@@ -68,7 +68,7 @@ class PedidoCompraItemType extends AbstractType
 
             $builder->add('referencia', TextType::class, array(
                 'label' => 'Referência',
-                'required' => true,
+                'required' => false,
             ));
 
             $builder->add('descricao', TextType::class, array(

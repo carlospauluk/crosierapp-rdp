@@ -53,12 +53,12 @@
                                     {% if e.id == null or e.status == 'INICIADO' %}
 
                                         <button type="button" class="btn btn-sm btn-primary"
-                                                onclick="window.location.href='{{ url('est_pedidoCompraItem_form', {pedidoCompra: e.id, 'item': item.id} ) }}'">
+                                                onclick="window.location.href='{{ url('est_pedidoCompraItem_form', {'pedidoCompra': e.id, 'pedidoCompraItem': item.id} ) }}'">
                                             <i class="fas fa-wrench" aria-hidden="true"></i>
                                         </button>
 
                                         <button type="button" class="btn btn-sm btn-danger"
-                                                data-url="{{ url('est_pedidoCompraItem_delete', {'pvItem': item.id}) }}"
+                                                data-url="{{ url('est_pedidoCompraItem_delete', {'pedidoCompraItem': item.id}) }}"
                                                 data-token="{{ csrf_token('delete') }}"
                                                 data-target="#confirmationModal" data-toggle="modal">
                                             <i class="fa fa-trash" aria-hidden="true"></i>

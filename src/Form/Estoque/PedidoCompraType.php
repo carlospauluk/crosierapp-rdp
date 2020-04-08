@@ -81,7 +81,7 @@ class PedidoCompraType extends AbstractType
             $builder->add('dtPrevEntrega', DateTimeType::class, [
                 'label' => 'Dt Prev Entrega',
                 'widget' => 'single_text',
-                'required' => true,
+                'required' => false,
                 'html5' => false,
                 'format' => 'dd/MM/yyyy',
                 'attr' => [

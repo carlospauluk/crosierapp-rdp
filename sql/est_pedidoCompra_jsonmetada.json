@@ -1,0 +1,11 @@
+{
+  "campos": {
+    "filial": {
+      "label": "Filial",
+      "tipo": "select",
+      "class": "s2allownew",
+      "sugestoes": []
+    }
+  },
+  "abas": {}
+}

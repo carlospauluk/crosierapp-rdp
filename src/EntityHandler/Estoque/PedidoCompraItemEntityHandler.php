@@ -29,5 +29,6 @@ class PedidoCompraItemEntityHandler extends EntityHandler
             }
             $item->ordem = ($ultimaOrdem + 1);
         }
+        $item->total = bcsub(bcmul($item->qtde, $item->precoCusto, 2), $item->desconto, 2);
     }
 }

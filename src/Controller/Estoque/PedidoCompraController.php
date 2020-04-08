@@ -22,6 +22,7 @@ use CrosierSource\CrosierLibBaseBundle\Utils\EntityIdUtils\EntityIdUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use CrosierSource\CrosierLibBaseBundle\Utils\ViewUtils\Select2JsUtils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -155,6 +156,10 @@ class PedidoCompraController extends FormListController
     /**
      *
      * @Route("/est/pedidoCompraItem/form/{pedidoCompra}/{pedidoCompraItem}", name="est_pedidoCompraItem_form", defaults={"pedidoCompraItem"=null}, requirements={"pedidoCompra"="\d+","pedidoCompraItem"="\d+"})
+     *
+     * @ParamConverter("pedidoCompra", class="App\Entity\Estoque\PedidoCompra", options={"id" = "pedidoCompra"})
+     * @ParamConverter("pedidoCompraItem", class="App\Entity\Estoque\PedidoCompraItem", options={"id" = "pedidoCompraItem"})
+     *
      * @param Request $request
      * @param PedidoCompra|null $pedidoCompra
      * @param PedidoCompraItem|null $pedidoCompraItem
@@ -177,20 +182,27 @@ class PedidoCompraController extends FormListController
             'formView' => 'Estoque/pedidoCompraItem_form.html.twig',
             'formRoute' => 'est_pedidoCompraItem_form',
             'formPageTitle' => 'Item do PedidoCompra',
-            'routeParams' => ['pedidoCompra' => $pedidoCompra->getId()],
+            'routeParams' => [
+                'pedidoCompra' => $pedidoCompra->getId(),
+                'pedidoCompraItem' => $pedidoCompraItem->getId(),
+            ],
             'entityHandler' => $this->pedidoCompraItemEntityHandler,
             'jsonMetadata' => $jsonMetadata
         ];
         return $this->doForm($request, $pedidoCompraItem, $params);
     }
 
+    /**
+     * @param Request $request
+     * @param $entity
+     */
     public function handleRequestOnValid(Request $request, $entity): void
     {
         if ($entity instanceof PedidoCompraItem) {
             /** @var AppConfigRepository $repoAppConfig */
             $repoAppConfig = $this->getDoctrine()->getRepository(AppConfig::class);
-            $jsonMetadata = json_decode($repoAppConfig->findByChave('est_pedidocompra_json_metadata'), true);
-            if ($jsonMetadata['vinculoAoEstoque'] === 'porProduto') {
+            $jsonMetadata = json_decode($repoAppConfig->findConfigByChaveAndAppUUID('est_pedidocompra_json_metadata', $_SERVER['CROSIERAPPRADX_UUID'])->getValor(), true);
+            if (isset($jsonMetadata['vinculoAoEstoque']) && $jsonMetadata['vinculoAoEstoque'] === 'porProduto') {
                 $entity->jsonData['produto'] = $request->get('produto');
             }
         }
@@ -255,8 +267,10 @@ class PedidoCompraController extends FormListController
                 $item = new PedidoCompraItem();
                 $item->pedidoCompra = $pedidoCompra;
                 $item->jsonData['produto_id'] = $produto->getId();
+                $item->descricao = $produto->nome;
                 $item->qtde = abs($qtdeSugerida);
                 $item->precoCusto = $produto->jsonData['preco_custo'] ?? 0.0;
+                $item->total = bcmul($item->qtde, $item->precoCusto, 2);
                 $pedidoCompra->itens->add($item);
 
                 $this->pedidoCompraItemEntityHandler->save($item);
