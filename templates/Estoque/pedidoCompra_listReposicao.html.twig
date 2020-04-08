@@ -91,26 +91,28 @@
                 <form name="form_listReposicao" id="form_listReposicao">
 
 
-                    <table class="table table-sm table-striped table-hover crsr-datatable">
+                    <table class="table table-sm table-striped table-hover crsr-datatable" id="listReposicao">
 
                         <thead>
                         <tr>
-                            <th scope="col"></th>
+                            <th scope="col">#</th>
                             <th scope="col">Produto</th>
                             <th scope="col">Fornecedor</th>
                             <th scope="col">Dt Últ Saída</th>
                             <th scope="col">Qtde Atual</th>
                             <th scope="col">Qtde Mínima</th>
                             <th scope="col">Qtde Reposição</th>
-                            <th scope="col"></th>
                         </tr>
                         </thead>
 
                         <tbody>
                         {% for produto in produtos %}
                             {% set deficit = produto.jsonData['deficit_estoque_' ~ filter.filial|lower]|default(0) %}
+                            {% set qtde_estoque = produto.jsonData['qtde_estoque_' ~ filter.filial|lower]|default(0) %}
+                            {% set qtde_estoque_min = produto.jsonData['qtde_estoque_min_' ~ filter.filial|lower] %}
+                            {% set dt_ult_saida = produto.jsonData['dt_ult_saida_' ~ filter.filial|lower]|default('') %}
                             <tr>
-                                <td>
+                                <td data-order="">
                                     <a role="button" href="#"
                                        data-target="#confirmationModal" data-toggle="modal"
                                        data-url="{{ url('est_pedidoCompra_adicionar', {'produto': produto.id, 'filial': filter.filial, 'qtdeSugerida': deficit}) }}"
@@ -118,16 +120,12 @@
                                        title="Adicionar ao carrinho">
                                         <i class="fas fa-truck"></i> Adicionar</a>
                                 </td>
-                                <td>{{ produto.id }} - {{ produto.nome }}</td>
-                                <td>{{ produto.fornecedor.id }} - {{ produto.fornecedor.nome }}</td>
-                                <td>{{ produto.jsonData['dt_ult_saida_' ~ filter.filial|lower]|default('')|date('d/m/Y') }}</td>
-                                <td class="text-right">
-                                    {{ produto.jsonData['qtde_estoque_' ~ filter.filial|lower]|default(0)|number_format(3,',','.') }}
-                                </td>
-                                <td class="text-right">
-                                    {{ produto.jsonData['qtde_estoque_min_' ~ filter.filial|lower]|number_format(3,',','.') }}
-                                </td>
-                                <td class="text-right" style="color: white; background-color: {{ produto.jsonData['deficit_estoque_' ~ filter.filial|lower]|default(0) < 0 ? 'indianred' : 'dodgerblue' }}">
+                                <td data-order="{{ produto.id }}">{{ produto.id }} - {{ produto.nome }}</td>
+                                <td data-order="{{ produto.fornecedor.nome }}">{{ produto.fornecedor.id }} - {{ produto.fornecedor.nome }}</td>
+                                <td data-order="{{ dt_ult_saida|date('Y-m-d') }}">{{ dt_ult_saida|date('d/m/Y') }}</td>
+                                <td data-order="{{ qtde_estoque }}" class="text-right">{{ qtde_estoque|number_format(3,',','.') }}</td>
+                                <td data-order="{{ qtde_estoque_min }}" class="text-right">{{ qtde_estoque_min|number_format(3,',','.') }}</td>
+                                <td data-order="{{ deficit }}" class="text-right" style="color: white; background-color: {{ deficit < 0 ? 'indianred' : 'dodgerblue' }}">
                                     {{ deficit|number_format(3,',','.') }}
                                 </td>
                             </tr>
