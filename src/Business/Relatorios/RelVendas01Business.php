@@ -300,7 +300,8 @@ class RelVendas01Business
             $jsonData['erp_codigo'] = $item['COD_PROD'];
             $jsonData['total_preco_custo'] = $item['TOTAL_PRECO_CUSTO'];
             $jsonData['rentabilidade_item'] = $item['RENTABILIDADE_ITEM'];
-            $produtoJsonData = json_decode($produto['json_data'], true);
+            
+            $produtoJsonData = json_decode($produto['json_data'] ?? '{}', true);
             $jsonData['fornecedor_id'] = $produto['fornecedor_id'] ?? null;
             $jsonData['fornecedor_documento'] = $produtoJsonData['fornecedor_documento'] ?? null;
             $jsonData['fornecedor_nome'] = $produtoJsonData['fornecedor_nome'] ?? null;
@@ -326,7 +327,8 @@ class RelVendas01Business
     /**
      * Constrói o array/cachê dos produtos
      */
-    private function buildProdutosArray() {
+    private function buildProdutosArray()
+    {
         /** @var Connection $conn */
         $conn = $this->doctrine->getConnection();
         $rProdutos = $conn->fetchAll('SELECT *, json_data->>"$.erp_codigo" as erp_codigo FROM est_produto');
