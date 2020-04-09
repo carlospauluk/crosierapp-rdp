@@ -96,6 +96,7 @@
                         <thead>
                         <tr>
                             <th scope="col">#</th>
+                            <th scope="col">Id</th>
                             <th scope="col">Produto</th>
                             <th scope="col">Fornecedor</th>
                             <th scope="col">Dt Últ Saída</th>
@@ -120,7 +121,8 @@
                                        title="Adicionar ao carrinho">
                                         <i class="fas fa-truck"></i> Adicionar</a>
                                 </td>
-                                <td data-order="{{ produto.id }}">{{ produto.id }} - {{ produto.nome }}</td>
+                                <td data-order="{{ produto.id }}">{{ produto.id|strpad(9) }}</td>
+                                <td data-order="{{ produto.jsonData['erp_codigo'] }}">{{ produto.jsonData['erp_codigo'] }} - {{ produto.nome }}</td>
                                 <td data-order="{{ produto.fornecedor.nome }}">{{ produto.fornecedor.id }} - {{ produto.fornecedor.nome }}</td>
                                 <td data-order="{{ dt_ult_saida|date('Y-m-d') }}">{{ dt_ult_saida|date('d/m/Y') }}</td>
                                 <td data-order="{{ qtde_estoque }}" class="text-right">{{ qtde_estoque|number_format(3,',','.') }}</td>

@@ -92,6 +92,7 @@
         <thead class="thead-dark">
         <tr>
             <th scope="col">#</th>
+            <th scope="col">Id</th>
             <th scope="col">Produto</th>
             <th scope="col">Fornecedor</th>
             <th scope="col">Dt Últ Saída</th>
@@ -116,7 +117,8 @@
             {% set dt_ult_saida = produto.jsonData['dt_ult_saida_' ~ filial|lower]|default('') %}
             <tr style="background-color: {{ strip ? 'lightgrey' : 'white' }}">
                 <th scope="row">{{ i }}</th>
-                <td>{{ produto.id }} - {{ produto.nome }}</td>
+                <td data-order="{{ produto.id }}">{{ produto.id|strpad(9) }}</td>
+                <td data-order="{{ produto.jsonData['erp_codigo']|default('') }}">{{ produto.jsonData['erp_codigo']|default('') }} - {{ produto.nome }}</td>
                 <td>{{ produto.fornecedor.id }} - {{ produto.fornecedor.nome }}</td>
                 <td>{{ dt_ult_saida|date('d/m/Y') }}</td>
                 <td class="text-right">{{ qtde_estoque|number_format(3,',','.') }}</td>
