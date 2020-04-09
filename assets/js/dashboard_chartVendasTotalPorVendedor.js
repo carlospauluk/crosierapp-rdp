@@ -121,32 +121,42 @@ $(document).ready(function () {
         $.getJSON(
             Routing.generate('ven_venda_graficoTotalPorVendedor') + '?filterDts=' + $filter_dts.val() + '&lojas=' + $filter_lojas.val() + '&grupos=' + $filter_grupos.val(),
             function (results) {
-                let rentabilidadeGeral = Numeral(parseFloat(results.rentabilidadeGeral)).format('0,0.00');
+                let margemLiquidaGeral = Numeral(parseFloat(results.margemLiquidaGeral)).format('0,0.00');
 
-                $('#chart_totalPorVendedor_rentabilidade').html('&nbsp;' + rentabilidadeGeral + '&percnt;');
+                $('#chart_totalPorVendedor_margemLiquidaGeral').html('&nbsp;' + margemLiquidaGeral + '&percnt;');
 
                 const data = new google.visualization.DataTable();
                 data.addColumn('string', 'Vendedor');
                 data.addColumn('number', 'Total');
                 data.addColumn({type: 'string', role: 'tooltip', 'p': {'html': true}});
-                data.addColumn('number', 'Rentabilidade');
+                data.addColumn('number', 'Margem Líquida');
                 data.addColumn({type: 'string', role: 'tooltip', 'p': {'html': true}});
 
                 $.each(results.dados, function (index, value) {
                     let totalVenda = parseFloat(value.total_venda);
                     let totalVendaF = Numeral(totalVenda).format('$ 0,0.00');
 
-                    let rent = parseFloat(value.rent);
-                    let rentF = Numeral(parseFloat(value.rent)).format('0,0.00');
+                    // let margemBruta = parseFloat(value.margem_bruta);
+                    let margemBrutaF = Numeral(parseFloat(value.margem_bruta)).format('0,0.00');
+
+                    let margemLiquida = parseFloat(value.margem_liquida);
+                    let margemLiquidaF = Numeral(parseFloat(value.margem_liquida)).format('0,0.00');
+
+                    // let totalComissoes = parseFloat(value.total_comissoes);
+                    let totalComissoesF = Numeral(parseFloat(value.total_comissoes)).format('$ 0,0.00');
 
                     let t = '<div style="white-space: nowrap">' + value.nome_vendedor + '<br />' +
-                        'Total vendido: <b>' + totalVendaF + '</b><br />Rentabilidade: <b>' + rentF + '%</b></div>';
+                                'Total Vendido: <b>' + totalVendaF + '</b><br />' +
+                                'Margem Bruta: <b>' + margemBrutaF + '%</b><br />' +
+                                'Margem Líquida: <b>' + margemLiquidaF + '%</b><br />' +
+                                'Total Comissões: <b>' + totalComissoesF + '</b><br />' +
+                        '</div>';
 
                     data.addRow([
                         value.nome_vendedor,
                         {'v': totalVenda, 'f': totalVendaF},
                         t,
-                        {'v': rent, 'f': rentF},
+                        {'v': margemLiquida, 'f': margemLiquidaF},
                         t]);
                 });
 
@@ -164,9 +174,10 @@ $(document).ready(function () {
                     },
                     vAxes: {
                         // Adds titles to each axis.
-                        0: {title: 'Total vendido'},
-                        1: {title: 'Rentabilidade'}
-                    }
+                        0: {title: 'Total Vendido'},
+                        1: {title: 'Margem Líquida'}
+                    },
+                    colors: ['darkblue', 'darkcyan']
 
                 };
 

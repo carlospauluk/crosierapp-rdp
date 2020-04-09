@@ -237,6 +237,7 @@ class VendaRepository extends FilterRepository
      * @param string|null $grupos
      * @return mixed
      * @throws NonUniqueResultException
+     * @throws DBALException
      */
     public function totalVendasPorVendedor(\DateTime $dtIni = null, \DateTime $dtFim = null, ?string $lojas = null, ?string $grupos = null)
     {
@@ -259,7 +260,9 @@ class VendaRepository extends FilterRepository
                 CONCAT(vendedor_codigo, \' - \', vendedor_nome) as nome_vendedor, 
                 SUM(valor_total) as total_venda,
                 SUM(json_data->>"$.total_custo_pv") as total_custo,
-                (((SUM(valor_total) / SUM(json_data->>"$.total_custo_pv")) - 1) * 100.0) as rent
+                (((SUM(valor_total) / SUM(json_data->>"$.total_custo_pv")) - 1) * 100.0) as margem_bruta,
+                   SUM(json_data->>"$.nova_comissao") as total_comissoes,
+                (SUM(valor_total * json_data->>"$.margem_liquida" / 100.0) / SUM(valor_total) * 100.0) as margem_liquida
             FROM 
                  ven_venda 
                     WHERE 
@@ -283,9 +286,9 @@ class VendaRepository extends FilterRepository
         $conn = $this->getEntityManager()->getConnection();
         $dados = $conn->fetchAll($sql, $params);
 
-        $rentabilidadeGeral = $this->totalRentabilidade($dtIni, $dtFim, $lojas, $grupos)['rent'] ?? 0.0;
+        $margemLiquidaGeral = ($this->totalMargemLiquida($dtIni, $dtFim, $lojas, $grupos)['margem_liquida'] ?? 0.0) * 100.0;
 
-        return ['dados' => $dados, 'rentabilidadeGeral' => $rentabilidadeGeral];
+        return ['dados' => $dados, 'margemLiquidaGeral' => $margemLiquidaGeral];
     }
 
     /**
@@ -299,7 +302,7 @@ class VendaRepository extends FilterRepository
      * @throws NonUniqueResultException
      * @throws DBALException
      */
-    public function totalRentabilidade(\DateTime $dtIni = null, \DateTime $dtFim = null, ?string $lojas = null, ?string $grupos = null)
+    public function totalMargemLiquida(\DateTime $dtIni = null, \DateTime $dtFim = null, ?string $lojas = null, ?string $grupos = null)
     {
         $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
         $dtIni->setTime(0, 0, 0, 0);
@@ -317,7 +320,7 @@ class VendaRepository extends FilterRepository
 
         $sql = '
             SELECT 
-                (((SUM(valor_total) / SUM(json_data->>"$.total_custo_pv")) - 1) * 100.0) as rent
+                (SUM(valor_total * json_data->>"$.margem_liquida" / 100.0) / SUM(valor_total)) as margem_liquida
             FROM 
                  ven_venda
                     WHERE 
