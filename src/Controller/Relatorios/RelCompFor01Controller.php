@@ -77,18 +77,14 @@ class RelCompFor01Controller extends FormListController
     {
         $codProd = $request->get('filter')['codProd'];
 
-        /** @var RelCompFor01Repository $repo */
-        $repo = $this->getDoctrine()->getRepository(RelCompFor01::class);
-        $produto = $repo->getProdutoByCodigo($codProd);
-
+        $produto = $this->repoRelCompFor01->getProdutoByCodigo($codProd);
 
         $vParams = $request->query->all();
-
 
         $dtIni = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 0, 10)) ?: new \DateTime();
         $dtFim = DateTimeUtils::parseDateStr(substr($vParams['filter']['dts'], 13, 10)) ?: new \DateTime();
 
-        $r = $repo->itensCompradosPorProduto($dtIni, $dtFim, $codProd);
+        $r = $this->repoRelCompFor01->itensCompradosPorProduto($dtIni, $dtFim, $codProd);
 
         $dtAnterior = clone $dtIni;
         $dtAnterior->setTime(12, 0, 0, 0)->modify('last day');

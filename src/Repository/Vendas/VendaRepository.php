@@ -27,9 +27,10 @@ class VendaRepository extends FilterRepository
     /**
      * @param \DateTime $dtVenda
      * @param $pv
+     * @return array|null
      * @throws \Exception
      */
-    public function findByDtVendaAndPV(\DateTime $dtVenda, $pv)
+    public function findByDtVendaAndPV(\DateTime $dtVenda, $pv): ?array
     {
         $dtVenda->setTime(0, 0, 0, 0);
         $ql = "SELECT v FROM App\Entity\Vendas\Venda v WHERE v.dtVenda = :dtVenda AND v.pv = :pv";
@@ -51,9 +52,10 @@ class VendaRepository extends FilterRepository
     /**
      * @param $pv
      * @param $mesano
+     * @return array
      * @throws \Exception
      */
-    public function findByPVAndMesAno($pv, $mesano)
+    public function findByPVAndMesAno($pv, $mesano): array
     {
         $ql = "SELECT v FROM App\Entity\Vendas\Venda v WHERE v.mesano = :mesano AND v.pv = :pv";
         $query = $this->getEntityManager()->createQuery($ql);
@@ -73,6 +75,7 @@ class VendaRepository extends FilterRepository
 
     /**
      * @param $pv
+     * @return array
      * @throws \Exception
      */
     public function findByPV($pv)
@@ -305,11 +308,11 @@ class VendaRepository extends FilterRepository
 
         $sql_AND_grupo = '';
         if ($grupos) {
-            $sql_AND_grupo .= ' AND grupo IN (:grupos)';
+            $sql_AND_grupo .= ' AND json_data->>"$.grupo" IN (:grupos)';
         }
         $sql_AND_loja = '';
         if ($lojas) {
-            $sql_AND_loja .= ' AND loja IN (:lojas)';
+            $sql_AND_loja .= ' AND json_data->>"$.loja" IN (:lojas)';
         }
 
         $sql = '
