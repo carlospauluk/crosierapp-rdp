@@ -1,0 +1,295 @@
+{
+  "campos": {
+    "pai_nome": {
+      "label": "Pai",
+      "tipo": "string"
+    },
+    "mae_nome": {
+      "label": "Mãe",
+      "tipo": "string"
+    },
+    "dt_nascimento": {
+      "label": "Dt Nascimento",
+      "tipo": "date"
+    },
+    "raca": {
+      "label": "Raça/Cor",
+      "tipo": "select",
+      "class": "s2allownew",
+      "sugestoes": [
+        "Branca",
+        "Parda",
+        "Preta",
+        "Amarela",
+        "Indígena"
+      ]
+    },
+    "sexo": {
+      "label": "Sexo",
+      "tipo": "select",
+      "sugestoes": [
+        "Masculino",
+        "Feminino"
+      ]
+    },
+    "deficiente": {
+      "label": "Deficiente",
+      "tipo": "bool"
+    },
+    "tipo_deficiencia": {
+      "label": "Tipo de Deficiência",
+      "tipo": "string"
+    },
+    "nacionalidade": {
+      "label": "Nacionalidade",
+      "tipo": "string"
+    },
+    "chegada_ao_brasil": {
+      "label": "Chegada ao Brasil",
+      "tipo": "string"
+    },
+    "naturalidade_cidade": {
+      "label": "Naturalidade",
+      "tipo": "string"
+    },
+    "naturalidade_estado": {
+      "label": "Estado",
+      "tipo": "uf"
+    },
+    "tipo_sanguineo": {
+      "label": "Tipo Sanguíneo",
+      "tipo": "select",
+      "sugestoes": [
+        "A+",
+        "A-",
+        "B+",
+        "B-",
+        "AB+",
+        "AB-",
+        "O+",
+        "O-"
+      ]
+    },
+    "end_logradouro": {
+      "label": "Logradouro",
+      "tipo": "string"
+    },
+    "end_numero": {
+      "label": "Número",
+      "tipo": "string"
+    },
+    "end_complemento": {
+      "label": "Complemento",
+      "tipo": "string"
+    },
+    "end_bairro": {
+      "label": "Bairro",
+      "tipo": "string"
+    },
+    "end_cidade": {
+      "label": "Cidade",
+      "tipo": "string"
+    },
+    "end_estado": {
+      "label": "Estado",
+      "tipo": "uf"
+    },
+    "end_cep": {
+      "label": "CEP",
+      "tipo": "string",
+      "css_class": "cep"
+    },
+    "telefone": {
+      "label": "Telefone",
+      "tipo": "string",
+      "css_class": "telefone"
+    },
+    "celular": {
+      "label": "Celular",
+      "tipo": "string",
+      "css_class": "telefone"
+    },
+    "email": {
+      "label": "E-mail",
+      "tipo": "string"
+    },
+    "rg": {
+      "label": "RG",
+      "tipo": "string"
+    },
+    "rg_emissao": {
+      "label": "Emissão",
+      "tipo": "date"
+    },
+    "rg_orgao": {
+      "label": "Órgão",
+      "tipo": "string"
+    },
+    "rg_uf": {
+      "label": "UF",
+      "tipo": "uf"
+    },
+    "habilitacao": {
+      "label": "Habilitação",
+      "tipo": "bool"
+    },
+    "habilitacao_categoria": {
+      "label": "Categoria",
+      "tipo": "string"
+    },
+    "habilitacao_validade": {
+      "label": "Validade",
+      "tipo": "date"
+    },
+    "ctps": {
+      "label": "CTPS",
+      "tipo": "string"
+    },
+    "ctps_emissao": {
+      "label": "Emissão",
+      "tipo": "date"
+    },
+    "pis": {
+      "label": "PIS",
+      "tipo": "string"
+    },
+    "carteira_reservista": {
+      "label": "Carteira de Reservista",
+      "tipo": "string"
+    },
+    "reg_profissional": {
+      "label": "Reg. Profissional",
+      "tipo": "string"
+    },
+    "conselho": {
+      "label": "Conselho",
+      "tipo": "string"
+    },
+    "titulo_eleitor": {
+      "label": "Título de Eleitor",
+      "tipo": "string"
+    },
+    "titulo_eleitor_zona": {
+      "label": "Zona",
+      "tipo": "string"
+    },
+    "titulo_eleitor_secao": {
+      "label": "Seção",
+      "tipo": "string"
+    },
+    "grau_instrucao": {
+      "label": "Grau de Instrução",
+      "tipo": "select",
+      "sugestoes": [
+        "Sem instrução",
+        "Ensino fundamental incompleto",
+        "Ensino fundamental completo",
+        "Ensino médio incompleto",
+        "Ensino médio completo",
+        "Ensino superior incompleto",
+        "Ensino superior completo"
+      ]
+    },
+    "estado_civil": {
+      "label": "Estado Civil",
+      "tipo": "select",
+      "sugestoes": [
+        "Casado(a)",
+        "União Estável",
+        "Divorciado(a)",
+        "Viúvo(a)",
+        "Solteiro(a)"
+      ]
+    },
+    "empresa_nome": {
+      "label": "Empresa",
+      "tipo": "select",
+      "class": "s2allownew",
+      "sugestoes": []
+    },
+    "empresa_cnpj": {
+      "label": "CNPJ",
+      "tipo": "string",
+      "css_class": "cpfCnpj"
+    },
+    "empresa_end_logradouro": {
+      "label": "Logradouro",
+      "tipo": "string"
+    },
+    "empresa_end_numero": {
+      "label": "Número",
+      "tipo": "string"
+    },
+    "empresa_end_complemento": {
+      "label": "Complemento",
+      "tipo": "string"
+    },
+    "empresa_end_bairro": {
+      "label": "Bairro",
+      "tipo": "string"
+    },
+    "empresa_end_cidade": {
+      "label": "Cidade",
+      "tipo": "string"
+    },
+    "empresa_end_estado": {
+      "label": "Estado",
+      "tipo": "uf"
+    },
+    "empresa_end_cep": {
+      "label": "CEP",
+      "tipo": "string",
+      "css_class": "cep"
+    },
+    "empresa_telefone": {
+      "label": "Telefone",
+      "tipo": "string",
+      "css_class": "telefone"
+    },
+    "empresa_matricula": {
+      "label": "Matrícula",
+      "tipo": "string"
+    },
+    "empresa_contrato": {
+      "label": "Contrato",
+      "tipo": "string"
+    },
+    "dt_admissao": {
+      "label": "Dt Admissão",
+      "tipo": "date"
+    },
+    "cargo_funcao": {
+      "label": "Cargo/Função",
+      "tipo": "select",
+      "class": "s2allownew"
+    },
+    "cbo": {
+      "label": "CBO",
+      "tipo": "string"
+    },
+    "salario_inicial": {
+      "label": "Salário Inicial",
+      "tipo": "preco"
+    },
+    "departamento": {
+      "label": "Departamento",
+      "tipo": "select",
+      "class": "s2allownew"
+    },
+    "sindicato": {
+      "label": "Sindicato",
+      "tipo": "select",
+      "class": "s2allownew"
+    },
+    "carga_horaria": {
+      "label": "Carga Horária",
+      "tipo": "string"
+    },
+    "forma_pagto": {
+      "label": "Forma Pagto",
+      "tipo": "select",
+      "class": "s2allownew"
+    }
+  },
+  "abas": {}
+}
