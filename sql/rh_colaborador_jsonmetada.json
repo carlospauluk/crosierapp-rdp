@@ -15,7 +15,6 @@
     "raca": {
       "label": "Raça/Cor",
       "tipo": "select",
-      "class": "s2allownew",
       "sugestoes": [
         "Branca",
         "Parda",
