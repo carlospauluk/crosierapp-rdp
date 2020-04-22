@@ -289,6 +289,11 @@
       "label": "Forma Pagto",
       "tipo": "select",
       "class": "s2allownew"
+    },
+    "obs": {
+      "label": "Obs",
+      "tipo": "textarea",
+      "height": "250px"
     }
   },
   "abas": {}
