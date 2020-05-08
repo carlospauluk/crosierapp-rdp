@@ -255,6 +255,9 @@ class RelEstoque01Business
 
             $json_data['preco_custo'] = $campos['custoMedio'] ?? null;
             $json_data['preco_tabela'] = $campos['precoVenda'] ?? null;
+            
+            // Se já tiver preco_site > 0, mantém. Senão, pega o preco_tabela.
+            $json_data['preco_site'] = (isset($json_data['preco_site']) && $json_data['preco_site'] > 0.0) ? $json_data['preco_site'] : $json_data['preco_tabela'];
 
             $json_data['qtde_imagens'] = $json_data['qtde_imagens'] ?? 0;
             $json_data['imagem1'] = $json_data['imagem1'] ?? '';
