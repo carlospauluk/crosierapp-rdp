@@ -255,9 +255,14 @@ class RelEstoque01Business
 
             $json_data['preco_custo'] = $campos['custoMedio'] ?? null;
             $json_data['preco_tabela'] = $campos['precoVenda'] ?? null;
-            
+
             // Se já tiver preco_site > 0, mantém. Senão, pega o preco_tabela.
-            $json_data['preco_site'] = (isset($json_data['preco_site']) && $json_data['preco_site'] > 0.0) ? $json_data['preco_site'] : $json_data['preco_tabela'];
+            if (isset($json_data['preco_site'])) {
+                $json_data['preco_site'] = ($json_data['preco_site'] > 0.0) ? $json_data['preco_site'] : $json_data['preco_tabela'];
+            } else {
+                $json_data['preco_site'] = $json_data['preco_tabela'];
+            }
+
 
             $json_data['qtde_imagens'] = $json_data['qtde_imagens'] ?? 0;
             $json_data['imagem1'] = $json_data['imagem1'] ?? '';
@@ -295,7 +300,7 @@ class RelEstoque01Business
                 $id = $produto['id'];
                 if (strcmp($produto['json_data'], json_encode($json_data_ORIG)) !== 0) {
                     // somente o campo json_data está sendo atualizado
-                    $conn->update('est_produto', ['json_data' => $produto['json_data'] ], ['id' => $id]);
+                    $conn->update('est_produto', ['json_data' => $produto['json_data']], ['id' => $id]);
                 } else {
                     $this->logger->info('Nada mudou para CODIGO = ' . $campos['codigoProduto'] . '. Continuando...');
                 }
