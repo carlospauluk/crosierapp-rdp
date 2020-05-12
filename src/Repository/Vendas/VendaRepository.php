@@ -160,8 +160,6 @@ class VendaRepository extends FilterRepository
             }
             return $this->getEntityManager()->getConnection()->fetchAssoc($sqlTotal, $params)['total_venda'];
         } catch (DBALException | \Throwable $e) {
-            $this->getLogger()->error('Erro ao calcular total');
-            $this->getLogger()->error($e->getMessage());
             throw new ViewException('Erro ao calcular total');
         }
     }
