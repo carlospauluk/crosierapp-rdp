@@ -234,6 +234,10 @@ class RelVendas01Business
 
         $venda['dt_venda'] = $cabecalho['EMISSAO'];
 
+        $venda['vendedor_id'] = 1; // 'NÃO IDENTIFICADO'
+        $venda['status'] = 'PV';
+        $venda['subtotal'] = $cabecalho['TOTAL_VENDA_PV'];
+        $venda['desconto'] = 0.0;
         $venda['valor_total'] = $cabecalho['TOTAL_VENDA_PV'];
 
         $jsonData = [];
@@ -260,6 +264,7 @@ class RelVendas01Business
         $venda['estabelecimento_id'] = 1;
         $venda['user_inserted_id'] = 1;
         $venda['user_updated_id'] = 1;
+        $venda['plano_pagto_id'] = 1;
 
         $conn->insert('ven_venda', $venda);
         $vendaId = $conn->lastInsertId();
@@ -288,6 +293,9 @@ class RelVendas01Business
             $vendaItem['qtde'] = $item['QTDE'];
             $vendaItem['descricao'] = $produto['nome'] ?? '<<< PRODUTO SEM NOME >>>';
             $vendaItem['preco_venda'] = bcdiv($item['TOTAL_PRECO_VENDA'], $item['QTDE'] ?? 1, 2);
+            $vendaItem['subtotal'] = bcmul($vendaItem['qtde'], $vendaItem['preco_venda'], 2);
+            $vendaItem['desconto'] = 0.0;
+            $vendaItem['total'] = $vendaItem['subtotal'];
 
             $vendaItem['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
             $vendaItem['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
