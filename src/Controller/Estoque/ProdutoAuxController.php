@@ -92,10 +92,10 @@ class ProdutoAuxController extends FormListController
     {
         return [
             new FilterData(['id'], 'EQ', 'id', $params),
-            new FilterData(['erp_codigo'], 'JSON_LIKE', 'codigoFrom', $params),
+            new FilterData(['erp_codigo'], 'LIKE', 'codigoFrom', $params, null, true),
             new FilterData(['nome'], 'LIKE', 'nome', $params),
-            new FilterData(['titulo'], 'JSON_LIKE', 'titulo', $params),
-            new FilterData(['depto_nome'], 'JSON_LIKE', 'nomeDepto', $params)
+            new FilterData(['titulo'], 'LIKE', 'titulo', $params, null, true),
+            new FilterData(['depto_nome'], 'LIKE', 'nomeDepto', $params, null, true)
         ];
     }
 
