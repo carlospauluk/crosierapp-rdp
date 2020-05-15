@@ -2,7 +2,7 @@
 
 import Numeral from 'numeral';
 import 'numeral/locales/pt-br.js';
-;
+
 
 import toastrr from "toastr";
 import $ from "jquery";

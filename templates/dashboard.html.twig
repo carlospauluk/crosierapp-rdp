@@ -1,6 +1,17 @@
 {% extends '@CrosierLibBase/index.html.twig' %}
 
 
+{% block stylesheets %}
+{{ parent() }}
+    {{ encore_entry_link_tags('dashboard_chartVendasTotalPorFornecedor') }}
+    {{ encore_entry_link_tags('dashboard_chartVendasTotalPorVendedor') }}
+    {{ encore_entry_link_tags('dashboard_chartCompras') }}
+    {{ encore_entry_link_tags('dashboard_chartEstoque') }}
+    {{ encore_entry_link_tags('dashboard_chartContasPagarReceber') }}
+
+{% endblock %}
+
+
 {% block page_content %}
 
 
@@ -404,10 +415,10 @@
 {% endblock %}
 
 {% block down_scripts %}
-    <script src="{{ asset('build/dashboard_chartVendasTotalPorFornecedor.js') }}"></script>
-    <script src="{{ asset('build/dashboard_chartVendasTotalPorVendedor.js') }}"></script>
-    <script src="{{ asset('build/dashboard_chartCompras.js') }}"></script>
-    <script src="{{ asset('build/dashboard_chartEstoque.js') }}"></script>
-    <script src="{{ asset('build/dashboard_chartContasPagarReceber.js') }}"></script>
+    {{ encore_entry_script_tags('dashboard_chartVendasTotalPorFornecedor') }}
+    {{ encore_entry_script_tags('dashboard_chartVendasTotalPorVendedor') }}
+    {{ encore_entry_script_tags('dashboard_chartCompras') }}
+    {{ encore_entry_script_tags('dashboard_chartEstoque') }}
+    {{ encore_entry_script_tags('dashboard_chartContasPagarReceber') }}
 
 {% endblock %}

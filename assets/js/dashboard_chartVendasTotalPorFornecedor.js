@@ -39,7 +39,12 @@ $(document).ready(function () {
 
     });
 
+    $.fn.select2.defaults.set("theme", "bootstrap");
+    $.fn.select2.defaults.set("language", "pt-BR");
+
     $filter_lojas.select2({
+        width: '100%',
+        dropdownAutoWidth: true,
         tags: true,
         data: $filter_lojas.data('options'),
         allowClear: true,
