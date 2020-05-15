@@ -57,7 +57,7 @@ class RelatoriosPushController extends FormListController
             'listPageTitle' => 'Push',
             'listId' => 'relatorioPushList',
             'list_PROGRAM_UUID' => null,
-            'listJS' => 'utils/relatorioPushList.js'
+            'listJS' => 'utils/relatorioPushList'
         ];
         return $this->doList($request, $params);
     }

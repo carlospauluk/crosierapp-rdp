@@ -89,6 +89,5 @@ function getDatatablesColumns() {
     ];
 }
 
-
 DatatablesJs.makeDatatableJs(listId, getDatatablesColumns());
 
