@@ -1,10 +1,17 @@
 'use strict';
 
-import Moment from 'moment';
-
 import $ from "jquery";
 
+import 'datatables';
+import 'datatables.net-bs4/css/dataTables.bootstrap4.css';
+import 'datatables/media/css/jquery.dataTables.css';
 
+import 'select2/dist/css/select2.css';
+import 'select2';
+import 'select2/dist/js/i18n/pt-BR.js';
+import 'select2-bootstrap-theme/dist/select2-bootstrap.css';
+
+import Moment from 'moment';
 
 import 'daterangepicker';
 

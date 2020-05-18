@@ -1,14 +1,26 @@
 'use strict';
 
+import $ from "jquery";
+
 import Moment from 'moment';
 
-import $ from "jquery";
+import 'datatables';
+import 'datatables.net-bs4/css/dataTables.bootstrap4.css';
+import 'datatables/media/css/jquery.dataTables.css';
+
+import 'select2/dist/css/select2.css';
+import 'select2';
+import 'select2/dist/js/i18n/pt-BR.js';
+import 'select2-bootstrap-theme/dist/select2-bootstrap.css';
 
 
 
 import 'daterangepicker';
 
 $(document).ready(function () {
+
+    $.fn.select2.defaults.set("theme", "bootstrap");
+    $.fn.select2.defaults.set("language", "pt-BR");
 
     let $formPesquisar = $('#formPesquisar');
 
@@ -35,6 +47,8 @@ $(document).ready(function () {
 
 
     $filter_lojas.select2({
+        width: '100%',
+        dropdownAutoWidth: true,
         data: $filter_lojas.data('options')
     });
     if ($filter_lojas.data('val')) {
@@ -46,6 +60,8 @@ $(document).ready(function () {
 
 
     $filter_grupos.select2({
+        width: '100%',
+        dropdownAutoWidth: true,
         data: $filter_grupos.data('options')
     });
     if ($filter_grupos.data('val')) {
@@ -120,6 +136,8 @@ $(document).ready(function () {
 
 
     $filterNomeFornec.select2({
+        width: '100%',
+        dropdownAutoWidth: true,
         placeholder: '...',
         allowClear: true,
         data: $filterNomeFornec.data('options')
@@ -131,24 +149,6 @@ $(document).ready(function () {
     $filterNomeFornec.on('select2:select', function () {
         $formPesquisar.submit();
     });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     // declaro antes para poder sobreescrever ali com o extent, no caso de querer mudar alguma coisa (ex.: movimentacaoRecorrentesList.js)

@@ -1,10 +1,12 @@
 'use strict';
 
-/**
- * Script que é utilizado em telas de extratos.
- */
-
 import $ from "jquery";
+
+import Moment from 'moment';
+
+import 'datatables';
+import 'datatables.net-bs4/css/dataTables.bootstrap4.css';
+import 'datatables/media/css/jquery.dataTables.css';
 
 
 

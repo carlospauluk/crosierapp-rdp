@@ -1,6 +1,9 @@
 {% extends '@CrosierLibBase/index.html.twig' %}
 
 
+{% block up_scripts %}
+    {{ encore_entry_link_tags('Relatorios/relCompFor01_listItensCompradosPorFornecedor') }}
+{% endblock %}
 
 
 {% block page_content %}
@@ -111,5 +114,5 @@
 
 
 {% block down_scripts %}
-    <script src="{{ asset('build/Relatorios/relCompFor01_listItensCompradosPorFornecedor.js') }}"></script>
+    {{ encore_entry_script_tags('Relatorios/relCompFor01_listItensCompradosPorFornecedor') }}
 {% endblock %}

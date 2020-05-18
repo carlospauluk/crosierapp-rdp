@@ -1,15 +1,17 @@
 'use strict';
 
+import $ from "jquery";
+
 import routes from '../../static/fos_js_routes.json';
 import Routing from '../../../vendor/friendsofsymfony/jsrouting-bundle/Resources/public/js/router.min.js';
-import Moment from 'moment';
 
+import 'datatables';
+import 'datatables.net-bs4/css/dataTables.bootstrap4.css';
+import 'datatables/media/css/jquery.dataTables.css';
 
 import Numeral from 'numeral';
-import 'numeral/locales/pt-br.js';
 
-import $ from "jquery";
-import toastrr from "toastr";
+import 'numeral/locales/pt-br.js';
 
 Routing.setRoutingData(routes);
 

@@ -1,5 +1,10 @@
 {% extends '@CrosierLibBase/index.html.twig' %}
 
+
+{% block up_scripts %}
+    {{ encore_entry_link_tags('Estoque/pedidoCompra_listReposicao') }}
+{% endblock %}
+
 {% block page_content %}
 
 
@@ -155,6 +160,6 @@
 {% endblock %}
 
 
-    {% block down_scripts %}
-        <script src="{{ asset('build/Estoque/pedidoCompra_listReposicao.js') }}"></script>
-    {% endblock %}
+{% block down_scripts %}
+    {{ encore_entry_script_tags('Estoque/pedidoCompra_listReposicao') }}
+{% endblock %}

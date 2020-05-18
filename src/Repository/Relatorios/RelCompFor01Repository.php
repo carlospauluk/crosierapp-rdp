@@ -117,12 +117,10 @@ class RelCompFor01Repository
     public function getProdutoByCodigo(string $codigo): ?string
     {
         $sql = 'SELECT desc_prod FROM rdp_rel_compfor01 WHERE cod_prod = :codigo GROUP BY cod_prod, desc_prod';
-        $rsm = new ResultSetMapping();
-        $rsm->addScalarResult('desc_prod', 'desc_prod');
 
         return $this->conn->fetchAssoc($sql, [
             'codigo' => $codigo,
-        ]);
+        ])['desc_prod'];
     }
 
 }

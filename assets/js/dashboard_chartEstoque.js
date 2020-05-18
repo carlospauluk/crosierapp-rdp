@@ -16,9 +16,16 @@ Numeral.locale('pt-br');
 
 Moment.locale('pt-BR');
 
+import 'select2/dist/css/select2.css';
+import 'select2';
+import 'select2/dist/js/i18n/pt-BR.js';
+import 'select2-bootstrap-theme/dist/select2-bootstrap.css';
+
 
 $(document).ready(function () {
 
+    $.fn.select2.defaults.set("theme", "bootstrap");
+    $.fn.select2.defaults.set("language", "pt-BR");
     /**
      *
      *

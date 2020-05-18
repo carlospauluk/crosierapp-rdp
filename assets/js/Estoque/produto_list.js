@@ -1,11 +1,11 @@
 'use strict';
 
-import Moment from 'moment';
-
-import Numeral from 'numeral';
-import 'numeral/locales/pt-br.js';
-
 import $ from "jquery";
+
+import Moment from 'moment';
+import Numeral from 'numeral';
+
+import 'numeral/locales/pt-br.js';
 
 Numeral.locale('pt-br');
 

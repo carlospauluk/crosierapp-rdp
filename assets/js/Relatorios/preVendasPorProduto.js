@@ -1,14 +1,24 @@
 'use strict';
 
-import Moment from 'moment';
-
 import $ from "jquery";
 
+import Moment from 'moment';
 
+import 'datatables';
+import 'datatables.net-bs4/css/dataTables.bootstrap4.css';
+import 'datatables/media/css/jquery.dataTables.css';
+
+import 'select2/dist/css/select2.css';
+import 'select2';
+import 'select2/dist/js/i18n/pt-BR.js';
+import 'select2-bootstrap-theme/dist/select2-bootstrap.css';
 
 import 'daterangepicker';
 
 $(document).ready(function () {
+
+    $.fn.select2.defaults.set("theme", "bootstrap");
+    $.fn.select2.defaults.set("language", "pt-BR");
 
     let $formPesquisar = $('#formPesquisar');
 
