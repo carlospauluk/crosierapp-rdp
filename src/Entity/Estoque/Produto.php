@@ -259,6 +259,15 @@ class Produto implements EntityId
      */
     public ?\DateTime $dtUltSaidaAcessorios = null;
 
+    /**
+     *
+     * @ORM\Column(name="ecommerce_dt_integr", type="datetime")
+     * @Groups("entity")
+     *
+     * @var null|\DateTime
+     */
+    public ?\DateTime $ecommerce_dt_integr = null;
+
 
 
 }
