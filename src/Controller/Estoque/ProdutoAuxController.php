@@ -93,8 +93,7 @@ class ProdutoAuxController extends FormListController
         return [
             new FilterData(['id'], 'EQ', 'id', $params),
             new FilterData(['erp_codigo'], 'LIKE', 'codigoFrom', $params, null, true),
-            new FilterData(['nome'], 'LIKE', 'nome', $params),
-            new FilterData(['titulo'], 'LIKE', 'titulo', $params, null, true),
+            new FilterData(['nome', 'titulo'], 'LIKE', 'nome', $params),
             new FilterData(['depto_nome'], 'LIKE', 'nomeDepto', $params, null, true),
             new FilterData(['porcent_preench'], 'BETWEEN_PORCENT', 'porcent_preench', $params, null, true),
             new FilterData(['ecommerce_dt_integr'], 'BETWEEN_DATE', 'ecommerce_dt_integr', $params, 'date', false)
@@ -125,12 +124,10 @@ class ProdutoAuxController extends FormListController
         $params['filterInputs'] = [
             new FilterInput('Código', 'id'),
             new FilterInput('Código (ERP)', 'codigoFrom'),
-            new FilterInput('Nome', 'nome'),
-            new FilterInput('Título', 'titulo'),
+            new FilterInput('Nome/Título', 'nome'),
             new FilterInput('Depto', 'nomeDepto'),
-            new FilterInput('Qtde Imagens', 'qtdeImagens', 'INTEGER'),
             new FilterInput('', 'tituloIsNotEmpty', 'HIDDEN'),
-            new FilterInput('% preench', 'porcent_preench', 'BETWEEN_PORCENT'),
+            new FilterInput('Porcent (%) Preench', 'porcent_preench', 'BETWEEN_PORCENT'),
             new FilterInput('Dt Integr E-commerce', 'ecommerce_dt_integr', 'BETWEEN_DATE'),
         ];
         $params['listAuxDatas'] = json_encode(['crosierappradx_url' => $_SERVER['CROSIERAPPRADX_URL']]);
@@ -204,143 +201,6 @@ class ProdutoAuxController extends FormListController
 
         return $this->doRender('/Estoque/dashboardEstoque.html.twig', $params);
     }
-
-
-    /**
-     * @Route("/est/produto/migrar", name="est_produto_migrar")
-     *
-     * @param Request $request
-     * @return Response
-     *
-     * @IsGranted("ROLE_ESTOQUE", statusCode=403)
-     * @throws \Exception
-     */
-    public function migrar(Request $request): Response
-    {
-        // @Route("/est/produto/migrar", name="est_produto_migrar")
-        try {
-            $this->logger->error('not an error');
-            /** @var Connection $conn */
-            $conn = $this->getDoctrine()->getConnection();
-            $conn->beginTransaction();
-
-            $produtos = $conn->fetchAll('SELECT p.*, u.label as unidade FROM vw_rdp_est_produto p, est_unidade_produto u WHERE p.unidade_produto_id = u.id ORDER BY id ');
-
-            // $json_metadata = $conn->fetchAssoc('SELECT valor FROM cfg_app_config WHERE chave = :chave', ['chave' => 'est_produto_json_metadata']);
-
-            $qryAtributosProduto = $conn->prepare('SELECT a.id, a.label, a.tipo, a.config, a.descricao, pa.valor 
-                FROM est_atributo a LEFT JOIN est_produto_atributo pa ON pa.atributo_id = a.id 
-                WHERE pa.produto_id = :produto_id ORDER BY pa.ordem');
-
-            $linha = 2;
-            $qtdeProdutos = 0;
-
-            $atrs[10] = 'ano';
-            $atrs[6] = 'caracteristicas';
-            $atrs[13] = 'erp_codigo';
-            $atrs[26] = 'cofins';
-            $atrs[9] = 'compativel_com';
-            $atrs[36] = 'promocao_de';
-            $atrs[14] = 'dimensoes';
-            $atrs[12] = 'erp_dt_ult_entrada';
-            $atrs[11] = 'erp_dt_ult_saida';
-            $atrs[7] = 'especif_tec';
-            $atrs[33] = 'qtde_estoque_acessorios';
-            $atrs[34] = 'qtde_estoque_matriz';
-            $atrs[16] = 'qtde_estoque_min';
-            $atrs[35] = 'qtde_estoque_total';
-            $atrs[23] = 'icms';
-            $atrs[21] = 'integr_ecommerce';
-            $atrs[24] = 'pis';
-            $atrs[8] = 'itens_inclusos';
-            $atrs[18] = 'marca';
-            $atrs[27] = 'modelos';
-            $atrs[29] = 'modelos_2';
-            $atrs[31] = 'modelos_3';
-            $atrs[19] = 'montadora';
-            $atrs[28] = 'montadora_2';
-            $atrs[30] = 'montadora_3';
-            $atrs[17] = 'peso';
-            $atrs[25] = 'pis';
-            $atrs[37] = 'promocao_de';
-            $atrs[5] = 'preco_acessorios';
-            $atrs[4] = 'preco_atacado';
-            $atrs[1] = 'preco_custo';
-            $atrs[3] = 'preco_site';
-            $atrs[2] = 'preco_tabela';
-            $atrs[40] = 'promocao_qtde_parcelas';
-            $atrs[32] = 'porcent_preench_campos_faltantes';
-            $atrs[22] = 'st';
-            $atrs[39] = 'promocao_dt_fim';
-            $atrs[42] = 'promocao_parcelas_dt_fim';
-            $atrs[38] = 'promocao_dt_ini';
-            $atrs[41] = 'promocao_parcelas_dt_ini';
-            $atrs[20] = 'video';
-
-            $unidades = [
-                1 => 'PC',
-                3 => 'JG',
-                4 => 'KIT',
-                5 => 'MT',
-                6 => 'PAR'
-            ];
-
-
-            foreach ($produtos as $produto) {
-                $qtdeProdutos++;
-
-                $json_data = [];
-                $json_data['depto_id'] = $produto['depto_id'];
-                $json_data['depto_codigo'] = $produto['depto_codigo'];
-                $json_data['depto_nome'] = $produto['depto_nome'];
-                $json_data['grupo_id'] = $produto['grupo_id'];
-                $json_data['grupo_codigo'] = $produto['grupo_codigo'];
-                $json_data['grupo_nome'] = $produto['grupo_nome'];
-                $json_data['subgrupo_codigo'] = $produto['subgrupo_codigo'];
-                $json_data['subgrupo_nome'] = $produto['subgrupo_nome'];
-                $json_data['fornecedor_nome'] = $produto['fornecedor_nome'];
-                $json_data['fornecedor_documento'] = $produto['fornecedor_documento'];
-                $json_data['titulo'] = $produto['titulo'];
-                $json_data['caracteristicas'] = $produto['caracteristicas'];
-                $json_data['ean'] = $produto['ean'];
-                $json_data['referencia'] = $produto['referencia'];
-                $json_data['ncm'] = $produto['ncm'];
-                $json_data['composicao'] = $produto['composicao'];
-                $json_data['erp_codigo'] = $produto['codigo_from'];
-                $json_data['porcent_preench'] = $produto['porcent_preench'];
-                $json_data['qtde_estoque_matriz'] = $produto['saldo_estoque_matriz'];
-                $json_data['qtde_estoque_acessorios'] = $produto['saldo_estoque_acessorios'];
-                $json_data['qtde_estoque_total'] = $produto['saldo_estoque_total'];
-                $json_data['qtde_imagens'] = $produto['qtde_imagens'];
-                $json_data['imagem1'] = $produto['imagem1'];
-                $json_data['unidade'] = $unidades[$produto['unidade_produto_id']];
-
-                $qryAtributosProduto->bindParam('produto_id', $produto['id']);
-                $qryAtributosProduto->execute();
-
-                $atributos = $qryAtributosProduto->fetchAll();
-
-                foreach ($atributos as $atributo) {
-                    $json_data[$atrs[$atributo['id']]] = $atributo['valor'];
-                }
-
-                $nProduto['json_data'] = json_encode($json_data);
-
-                $conn->update('est_produto', $nProduto, ['id' => $produto['id']]);
-                $this->logger->info($linha++ . ' escrita(s)');
-            }
-
-            $conn->commit();
-            return new Response('OK');
-
-        } catch (\Exception | DBALException $e) {
-            $conn->rollBack();
-            $this->logger->error($e->getTraceAsString());
-            throw new \RuntimeException($e->getMessage());
-        }
-
-    }
-
 
     /**
      *

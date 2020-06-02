@@ -83,7 +83,7 @@ function getDatatablesColumns() {
             className: 'text-right'
         },
         {
-            name: 'e.jsonData.ecommerce_dt_integr',
+            name: 'e.ecommerce_dt_integr',
             data: 'e.ecommerce_dt_integr',
             title: 'Integr E-commerce',
             render: function (data, type, row) {[]
