@@ -74,15 +74,6 @@ function getDatatablesColumns() {
             className: 'text-right'
         },
         {
-            name: 'e.qtdeEstoqueTotal',
-            data: 'e.qtdeEstoqueTotal',
-            title: 'Estoque Total',
-            render: function (data, type, row) {
-                return Numeral(parseFloat(data)).format('0,0[000]');
-            },
-            className: 'text-right'
-        },
-        {
             name: 'e.ecommerce_dt_integr',
             data: 'e.ecommerce_dt_integr',
             title: 'Integr E-commerce',
