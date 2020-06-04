@@ -3,9 +3,8 @@
 namespace App\Controller;
 
 
+use App\Business\Vendas\VendaRepositoryBusiness;
 use App\Entity\Relatorios\RelCtsPagRec01;
-use App\Entity\Vendas\Venda;
-use CrosierSource\CrosierLibBaseBundle\Business\Config\StoredViewInfoBusiness;
 use CrosierSource\CrosierLibBaseBundle\Controller\BaseController;
 use CrosierSource\CrosierLibBaseBundle\Entity\Config\AppConfig;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
@@ -21,15 +20,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class DefaultController extends BaseController
 {
 
-    protected StoredViewInfoBusiness $storedViewInfoBusiness;
+    private VendaRepositoryBusiness $vendaRepositoryBusiness;
 
     /**
      * @required
-     * @param StoredViewInfoBusiness $storedViewInfoBusiness
+     * @param VendaRepositoryBusiness $vendaRepositoryBusiness
      */
-    public function setStoredViewInfoBusiness(StoredViewInfoBusiness $storedViewInfoBusiness): void
+    public function setVendaRepositoryBusiness(VendaRepositoryBusiness $vendaRepositoryBusiness): void
     {
-        $this->storedViewInfoBusiness = $storedViewInfoBusiness;
+        $this->vendaRepositoryBusiness = $vendaRepositoryBusiness;
     }
 
 
@@ -59,11 +58,11 @@ class DefaultController extends BaseController
         array_unshift($localizadores, ['id' => '', 'text' => 'TODOS']);
         $params['localizadores'] = json_encode($localizadores);
 
-        $lojas = $this->getDoctrine()->getRepository(Venda::class)->getLojas();
+        $lojas = $this->vendaRepositoryBusiness->getLojas();
         array_unshift($lojas, ['id' => '', 'text' => 'TODAS']);
         $params['lojas'] = json_encode($lojas);
 
-        $grupos = $this->getDoctrine()->getRepository(Venda::class)->getGrupos();
+        $grupos = $this->vendaRepositoryBusiness->getGrupos();
         array_unshift($grupos, ['id' => '', 'text' => 'TODOS']);
         $params['grupos'] = json_encode($grupos);
 

@@ -76,8 +76,11 @@
                 <img src="build/static/images/rodoponta.png" width="160" height="36">
             </td>
             <td style="text-align: right;">
-                <span style="font-size: x-large; font-weight: bolder">Reposição de Estoque</span><br/>
-                <span style="font-size: small;"></span><br/>
+                <span style="font-size: x-large; font-weight: bolder; margin-bottom: 5px">Reposição de Estoque</span><br/>
+                {% if fornecedor.nome|default('') != '' %}
+                <br><span style="font-size: medium; font-weight: bold">{{ fornecedor.nome }}</span><br/>
+                {% endif %}
+                <br/>
                 <span style="font-size: x-small;"><i>Impresso em: {{ hoje }}</i></span>
             </td>
         </tr>
@@ -94,7 +97,9 @@
             <th scope="col">#</th>
             <th scope="col">Id</th>
             <th scope="col">Produto</th>
+            {% if fornecedor.nome|default('') == '' %}
             <th scope="col">Fornecedor</th>
+            {% endif %}
             <th scope="col">Dt Últ Saída</th>
             <th scope="col">Qt Atual</th>
             <th scope="col">Qt Mín</th>
@@ -119,12 +124,14 @@
                 <th scope="row">{{ i }}</th>
                 <td data-order="{{ produto.id }}">{{ produto.id|strpad(9) }}</td>
                 <td data-order="{{ produto.jsonData['erp_codigo']|default('') }}">{{ produto.jsonData['erp_codigo']|default('') }} - {{ produto.nome }}</td>
-                <td>{{ produto.fornecedor.id }} - {{ produto.fornecedor.nome }}</td>
+                {% if fornecedor.nome|default('') == '' %}
+                <td>{{ produto.fornecedor_nome }}</td>
+                {% endif %}
                 <td>{{ dt_ult_saida|date('d/m/Y') }}</td>
                 <td class="text-right">{{ qtde_estoque|number_format(3,',','.') }}</td>
                 <td class="text-right">{{ qtde_estoque_min|number_format(3,',','.') }}</td>
-                <td class="text-right" style="color: white; background-color: {{ deficit < 0 ? 'indianred' : 'dodgerblue' }}">
-                    {{ deficit|number_format(3,',','.') }}
+                <td class="text-right" style="border: 1px solid white; color: white; background-color: {{ deficit < 0 ? 'indianred' : 'dodgerblue' }}">
+                    {{ deficit|abs|number_format(3,',','.') }}
                 </td>
             </tr>
         {% endfor %}

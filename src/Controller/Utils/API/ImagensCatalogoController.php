@@ -3,14 +3,14 @@
 namespace App\Controller\Utils\API;
 
 
-use App\Entity\Estoque\Produto;
-use App\Entity\Estoque\ProdutoImagem;
-use App\EntityHandler\Estoque\ProdutoImagemEntityHandler;
-use App\Repository\Estoque\ProdutoRepository;
 use CrosierSource\CrosierLibBaseBundle\Controller\BaseController;
 use CrosierSource\CrosierLibBaseBundle\Entity\Config\AppConfig;
 use CrosierSource\CrosierLibBaseBundle\EntityHandler\Config\AppConfigEntityHandler;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
+use CrosierSource\CrosierLibRadxBundle\Entity\Estoque\Produto;
+use CrosierSource\CrosierLibRadxBundle\Entity\Estoque\ProdutoImagem;
+use CrosierSource\CrosierLibRadxBundle\EntityHandler\Estoque\ProdutoImagemEntityHandler;
+use CrosierSource\CrosierLibRadxBundle\Repository\Estoque\ProdutoRepository;
 use Doctrine\DBAL\Connection;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -64,6 +64,7 @@ class ImagensCatalogoController extends BaseController
      * @Route("/api/utils/obterImagemParaUsuario", name="api_utils_obterImagemParaUsuario")
      * @param Request $request
      * @return RedirectResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function obterImagemParaUsuario(Request $request): RedirectResponse
     {
@@ -102,6 +103,7 @@ class ImagensCatalogoController extends BaseController
      * @param ProdutoImagemEntityHandler $produtoImagemEntityHandler
      * @param AppConfigEntityHandler $appConfigEntityHandler
      * @return Response
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function downloadCatalogo(Request $request, ProdutoImagemEntityHandler $produtoImagemEntityHandler, AppConfigEntityHandler $appConfigEntityHandler): Response
     {

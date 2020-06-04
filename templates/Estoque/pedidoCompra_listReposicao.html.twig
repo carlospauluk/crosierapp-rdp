@@ -115,20 +115,20 @@
                         {% for produto in produtos %}
                             {% set deficit = produto.jsonData['deficit_estoque_' ~ filter.filial|lower]|default(0) %}
                             {% set qtde_estoque = produto.jsonData['qtde_estoque_' ~ filter.filial|lower]|default(0) %}
-                            {% set qtde_estoque_min = produto.jsonData['qtde_estoque_min_' ~ filter.filial|lower] %}
+                            {% set qtde_estoque_min = produto.jsonData['qtde_estoque_min_' ~ filter.filial|lower]|default(0) %}
                             {% set dt_ult_saida = produto.jsonData['dt_ult_saida_' ~ filter.filial|lower]|default('') %}
                             <tr>
                                 <td data-order="">
                                     <a role="button" href="#"
                                        data-target="#confirmationModal" data-toggle="modal"
-                                       data-url="{{ url('est_pedidoCompra_adicionar', {'produto': produto.id, 'filial': filter.filial, 'qtdeSugerida': deficit}) }}"
+                                       data-url="{{ getEnv('CROSIERAPPRADX_URL') ~ '/est/pedidoCompra/adicionar/' ~ produto.id ~ '/' ~ filter.filial ~ '/' ~ deficit ~ '?rtr=true' }}"
                                        class="btn btn-outline-primary btn-sm text-nowrap"
                                        title="Adicionar ao carrinho">
                                         <i class="fas fa-truck"></i> Adicionar</a>
                                 </td>
                                 <td data-order="{{ produto.id }}">{{ produto.id|strpad(9) }}</td>
                                 <td data-order="{{ produto.jsonData['erp_codigo'] }}">{{ produto.jsonData['erp_codigo'] }} - {{ produto.nome }}</td>
-                                <td data-order="{{ produto.fornecedor.nome }}">{{ produto.fornecedor.id }} - {{ produto.fornecedor.nome }}</td>
+                                <td data-order="{{ produto.fornecedor_nome|default('') }}">{{ produto.fornecedor_nome|default('') }}</td>
                                 <td data-order="{{ dt_ult_saida|date('Y-m-d') }}">{{ dt_ult_saida|date('d/m/Y') }}</td>
                                 <td data-order="{{ qtde_estoque }}" class="text-right">{{ qtde_estoque|number_format(3,',','.') }}</td>
                                 <td data-order="{{ qtde_estoque_min }}" class="text-right">{{ qtde_estoque_min|number_format(3,',','.') }}</td>

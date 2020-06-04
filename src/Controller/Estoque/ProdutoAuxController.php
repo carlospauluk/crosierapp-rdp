@@ -5,12 +5,12 @@ namespace App\Controller\Estoque;
 
 
 use App\Business\Estoque\ProdutoBusiness;
-use App\Entity\Estoque\Produto;
-use App\Repository\Estoque\ProdutoRepository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Twig\FilterInput;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
+use CrosierSource\CrosierLibRadxBundle\Entity\Estoque\Produto;
+use CrosierSource\CrosierLibRadxBundle\Repository\Estoque\ProdutoRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -161,14 +161,13 @@ class ProdutoAuxController extends FormListController
     /**
      *
      * @Route("/est/produto/dashboard", name="est_produto_dashboard")
-     * @param Request $request
      * @param Connection $conn
      * @return Response
      *
      * @throws DBALException
      * @IsGranted("ROLE_ESTOQUE", statusCode=403)
      */
-    public function dashboardEstoque(Request $request, Connection $conn): Response
+    public function dashboardEstoque(Connection $conn): Response
     {
         $hoje = (new \DateTime())->format('d/m/Y');
 
@@ -205,17 +204,16 @@ class ProdutoAuxController extends FormListController
     /**
      *
      * @Route("/est/graficoTotalEstoquePorFilial/", name="est_graficoTotalEstoquePorFilial")
-     * @param Request $request
      * @return JsonResponse
      *
-     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      * @throws ViewException
+     * @IsGranted("ROLE_RELVENDAS", statusCode=403)
      */
-    public function graficoTotalEstoquePorFilial(Request $request): JsonResponse
+    public function graficoTotalEstoquePorFilial(): JsonResponse
     {
         /** @var ProdutoRepository $produtoRepository */
         $produtoRepository = $this->getDoctrine()->getRepository(Produto::class);
-        $r = $produtoRepository->totalEstoquePorFilial();
+        $r = $this->produtoBusiness->totalEstoquePorFilial();
         return new JsonResponse($r);
     }
 

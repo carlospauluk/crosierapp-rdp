@@ -57,6 +57,7 @@
     "symfony/yaml": "5.0.*",
     "twig/extensions": "^1.5",
     "crosiersource/crosierlib-base": "@dev",
+    "crosiersource/crosierlib-radx": "@dev",
     "symfony/web-profiler-bundle": "5.0.*",
     "scienta/doctrine-json-functions": "~4.1"
   },
@@ -116,6 +117,13 @@
     {
       "type": "path",
       "url": "../crosierlib-base/",
+      "options": {
+        "symlink": true
+      }
+    },
+    {
+      "type": "path",
+      "url": "../crosierlib-radx/",
       "options": {
         "symlink": true
       }

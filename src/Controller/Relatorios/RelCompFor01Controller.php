@@ -3,7 +3,7 @@
 namespace App\Controller\Relatorios;
 
 
-use App\Entity\Vendas\Venda;
+use App\Business\Vendas\VendaRepositoryBusiness;
 use App\EntityHandler\Relatorios\RelCompFor01EntityHandler;
 use App\Repository\Relatorios\RelCompFor01Repository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
@@ -11,6 +11,7 @@ use CrosierSource\CrosierLibBaseBundle\Entity\Base\DiaUtil;
 use CrosierSource\CrosierLibBaseBundle\Repository\Base\DiaUtilRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
+use CrosierSource\CrosierLibRadxBundle\Entity\Vendas\Venda;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +30,8 @@ class RelCompFor01Controller extends FormListController
 
     private RelCompFor01Repository $repoRelCompFor01;
 
+    private VendaRepositoryBusiness $vendaRepositoryBusiness;
+
     /**
      * @required
      * @param RelCompFor01EntityHandler $entityHandler
@@ -46,6 +49,16 @@ class RelCompFor01Controller extends FormListController
     {
         $this->session = $session;
     }
+
+    /**
+     * @required
+     * @param VendaRepositoryBusiness $vendaRepositoryBusiness
+     */
+    public function setVendaRepositoryBusiness(VendaRepositoryBusiness $vendaRepositoryBusiness): void
+    {
+        $this->vendaRepositoryBusiness = $vendaRepositoryBusiness;
+    }
+
 
     /**
      * @required
@@ -179,7 +192,7 @@ class RelCompFor01Controller extends FormListController
         $vParams['proxPeriodoF'] = $prox['dtFim'];
 
 
-        $vParams['fornecedores'] = json_encode($this->getDoctrine()->getRepository(Venda::class)->getFornecedores());
+        $vParams['fornecedores'] = json_encode($this->vendaRepositoryBusiness->getFornecedores());
 
         $vParams['dados'] = $r;
         $vParams['total'] = $total;

@@ -2,10 +2,13 @@
 
 namespace App\Controller\Estoque\API;
 
-use App\Entity\Estoque\PedidoCompra;
-use App\EntityHandler\Estoque\PedidoCompraEntityHandler;
-use App\Repository\Estoque\PedidoCompraRepository;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
+use CrosierSource\CrosierLibRadxBundle\Entity\Estoque\PedidoCompra;
+use CrosierSource\CrosierLibRadxBundle\Entity\Estoque\PedidoCompraItem;
+use CrosierSource\CrosierLibRadxBundle\Entity\Estoque\Produto;
+use CrosierSource\CrosierLibRadxBundle\EntityHandler\Estoque\PedidoCompraEntityHandler;
+use CrosierSource\CrosierLibRadxBundle\Repository\Estoque\PedidoCompraRepository;
+use CrosierSource\CrosierLibRadxBundle\Repository\Estoque\ProdutoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -54,6 +57,9 @@ class PedidoCompraAPIController extends AbstractController
         $repoPedidoCompra = $this->doctrine->getRepository(PedidoCompra::class);
         $enviados = $repoPedidoCompra->findBy(['status' => 'ENVIADO']);
 
+        /** @var ProdutoRepository $repoProduto */
+        $repoProduto = $this->doctrine->getRepository(Produto::class);
+
         $r = [];
 
         if ($enviados) {
@@ -75,16 +81,27 @@ class PedidoCompraAPIController extends AbstractController
                 $r[] = $pedidoCompra->getDescontos();
                 $r[] = $pedidoCompra->getTotal();
 
+
+                /** @var PedidoCompraItem $item */
                 foreach ($pedidoCompra->getItens() as $item) {
                     $r[] = '<<Itens>>';
-                    $r[] = $item->getProduto()->codigoFrom;
-                    $r[] = $item->getProduto()->nome;
-                    $r[] = $item->getCodFornecedor();
-                    $r[] = $item->getNomeFornecedor();
-                    $r[] = $item->getQtde();
-                    $r[] = $item->getPrecoCusto();
-                    $r[] = $item->getPrecoOrc();
-                    $r[] = $item->getPrecoVenda();
+
+                    /** @var Produto $produto */
+                    $produto = null;
+
+                    $r[] = $item->jsonData['erp_codigo'] ?? '';
+                    if ($item->jsonData['produto_id'] ?? false) {
+                        $produto = $repoProduto->find($item->jsonData['produto_id']);
+                    }
+
+
+                    $r[] = $produto->nome ?? '';
+                    $r[] = $produto->fornecedor->jsonData['codigo'] ?? '';
+                    $r[] = $produto->fornecedor->nome ?? '';
+                    $r[] = $item->qtde;
+                    $r[] = $item->precoCusto;
+                    $r[] = $item->precoCusto;
+                    $r[] = $item->total;
                 }
             }
             return new Response(implode(PHP_EOL, $r));

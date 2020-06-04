@@ -26,9 +26,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class RelCtsPagRec01Controller extends FormListController
 {
 
-
-    /** @var SessionInterface */
-    private $session;
+    private SessionInterface $session;
 
     /**
      * @required

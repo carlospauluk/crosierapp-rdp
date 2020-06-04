@@ -8,6 +8,7 @@ use CrosierSource\CrosierLibBaseBundle\EntityHandler\Config\AppConfigEntityHandl
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
+use CrosierSource\CrosierLibRadxBundle\EntityHandler\CRM\ClienteEntityHandler;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ConnectionException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,6 +28,10 @@ class RelClientes01Business
 
     private AppConfigEntityHandler $appConfigEntityHandler;
 
+    private ClienteEntityHandler $clienteEntityHandler;
+
+    private array $todosNaCrmCliente;
+
     /**
      * @param EntityManagerInterface $doctrine
      * @param LoggerInterface $logger
@@ -34,10 +39,12 @@ class RelClientes01Business
      */
     public function __construct(EntityManagerInterface $doctrine,
                                 LoggerInterface $logger,
-                                AppConfigEntityHandler $appConfigEntityHandler)
+                                AppConfigEntityHandler $appConfigEntityHandler,
+                                ClienteEntityHandler $clienteEntityHandler)
     {
         $this->doctrine = $doctrine;
         $this->appConfigEntityHandler = $appConfigEntityHandler;
+        $this->clienteEntityHandler = $clienteEntityHandler;
         $this->logger = $logger;
     }
 
@@ -317,6 +324,8 @@ class RelClientes01Business
 
         $t = 0;
         $linha = null;
+
+        $this->findAllCrmCliente();
         try {
             for ($i = 1; $i < $totalRegistros; $i++) {
                 $linha = $linhas[$i];
@@ -385,7 +394,7 @@ class RelClientes01Business
                 $campos[110] = $campos[110] ? 'S' : 'N';
                 $campos[112] = $campos[112] ? 'S' : 'N';
 
-                $cMax = count($campos);
+
                 foreach ($campos as $k => $v) {
                     $campos[$k] = $v ? "'" . utf8_encode(trim(str_replace("'", "''", $v))) . "'" : 'null';
                 }
@@ -394,6 +403,10 @@ class RelClientes01Business
                     'INSERT INTO rdp_rel_cliente01 (id, ' . implode(', ', $camposMySQL) . ', inserted,updated,estabelecimento_id,user_inserted_id,user_updated_id)
                     VALUES(null,' . str_repeat('%s,', 110) . ' now(), now(),1, 1, 1)', $campos
                 );
+
+                $camposComChaves = array_combine($camposMySQL, $campos);
+
+                $this->handleNaCrmCliente($camposComChaves);
 
                 $t += $conn->executeUpdate($sql);
                 $this->logger->info($t . ' inseridos');
@@ -413,6 +426,32 @@ class RelClientes01Business
         }
 
         return $t;
+    }
+
+    /**
+     * Retorna todos os clientes na crm_cliente indexados pelo CODIGO EKT
+     */
+    private function findAllCrmCliente()
+    {
+        $todos = $this->doctrine->getConnection()->fetchAll('SELECT * FROM crm_cliente');
+        $this->todosNaCrmCliente = [];
+        foreach ($todos as $r) {
+            $jsonData = json_decode($r['json_data'], true);
+            $this->todosNaCrmCliente[$jsonData['CODIGO']] = $r;
+        }
+    }
+
+    private function handleNaCrmCliente(array $relCliente01)
+    {
+        if ($this->todosNaCrmCliente[$relCliente01['codigo']] ?? false) {
+            /** @var Client $cliente */
+            $cliente = $this->todosNaCrmCliente[$relCliente01['codigo']];
+            $cliente->nome = $relCliente01['nome'];
+            $cliente->nome = $relCliente01['nome'];
+        } else {
+            $cliente = new Cliente();
+        }
+
     }
 
     /**
@@ -440,9 +479,3 @@ class RelClientes01Business
     }
 
 }
-
-
-
-
-
-

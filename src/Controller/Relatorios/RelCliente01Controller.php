@@ -6,7 +6,6 @@ namespace App\Controller\Relatorios;
 use App\Entity\Relatorios\RelCliente01;
 use App\EntityHandler\Relatorios\RelCliente01EntityHandler;
 use App\Form\Relatorios\RelCliente01Type;
-use App\Repository\Relatorios\RelCliente01Repository;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Entity\Config\AppConfig;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
@@ -25,8 +24,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class RelCliente01Controller extends FormListController
 {
 
-    /** @var SessionInterface */
-    private $session;
+    private SessionInterface $session;
 
     /**
      * @required

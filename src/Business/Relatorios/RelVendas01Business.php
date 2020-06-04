@@ -3,12 +3,12 @@
 namespace App\Business\Relatorios;
 
 
-use App\EntityHandler\Vendas\VendaEntityHandler;
 use CrosierSource\CrosierLibBaseBundle\Entity\Config\AppConfig;
 use CrosierSource\CrosierLibBaseBundle\EntityHandler\Config\AppConfigEntityHandler;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
+use CrosierSource\CrosierLibRadxBundle\EntityHandler\Vendas\VendaEntityHandler;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;

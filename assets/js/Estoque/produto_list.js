@@ -35,8 +35,8 @@ function getDatatablesColumns() {
             },
         },
         {
-            name: 'e.deptoNome',
-            data: 'e.deptoNome',
+            name: 'e.jsonData.depto_nome',
+            data: 'e.jsonData.depto_nome',
             title: 'Depto',
             render: function (data, type, row) {
                 return data;
@@ -51,22 +51,22 @@ function getDatatablesColumns() {
             }
         },
         {
-            name: 'e.porcentPreench',
-            data: 'e.porcentPreench',
+            name: 'e.jsonData.porcent_preench',
+            data: 'e.jsonData.porcent_preench',
             title: 'Status Cad',
             render: function (data, type, row) {
                 return Numeral(parseFloat(data) * 100).format('0,0') + '%';
             }
         },
         {
-            name: 'e.qtdeImagens',
-            data: 'e.qtdeImagens',
+            name: 'e.jsonData.qtde_imagens',
+            data: 'e.jsonData.qtde_imagens',
             title: 'Qtde Imagens',
             className: 'text-center'
         },
         {
-            name: 'e.qtdeEstoqueTotal',
-            data: 'e.qtdeEstoqueTotal',
+            name: 'e.jsonData.qtde_estoque_total',
+            data: 'e.jsonData.qtde_estoque_total',
             title: 'Estoque Total',
             render: function (data, type, row) {
                 return Numeral(parseFloat(data)).format('0,0[000]');
@@ -74,8 +74,8 @@ function getDatatablesColumns() {
             className: 'text-right'
         },
         {
-            name: 'e.ecommerce_dt_integr',
-            data: 'e.ecommerce_dt_integr',
+            name: 'e.jsonData.ecommerce_dt_integr',
+            data: 'e.jsonData.ecommerce_dt_integr',
             title: 'Integr E-commerce',
             render: function (data, type, row) {[]
                 return data ? Moment(data).format('DD/MM/YYYY HH:mm:ss') : '';

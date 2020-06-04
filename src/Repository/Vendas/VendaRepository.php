@@ -3,9 +3,9 @@
 namespace App\Repository\Vendas;
 
 
-use App\Entity\Vendas\Venda;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\FilterRepository;
+use CrosierSource\CrosierLibRadxBundle\Entity\Vendas\Venda;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\NonUniqueResultException;
@@ -33,7 +33,7 @@ class VendaRepository extends FilterRepository
     public function findByDtVendaAndPV(\DateTime $dtVenda, $pv): ?array
     {
         $dtVenda->setTime(0, 0, 0, 0);
-        $ql = "SELECT v FROM App\Entity\Vendas\Venda v WHERE v.dtVenda = :dtVenda AND v.pv = :pv";
+        $ql = "SELECT v FROM CrosierSource\CrosierLibRadxBundle\Entity\Vendas\Venda v WHERE v.dtVenda = :dtVenda AND v.pv = :pv";
         $query = $this->getEntityManager()->createQuery($ql);
         $query->setParameters(array(
             'dtVenda' => $dtVenda,
@@ -57,7 +57,7 @@ class VendaRepository extends FilterRepository
      */
     public function findByPVAndMesAno($pv, $mesano): array
     {
-        $ql = "SELECT v FROM App\Entity\Vendas\Venda v WHERE v.mesano = :mesano AND v.pv = :pv";
+        $ql = "SELECT v FROM CrosierSource\CrosierLibRadxBundle\Entity\Vendas\Venda v WHERE v.mesano = :mesano AND v.pv = :pv";
         $query = $this->getEntityManager()->createQuery($ql);
         $query->setParameters(array(
             'mesano' => $mesano,
