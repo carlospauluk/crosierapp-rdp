@@ -8,6 +8,7 @@ use App\Business\Relatorios\RelCompFor01Business;
 use App\Business\Relatorios\RelCompras01Business;
 use App\Business\Relatorios\RelCtsPagRec01Business;
 use App\Business\Relatorios\RelEstoque01Business;
+use App\Business\Relatorios\RelQtdesEstoque01Business;
 use App\Business\Relatorios\RelVendas01Business;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -34,6 +35,50 @@ class ProcessarRelatoriosCommand extends Command
     private RelCompras01Business $relCompras01Business;
 
     private RelClientes01Business $relCliente01Business;
+
+
+    protected function configure()
+    {
+        $this->setName('crosierapprdp:processarRelatorios');
+        $this->addArgument('tipoRelatorio', InputArgument::REQUIRED,
+            'Tipo de relatório [\'RELCTSPAGREC01\', \'RELVENDAS01\', \'RELCOMPFOR01\', \'RELESTOQUE01\', \'RELCOMPRAS01\', \'RELCLIENTES01\']');
+    }
+
+    /**
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int|null|void
+     * @throws \Exception
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $tipoRelatorio = $input->getArgument('tipoRelatorio');
+        switch ($tipoRelatorio) {
+            case 'RELCTSPAGREC01':
+                $this->relCtsPagRec01Business->processarArquivosNaFila();
+                break;
+            case 'RELVENDAS01':
+                $this->relVendas01Business->processarArquivosNaFila();
+                break;
+            case 'RELCOMPFOR01':
+                $this->relCompFor01Business->processarArquivosNaFila();
+                break;
+            case 'RELESTOQUE01':
+                $this->relEstoque01Business->processarArquivosNaFila();
+                break;
+            case 'RELCOMPRAS01':
+                $this->relCompras01Business->processarArquivosNaFila();
+                break;
+            case 'RELCLIENTES01':
+                $this->relCliente01Business->processarArquivosNaFila();
+                break;
+            default:
+                throw new \RuntimeException('tipoRelatorio desconhecido: ' . $tipoRelatorio);
+        }
+        return 1;
+    }
+
 
     /**
      * @required
@@ -96,49 +141,6 @@ class ProcessarRelatoriosCommand extends Command
     public function setRelCliente01Business(RelClientes01Business $relCliente01Business): void
     {
         $this->relCliente01Business = $relCliente01Business;
-    }
-
-
-    protected function configure()
-    {
-        $this->setName('crosierapprdp:processarRelatorios');
-        $this->addArgument('tipoRelatorio', InputArgument::REQUIRED,
-            'Tipo de relatório [\'RELCTSPAGREC01\', \'RELVENDAS01\', \'RELCOMPFOR01\', \'RELESTOQUE01\', \'RELCOMPRAS01\', \'RELCLIENTES01\']');
-    }
-
-    /**
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int|null|void
-     * @throws \Exception
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $tipoRelatorio = $input->getArgument('tipoRelatorio');
-        switch ($tipoRelatorio) {
-            case 'RELCTSPAGREC01':
-                $this->relCtsPagRec01Business->processarArquivosNaFila();
-                break;
-            case 'RELVENDAS01':
-                $this->relVendas01Business->processarArquivosNaFila();
-                break;
-            case 'RELCOMPFOR01':
-                $this->relCompFor01Business->processarArquivosNaFila();
-                break;
-            case 'RELESTOQUE01':
-                $this->relEstoque01Business->processarArquivosNaFila();
-                break;
-            case 'RELCOMPRAS01':
-                $this->relCompras01Business->processarArquivosNaFila();
-                break;
-            case 'RELCLIENTES01':
-                $this->relCliente01Business->processarArquivosNaFila();
-                break;
-            default:
-                throw new \RuntimeException('tipoRelatorio desconhecido: ' . $tipoRelatorio);
-        }
-        return 1;
     }
 
 }

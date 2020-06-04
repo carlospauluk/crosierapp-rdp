@@ -44,19 +44,24 @@ class RelEstoque01Business
         $this->doctrine = $doctrine;
         $this->appConfigEntityHandler = $appConfigEntityHandler;
         $this->logger = $logger;
-        $this->prepararCampos();
     }
 
 
+    /**
+     *
+     */
     public function prepararCampos()
     {
-        /** @var Connection $conn */
-        $conn = $this->doctrine->getConnection();
 
-        $this->deptoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_depto WHERE codigo = \'00\'');
-        $this->grupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_grupo WHERE codigo = \'00\'');
-        $this->subgrupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_subgrupo WHERE codigo = \'00\'');
-
+        try {
+            /** @var Connection $conn */
+            $conn = $this->doctrine->getConnection();
+            $this->deptoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_depto WHERE codigo = \'00\'');
+            $this->grupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_grupo WHERE codigo = \'00\'');
+            $this->subgrupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_subgrupo WHERE codigo = \'00\'');
+        } catch (DBALException $e) {
+            throw new \RuntimeException('Erro ao prepararCampos()');
+        }
     }
 
     /**
@@ -86,7 +91,6 @@ class RelEstoque01Business
     /**
      * @param string $arquivo
      * @return int
-     * @throws ViewException
      */
     public function processarArquivo(string $arquivo): int
     {
@@ -95,7 +99,7 @@ class RelEstoque01Business
         $linhas = explode(PHP_EOL, $conteudo);
         $totalRegistros = count($linhas) - 2;
 
-        $t = 0;
+        $mudancas = 0;
         $linha = null;
         try {
             $camposAgrupados = [];
@@ -161,9 +165,14 @@ class RelEstoque01Business
             $totalCamposAgrupados = count($camposAgrupados);
             $i = 0;
             foreach ($camposAgrupados as $erp_codigo => $dadosProduto) {
-                $this->handleNaEstProduto($dadosProduto, $produtos[$erp_codigo] ?? null);
+                if ($this->handleNaEstProduto($dadosProduto, $produtos[$erp_codigo] ?? null)) {
+                    $mudancas++;
+                }
                 $this->logger->info('est_produto: ' . ++$i . '/' . $totalCamposAgrupados);
             }
+            $this->logger->info('----------------------------');
+            $this->logger->info('Total de mudanças: ' . $mudancas);
+            return $mudancas;
 
         } catch (\Throwable $e) {
             $this->logger->error('processarArquivo() - erro ');
@@ -171,17 +180,14 @@ class RelEstoque01Business
             $this->logger->error($e->getMessage());
             throw new \RuntimeException($e->getMessage());
         }
-
-        return $t;
-
-
     }
 
     /**
      * @param array $campos
-     * @return string
+     * @param array|null $produto
+     * @return bool
      */
-    public function handleNaEstProduto(array $campos, ?array $produto = null): string
+    public function handleNaEstProduto(array $campos, ?array $produto = null): bool
     {
         try {
             /** @var Connection $conn */
@@ -295,18 +301,18 @@ class RelEstoque01Business
 
             if (!$updating) {
                 $conn->insert('est_produto', $produto);
-                $id = $conn->lastInsertId();
+                return true;
             } else {
                 $id = $produto['id'];
                 if (strcmp($produto['json_data'], json_encode($json_data_ORIG)) !== 0) {
                     // somente o campo json_data está sendo atualizado
                     $conn->update('est_produto', ['json_data' => $produto['json_data']], ['id' => $id]);
+                    return true;
                 } else {
                     $this->logger->info('Nada mudou para CODIGO = ' . $campos['codigoProduto'] . '. Continuando...');
+                    return false;
                 }
-
             }
-            return $id;
         } catch (\Throwable | DBALException $e) {
             $this->logger->error('Erro ao handleNaEstProduto');
             $this->logger->error($e->getMessage());
