@@ -100,6 +100,7 @@ class RelEstoque01Business
         $totalRegistros = count($linhas) - 2;
 
         $mudancas = 0;
+        $naoAlterados = 0;
         $linha = null;
         try {
             $camposAgrupados = [];
@@ -167,11 +168,14 @@ class RelEstoque01Business
             foreach ($camposAgrupados as $erp_codigo => $dadosProduto) {
                 if ($this->handleNaEstProduto($dadosProduto, $produtos[$erp_codigo] ?? null)) {
                     $mudancas++;
+                } else {
+                    $naoAlterados++;
                 }
                 $this->logger->info('est_produto: ' . ++$i . '/' . $totalCamposAgrupados);
             }
             $this->logger->info('----------------------------');
             $this->logger->info('Total de mudanças: ' . $mudancas);
+            $this->logger->info('Total não alterados: ' . $naoAlterados);
             return $mudancas;
 
         } catch (\Throwable $e) {
@@ -248,6 +252,7 @@ class RelEstoque01Business
             } else {
                 $json_data = json_decode($produto['json_data'], true);
                 $json_data_ORIG = json_decode($produto['json_data'], true);
+                ksort($json_data_ORIG);
             }
 
             $json_data['recnum'] = $campos['recnum'] ?? null;
@@ -290,6 +295,7 @@ class RelEstoque01Business
             $json_data['qtde_estoque_telemaco'] = $campos['qtde_estoque_telemaco'] ?? null;
             $json_data['dt_ult_saida_telemaco'] = $campos['dt_ult_saida_telemaco'] ?? null;
 
+            ksort($json_data);
             $produto['json_data'] = json_encode($json_data);
 
             if (!$produto['json_data']) {
@@ -304,6 +310,7 @@ class RelEstoque01Business
                 return true;
             } else {
                 $id = $produto['id'];
+
                 if (strcmp($produto['json_data'], json_encode($json_data_ORIG)) !== 0) {
                     // somente o campo json_data está sendo atualizado
                     $conn->update('est_produto', ['json_data' => $produto['json_data']], ['id' => $id]);

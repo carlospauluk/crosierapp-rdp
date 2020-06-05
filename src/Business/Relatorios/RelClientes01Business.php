@@ -8,9 +8,8 @@ use CrosierSource\CrosierLibBaseBundle\EntityHandler\Config\AppConfigEntityHandl
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
+use CrosierSource\CrosierLibRadxBundle\Entity\CRM\Cliente;
 use CrosierSource\CrosierLibRadxBundle\EntityHandler\CRM\ClienteEntityHandler;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ConnectionException;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -27,8 +26,6 @@ class RelClientes01Business
     private LoggerInterface $logger;
 
     private AppConfigEntityHandler $appConfigEntityHandler;
-
-    private ClienteEntityHandler $clienteEntityHandler;
 
     private array $todosNaCrmCliente;
 
@@ -84,10 +81,7 @@ class RelClientes01Business
         $conteudo = file_get_contents($pastaFila . $arquivo);
         $linhas = explode(PHP_EOL, $conteudo);
         $totalRegistros = count($linhas);
-        /** @var Connection $conn */
-        $conn = $this->doctrine->getConnection();
 
-        $conn->beginTransaction();
 
         /**
          * 0    CODIGO            NUM    6.0
@@ -323,6 +317,7 @@ class RelClientes01Business
 
 
         $t = 0;
+        $crmClienteModificados = 0;
         $linha = null;
 
         $this->findAllCrmCliente();
@@ -335,12 +330,6 @@ class RelClientes01Business
                 $campos = explode('|@|', $linha);
                 if (count($campos) !== 114) {
                     throw new ViewException('Qtde de campos difere de 114 para a linha "' . $linha . '"');
-                }
-
-                $existeCodigo = $conn->fetchAssoc('SELECT * FROM rdp_rel_cliente01 WHERE codigo = :codigo', ['codigo' => $campos[0]]);
-                if ($existeCodigo) {
-                    $this->logger->info('Cliente com código ' . $campos[0] . ' já existe na base. Continuando...');
-                    continue;
                 }
 
                 try {
@@ -396,32 +385,22 @@ class RelClientes01Business
 
 
                 foreach ($campos as $k => $v) {
-                    $campos[$k] = $v ? "'" . utf8_encode(trim(str_replace("'", "''", $v))) . "'" : 'null';
+                    $campos[$k] = $v ? utf8_encode(trim(str_replace("'", "''", $v))) : null;
                 }
-
-                $sql = vsprintf(
-                    'INSERT INTO rdp_rel_cliente01 (id, ' . implode(', ', $camposMySQL) . ', inserted,updated,estabelecimento_id,user_inserted_id,user_updated_id)
-                    VALUES(null,' . str_repeat('%s,', 110) . ' now(), now(),1, 1, 1)', $campos
-                );
 
                 $camposComChaves = array_combine($camposMySQL, $campos);
 
-                $this->handleNaCrmCliente($camposComChaves);
+                if ($this->handleNaCrmCliente($camposComChaves)) {
+                    $crmClienteModificados++;
+                    $this->logger->info($crmClienteModificados . ' inseridos/modificados');
+                }
 
-                $t += $conn->executeUpdate($sql);
-                $this->logger->info($t . ' inseridos');
+
             }
             $this->logger->info($t . ' registros inseridos');
-            $conn->commit();
-            $this->logger->info('commit');
         } catch (\Exception $e) {
             $this->logger->error('processarArquivo() - erro ');
             $this->logger->error($e->getMessage());
-            try {
-                $conn->rollBack();
-            } catch (ConnectionException $e) {
-                throw new ViewException($e->getMessage());
-            }
             throw new \RuntimeException($e->getMessage());
         }
 
@@ -437,21 +416,47 @@ class RelClientes01Business
         $this->todosNaCrmCliente = [];
         foreach ($todos as $r) {
             $jsonData = json_decode($r['json_data'], true);
-            $this->todosNaCrmCliente[$jsonData['CODIGO']] = $r;
+            if (isset($jsonData['codigo'])) {
+                $this->todosNaCrmCliente[$jsonData['codigo']] = $r;
+            }
         }
     }
 
-    private function handleNaCrmCliente(array $relCliente01)
+    /**
+     * @param array $relCliente01
+     * @return bool
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function handleNaCrmCliente(array $relCliente01): bool
     {
+        $cliente = [];
+        /** @var Cliente $cliente */
         if ($this->todosNaCrmCliente[$relCliente01['codigo']] ?? false) {
-            /** @var Client $cliente */
             $cliente = $this->todosNaCrmCliente[$relCliente01['codigo']];
-            $cliente->nome = $relCliente01['nome'];
-            $cliente->nome = $relCliente01['nome'];
-        } else {
-            $cliente = new Cliente();
+            $clienteJsonData = json_decode($cliente['json_data'], true);
+            ksort($clienteJsonData);
+            ksort($relCliente01);
+            if ($cliente['documento'] === $relCliente01['documento'] &&
+                $cliente['nome'] === $relCliente01['nome'] &&
+                strcmp(json_encode($clienteJsonData), json_encode($relCliente01)) === 0) {
+                return false;
+            }
         }
+        $cliente['documento'] = $relCliente01['documento'];
+        $cliente['nome'] = $relCliente01['nome'];
+        $cliente['json_data'] = json_encode($relCliente01);
 
+        $cliente['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+        if (isset($cliente['id'])) {
+            $this->doctrine->getConnection()->update('crm_cliente', $cliente, ['id' => $cliente['id']]);
+        } else {
+            $cliente['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+            $cliente['user_inserted_id'] = 1;
+            $cliente['user_updated_id'] = 1;
+            $cliente['estabelecimento_id'] = 1;
+            $this->doctrine->getConnection()->insert('crm_cliente', $cliente);
+        }
+        return true;
     }
 
     /**
