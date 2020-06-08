@@ -92,8 +92,10 @@ class ProdutoBusiness
             $titulos[] = 'Ano';
             $titulos[] = 'Montadora';
             $titulos[] = 'Modelos';
+            $titulos[] = 'Ano (2)';
             $titulos[] = 'Montadora (2)';
             $titulos[] = 'Modelos (2)';
+            $titulos[] = 'Ano (3)';
             $titulos[] = 'Montadora (3)';
             $titulos[] = 'Modelos (3)';
             $titulos[] = 'Status';
@@ -182,8 +184,10 @@ class ProdutoBusiness
                 $r[] = $atributosProduto['ano'] ?? '';
                 $r[] = $atributosProduto['montadora'] ?? '';
                 $r[] = $atributosProduto['modelos'] ?? '';
+                $r[] = $atributosProduto['ano_2'] ?? '';
                 $r[] = $atributosProduto['montadora_2'] ?? '';
                 $r[] = $atributosProduto['modelos_2'] ?? '';
+                $r[] = $atributosProduto['ano_3'] ?? '';
                 $r[] = $atributosProduto['montadora_3'] ?? '';
                 $r[] = $atributosProduto['modelos_3'] ?? '';
                 $r[] = $produto['status'];
