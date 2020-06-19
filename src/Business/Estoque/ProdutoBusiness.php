@@ -355,4 +355,102 @@ class ProdutoBusiness
     }
 
 
+    /**
+     * @param string|null $montadoraSel
+     * @param string|null $anoSel
+     * @param string|null $modeloSel
+     * @return false|string
+     */
+    public function buildMontadorasAnosModelosSelect2(?string $montadoraSel = null, ?string $anoSel = null, ?string $modeloSel = null)
+    {
+
+        $sql = 'select valor from cfg_app_config where chave = \'est_produto_json_metadata\'';
+        $conn = $this->doctrine->getConnection();
+        $rProdutoJsonMetadata = $conn->fetchAll($sql);
+        $produtoJsonMetadata = json_decode($rProdutoJsonMetadata[0]['valor'], true);
+        $montadoras = array_unique(array_merge(
+            $produtoJsonMetadata['campos']['montadora']['sugestoes'],
+            $produtoJsonMetadata['campos']['montadora_2']['sugestoes'],
+            $produtoJsonMetadata['campos']['montadora_3']['sugestoes']), SORT_REGULAR);
+
+
+
+        $sMontadoras = [];
+
+        $sMontadoras[0] = [
+            'id' => '',
+            'text' => 'Selecione...'
+        ];
+
+
+        $sql_anos = 'select ano from (
+            select distinct(json_data->>"$.ano_3") as ano from est_produto where json_data->>"$.montadora_3" LIKE :montadora
+            union 
+            select distinct(json_data->>"$.ano_2") as ano from est_produto where json_data->>"$.montadora_2" LIKE :montadora
+            union
+            select distinct(json_data->>"$.ano") as ano from est_produto where json_data->>"$.montadora" LIKE :montadora
+            ) a where ano is not null and ano != \'\' order by ano COLLATE utf8mb4_swedish_ci';
+
+
+        $sql_modelos = 'select modelos from (
+            select distinct(json_data->>"$.modelos_3") as modelos from est_produto where json_data->>"$.montadora_3" LIKE :montadora AND json_data->>"$.ano_3" LIKE :ano 
+            union 
+            select distinct(json_data->>"$.modelos_2") as modelos from est_produto where json_data->>"$.montadora_2" LIKE :montadora AND json_data->>"$.ano_2" LIKE :ano
+            union
+            select distinct(json_data->>"$.modelos") as modelos from est_produto where json_data->>"$.montadora" LIKE :montadora AND json_data->>"$.ano" LIKE :ano 
+            ) a where modelos is not null and modelos != \'\' order by modelos COLLATE utf8mb4_swedish_ci;';
+
+        $m = 1;
+        foreach ($montadoras as $montadora) {
+
+            $sMontadoras[$m] = [
+                'id' => $montadora,
+                'text' => $montadora,
+                'selected' => $montadora === $montadoraSel
+            ];
+            $sMontadoras[$m]['anos'][0] = [
+                'id' => '',
+                'text' => 'Selecione...'
+            ];
+
+            $rAnos = $conn->fetchAll($sql_anos, ['montadora' => '%' . $montadora . '%']);
+            $anosMontadora = [];
+            foreach ($rAnos as $rAno) {
+                $anosMontadora = array_unique(array_merge($anosMontadora, explode(',', $rAno['ano'])), SORT_REGULAR);
+            }
+            $a = 1;
+            foreach ($anosMontadora as $ano) {
+                if (!$ano) continue;
+                $sMontadoras[$m]['anos'][$a] = [
+                    'id' => $ano,
+                    'text' => $ano,
+                    'selected' => $ano == $anoSel
+                ];
+                $sMontadoras[$m]['anos'][$a]['modelos'][] = [
+                    'id' => '',
+                    'text' => 'Selecione...'
+                ];
+
+                $rModelos = $conn->fetchAll($sql_modelos, ['montadora' => '%' . $montadora . '%', 'ano' => '%' . $ano . '%']);
+                $modelosAnosMontadora = [];
+                foreach ($rModelos as $rModelo) {
+                    $modelosAnosMontadora = array_unique(array_merge($modelosAnosMontadora, explode(',', $rModelo['modelos'])), SORT_REGULAR);
+                }
+                foreach ($modelosAnosMontadora as $modelo) {
+                    if (!$modelo) continue;
+                    $sMontadoras[$m]['anos'][$a]['modelos'][] = [
+                        'id' => $modelo,
+                        'text' => $modelo,
+                        'selected' => $modelo == $modeloSel
+                    ];
+                }
+                $a++;
+            }
+            $m++;
+        }
+
+        return json_encode($sMontadoras);
+
+    }
+
 }

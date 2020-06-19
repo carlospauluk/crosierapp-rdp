@@ -7,9 +7,10 @@ namespace App\Controller\Estoque;
 use App\Business\Estoque\ProdutoBusiness;
 use CrosierSource\CrosierLibBaseBundle\Controller\FormListController;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
-use CrosierSource\CrosierLibBaseBundle\Twig\FilterInput;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
+use CrosierSource\CrosierLibRadxBundle\Entity\Estoque\Depto;
 use CrosierSource\CrosierLibRadxBundle\Entity\Estoque\Produto;
+use CrosierSource\CrosierLibRadxBundle\EntityHandler\Estoque\ProdutoEntityHandler;
 use CrosierSource\CrosierLibRadxBundle\Repository\Estoque\ProdutoRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
@@ -39,6 +40,16 @@ class ProdutoAuxController extends FormListController
     {
         $this->produtoBusiness = $produtoBusiness;
     }
+
+    /**
+     * @required
+     * @param ProdutoEntityHandler $entityHandler
+     */
+    public function setEntityHandler(ProdutoEntityHandler $entityHandler): void
+    {
+        $this->entityHandler = $entityHandler;
+    }
+
 
     /**
      *
@@ -84,22 +95,6 @@ class ProdutoAuxController extends FormListController
         return $this->doRender('Estoque/excelProdutos.html.twig', $params);
     }
 
-    /**
-     * @param array $params
-     * @return array
-     */
-    public function getFilterDatas(array $params): array
-    {
-        return [
-            new FilterData(['id'], 'EQ', 'id', $params),
-            new FilterData(['erp_codigo'], 'LIKE', 'codigoFrom', $params, null, true),
-            new FilterData(['nome', 'titulo'], 'LIKE', 'nome', $params),
-            new FilterData(['depto_nome'], 'LIKE', 'nomeDepto', $params, null, true),
-            new FilterData(['porcent_preench'], 'BETWEEN_PORCENT', 'porcent_preench', $params, null, true),
-            new FilterData(['ecommerce_dt_integr'], 'BETWEEN_DATE', 'ecommerce_dt_integr', $params, 'date', false)
-        ];
-    }
-
 
     /**
      *
@@ -113,7 +108,7 @@ class ProdutoAuxController extends FormListController
     public function list(Request $request): Response
     {
         $params = [
-            'listView' => '@CrosierLibBase/list.html.twig',
+            'listView' => 'Estoque/produto_list.html.twig',
             'listJS' => 'Estoque/produto_list.js',
             'listRoute' => 'est_produto_list',
             'listRouteAjax' => 'est_produto_datatablesJsList',
@@ -121,17 +116,50 @@ class ProdutoAuxController extends FormListController
             'formUrl' => $_SERVER['CROSIERAPPRADX_URL'] . '/est/produto/form',
             'listId' => 'produto_list'
         ];
-        $params['filterInputs'] = [
-            new FilterInput('Código', 'id'),
-            new FilterInput('Código (ERP)', 'codigoFrom'),
-            new FilterInput('Nome/Título', 'nome'),
-            new FilterInput('Depto', 'nomeDepto'),
-            new FilterInput('', 'tituloIsNotEmpty', 'HIDDEN'),
-            new FilterInput('Porcent (%) Preench', 'porcent_preench', 'BETWEEN_PORCENT'),
-            new FilterInput('Dt Integr E-commerce', 'ecommerce_dt_integr', 'BETWEEN_DATE'),
-        ];
+
         $params['listAuxDatas'] = json_encode(['crosierappradx_url' => $_SERVER['CROSIERAPPRADX_URL']]);
-        return $this->doList($request, $params);
+
+        $fnGetFilterDatas = function (array $params): array {
+            return [
+                new FilterData(['id'], 'EQ', 'id', $params),
+                new FilterData(['erp_codigo'], 'LIKE', 'codigoFrom', $params, null, true),
+                new FilterData(['marca', 'montadora'], 'LIKE', 'marca', $params, null, true),
+                new FilterData(['nome', 'titulo'], 'LIKE', 'nome', $params),
+                new FilterData(['depto'], 'EQ', 'depto', $params, null, false),
+                new FilterData(['grupo'], 'EQ', 'grupo', $params, null, false),
+                new FilterData(['subgrupo'], 'EQ', 'subgrupo', $params, null, false),
+                new FilterData(['porcent_preench'], 'BETWEEN_PORCENT', 'porcent_preench', $params, null, true),
+                new FilterData(['ecommerce_dt_integr'], 'BETWEEN_DATE_CONCAT', 'dtIntegrEcommerce', $params, 'date', true)
+            ];
+        };
+
+        $params['limit'] = 50;
+
+        $repoDepto = $this->getDoctrine()->getRepository(Depto::class);
+
+        $params['deptos'] = $repoDepto->buildDeptosGruposSubgruposSelect2(
+            (int)($request->get('filter')['depto'] ?? null),
+            (int)($request->get('filter')['grupo'] ?? null),
+            (int)($request->get('filter')['subgrupo'] ?? null));
+        $params['grupos'] = json_encode([['id' => 0, 'text' => 'Selecione...']]);
+        $params['subgrupos'] = json_encode([['id' => 0, 'text' => 'Selecione...']]);
+
+        $params['montadoras'] = $this->produtoBusiness->buildMontadorasAnosModelosSelect2(
+            ($request->get('filter')['montadora'] ?? null),
+            ($request->get('filter')['ano'] ?? null),
+            ($request->get('filter')['modelo'] ?? null)
+        );
+        $params['anos'] = json_encode([['id' => 0, 'text' => 'Selecione...']]);
+        $params['modelos'] = json_encode([['id' => 0, 'text' => 'Selecione...']]);
+
+
+        $fnHandleDadosList = function (array &$dados, int $totalRegistros) use ($params) {
+            if (count($dados) >= $params['limit'] && $totalRegistros > $params['limit']) {
+                $this->addFlash('warn', 'Retornando apenas ' . $params['limit'] . ' registros de um total de ' . $totalRegistros . '. Utilize os filtros!');
+            }
+        };
+
+        return $this->doListSimpl($request, $params, $fnGetFilterDatas, $fnHandleDadosList);
     }
 
     /**
@@ -140,21 +168,6 @@ class ProdutoAuxController extends FormListController
     public function getRepository(): \Doctrine\Common\Persistence\ObjectRepository
     {
         return $this->getDoctrine()->getRepository(Produto::class);
-    }
-
-
-    /**
-     *
-     * @Route("/est/produto/datatablesJsList/", name="est_produto_datatablesJsList")
-     * @param Request $request
-     * @return Response
-     * @throws ViewException
-     *
-     * @IsGranted("ROLE_ESTOQUE", statusCode=403)
-     */
-    public function datatablesJsList(Request $request): Response
-    {
-        return $this->doDatatablesJsList($request);
     }
 
 

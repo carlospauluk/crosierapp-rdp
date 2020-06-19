@@ -1,0 +1,275 @@
+{% extends '@CrosierLibBase/index.html.twig' %}
+
+
+{% block page_content %}
+
+
+    <div class="card">
+        <div class="card-header">
+
+
+            <div class="d-flex flex-wrap align-items-center">
+
+                <div class="d-sm-flex text-nowrap mr-1">
+                    <h3 class="text-dark">Produtos</h3>
+                </div>
+
+                <div class="d-sm-flex ml-auto">
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="card-body">
+
+            <form name="form_produto_list" id="form_produto_list">
+
+                <div class="row">
+
+                    <div class="col-md-3 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_codigo">Código (Id)</label>
+                            <input type="number" id="filter_codigo" name="filter[id]"
+                                   class="form-control"
+                                   value="{{ filter['id']|default('') }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_codigoFrom">Código (ERP)</label>
+                            <input type="number" id="filter_codigoFrom" name="filter[codigoFrom]"
+                                   class="form-control"
+                                   value="{{ filter['codigoFrom']|default('') }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_nome">Nome/Título</label>
+                            <input type="text" id="filter_nome" name="filter[nome]"
+                                   class="form-control"
+                                   value="{{ filter['nome']|default('') }}">
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-3 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_dtIntegrEcommerce">Dt Integr E-commerce</label>
+                            <input type="text" id="filter_dtIntegrEcommerce" name="filter[dtIntegrEcommerce]"
+                                   class="form-control text-center"
+                                   value="{{ filter['dtIntegrEcommerce']|default('') }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-5 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_marca">Marca</label>
+                            <input type="text" id="filter_marca" name="filter[marca]"
+                                   class="form-control"
+                                   value="{{ filter['marca']|default('') }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_porcent_preench_i">% preench</label>
+
+                            <div class="form-group form-inline">
+                                Entre&nbsp;
+                                <input type="text" id="filter_porcent_preench_i" name="filter[porcent_preench][i]"
+                                       class="form-control crsr-dec2"
+                                       value="{{ filter['porcent_preench']['i']|default('') }}">
+                                &nbsp;e&nbsp; <input type="text" id="filter_porcent_preench_f"
+                                                     name="filter[porcent_preench][f]"
+                                                     class="form-control crsr-dec2"
+                                                     value="{{ filter['porcent_preench']['f']|default('') }}">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-3 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_montadora">Montadora</label>
+                            <select id="filter_montadora" name="filter[montadora]"
+                                    data-options="{{ montadoras }}"
+                                    class="form-control"
+                                    data-val="{{ filter['montadora']|default('') }}">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_ano">Ano</label>
+                            <select id="filter_ano" name="filter[ano]"
+                                    class="form-control"
+                                    data-val="{{ filter['ano']|default('') }}">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_modelo">Modelo</label>
+                            <select id="filter_modelo" name="filter[modelo]"
+                                    class="form-control"
+                                    data-val="{{ filter['modelo']|default('') }}">
+                            </select>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-3 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_depto">Depto</label>
+                            <select id="filter_depto" name="filter[depto]"
+                                    data-options="{{ deptos }}"
+                                    class="form-control"
+                                    data-val="{{ filter['depto']|default('') }}">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_grupo">Grupo</label>
+                            <select id="filter_grupo" name="filter[grupo]"
+                                    class="form-control"
+                                    data-val="{{ filter['grupo']|default('') }}">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_subgrupo">Subgrupo</label>
+                            <select id="filter_subgrupo" name="filter[subgrupo]"
+                                    class="form-control"
+                                    data-val="{{ filter['subgrupo']|default('') }}">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 col-sm-12">
+                        <div class="form-group">
+                            <label for="btnFiltrar">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary btn-block" id="btnFiltrar">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-1 col-sm-12">
+                        <div class="form-group">
+                            <label for="btnRecarregar">&nbsp;</label>
+                            <a role="button" class="btn btn-secondary btn-block" id="btnRecarregar"
+                               href="{{ url(listRoute, {'r':1}) }}">
+                                <i class="fas fa-redo-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </form>
+
+
+            <div class="row">
+                <div class="col">
+                    {% include '@CrosierLibBase/Util/flashesOnAlerts.html.twig' %}
+                </div>
+            </div>
+
+
+            <div class="table-responsive-sm">
+
+                <table class="table table-sm table-striped table-hover crsr-datatable" id="produto_list">
+
+                    <thead>
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Nome/Título</th>
+                        <th scope="col">Depto/Grupo/Subgrupo</th>
+                        <th scope="col">Marca</th>
+                        <th scope="col">% Preench</th>
+                        <th scope="col">Qtde Imagens</th>
+                        <th scope="col">Estoque Total</th>
+                        <th scope="col">Dt Integr <br/>E-commerce</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+
+                    {% for e in dados %}
+
+                        <tr>
+                            <td>{{ e.id|strpad(9) }}</td>
+                            <td>
+                                <div class="float-left">{{ e.titulo|default(false) ? e.titulo : e.nome }}</div>
+                                {% if e.jsonData.imagem1 %}
+                                    <div class="float-right">
+                                        <img src="{{ getEnv('CROSIERAPPRADX_URL') }}/images/produtos/{{ e.depto.id }}/{{ e.grupo.id }}/{{ e.subgrupo.id }}/{{ e.jsonData.imagem1 }}"
+                                             width="50px"/>
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                : {{ e.depto.codigo }} - {{ e.depto.nome }}<br>
+                                :: {{ e.grupo.codigo }} - {{ e.grupo.nome }}<br>
+                                ::: {{ e.subgrupo.codigo }} - {{ e.subgrupo.nome }}
+                            </td>
+                            <td>{{ e.jsonData.marca|default('') }}</td>
+                            <td class="text-center">
+                                {{ (e.jsonData.porcent_preench|default(0) * 100)|number_format(0,',','.') }}%
+                            </td>
+
+                            <td class="text-center">{{ e.jsonData.qtde_imagens|default('') }}</td>
+                            <td class="text-center">{{ e.jsonData.qtde_estoque_total|default('') }}</td>
+                            <td class="text-center">{{ e.jsonData.ecommerce_dt_integr|default(false) ? e.jsonData.ecommerce_dt_integr|date('d/m/Y H:i:s') : 'Não Integrado' }}</td>
+
+                            <td class="text-right">
+                                <a role="button" class="btn btn-primary btn-sm" title="Editar registro"
+                                   href="{{ formUrl }}/{{ e.id }}">
+                                    <i class="fas fa-wrench" aria-hidden="true"></i>
+                                </a>
+
+                                <br/><span
+                                        class="badge badge-pill badge-info">{{ e.updated|date('d/m/Y H:i:s') }}</span>
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+
+
+                    </tbody>
+
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+
+
+{% endblock %}
+
+
+{% block down_scripts %}
+    {{ encore_entry_script_tags('Estoque/produto_list') }}
+{% endblock %}
