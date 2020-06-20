@@ -133,7 +133,7 @@ class ProdutoAuxController extends FormListController
             ];
         };
 
-        $params['limit'] = 50;
+        $params['limit'] = 200;
 
         $repoDepto = $this->getDoctrine()->getRepository(Depto::class);
 
