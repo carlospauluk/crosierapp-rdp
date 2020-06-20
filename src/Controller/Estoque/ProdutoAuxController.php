@@ -125,7 +125,7 @@ class ProdutoAuxController extends FormListController
                 new FilterData(['erp_codigo'], 'LIKE', 'codigoFrom', $params, null, true),
                 new FilterData(['marca', 'montadora'], 'LIKE', 'marca', $params, null, true),
                 new FilterData(['nome'], 'LIKE', 'nome', $params),
-                new FilterData(['titulo'], 'LIKE', 'nome', $params, null, true),
+                new FilterData(['titulo'], 'LIKE', 'titulo', $params, null, true),
                 new FilterData(['depto'], 'EQ', 'depto', $params, null, false),
                 new FilterData(['grupo'], 'EQ', 'grupo', $params, null, false),
                 new FilterData(['subgrupo'], 'EQ', 'subgrupo', $params, null, false),
