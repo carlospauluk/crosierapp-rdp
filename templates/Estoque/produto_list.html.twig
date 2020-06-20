@@ -221,7 +221,7 @@
                         <tr>
                             <td>{{ e.id|strpad(9) }}</td>
                             <td>
-                                <div class="float-left">{{ e.titulo|default(false) ? e.titulo : e.nome }}</div>
+                                <div class="float-left">{{ e.jsonData.titulo|default(false) ? e.titulo : e.nome }}</div>
                                 {% if e.jsonData.imagem1 %}
                                     <div class="float-right">
                                         <img src="{{ getEnv('CROSIERAPPRADX_URL') }}/images/produtos/{{ e.depto.id }}/{{ e.grupo.id }}/{{ e.subgrupo.id }}/{{ e.jsonData.imagem1 }}"
