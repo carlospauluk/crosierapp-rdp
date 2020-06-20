@@ -197,7 +197,6 @@ $(document).ready(function () {
     function build_filterAno(onSelect = false) {
         $filter_ano.empty().trigger("change");
         if ($filter_montadora.select2('data')[0]['id']) {
-            console.dir($filter_montadora.select2('data')[0]);
             if (onSelect) {
                 $filter_montadora.select2('data')[0].anos.forEach((v, i) => v.selected = false);
             }
@@ -224,7 +223,6 @@ $(document).ready(function () {
     function build_filterModelo(onSelect = false) {
         $filter_modelo.empty().trigger("change");
         if ($filter_ano.select2('data')[0]['id']) {
-            console.dir($filter_ano.select2('data')[0]);
             if (onSelect) {
                 $filter_ano.select2('data')[0].modelos.forEach((v, i) => v.selected = false);
             }

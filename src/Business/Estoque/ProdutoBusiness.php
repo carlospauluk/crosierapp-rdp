@@ -16,7 +16,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Controller auxiliar ao ProdutoController
@@ -360,10 +363,10 @@ class ProdutoBusiness
      * @param string|null $anoSel
      * @param string|null $modeloSel
      * @return false|string
+     * @throws ViewException
      */
     public function buildMontadorasAnosModelosSelect2(?string $montadoraSel = null, ?string $anoSel = null, ?string $modeloSel = null)
     {
-
         $sql = 'select valor from cfg_app_config where chave = \'est_produto_json_metadata\'';
         $conn = $this->doctrine->getConnection();
         $rProdutoJsonMetadata = $conn->fetchAll($sql);
@@ -373,8 +376,6 @@ class ProdutoBusiness
             $produtoJsonMetadata['campos']['montadora_2']['sugestoes'],
             $produtoJsonMetadata['campos']['montadora_3']['sugestoes']), SORT_REGULAR);
 
-
-
         $sMontadoras = [];
 
         $sMontadoras[0] = [
@@ -382,23 +383,6 @@ class ProdutoBusiness
             'text' => 'Selecione...'
         ];
 
-
-        $sql_anos = 'select ano from (
-            select distinct(json_data->>"$.ano_3") as ano from est_produto where json_data->>"$.montadora_3" LIKE :montadora
-            union 
-            select distinct(json_data->>"$.ano_2") as ano from est_produto where json_data->>"$.montadora_2" LIKE :montadora
-            union
-            select distinct(json_data->>"$.ano") as ano from est_produto where json_data->>"$.montadora" LIKE :montadora
-            ) a where ano is not null and ano != \'\' order by ano COLLATE utf8mb4_swedish_ci';
-
-
-        $sql_modelos = 'select modelos from (
-            select distinct(json_data->>"$.modelos_3") as modelos from est_produto where json_data->>"$.montadora_3" LIKE :montadora AND json_data->>"$.ano_3" LIKE :ano 
-            union 
-            select distinct(json_data->>"$.modelos_2") as modelos from est_produto where json_data->>"$.montadora_2" LIKE :montadora AND json_data->>"$.ano_2" LIKE :ano
-            union
-            select distinct(json_data->>"$.modelos") as modelos from est_produto where json_data->>"$.montadora" LIKE :montadora AND json_data->>"$.ano" LIKE :ano 
-            ) a where modelos is not null and modelos != \'\' order by modelos COLLATE utf8mb4_swedish_ci;';
 
         $m = 1;
         foreach ($montadoras as $montadora) {
@@ -413,7 +397,7 @@ class ProdutoBusiness
                 'text' => 'Selecione...'
             ];
 
-            $rAnos = $conn->fetchAll($sql_anos, ['montadora' => '%' . $montadora . '%']);
+            $rAnos = $this->getAnosByMontadora($montadora);
             $anosMontadora = [];
             foreach ($rAnos as $rAno) {
                 $anosMontadora = array_unique(array_merge($anosMontadora, explode(',', $rAno['ano'])), SORT_REGULAR);
@@ -431,7 +415,7 @@ class ProdutoBusiness
                     'text' => 'Selecione...'
                 ];
 
-                $rModelos = $conn->fetchAll($sql_modelos, ['montadora' => '%' . $montadora . '%', 'ano' => '%' . $ano . '%']);
+                $rModelos = $this->getModelosByMontadoraEAno($montadora, $ano);
                 $modelosAnosMontadora = [];
                 foreach ($rModelos as $rModelo) {
                     $modelosAnosMontadora = array_unique(array_merge($modelosAnosMontadora, explode(',', $rModelo['modelos'])), SORT_REGULAR);
@@ -451,6 +435,77 @@ class ProdutoBusiness
 
         return json_encode($sMontadoras);
 
+    }
+
+    /**
+     * @param string $montadora
+     * @return mixed
+     * @throws ViewException
+     */
+    private function getAnosByMontadora(string $montadora)
+    {
+        try {
+            $cache = new FilesystemAdapter($_SERVER['CROSIERAPP_ID'] . '.cache', 0, $_SERVER['CROSIER_SESSIONS_FOLDER']);
+            $rAnos = $cache->get('produtoBusiness_getAnosByMontadora_' . $montadora, function (ItemInterface $item) use ($montadora) {
+
+                $sql_anos = 'select ano from (
+                select distinct(json_data->>"$.ano_3") as ano from est_produto where json_data->>"$.montadora_3" LIKE :montadora
+                union 
+                select distinct(json_data->>"$.ano_2") as ano from est_produto where json_data->>"$.montadora_2" LIKE :montadora
+                union
+                select distinct(json_data->>"$.ano") as ano from est_produto where json_data->>"$.montadora" LIKE :montadora
+                ) a where ano is not null and ano != \'\' order by ano COLLATE utf8mb4_swedish_ci';
+
+                $conn = $this->doctrine->getConnection();
+                $rAnos = $conn->fetchAll($sql_anos, ['montadora' => '%' . $montadora . '%']);
+
+                return $rAnos;
+            });
+            return $rAnos;
+        } catch (InvalidArgumentException $e) {
+            throw new ViewException('Erro ao obter getAnosByMontadora - ' . $montadora);
+        }
+    }
+
+    /**
+     * @param string $montadora
+     * @param string $ano
+     * @return mixed
+     * @throws ViewException
+     */
+    private function getModelosByMontadoraEAno(string $montadora, string $ano)
+    {
+        try {
+            $cache = new FilesystemAdapter($_SERVER['CROSIERAPP_ID'] . '.cache', 0, $_SERVER['CROSIER_SESSIONS_FOLDER']);
+            $rModelos = $cache->get('produtoBusiness_getModelosByMontadoraEAno_' . $montadora . '_' . $ano, function (ItemInterface $item) use ($montadora, $ano) {
+
+                $sql_modelos = 'select modelos from (
+                    select distinct(json_data->>"$.modelos_3") as modelos from est_produto where json_data->>"$.montadora_3" LIKE :montadora AND json_data->>"$.ano_3" LIKE :ano 
+                    union 
+                    select distinct(json_data->>"$.modelos_2") as modelos from est_produto where json_data->>"$.montadora_2" LIKE :montadora AND json_data->>"$.ano_2" LIKE :ano
+                    union
+                    select distinct(json_data->>"$.modelos") as modelos from est_produto where json_data->>"$.montadora" LIKE :montadora AND json_data->>"$.ano" LIKE :ano 
+                    ) a where modelos is not null and modelos != \'\' order by modelos COLLATE utf8mb4_swedish_ci;';
+
+
+                $conn = $this->doctrine->getConnection();
+                $rModelos = $conn->fetchAll($sql_modelos, ['montadora' => '%' . $montadora . '%', 'ano' => '%' . $ano . '%']);
+
+                return $rModelos;
+            });
+            return $rModelos;
+        } catch (InvalidArgumentException $e) {
+            throw new ViewException('Erro ao obter getAnosByMontadora - ' . $montadora);
+        }
+    }
+
+    /**
+     *
+     */
+    public function clearCaches()
+    {
+        $cache = new FilesystemAdapter($_SERVER['CROSIERAPP_ID'] . '.cache', 0, $_SERVER['CROSIER_SESSIONS_FOLDER']);
+        $cache->reset();
     }
 
 }
