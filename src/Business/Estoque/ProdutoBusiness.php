@@ -393,9 +393,27 @@ class ProdutoBusiness
                 'selected' => $montadora === $montadoraSel
             ];
             $sMontadoras[$m]['anos'][0] = [
-                'id' => '',
-                'text' => 'Selecione...'
+                'id' => '%',
+                'text' => 'TODOS'
             ];
+            $sMontadoras[$m]['anos'][0]['modelos'][0] = [
+                'id' => '%',
+                'text' => 'TODOS'
+            ];
+            $rModelos = $this->getModelosByMontadoraEAno($montadora, '%');
+            $modelosAnosMontadora = [];
+            foreach ($rModelos as $rModelo) {
+                $modelosAnosMontadora = array_unique(array_merge($modelosAnosMontadora, explode(',', $rModelo['modelos'])), SORT_REGULAR);
+            }
+            foreach ($modelosAnosMontadora as $modelo) {
+                if (!$modelo) continue;
+                $sMontadoras[$m]['anos'][0]['modelos'][] = [
+                    'id' => $modelo,
+                    'text' => $modelo,
+                    'selected' => $modelo == $modeloSel
+                ];
+            }
+
 
             $rAnos = $this->getAnosByMontadora($montadora);
             $anosMontadora = [];
@@ -411,8 +429,8 @@ class ProdutoBusiness
                     'selected' => $ano == $anoSel
                 ];
                 $sMontadoras[$m]['anos'][$a]['modelos'][] = [
-                    'id' => '',
-                    'text' => 'Selecione...'
+                    'id' => '%',
+                    'text' => 'TODOS'
                 ];
 
                 $rModelos = $this->getModelosByMontadoraEAno($montadora, $ano);
