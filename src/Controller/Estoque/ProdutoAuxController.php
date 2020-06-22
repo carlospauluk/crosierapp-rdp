@@ -15,7 +15,9 @@ use CrosierSource\CrosierLibRadxBundle\Repository\Estoque\ProdutoRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -161,6 +163,20 @@ class ProdutoAuxController extends FormListController
         };
 
         return $this->doListSimpl($request, $params, $fnGetFilterDatas, $fnHandleDadosList);
+    }
+
+    /**
+     *
+     * @Route("/est/produto/clearCaches", name="est_produto_clearCaches")
+     * @return RedirectResponse
+     *
+     * @IsGranted("ROLE_ESTOQUE_ADMIN", statusCode=403)
+     */
+    public function clearCaches(): RedirectResponse
+    {
+        $cache = new FilesystemAdapter($_SERVER['CROSIERAPP_ID'] . '.produto.cache', 0, $_SERVER['CROSIER_SESSIONS_FOLDER']);
+        $cache->clear();
+        return $this->redirectToRoute('est_produto_list');
     }
 
     /**

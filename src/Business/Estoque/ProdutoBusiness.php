@@ -445,7 +445,7 @@ class ProdutoBusiness
     private function getAnosByMontadora(string $montadora)
     {
         try {
-            $cache = new FilesystemAdapter($_SERVER['CROSIERAPP_ID'] . '.cache', 0, $_SERVER['CROSIER_SESSIONS_FOLDER']);
+            $cache = new FilesystemAdapter($_SERVER['CROSIERAPP_ID'] . '.produto.cache', 0, $_SERVER['CROSIER_SESSIONS_FOLDER']);
             $rAnos = $cache->get('produtoBusiness_getAnosByMontadora_' . $montadora, function (ItemInterface $item) use ($montadora) {
 
                 $sql_anos = 'select ano from (
@@ -476,7 +476,7 @@ class ProdutoBusiness
     private function getModelosByMontadoraEAno(string $montadora, string $ano)
     {
         try {
-            $cache = new FilesystemAdapter($_SERVER['CROSIERAPP_ID'] . '.cache', 0, $_SERVER['CROSIER_SESSIONS_FOLDER']);
+            $cache = new FilesystemAdapter($_SERVER['CROSIERAPP_ID'] . '.produto.cache', 0, $_SERVER['CROSIER_SESSIONS_FOLDER']);
             $rModelos = $cache->get('produtoBusiness_getModelosByMontadoraEAno_' . $montadora . '_' . $ano, function (ItemInterface $item) use ($montadora, $ano) {
 
                 $sql_modelos = 'select modelos from (
@@ -505,6 +505,7 @@ class ProdutoBusiness
     public function clearCaches()
     {
         $cache = new FilesystemAdapter($_SERVER['CROSIERAPP_ID'] . '.cache', 0, $_SERVER['CROSIER_SESSIONS_FOLDER']);
+
         $cache->reset();
     }
 
