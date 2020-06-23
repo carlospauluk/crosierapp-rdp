@@ -323,7 +323,7 @@ class RelEstoque01Business
                     $this->syslog->info('handleNaEstProduto - UPDATE OK (id: ' . $produto['id'] . ')');
                     return true;
                 } else {
-                    $this->syslog->info('Nada mudou para CODIGO = ' . $campos['codigoProduto'] . '. Continuando...');
+                    $this->syslog->debug('Nada mudou para CODIGO = ' . $campos['codigoProduto'] . '. Continuando...');
                     return false;
                 }
             }
