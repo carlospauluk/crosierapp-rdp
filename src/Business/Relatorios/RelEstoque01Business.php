@@ -3,6 +3,7 @@
 namespace App\Business\Relatorios;
 
 
+use CrosierSource\CrosierLibBaseBundle\Business\Config\SyslogBusiness;
 use CrosierSource\CrosierLibBaseBundle\Entity\Config\AppConfig;
 use CrosierSource\CrosierLibBaseBundle\EntityHandler\Config\AppConfigEntityHandler;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
@@ -12,7 +13,6 @@ use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  *
@@ -24,9 +24,9 @@ class RelEstoque01Business
 
     private EntityManagerInterface $doctrine;
 
-    private LoggerInterface $logger;
-
     private AppConfigEntityHandler $appConfigEntityHandler;
+
+    private SyslogBusiness $syslog;
 
     private array $deptoIndefinido;
     private array $grupoIndefinido;
@@ -34,25 +34,23 @@ class RelEstoque01Business
 
     /**
      * @param EntityManagerInterface $doctrine
-     * @param LoggerInterface $logger
      * @param AppConfigEntityHandler $appConfigEntityHandler
+     * @param SyslogBusiness $syslog
      */
     public function __construct(EntityManagerInterface $doctrine,
-                                LoggerInterface $logger,
-                                AppConfigEntityHandler $appConfigEntityHandler)
+                                AppConfigEntityHandler $appConfigEntityHandler,
+                                SyslogBusiness $syslog)
     {
         $this->doctrine = $doctrine;
         $this->appConfigEntityHandler = $appConfigEntityHandler;
-        $this->logger = $logger;
+        $this->syslog = $syslog->setApp('rdp')->setComponent(self::class);
     }
-
 
     /**
      *
      */
     public function prepararCampos()
     {
-
         try {
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
@@ -69,23 +67,30 @@ class RelEstoque01Business
      */
     public function processarArquivosNaFila(): void
     {
-        $this->prepararCampos();
+        $this->syslog->info('Processando arquivos na fila.');
         $pastaFila = $_SERVER['PASTA_UPLOAD_RELESTOQUE01'] . 'fila/';
         $files = scandir($pastaFila, 0);
+        if (count($files) < 1) {
+            $this->syslog->info('Nenhum arquivo para processar. Finalizando.');
+            return;
+        }
+        $this->syslog->info(count($files) . ' arquivo(s) para processar');
+        $this->prepararCampos();
         foreach ($files as $file) {
             if (!in_array($file, array('.', '..'))) {
                 try {
                     $this->processarArquivo($file);
                     $this->marcarDtHrAtualizacao();
-                    $this->logger->info('Arquivo processado com sucesso.');
+                    $this->syslog->info('Arquivo processado com sucesso.');
                     rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELESTOQUE01'] . 'ok/' . $file);
-                    $this->logger->info('Arquivo movido para pasta "ok".');
+                    $this->syslog->info('Arquivo movido para pasta "ok".');
                 } catch (\Exception $e) {
                     rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELESTOQUE01'] . 'falha/' . $file);
-                    $this->logger->info('Arquivo movido para pasta "falha".');
+                    $this->syslog->info('Arquivo movido para pasta "falha".');
                 }
             }
         }
+        $this->syslog->info(' arquivo(s) para processar');
     }
 
     /**
@@ -94,6 +99,7 @@ class RelEstoque01Business
      */
     public function processarArquivo(string $arquivo): int
     {
+        $this->syslog->info('Iniciando processamento do arquivo ' . $arquivo);
         $pastaFila = $_SERVER['PASTA_UPLOAD_RELESTOQUE01'] . 'fila/';
         $conteudo = file_get_contents($pastaFila . $arquivo);
         $linhas = explode(PHP_EOL, $conteudo);
@@ -148,7 +154,7 @@ class RelEstoque01Business
                 $camposAgrupados[$codigo]['deficit_estoque_' . strtolower($filial)] = bcsub($campos[7], $campos[5], 3);
                 $camposAgrupados[$codigo]['dt_ult_saida_' . strtolower($filial)] = $campos[8];
 
-                $this->logger->info('camposAgrupados: ' . str_pad($i, 9, '0', STR_PAD_LEFT) . '/' . $totalRegistros);
+                $this->syslog->info('camposAgrupados: ' . str_pad($i, 9, '0', STR_PAD_LEFT) . '/' . $totalRegistros);
             }
 
             /** @var Connection $conn */
@@ -171,17 +177,15 @@ class RelEstoque01Business
                 } else {
                     $naoAlterados++;
                 }
-                $this->logger->info('est_produto: ' . ++$i . '/' . $totalCamposAgrupados);
             }
-            $this->logger->info('----------------------------');
-            $this->logger->info('Total de mudanças: ' . $mudancas);
-            $this->logger->info('Total não alterados: ' . $naoAlterados);
+            $this->syslog->info('Total de mudanças: ' . $mudancas);
+            $this->syslog->info('Total não alterados: ' . $naoAlterados);
             return $mudancas;
 
         } catch (\Throwable $e) {
-            $this->logger->error('processarArquivo() - erro ');
-            $this->logger->info('Erro ao inserir a linha "' . $linha . '"');
-            $this->logger->error($e->getMessage());
+            $this->syslog->err('processarArquivo() - erro ');
+            $this->syslog->info('Erro ao inserir a linha "' . $linha . '"');
+            $this->syslog->err($e->getMessage());
             throw new \RuntimeException($e->getMessage());
         }
     }
@@ -194,6 +198,7 @@ class RelEstoque01Business
     public function handleNaEstProduto(array $campos, ?array $produto = null): bool
     {
         try {
+            $this->syslog->info('handleNaEstProduto - ' . implode(',', $campos));
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
 
@@ -210,7 +215,7 @@ class RelEstoque01Business
                 $produto['grupo_id'] = $this->grupoIndefinido['id'];
                 $json_data['grupo_codigo'] = '00';
                 $json_data['grupo_nome'] = 'INDEFINIDO';
-                $produto['subgrupo_id'] = $this->subgrupoIndefinido['id'];;
+                $produto['subgrupo_id'] = $this->subgrupoIndefinido['id'];
                 $json_data['subgrupo_codigo'] = '00';
                 $json_data['subgrupo_nome'] = 'INDEFINIDO';
                 $json_data['erp_codigo'] = $campos['codigoProduto'];
@@ -291,7 +296,6 @@ class RelEstoque01Business
             $json_data['qtde_estoque_delpozo'] = $campos['qtde_estoque_delpozo'] ?? null;
             $json_data['dt_ult_saida_delpozo'] = $campos['dt_ult_saida_delpozo'] ?? null;
 
-
             $json_data['qtde_estoque_telemaco'] = $campos['qtde_estoque_telemaco'] ?? null;
             $json_data['dt_ult_saida_telemaco'] = $campos['dt_ult_saida_telemaco'] ?? null;
 
@@ -299,30 +303,33 @@ class RelEstoque01Business
             $produto['json_data'] = json_encode($json_data);
 
             if (!$produto['json_data']) {
-                $this->logger->error('Erro ao gerar json_data para CODIGO = ' . $campos['codigoProduto'] . '. Continuando...');
+                $this->syslog->err('Erro ao gerar json_data para CODIGO = ' . $campos['codigoProduto'] . '. Continuando...');
                 $produto['json_data'] = null;
             }
 
             $produto['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
 
             if (!$updating) {
+                $this->syslog->info('handleNaEstProduto - inserindo novo produto');
                 $conn->insert('est_produto', $produto);
+                $this->syslog->info('handleNaEstProduto - produto inserido (id: ' . $produto['id'] . ')');
                 return true;
             } else {
                 $id = $produto['id'];
-
                 if (strcmp($produto['json_data'], json_encode($json_data_ORIG)) !== 0) {
+                    $this->syslog->info('handleNaEstProduto - produto com alterações no json_data. UPDATE...');
                     // somente o campo json_data está sendo atualizado
                     $conn->update('est_produto', ['json_data' => $produto['json_data']], ['id' => $id]);
+                    $this->syslog->info('handleNaEstProduto - UPDATE OK (id: ' . $produto['id'] . ')');
                     return true;
                 } else {
-                    $this->logger->info('Nada mudou para CODIGO = ' . $campos['codigoProduto'] . '. Continuando...');
+                    $this->syslog->info('Nada mudou para CODIGO = ' . $campos['codigoProduto'] . '. Continuando...');
                     return false;
                 }
             }
         } catch (\Throwable | DBALException $e) {
-            $this->logger->error('Erro ao handleNaEstProduto');
-            $this->logger->error($e->getMessage());
+            $this->syslog->err('Erro ao handleNaEstProduto');
+            $this->syslog->err($e->getMessage());
             throw new \RuntimeException('Erro ao handleNaEstProduto');
         }
     }
@@ -345,8 +352,8 @@ class RelEstoque01Business
             $appConfig->setValor((new \DateTime())->format('Y-m-d H:i:s.u'));
             $this->appConfigEntityHandler->save($appConfig);
         } catch (\Exception $e) {
-            $this->logger->error('Erro ao marcar app_config (relEstoque01.dthrAtualizacao)');
-            $this->logger->error($e->getMessage());
+            $this->syslog->err('Erro ao marcar app_config (relEstoque01.dthrAtualizacao)');
+            $this->syslog->err($e->getMessage());
             throw new ViewException('Erro ao marcar dt/hr atualização');
         }
     }
