@@ -70,11 +70,11 @@ class RelEstoque01Business
         $this->syslog->info('Processando arquivos na fila.');
         $pastaFila = $_SERVER['PASTA_UPLOAD_RELESTOQUE01'] . 'fila/';
         $files = scandir($pastaFila, 0);
-        if (count($files) < 1) {
+        if (count($files) < 3) { // conta sempre mais o "." e o ".."
             $this->syslog->info('Nenhum arquivo para processar. Finalizando.');
             return;
         }
-        $this->syslog->info(count($files) . ' arquivo(s) para processar');
+        $this->syslog->info((count($files) - 2) . ' arquivo(s) para processar');
         $this->prepararCampos();
         foreach ($files as $file) {
             if (!in_array($file, array('.', '..'))) {
