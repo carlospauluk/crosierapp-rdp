@@ -90,7 +90,7 @@ class RelEstoque01Business
                 }
             }
         }
-        $this->syslog->info(' arquivo(s) para processar');
+        $this->syslog->info('Finalizando com sucesso.');
     }
 
     /**
@@ -319,7 +319,7 @@ class RelEstoque01Business
                     $this->syslog->info('handleNaEstProduto - produto com alterações no json_data. UPDATE...');
                     $this->syslog->info('handleNaEstProduto - ' . implode(',', $campos));
                     // somente o campo json_data está sendo atualizado
-                    $conn->update('est_produto', ['json_data' => $produto['json_data']], ['id' => $id]);
+                    $conn->update('est_produto', ['json_data' => $produto['json_data'], 'updated' => $produto['updated']], ['id' => $id]);
                     $this->syslog->info('handleNaEstProduto - UPDATE OK (id: ' . $produto['id'] . ')');
                     return true;
                 } else {
