@@ -154,7 +154,6 @@ class RelEstoque01Business
                 $camposAgrupados[$codigo]['deficit_estoque_' . strtolower($filial)] = bcsub($campos[7], $campos[5], 3);
                 $camposAgrupados[$codigo]['dt_ult_saida_' . strtolower($filial)] = $campos[8];
 
-                $this->syslog->info('camposAgrupados: ' . str_pad($i, 9, '0', STR_PAD_LEFT) . '/' . $totalRegistros);
             }
 
             /** @var Connection $conn */
@@ -198,7 +197,7 @@ class RelEstoque01Business
     public function handleNaEstProduto(array $campos, ?array $produto = null): bool
     {
         try {
-            $this->syslog->info('handleNaEstProduto - ' . implode(',', $campos));
+
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
 
@@ -266,7 +265,6 @@ class RelEstoque01Business
                 $json_data['cod_edi'] = $codedi;
             }
 
-
             $json_data['qtde_estoque_max'] = $campos['qtdeMaxima'] ?? null;
 
             $json_data['preco_custo'] = $campos['custoMedio'] ?? null;
@@ -311,6 +309,7 @@ class RelEstoque01Business
 
             if (!$updating) {
                 $this->syslog->info('handleNaEstProduto - inserindo novo produto');
+                $this->syslog->info('handleNaEstProduto - ' . implode(',', $campos));
                 $conn->insert('est_produto', $produto);
                 $this->syslog->info('handleNaEstProduto - produto inserido (id: ' . $produto['id'] . ')');
                 return true;
@@ -318,6 +317,7 @@ class RelEstoque01Business
                 $id = $produto['id'];
                 if (strcmp($produto['json_data'], json_encode($json_data_ORIG)) !== 0) {
                     $this->syslog->info('handleNaEstProduto - produto com alterações no json_data. UPDATE...');
+                    $this->syslog->info('handleNaEstProduto - ' . implode(',', $campos));
                     // somente o campo json_data está sendo atualizado
                     $conn->update('est_produto', ['json_data' => $produto['json_data']], ['id' => $id]);
                     $this->syslog->info('handleNaEstProduto - UPDATE OK (id: ' . $produto['id'] . ')');
