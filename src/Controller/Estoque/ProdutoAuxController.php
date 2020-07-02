@@ -111,12 +111,8 @@ class ProdutoAuxController extends FormListController
     {
         $params = [
             'listView' => 'Estoque/produto_list.html.twig',
-            'listJS' => 'Estoque/produto_list.js',
             'listRoute' => 'est_produto_list',
-            'listRouteAjax' => 'est_produto_datatablesJsList',
-            'listPageTitle' => 'Produtos',
             'formUrl' => $_SERVER['CROSIERAPPRADX_URL'] . '/est/produto/form',
-            'listId' => 'produto_list'
         ];
 
         $params['listAuxDatas'] = json_encode(['crosierappradx_url' => $_SERVER['CROSIERAPPRADX_URL']]);
