@@ -122,9 +122,9 @@ class ProdutoAuxController extends FormListController
                 new FilterData(['id'], 'EQ', 'id', $params),
                 new FilterData(['erp_codigo'], 'LIKE', 'codigoFrom', $params, null, true),
                 new FilterData(['marca'], 'LIKE', 'marca', $params, null, true),
-                new FilterData(['montadora','montadora_2','montadora_3'], 'LIKE', 'montadora', $params, null, true),
-                new FilterData(['ano','ano_2','ano_3'], 'LIKE', 'ano', $params, null, true),
-                new FilterData(['modelos','modelos_2','modelos_3'], 'LIKE', 'modelos', $params, null, true),
+                new FilterData(['montadora', 'montadora_2', 'montadora_3'], 'LIKE', 'montadora', $params, null, true),
+                new FilterData(['ano', 'ano_2', 'ano_3'], 'LIKE', 'ano', $params, null, true),
+                new FilterData(['modelos', 'modelos_2', 'modelos_3'], 'LIKE', 'modelos', $params, null, true),
                 new FilterData(['nome'], 'LIKE', 'nome', $params),
                 new FilterData(['titulo'], 'LIKE', 'titulo', $params, null, true),
                 new FilterData(['depto'], 'EQ', 'depto', $params, null, false),
@@ -245,6 +245,5 @@ class ProdutoAuxController extends FormListController
         $r = $this->produtoBusiness->totalEstoquePorFilial();
         return new JsonResponse($r);
     }
-
 
 }
