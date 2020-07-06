@@ -444,6 +444,7 @@ class RelClientes01Business
         }
         $cliente['documento'] = $relCliente01['documento'];
         $cliente['nome'] = $relCliente01['nome'];
+        $cliente['json_data']['tipo_pessoa'] = strlen($cliente['documento']) === 11 ? 'PF' : 'PJ';
         $cliente['json_data'] = json_encode($relCliente01);
 
         $cliente['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
