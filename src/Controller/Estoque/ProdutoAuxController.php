@@ -11,7 +11,6 @@ use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
 use CrosierSource\CrosierLibRadxBundle\Entity\Estoque\Depto;
 use CrosierSource\CrosierLibRadxBundle\Entity\Estoque\Produto;
 use CrosierSource\CrosierLibRadxBundle\EntityHandler\Estoque\ProdutoEntityHandler;
-use CrosierSource\CrosierLibRadxBundle\Repository\Estoque\ProdutoRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -117,14 +116,11 @@ class ProdutoAuxController extends FormListController
 
         $params['listAuxDatas'] = json_encode(['crosierappradx_url' => $_SERVER['CROSIERAPPRADX_URL']]);
 
-        $fnGetFilterDatas = function (array $params): array {
-            return [
+        $fnGetFilterDatas = function (array $params) use ($request) : array {
+            $filterDatas = [
                 new FilterData(['id'], 'EQ', 'id', $params),
                 new FilterData(['erp_codigo'], 'LIKE', 'codigoFrom', $params, null, true),
                 new FilterData(['marca'], 'LIKE', 'marca', $params, null, true),
-                new FilterData(['montadora', 'montadora_2', 'montadora_3'], 'LIKE', 'montadora', $params, null, true),
-                new FilterData(['ano', 'ano_2', 'ano_3'], 'LIKE', 'ano', $params, null, true),
-                new FilterData(['modelos', 'modelos_2', 'modelos_3'], 'LIKE', 'modelos', $params, null, true),
                 new FilterData(['nome'], 'LIKE', 'nome', $params),
                 new FilterData(['titulo'], 'LIKE', 'titulo', $params, null, true),
                 new FilterData(['depto'], 'EQ', 'depto', $params, null, false),
@@ -133,7 +129,39 @@ class ProdutoAuxController extends FormListController
                 new FilterData(['porcent_preench'], 'BETWEEN_PORCENT', 'porcent_preench', $params, null, true),
                 new FilterData(['ecommerce_dt_integr'], 'BETWEEN_DATE_CONCAT', 'dtIntegrEcommerce', $params, 'date', true)
             ];
+
+
+            $requestFilter = $request->get('filter');
+
+
+            $filterTodos_montadora = null;
+            if (($requestFilter['montadora'] ?? false) && ($requestFilter['montadora'] !== '%')) {
+                $filterTodos_montadora = new FilterData(['montadora', 'montadora_2', 'montadora_3'], 'LIKE');
+                $filterTodos_montadora->jsonDataField = true;
+                $filterTodos_montadora->val = 'TODOS';
+            }
+            $filterDatas[] = new FilterData(['montadora', 'montadora_2', 'montadora_3'], 'LIKE', 'montadora', $params, null, true, $filterTodos_montadora);
+
+
+            $filterTodos_ano = null;
+            if (($requestFilter['ano'] ?? false) && ($requestFilter['ano'] !== '%')) {
+                $filterTodos_ano = new FilterData(['ano', 'ano_2', 'ano_3'], 'LIKE');
+                $filterTodos_ano->jsonDataField = true;
+                $filterTodos_ano->val = 'TODOS';
+            }
+            $filterDatas[] = new FilterData(['ano', 'ano_2', 'ano_3'], 'LIKE', 'ano', $params, null, true, $filterTodos_ano);
+
+            $filterTodos_modelos = null;
+            if (($requestFilter['modelos'] ?? false) && ($requestFilter['modelos'] !== '%')) {
+                $filterTodos_modelos = new FilterData(['modelos', 'modelos_2', 'modelos_3'], 'LIKE');
+                $filterTodos_modelos->jsonDataField = true;
+                $filterTodos_modelos->val = 'TODOS';
+            }
+            $filterDatas[] = new FilterData(['modelos', 'modelos_2', 'modelos_3'], 'LIKE', 'modelos', $params, null, true, $filterTodos_modelos);
+
+            return $filterDatas;
         };
+
 
         $params['limit'] = 200;
 
@@ -240,8 +268,6 @@ class ProdutoAuxController extends FormListController
      */
     public function graficoTotalEstoquePorFilial(): JsonResponse
     {
-        /** @var ProdutoRepository $produtoRepository */
-        $produtoRepository = $this->getDoctrine()->getRepository(Produto::class);
         $r = $this->produtoBusiness->totalEstoquePorFilial();
         return new JsonResponse($r);
     }

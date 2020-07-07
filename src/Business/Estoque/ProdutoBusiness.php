@@ -367,14 +367,23 @@ class ProdutoBusiness
      */
     public function buildMontadorasAnosModelosSelect2(?string $montadoraSel = null, ?string $anoSel = null, ?string $modeloSel = null)
     {
-        $sql = 'select valor from cfg_app_config where chave = \'est_produto_json_metadata\'';
+        $sql = 'select distinct(montadora) from ' .
+            '(select distinct(upper(json_data->>"$.montadora")) as montadora from est_produto union ' .
+            'select distinct(upper(json_data->>"$.montadora_2")) as montadora from est_produto union ' .
+            'select distinct(upper(json_data->>"$.montadora_3")) as montadora from est_produto) a ' .
+            'where montadora is not null and montadora != \'\' and montadora != \'NULL\' order by montadora;';
+
         $conn = $this->doctrine->getConnection();
-        $rProdutoJsonMetadata = $conn->fetchAll($sql);
-        $produtoJsonMetadata = json_decode($rProdutoJsonMetadata[0]['valor'], true);
-        $montadoras = array_unique(array_merge(
-            $produtoJsonMetadata['campos']['montadora']['sugestoes'],
-            $produtoJsonMetadata['campos']['montadora_2']['sugestoes'],
-            $produtoJsonMetadata['campos']['montadora_3']['sugestoes']), SORT_REGULAR);
+        $rDistinctMontadora = $conn->fetchAll($sql);
+
+        $montadoras = [];
+        foreach ($rDistinctMontadora as $rdMontadoras) {
+            $expl = explode(',', $rdMontadoras['montadora']);
+            foreach ($expl as $v) {
+                $montadoras[] = $v;
+            }
+        }
+
 
         $sMontadoras = [];
 
@@ -386,6 +395,8 @@ class ProdutoBusiness
 
         $m = 1;
         foreach ($montadoras as $montadora) {
+
+            if ($montadora === 'TODOS') continue;
 
             $sMontadoras[$m] = [
                 'id' => $montadora,
@@ -406,6 +417,7 @@ class ProdutoBusiness
                 $modelosAnosMontadora = array_unique(array_merge($modelosAnosMontadora, explode(',', $rModelo['modelos'])), SORT_REGULAR);
             }
             foreach ($modelosAnosMontadora as $modelo) {
+                if ($modelo === 'TODOS') continue;
                 if (!$modelo) continue;
                 $sMontadoras[$m]['anos'][0]['modelos'][] = [
                     'id' => $modelo,
@@ -422,6 +434,7 @@ class ProdutoBusiness
             }
             $a = 1;
             foreach ($anosMontadora as $ano) {
+                if ($ano === 'TODOS') continue;
                 if (!$ano) continue;
                 $sMontadoras[$m]['anos'][$a] = [
                     'id' => $ano,
