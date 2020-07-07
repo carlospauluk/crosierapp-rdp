@@ -371,7 +371,7 @@ class ProdutoBusiness
             '(select distinct(upper(json_data->>"$.montadora")) as montadora from est_produto union ' .
             'select distinct(upper(json_data->>"$.montadora_2")) as montadora from est_produto union ' .
             'select distinct(upper(json_data->>"$.montadora_3")) as montadora from est_produto) a ' .
-            'where montadora is not null and montadora != \'\' and montadora != \'NULL\' order by montadora;';
+            'where montadora is not null and montadora != \'\' and montadora != \'NULL\' order by montadora';
 
         $conn = $this->doctrine->getConnection();
         $rDistinctMontadora = $conn->fetchAll($sql);
@@ -383,7 +383,7 @@ class ProdutoBusiness
                 $montadoras[] = $v;
             }
         }
-
+        $montadoras = array_unique($montadoras);
 
         $sMontadoras = [];
 
