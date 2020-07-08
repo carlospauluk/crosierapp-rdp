@@ -430,6 +430,7 @@ class RelClientes01Business
     private function handleNaCrmCliente(array $relCliente01): bool
     {
         $cliente = [];
+        $clienteJsonData = [];
         /** @var Cliente $cliente */
         if ($this->todosNaCrmCliente[$relCliente01['codigo']] ?? false) {
             $cliente = $this->todosNaCrmCliente[$relCliente01['codigo']];
@@ -444,8 +445,9 @@ class RelClientes01Business
         }
         $cliente['documento'] = $relCliente01['documento'];
         $cliente['nome'] = $relCliente01['nome'];
+
+        $cliente['json_data'] = array_replace_recursive($clienteJsonData, $relCliente01);
         $cliente['json_data']['tipo_pessoa'] = strlen($cliente['documento']) === 11 ? 'PF' : 'PJ';
-        $cliente['json_data'] = json_encode($relCliente01);
 
         $cliente['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
         if (isset($cliente['id'])) {
