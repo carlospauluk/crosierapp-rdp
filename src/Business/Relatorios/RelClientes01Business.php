@@ -448,6 +448,7 @@ class RelClientes01Business
 
         $cliente['json_data'] = array_replace_recursive($clienteJsonData, $relCliente01);
         $cliente['json_data']['tipo_pessoa'] = strlen($cliente['documento']) === 11 ? 'PF' : 'PJ';
+        $cliente['json_data'] = json_encode($cliente['json_data']);
 
         $cliente['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
         if (isset($cliente['id'])) {
