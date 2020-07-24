@@ -114,6 +114,17 @@ class ProdutoAuxController extends FormListController
             'formUrl' => $_SERVER['CROSIERAPPRADX_URL'] . '/est/produto/form',
         ];
 
+        $params['colunas'] = [
+            'id',
+            'nome',
+            'jsonData.depto_nome',
+            'jsonData.marca',
+            'jsonData.porcent_preench',
+            'jsonData.qtde_imagens',
+            'jsonData.estoque_total',
+            'jsonData.dt_integr_ecommerce'
+        ];
+
         $params['listAuxDatas'] = json_encode(['crosierappradx_url' => $_SERVER['CROSIERAPPRADX_URL']]);
 
         $fnGetFilterDatas = function (array $params) use ($request) : array {

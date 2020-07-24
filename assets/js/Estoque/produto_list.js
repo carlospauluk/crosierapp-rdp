@@ -34,6 +34,8 @@ $(document).ready(function () {
     let $filter_ano = $('#filter_ano');
     let $filter_modelo = $('#filter_modelo');
 
+    let $filter_order = $('#filter_order');
+
 
     let $form = $('#form_produto_list');
 
@@ -51,6 +53,12 @@ $(document).ready(function () {
     };
 
     let datatable = $datatable.DataTable(defaultParams);
+
+    datatable.on('order.dt', function () {
+        // Atenção: as colunas devem estar na mesma ordem que o array no Controller
+        let order = datatable.order();
+        $filter_order.val(JSON.stringify(order));
+    });
 
 
     $filter_dtIntegrEcommerce.daterangepicker(
