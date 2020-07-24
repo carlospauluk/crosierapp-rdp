@@ -54,12 +54,18 @@ $(document).ready(function () {
 
     let datatable = $datatable.DataTable(defaultParams);
 
-    datatable.on('order.dt', function () {
-        // Atenção: as colunas devem estar na mesma ordem que o array no Controller
-        let order = datatable.order();
-        $filter_order.val(JSON.stringify(order));
-        $form.submit();
+    datatable.on('init.dt', function(e, settings, json){
+        console.log('inicializou');
+        datatable.on('order.dt', function () {
+            console.log('ordenando');
+            // Atenção: as colunas devem estar na mesma ordem que o array no Controller
+            let order = datatable.order();
+            $filter_order.val(JSON.stringify(order));
+            $form.submit();
+        });
     });
+
+
 
 
     $filter_dtIntegrEcommerce.daterangepicker(
