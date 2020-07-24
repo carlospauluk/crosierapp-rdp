@@ -58,6 +58,7 @@ $(document).ready(function () {
         // Atenção: as colunas devem estar na mesma ordem que o array no Controller
         let order = datatable.order();
         $filter_order.val(JSON.stringify(order));
+        $form.submit();
     });
 
 
