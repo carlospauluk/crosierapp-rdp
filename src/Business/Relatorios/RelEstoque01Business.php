@@ -208,6 +208,7 @@ class RelEstoque01Business
                 $produto = [];
                 $json_data = [];
                 $produto['uuid'] = StringUtils::guidv4();
+                $produto['codigo'] = $campos['codigoProduto'];
                 $produto['depto_id'] = $this->deptoIndefinido['id'];
                 $json_data['depto_codigo'] = '00';
                 $json_data['depto_nome'] = 'INDEFINIDO';

@@ -14,7 +14,14 @@
                     <h3 class="text-dark">Produtos</h3>
                 </div>
 
-                <div class="d-sm-flex ml-auto">
+                <div class="d-sm-flex flex-nowrap ml-auto">
+
+
+                    <a role="button" class="btn btn-primary ml-1" title="Novo" href="{{ getEnv('CROSIERAPPRADX_URL') }}/est/produto/form">
+                        <i class="fas fa-file" aria-hidden="true"></i>
+                    </a>
+
+
                 </div>
             </div>
 
@@ -190,7 +197,7 @@
                         <div class="form-group">
                             <label for="btnFiltrar">&nbsp;</label>
                             <button type="submit" class="btn btn-primary btn-block" id="btnFiltrar" title="Pesquisar">
-                                <i class="fas fa-search"></i>
+                                <i class="fas fa-search"></i> Pesquisar
                             </button>
                         </div>
                     </div>
@@ -243,7 +250,7 @@
                             <td>{{ e.id|strpad(9) }}</td>
                             <td>
                                 <div class="float-left">{{ e.jsonData.titulo|default(false) ? e.jsonData.titulo : e.nome }}</div>
-                                {% if e.jsonData.imagem1 %}
+                                {% if e.jsonData.imagem1|default(false) %}
                                     <div class="float-right">
                                         <img src="{{ getEnv('CROSIERAPPRADX_URL') }}/images/produtos/{{ e.depto.id }}/{{ e.grupo.id }}/{{ e.subgrupo.id }}/{{ e.jsonData.imagem1 }}"
                                              width="50px"/>
