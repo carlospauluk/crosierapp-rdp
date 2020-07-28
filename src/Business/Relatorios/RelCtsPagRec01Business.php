@@ -105,16 +105,16 @@ class RelCtsPagRec01Business
                 $campos[4] = trim($campos[4]) ? DateTimeUtils::parseDateStr($campos[4])->format('Y-m-d') : '';
                 $campos[16] = trim($campos[16]) ? DateTimeUtils::parseDateStr($campos[16])->format('Y-m-d') : '';
 
-                $campos[11] = $campos[11] ?? 0;
+                if (!$campos[11]) {
+                    $campos[11] = 0.0; // valor_titulo
+                }
 
                 $cMax = count($campos);
                 for ($c = 0; $c < $cMax; $c++) {
                     $campos[$c] = $campos[$c] ? "'" . trim(str_replace("'", "''", $campos[$c])) . "'" : 'null';
                 }
 
-                if (!$campos[11]) {
-                    $campos[11] = 0.0; // valor_titulo
-                }
+
 
                 $sql = sprintf(
                     'INSERT INTO rdp_rel_ctspagrec01 (
