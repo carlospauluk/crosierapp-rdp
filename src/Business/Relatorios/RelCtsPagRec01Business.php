@@ -111,7 +111,7 @@ class RelCtsPagRec01Business
 
                 $cMax = count($campos);
                 for ($c = 0; $c < $cMax; $c++) {
-                    $campos[$c] = $campos[$c] ? "'" . trim(str_replace("'", "''", $campos[$c])) . "'" : 'null';
+                    $campos[$c] = $campos[$c] !== '' ? "'" . trim(str_replace("'", "''", $campos[$c])) . "'" : 'null';
                 }
 
 
