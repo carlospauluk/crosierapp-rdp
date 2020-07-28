@@ -44,6 +44,7 @@ class RelEstoque01Business
         $this->doctrine = $doctrine;
         $this->appConfigEntityHandler = $appConfigEntityHandler;
         $this->syslog = $syslog->setApp('rdp')->setComponent(self::class);
+        $this->prepararCampos();
     }
 
     /**
