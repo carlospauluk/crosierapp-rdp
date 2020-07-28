@@ -316,7 +316,7 @@ class RelEstoque01Business
             $json_data['qtde_estoque_total'] = $json_data['qtde_estoque_matriz'];
 
 
-            $json_data['ean'] = $campos['EAN'];
+            // $json_data['ean'] = $campos['EAN'];
             $json_data['genero'] = $campos['GENERO'];
             $json_data['cfop_dentro'] = $campos['CFOP_DENTRO'];
             $json_data['cfop_fora'] = $campos['CFOP_FORA'];
