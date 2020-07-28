@@ -261,6 +261,7 @@ class RelEstoque01Business
                 $produto['nome'] = $campos['nome'];
                 $produto['status'] = 'INATIVO';
                 $produto['composicao'] = 'N';
+                $produto['unidade_padrao_id'] = 1;
                 $produto['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
 
                 $produto['version'] = 0;
