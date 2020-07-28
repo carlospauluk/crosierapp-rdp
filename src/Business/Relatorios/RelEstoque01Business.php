@@ -318,21 +318,21 @@ class RelEstoque01Business
 
 
             // $json_data['ean'] = $campos['EAN'];
-            $json_data['genero'] = $campos['GENERO'];
-            $json_data['cfop_dentro'] = $campos['CFOP_DENTRO'];
-            $json_data['cfop_fora'] = $campos['CFOP_FORA'];
-            $json_data['unidade'] = $campos['UNIDADE'];
-            $json_data['ean_trib'] = $campos['EAN_TRIB'];
-            $json_data['origem'] = $campos['ORIGEM'];
-            $json_data['cst_icms'] = $campos['CST_ICMS'];
-            $json_data['modalidade_icms'] = $campos['MODALIDADE_ICMS'];
-            $json_data['aliquota_icms'] = $campos['ALIQUOTA_ICMS'];
-            $json_data['cest'] = $campos['CEST'];
-            $json_data['custo_medio_erp'] = $campos['CUSTO_MEDIO_ERP'];
-            $json_data['preco_medio_erp'] = $campos['PRECO_MEDIO_ERP'];
-            $json_data['margem_liquida_erp'] = $campos['MARGEM_LIQUIDA_ERP'];
-            $json_data['pis'] = $campos['PIS'];
-            $json_data['cofins'] = $campos['COFINS'];
+            $json_data['genero'] = $campos['GENERO'] ?? null;
+            $json_data['cfop_dentro'] = $campos['CFOP_DENTRO'] ?? null;
+            $json_data['cfop_fora'] = $campos['CFOP_FORA'] ?? null;
+            $json_data['unidade'] = $campos['UNIDADE'] ?? null;
+            $json_data['ean_trib'] = $campos['EAN_TRIB'] ?? null;
+            $json_data['origem'] = $campos['ORIGEM'] ?? null;
+            $json_data['cst_icms'] = $campos['CST_ICMS'] ?? null;
+            $json_data['modalidade_icms'] = $campos['MODALIDADE_ICMS'] ?? null;
+            $json_data['aliquota_icms'] = $campos['ALIQUOTA_ICMS'] ?? null;
+            $json_data['cest'] = $campos['CEST'] ?? null;
+            $json_data['custo_medio_erp'] = $campos['CUSTO_MEDIO_ERP'] ?? null;
+            $json_data['preco_medio_erp'] = $campos['PRECO_MEDIO_ERP'] ?? null;
+            $json_data['margem_liquida_erp'] = $campos['MARGEM_LIQUIDA_ERP'] ?? null;
+            $json_data['pis'] = $campos['PIS'] ?? null;
+            $json_data['cofins'] = $campos['COFINS'] ?? null;
 
 
             ksort($json_data);
