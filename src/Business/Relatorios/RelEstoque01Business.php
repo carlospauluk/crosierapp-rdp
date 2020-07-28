@@ -119,8 +119,8 @@ class RelEstoque01Business
                 $linha = $linha[-1] === '|' ? substr($linha, 0, -1) : $linha;
 
                 $campos = explode('|', $linha);
-                if (count($campos) !== 30) {
-                    throw new ViewException('Qtde de campos difere de 13 para a linha "' . $linha . '" (qtde: ' . count($campos) . ')');
+                if (count($campos) !== 29) {
+                    throw new ViewException('Qtde de campos difere de 29 para a linha "' . $linha . '" (qtde: ' . count($campos) . ')');
                 }
 
                 if ($campos[8] ?: false) {
