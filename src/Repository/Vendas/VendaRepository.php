@@ -122,7 +122,11 @@ class VendaRepository extends FilterRepository
         $results = $this->getEntityManager()->getConnection()->fetchAll($sql, $params);
 
         foreach ($results as $k => $r) {
-            $results[$k]['participacao'] = bcmul(bcdiv($r['total_venda'], $total, 6), 100, 4);
+            if ($total > 0) {
+                $results[$k]['participacao'] = bcmul(bcdiv($r['total_venda'], $total, 6), 100, 4);
+            } else {
+                $results[$k]['participacao'] = 0;
+            }
         }
 
 
