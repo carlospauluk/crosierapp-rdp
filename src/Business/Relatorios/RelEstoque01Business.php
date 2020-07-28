@@ -56,8 +56,8 @@ class RelEstoque01Business
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
             $this->deptoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_depto WHERE codigo = \'00\'');
-            $this->grupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_grupo WHERE codigo = \'00\'');
-            $this->subgrupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_subgrupo WHERE codigo = \'00\'');
+            $this->grupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_grupo WHERE codigo = \'00\' AND depto_id = :deptoId', ['deptoId' => $this->deptoIndefinido['id']]);
+            $this->subgrupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_subgrupo WHERE codigo = \'00\' AND grupo_id = :grupoId', ['grupoId' => $this->grupoIndefinido['id']]);
         } catch (DBALException $e) {
             throw new \RuntimeException('Erro ao prepararCampos()');
         }
