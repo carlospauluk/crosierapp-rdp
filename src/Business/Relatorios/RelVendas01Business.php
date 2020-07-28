@@ -293,7 +293,7 @@ class RelVendas01Business
             $vendaItem['ordem'] = $i + 1;
             $vendaItem['qtde'] = $item['QTDE'];
             $vendaItem['descricao'] = $produto['nome'] ?? '<<< PRODUTO SEM NOME >>>';
-            $vendaItem['preco_venda'] = bcdiv($item['TOTAL_PRECO_VENDA'], $item['QTDE'] ?? 1, 2);
+            $vendaItem['preco_venda'] = bcdiv($item['TOTAL_PRECO_VENDA'], ($item['QTDE'] > 0) ? $item['QTDE'] :  1, 2);
             $vendaItem['subtotal'] = bcmul($vendaItem['qtde'], $vendaItem['preco_venda'], 2);
             $vendaItem['desconto'] = 0.0;
             $vendaItem['total'] = $vendaItem['subtotal'];
