@@ -367,7 +367,7 @@ class RelEstoque01Business
             }
         } catch (\Throwable | DBALException $e) {
             $this->syslog->err('Erro ao handleNaEstProduto');
-            $this->syslog->err($e->getMessage());
+            $this->syslog->err($e->getTraceAsString());
             throw new \RuntimeException('Erro ao handleNaEstProduto');
         }
     }
