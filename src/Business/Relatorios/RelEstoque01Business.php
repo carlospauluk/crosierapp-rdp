@@ -119,7 +119,7 @@ class RelEstoque01Business
                 $linha = $linha[-1] === '|' ? substr($linha, 0, -1) : $linha;
 
                 $campos = explode('|', $linha);
-                if (count($campos) !== 13) {
+                if (count($campos) !== 30) {
                     throw new ViewException('Qtde de campos difere de 13 para a linha "' . $linha . '" (qtde: ' . count($campos) . ')');
                 }
 
@@ -146,7 +146,23 @@ class RelEstoque01Business
                         'codigoFornecedor' => $campos[9],
                         'nomeFornecedor' => mb_convert_encoding($campos[10], 'ISO-8859-1', 'UTF-8'),
                         'recnum' => $campos[11],
-                        'codedi' => mb_convert_encoding($campos[12], 'ISO-8859-1', 'UTF-8')
+                        'codedi' => mb_convert_encoding($campos[12], 'ISO-8859-1', 'UTF-8'),
+                        'EAN' => $campos[13],
+                        'GENERO' => $campos[14],
+                        'CFOP_DENTRO' => $campos[15],
+                        'CFOP_FORA' => $campos[16],
+                        'UNIDADE' => $campos[17],
+                        'EAN_TRIB' => $campos[18],
+                        'ORIGEM' => $campos[19],
+                        'CST_ICMS' => $campos[20],
+                        'MODALIDADE_ICMS' => $campos[21],
+                        'ALIQUOTA_ICMS' => $campos[22],
+                        'CEST' => $campos[23],
+                        'CUSTO_MEDIO_ERP' => $campos[24],
+                        'PRECO_MEDIO_ERP' => $campos[25],
+                        'MARGEM_LIQUIDA_ERP' => $campos[26],
+                        'PIS' => $campos[27],
+                        'COFINS' => $campos[28],
                     ];
 
                 $camposAgrupados[$codigo]['qtde_estoque_min_' . strtolower($filial)] = $campos[5];
@@ -168,8 +184,6 @@ class RelEstoque01Business
                 }
             }
 
-            $totalCamposAgrupados = count($camposAgrupados);
-            $i = 0;
             foreach ($camposAgrupados as $erp_codigo => $dadosProduto) {
                 if ($this->handleNaEstProduto($dadosProduto, $produtos[$erp_codigo] ?? null)) {
                     $mudancas++;
@@ -197,7 +211,6 @@ class RelEstoque01Business
     public function handleNaEstProduto(array $campos, ?array $produto = null): bool
     {
         try {
-
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
 
@@ -275,7 +288,7 @@ class RelEstoque01Business
             //if (isset($json_data['preco_site'])) {
             //    $json_data['preco_site'] = ($json_data['preco_site'] > 0.0) ? $json_data['preco_site'] : $json_data['preco_tabela'];
             //} else {
-                $json_data['preco_site'] = $json_data['preco_tabela'];
+            $json_data['preco_site'] = $json_data['preco_tabela'];
             //}
 
 
@@ -299,11 +312,26 @@ class RelEstoque01Business
             $json_data['dt_ult_saida_telemaco'] = $campos['dt_ult_saida_telemaco'] ?? null;
 
 
-            $json_data['qtde_estoque_total'] = bcadd(
-                $json_data['qtde_estoque_matriz'],
-                $json_data['qtde_estoque_acessorios'],
-                2
-            );
+            $json_data['qtde_estoque_total'] = $json_data['qtde_estoque_matriz'];
+
+
+            $json_data['ean'] = $campos['EAN'];
+            $json_data['genero'] = $campos['GENERO'];
+            $json_data['cfop_dentro'] = $campos['CFOP_DENTRO'];
+            $json_data['cfop_fora'] = $campos['CFOP_FORA'];
+            $json_data['unidade'] = $campos['UNIDADE'];
+            $json_data['ean_trib'] = $campos['EAN_TRIB'];
+            $json_data['origem'] = $campos['ORIGEM'];
+            $json_data['cst_icms'] = $campos['CST_ICMS'];
+            $json_data['modalidade_icms'] = $campos['MODALIDADE_ICMS'];
+            $json_data['aliquota_icms'] = $campos['ALIQUOTA_ICMS'];
+            $json_data['cest'] = $campos['CEST'];
+            $json_data['custo_medio_erp'] = $campos['CUSTO_MEDIO_ERP'];
+            $json_data['preco_medio_erp'] = $campos['PRECO_MEDIO_ERP'];
+            $json_data['margem_liquida_erp'] = $campos['MARGEM_LIQUIDA_ERP'];
+            $json_data['pis'] = $campos['PIS'];
+            $json_data['cofins'] = $campos['COFINS'];
+
 
             ksort($json_data);
             $produto['json_data'] = json_encode($json_data);
