@@ -346,7 +346,7 @@ class RelEstoque01Business
 
             if (!$updating) {
                 $this->syslog->info('handleNaEstProduto - inserindo novo produto');
-                $this->syslog->info('handleNaEstProduto - ' . implode(',', $campos));
+                $this->syslog->debug('handleNaEstProduto - ' . implode(',', $campos));
                 $conn->insert('est_produto', $produto);
                 $this->syslog->info('handleNaEstProduto - produto inserido (id: ' . $produto['id'] . ')');
                 return true;
@@ -354,7 +354,7 @@ class RelEstoque01Business
                 $id = $produto['id'];
                 if (strcmp($produto['json_data'], json_encode($json_data_ORIG)) !== 0) {
                     $this->syslog->info('handleNaEstProduto - produto com alterações no json_data. UPDATE...');
-                    $this->syslog->info('handleNaEstProduto - ' . implode(',', $campos));
+                    $this->syslog->debug('handleNaEstProduto - ' . implode(',', $campos));
                     // somente o campo json_data está sendo atualizado
                     $conn->update('est_produto', ['json_data' => $produto['json_data'], 'updated' => $produto['updated']], ['id' => $id]);
                     $this->syslog->info('handleNaEstProduto - UPDATE OK (id: ' . $produto['id'] . ')');
