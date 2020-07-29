@@ -122,7 +122,8 @@ class ProdutoAuxController extends FormListController
             'jsonData.porcent_preench',
             'jsonData.qtde_imagens',
             'jsonData.estoque_total',
-            'jsonData.dt_integr_ecommerce'
+            'jsonData.dt_integr_ecommerce',
+            'updated'
         ];
 
         $params['listAuxDatas'] = json_encode(['crosierappradx_url' => $_SERVER['CROSIERAPPRADX_URL']]);
@@ -173,7 +174,7 @@ class ProdutoAuxController extends FormListController
         };
 
 
-        $params['limit'] = 200;
+        $params['limit'] = $request->get('limit') ?? 200;
 
         $repoDepto = $this->getDoctrine()->getRepository(Depto::class);
 
@@ -198,6 +199,8 @@ class ProdutoAuxController extends FormListController
                 $this->addFlash('warn', 'Retornando apenas ' . $params['limit'] . ' registros de um total de ' . $totalRegistros . '. Utilize os filtros!');
             }
         };
+
+
 
         return $this->doListSimpl($request, $params, $fnGetFilterDatas, $fnHandleDadosList);
     }

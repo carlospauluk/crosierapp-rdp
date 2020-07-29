@@ -210,8 +210,8 @@ class RelEstoque01Business
         } catch (\Throwable $e) {
             $this->syslog->err('processarArquivo() - erro ');
             $this->syslog->info('Erro ao inserir a linha "' . $linha . '"');
-            $this->syslog->err($e->getMessage());
-            throw new \RuntimeException($e->getMessage());
+            $this->syslog->err($e->getTraceAsString());
+            // throw new \RuntimeException($e->getMessage());
         }
     }
 

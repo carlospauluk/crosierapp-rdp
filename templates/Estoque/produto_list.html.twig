@@ -101,7 +101,7 @@
                             <label for="filter_composicao" class="required">Composição</label>
                             <select id="filter_composicao" name="filter[composicao]"
                                     class="form-control autoSelect2">
-                                <option value="null" {{ filter.composicao is not defined }}>...</option>
+                                <option value="" {{ filter.composicao is not defined }}>...</option>
                                 <option value="S" {{ filter.composicao|default(null) == 'S' ? 'selected' : '' }}>
                                     Sim
                                 </option>
@@ -282,9 +282,11 @@
                                 {% endif %}
                             </td>
                             <td>
-                                : {{ e.depto.codigo }} - {{ e.depto.nome }}<br>
-                                :: {{ e.grupo.codigo }} - {{ e.grupo.nome }}<br>
-                                ::: {{ e.subgrupo.codigo }} - {{ e.subgrupo.nome }}
+                                : {{ e.jsonData.depto_codigo|default(0) }} - {{ e.jsonData.depto_nome|default('') }}<br>
+                                :: {{ e.jsonData.grupo_codigo|default(0) }} - {{ e.jsonData.grupo_nome|default('') }}
+                                <br>
+                                ::: {{ e.jsonData.subgrupo_codigo|default(0) }}
+                                - {{ e.jsonData.subgrupo_nome|default('') }}
                             </td>
                             <td>{{ e.jsonData.marca|default('') }}</td>
                             <td class="text-center">
@@ -293,11 +295,7 @@
 
                             <td class="text-center">{{ e.jsonData.qtde_imagens|default('') }}</td>
                             <td class="text-center">
-                                {% if e.composicao %}
-
-                                {% else %}
-                                    {{ e.jsonData.qtde_estoque_total|default('') }}
-                                {% endif %}
+                                {{ e.jsonData.qtde_estoque_total|default('') }}
                             </td>
                             <td class="text-center">{{ e.jsonData.ecommerce_dt_integr|default(false) ? e.jsonData.ecommerce_dt_integr|date('d/m/Y H:i:s') : 'Não Integrado' }}</td>
 
