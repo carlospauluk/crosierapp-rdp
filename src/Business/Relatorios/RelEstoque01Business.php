@@ -86,7 +86,7 @@ class RelEstoque01Business
         $this->syslog->info((count($files) - 2) . ' arquivo(s) para processar');
         $this->prepararCampos();
         foreach ($files as $file) {
-            if (!in_array($file, array('.', '..'))) {
+            if (!in_array($file, array('.', '..')) && !is_dir($pastaFila . $file)) {
                 try {
                     $this->processarArquivo($file);
                     $this->corrigirEstoquesProdutosComposicao();
@@ -95,7 +95,7 @@ class RelEstoque01Business
                     rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELESTOQUE01'] . 'ok/' . $file);
                     $this->syslog->info('Arquivo movido para pasta "ok".');
                 } catch (\Exception $e) {
-                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELESTOQUE01'] . 'falha/' . $file);
+                    @rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELESTOQUE01'] . 'falha/' . $file);
                     $this->syslog->err('Erro processarArquivosNaFila()');
                     $this->syslog->err($e->getTraceAsString());
                     $this->syslog->info('Arquivo movido para pasta "falha".');
@@ -132,7 +132,8 @@ class RelEstoque01Business
 
                 $campos = explode('|', $linha);
                 if (count($campos) !== 29) {
-                    throw new ViewException('Qtde de campos difere de 29 para a linha "' . $linha . '" (qtde: ' . count($campos) . ')');
+                    $this->syslog->err('Qtde de campos difere de 29 para a linha "' . $linha . '" (qtde: ' . count($campos) . ')');
+                    continue;
                 }
 
                 if ($campos[8] ?: false) {
@@ -187,7 +188,7 @@ class RelEstoque01Business
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
 
-            $rProdutos = $conn->fetchAll('SELECT * FROM est_produto');
+            $rProdutos = $conn->fetchAll('SELECT * FROM est_produto WHERE composicao = \'N\'');
             $produtos = [];
             foreach ($rProdutos as $rProduto) {
                 $rProdutoJsonData = json_decode($rProduto['json_data'], true);
@@ -360,6 +361,7 @@ class RelEstoque01Business
                 $this->syslog->info('handleNaEstProduto - inserindo novo produto');
                 $this->syslog->debug('handleNaEstProduto - ' . implode(',', $campos));
                 $conn->insert('est_produto', $produto);
+                $produto['id'] = $conn->lastInsertId();
                 $this->syslog->info('handleNaEstProduto - produto inserido (id: ' . $produto['id'] . ')');
                 return true;
             } else {
