@@ -88,7 +88,7 @@ class RelEstoque01Business
         foreach ($files as $file) {
             if (!in_array($file, array('.', '..')) && !is_dir($pastaFila . $file)) {
                 try {
-                    $this->processarArquivo($file);
+                    // $this->processarArquivo($file);
                     $this->corrigirEstoquesProdutosComposicao();
                     $this->marcarDtHrAtualizacao();
                     $this->syslog->info('Arquivo processado com sucesso.');
@@ -401,7 +401,12 @@ class RelEstoque01Business
         foreach ($rProdutosComposicao as $rProdutoComposicao) {
             /** @var Produto $produtoComposicao */
             $produtoComposicao = $repoProduto->find($rProdutoComposicao['id']);
-            $this->produtoEntityHandler->save($produtoComposicao);
+            try {
+                $this->produtoEntityHandler->save($produtoComposicao);
+            } catch (\Exception $e) {
+                $this->syslog->err('Erro ao salvar produtoComposicao', $e->getTraceAsString());
+                continue;
+            }
         }
     }
 
