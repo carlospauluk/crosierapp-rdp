@@ -88,7 +88,7 @@ class RelEstoque01Business
         foreach ($files as $file) {
             if (!in_array($file, array('.', '..')) && !is_dir($pastaFila . $file)) {
                 try {
-                    // $this->processarArquivo($file);
+                    $this->processarArquivo($file);
                     $this->corrigirEstoquesProdutosComposicao();
                     $this->marcarDtHrAtualizacao();
                     $this->syslog->info('Arquivo processado com sucesso.');
