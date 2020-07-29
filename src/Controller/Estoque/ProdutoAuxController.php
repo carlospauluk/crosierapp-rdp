@@ -131,6 +131,7 @@ class ProdutoAuxController extends FormListController
             $filterDatas = [
                 new FilterData(['id'], 'EQ', 'id', $params),
                 new FilterData(['erp_codigo'], 'LIKE', 'codigoFrom', $params, null, true),
+                new FilterData(['composicao'], 'EQ', 'composicao', $params),
                 new FilterData(['marca'], 'LIKE', 'marca', $params, null, true),
                 new FilterData(['nome'], 'LIKE', 'nome', $params),
                 new FilterData(['titulo'], 'LIKE', 'titulo', $params, null, true),
@@ -141,9 +142,7 @@ class ProdutoAuxController extends FormListController
                 new FilterData(['ecommerce_dt_integr'], 'BETWEEN_DATE_CONCAT', 'dtIntegrEcommerce', $params, 'date', true)
             ];
 
-
             $requestFilter = $request->get('filter');
-
 
             $filterTodos_montadora = null;
             if (($requestFilter['montadora'] ?? false) && ($requestFilter['montadora'] !== '%')) {

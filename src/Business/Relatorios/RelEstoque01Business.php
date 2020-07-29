@@ -10,6 +10,9 @@ use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
+use CrosierSource\CrosierLibRadxBundle\Entity\Estoque\Produto;
+use CrosierSource\CrosierLibRadxBundle\EntityHandler\Estoque\ProdutoEntityHandler;
+use CrosierSource\CrosierLibRadxBundle\Repository\Estoque\ProdutoRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,6 +29,8 @@ class RelEstoque01Business
 
     private AppConfigEntityHandler $appConfigEntityHandler;
 
+    private ProdutoEntityHandler $produtoEntityHandler;
+
     private SyslogBusiness $syslog;
 
     private array $deptoIndefinido;
@@ -35,15 +40,18 @@ class RelEstoque01Business
     /**
      * @param EntityManagerInterface $doctrine
      * @param AppConfigEntityHandler $appConfigEntityHandler
+     * @param ProdutoEntityHandler $produtoEntityHandler
      * @param SyslogBusiness $syslog
      */
     public function __construct(EntityManagerInterface $doctrine,
                                 AppConfigEntityHandler $appConfigEntityHandler,
+                                ProdutoEntityHandler $produtoEntityHandler,
                                 SyslogBusiness $syslog)
     {
         $this->doctrine = $doctrine;
         $this->appConfigEntityHandler = $appConfigEntityHandler;
         $this->syslog = $syslog->setApp('rdp')->setComponent(self::class);
+        $this->produtoEntityHandler = $produtoEntityHandler;
         $this->prepararCampos();
     }
 
@@ -81,12 +89,15 @@ class RelEstoque01Business
             if (!in_array($file, array('.', '..'))) {
                 try {
                     $this->processarArquivo($file);
+                    $this->corrigirEstoquesProdutosComposicao();
                     $this->marcarDtHrAtualizacao();
                     $this->syslog->info('Arquivo processado com sucesso.');
                     rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELESTOQUE01'] . 'ok/' . $file);
                     $this->syslog->info('Arquivo movido para pasta "ok".');
                 } catch (\Exception $e) {
                     rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELESTOQUE01'] . 'falha/' . $file);
+                    $this->syslog->err('Erro processarArquivosNaFila()');
+                    $this->syslog->err($e->getTraceAsString());
                     $this->syslog->info('Arquivo movido para pasta "falha".');
                 }
             }
@@ -369,6 +380,26 @@ class RelEstoque01Business
             $this->syslog->err('Erro ao handleNaEstProduto');
             $this->syslog->err($e->getTraceAsString());
             throw new \RuntimeException('Erro ao handleNaEstProduto');
+        }
+    }
+
+    /**
+     *
+     * @throws ViewException
+     */
+    public function corrigirEstoquesProdutosComposicao()
+    {
+        $conn = $this->appConfigEntityHandler->getDoctrine()->getConnection();
+        $rProdutosComposicao = $conn->fetchAll('SELECT id FROM est_produto WHERE composicao = \'S\'');
+        $this->syslog->info('Corrigindo estoques para ' . count($rProdutosComposicao) . ' produto(s) em composição');
+
+        /** @var ProdutoRepository $repoProduto */
+        $repoProduto = $this->appConfigEntityHandler->getDoctrine()->getRepository(Produto::class);
+
+        foreach ($rProdutosComposicao as $rProdutoComposicao) {
+            /** @var Produto $produtoComposicao */
+            $produtoComposicao = $repoProduto->find($rProdutoComposicao['id']);
+            $this->produtoEntityHandler->save($produtoComposicao);
         }
     }
 

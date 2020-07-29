@@ -17,7 +17,8 @@
                 <div class="d-sm-flex flex-nowrap ml-auto">
 
 
-                    <a role="button" class="btn btn-primary ml-1" title="Novo" href="{{ getEnv('CROSIERAPPRADX_URL') }}/est/produto/form">
+                    <a role="button" class="btn btn-primary ml-1" title="Novo"
+                       href="{{ getEnv('CROSIERAPPRADX_URL') }}/est/produto/form">
                         <i class="fas fa-file" aria-hidden="true"></i>
                     </a>
 
@@ -86,12 +87,28 @@
                         </div>
                     </div>
 
-                    <div class="col-md-5 col-sm-12">
+                    <div class="col-md-3 col-sm-12">
                         <div class="form-group">
                             <label for="filter_marca">Marca</label>
                             <input type="text" id="filter_marca" name="filter[marca]"
                                    class="form-control"
                                    value="{{ filter['marca']|default('') }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 col-sm-12">
+                        <div class="form-group">
+                            <label for="filter_composicao" class="required">Composição</label>
+                            <select id="filter_composicao" name="filter[composicao]"
+                                    class="form-control autoSelect2">
+                                <option value="null" {{ filter.composicao is not defined }}>...</option>
+                                <option value="S" {{ filter.composicao|default(null) == 'S' ? 'selected' : '' }}>
+                                    Sim
+                                </option>
+                                <option value="N" {{ filter.composicao|default(null) == 'N' ? 'selected' : '' }}>
+                                    Não
+                                </option>
+                            </select>
                         </div>
                     </div>
 
@@ -251,7 +268,12 @@
                         <tr>
                             <td>{{ e.id|strpad(9) }}</td>
                             <td>
-                                <div class="float-left">{{ e.jsonData.titulo|default(false) ? e.jsonData.titulo : e.nome }}</div>
+                                <div class="float-left">
+                                    {{ e.jsonData.titulo|default(false) ? e.jsonData.titulo : e.nome }}
+                                    {% if e.composicao == 'S' %}
+                                        <br/><span class="badge badge-pill badge-info">Composição</span>
+                                    {% endif %}
+                                </div>
                                 {% if e.jsonData.imagem1|default(false) %}
                                     <div class="float-right">
                                         <img src="{{ getEnv('CROSIERAPPRADX_URL') }}/images/produtos/{{ e.depto.id }}/{{ e.grupo.id }}/{{ e.subgrupo.id }}/{{ e.jsonData.imagem1 }}"
@@ -270,7 +292,13 @@
                             </td>
 
                             <td class="text-center">{{ e.jsonData.qtde_imagens|default('') }}</td>
-                            <td class="text-center">{{ e.jsonData.qtde_estoque_total|default('') }}</td>
+                            <td class="text-center">
+                                {% if e.composicao %}
+
+                                {% else %}
+                                    {{ e.jsonData.qtde_estoque_total|default('') }}
+                                {% endif %}
+                            </td>
                             <td class="text-center">{{ e.jsonData.ecommerce_dt_integr|default(false) ? e.jsonData.ecommerce_dt_integr|date('d/m/Y H:i:s') : 'Não Integrado' }}</td>
 
                             <td class="text-right">
