@@ -211,7 +211,7 @@ class RelEstoque01Business
             $this->syslog->err('processarArquivo() - erro ');
             $this->syslog->info('Erro ao inserir a linha "' . $linha . '"');
             $this->syslog->err($e->getTraceAsString());
-            // throw new \RuntimeException($e->getMessage());
+            throw new \RuntimeException($e->getMessage());
         }
     }
 
@@ -379,7 +379,7 @@ class RelEstoque01Business
         } catch (\Throwable | DBALException $e) {
             $this->syslog->err('Erro ao handleNaEstProduto');
             $this->syslog->err($e->getTraceAsString());
-            throw new \RuntimeException('Erro ao handleNaEstProduto');
+            return false;
         }
     }
 
