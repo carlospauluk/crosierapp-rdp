@@ -291,7 +291,7 @@ class RelVendas01Business
 
             $vendaItem['produto_id'] = $produto['id'];
             $vendaItem['unidade_id'] = $produto['unidade_padrao_id'];
-            $vendaItem['devolucao'] = false;
+            $vendaItem['devolucao'] = 0;
             $vendaItem['ordem'] = $i + 1;
             $vendaItem['qtde'] = $item['QTDE'];
             $vendaItem['descricao'] = $produto['nome'] ?? '<<< PRODUTO SEM NOME >>>';
