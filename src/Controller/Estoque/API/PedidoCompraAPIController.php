@@ -94,7 +94,6 @@ class PedidoCompraAPIController extends AbstractController
                         $produto = $repoProduto->find($item->jsonData['produto_id']);
                     }
 
-
                     $r[] = $produto->nome ?? '';
                     $r[] = $produto->fornecedor->jsonData['codigo'] ?? '';
                     $r[] = $produto->fornecedor->nome ?? '';
