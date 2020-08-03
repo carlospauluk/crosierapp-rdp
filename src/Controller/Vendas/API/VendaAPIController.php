@@ -83,28 +83,34 @@ class VendaAPIController extends AbstractController
             /** @var Venda $venda */
             foreach ($vendas as $venda) {
                 $r = [];
-                $r[] = '<<Cabeçalho>>';
-                $r[] = $venda->getId();
-                $r[] = $venda->dtVenda->format('Y-m-d H:i:s');
-                $r[] = $venda->cliente->documento;
-                $r[] = $venda->cliente->nome;
-                $r[] = $venda->subtotal;
-                $r[] = $venda->desconto;
-                $r[] = $venda->valorTotal;
+                $r[] = '<venda>';
+                $r[] = '<id>' . $venda->getId() . '</id>';
+                $r[] = '<dtVenda>' . $venda->dtVenda->format('Y-m-d H:i:s') . '</dtVenda>';
+                $r[] = '<cliente_documento>' . $venda->cliente->documento . '</cliente_documento>';
+                $r[] = '<cliente_nome>' . $venda->cliente->nome . '</cliente_nome>';
+                $r[] = '<subtotal>' . $venda->subtotal . '</subtotal>';
+                $r[] = '<desconto>' . $venda->desconto . '</desconto>';
+                $r[] = '<valor_total>' . $venda->valorTotal . '</valor_total>';
 
+                $r[] = '<itens>';
                 /** @var VendaItem $item */
                 foreach ($venda->itens as $item) {
-                    $r[] = '<<Itens>>';
 
-                    $r[] = $item->produto->jsonData['erp_codigo'] ?? '';
-                    $r[] = $item->produto->nome ?? $item->descricao;
-                    $r[] = $item->produto->fornecedor->documento ?? '';
-                    $r[] = $item->produto->fornecedor->nome ?? '';
-                    $r[] = $item->qtde;
-                    $r[] = $item->precoVenda;
-                    $r[] = $item->desconto;
-                    $r[] = $item->total;
+                    $r[] = '  <item>';
+                    $r[] = '    <erp_codigo>' . ($item->produto->jsonData['erp_codigo'] ?? '') . '</erp_codigo>';
+                    $r[] = '    <produto_nome>' . ($item->produto->nome ?? $item->descricao) . '</produto_nome>';
+                    $r[] = '    <fornecedor_documento>' . ($item->produto->fornecedor->documento ?? '') . '</fornecedor_documento>';
+                    $r[] = '    <fornecedor_nome>' . ($item->produto->fornecedor->nome ?? '') . '</fornecedor_nome>';
+                    $r[] = '    <qtde>' . $item->qtde . '</qtde>';
+                    $r[] = '    <preco_venda>' . $item->precoVenda . '</preco_venda>';
+                    $r[] = '    <desconto>' . $item->desconto . '</desconto>';
+                    $r[] = '    <total>' . $item->total . '</total>';
+                    $r[] = '  </item>';
                 }
+                $r[] = '</itens>';
+
+                $r[] = '</venda>';
+                $r[] = '';
 
                 file_put_contents($_SERVER['PASTA_VENDAS'] . $venda->getId() . '.txt', implode(PHP_EOL, $r));
 
