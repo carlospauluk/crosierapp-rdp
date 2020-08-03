@@ -77,15 +77,14 @@ class VendaAPIController extends AbstractController
             $vendas = $repoVenda->findByFiltersSimpl([$filterData_canal, $filterData_data]);
         }
 
-        /** @var ProdutoRepository $repoProduto */
-        $repoProduto = $this->doctrine->getRepository(Produto::class);
-
-        $r = [];
+        $rs = [];
 
         if ($vendas) {
             /** @var Venda $venda */
             foreach ($vendas as $venda) {
+                $r = [];
                 $r[] = '<<Cabeçalho>>';
+                $r[] = $venda->getId();
                 $r[] = $venda->dtVenda->format('Y-m-d H:i:s');
                 $r[] = $venda->cliente->documento;
                 $r[] = $venda->cliente->nome;
@@ -106,8 +105,12 @@ class VendaAPIController extends AbstractController
                     $r[] = $item->desconto;
                     $r[] = $item->total;
                 }
+
+                file_put_contents($_SERVER['PASTA_VENDAS'] . $venda->getId() . '.txt', implode(PHP_EOL, $r));
+
+                $rs = array_merge($rs, $r);
             }
-            return new Response(implode(PHP_EOL, $r));
+            return new Response(implode(PHP_EOL, $rs));
         }
 
         return new Response('Nenhum resultado');

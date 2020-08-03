@@ -36,6 +36,7 @@ yarn-error.log
 /files/curl*HOM.php
 /files/curl*PROD.php
 /files/pedidoscompra/*
+/files/vendas_ecommerce/*
 /files/relatorios/*
 /files/curl_uploadRel_HOM.php
 /files/curl_uploadRel_PROD.php
