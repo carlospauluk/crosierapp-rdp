@@ -290,7 +290,7 @@ class RelVendas01Business
             }
 
             $vendaItem['produto_id'] = $produto['id'];
-            $vendaItem['unidade_id'] = $produto['unidade_padrao_id'];
+            $vendaItem['unidade_id'] = $produto['unidade_padrao_id'] ?? 1;
             $vendaItem['devolucao'] = 0;
             $vendaItem['ordem'] = $i + 1;
             $vendaItem['qtde'] = $item['QTDE'];
