@@ -139,8 +139,13 @@ class ProdutoBusiness
                 ]
             )->getValor(), true);
 
+            $rUnidades = $conn->fetchAll('SELECT id, label FROM est_unidade');
+            $unidades = [];
+            foreach ($rUnidades as $rUnidade) {
+                $unidades[$rUnidade['id']] = $rUnidade['label'];
+            }
 
-            /** @var Produto $produto */
+
             foreach ($produtos as $produto) {
                 $qtdeProdutos++;
                 $atributosProduto = [];
@@ -164,7 +169,7 @@ class ProdutoBusiness
 
                 $r[] = DateTimeUtils::parseDateStr($produto['updated'])->format('d/m/Y H:i:s');
                 $r[] = $produto['id'];
-                $r[] = $atributosProduto['unidade'];
+                $r[] = $unidades[$produto['unidade_padrao_id']];
                 $r[] = bcmul((float)$atributosProduto['porcent_preench'], 100, 2);
                 $r[] = $produto['nome'];
                 $r[] = $atributosProduto['titulo'];
