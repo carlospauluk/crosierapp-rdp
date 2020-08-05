@@ -9,11 +9,9 @@ use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
-use CrosierSource\CrosierLibRadxBundle\Entity\Estoque\Produto;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
-use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Psr\Cache\InvalidArgumentException;
@@ -225,7 +223,7 @@ class ProdutoBusiness
             }
 
             return $dados;
-        } catch (Exception | DBALException $e) {
+        } catch (\Throwable $e) {
             $this->logger->error('Erro ao gerar arquivo xlsx');
             $this->logger->error($e->getMessage());
             throw new ViewException('Erro ao gerar arquivo xlsx');

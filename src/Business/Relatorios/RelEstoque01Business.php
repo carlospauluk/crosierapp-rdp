@@ -325,8 +325,14 @@ class RelEstoque01Business
             $json_data['qtde_estoque_telemaco'] = $campos['qtde_estoque_telemaco'] ?? null;
             $json_data['dt_ult_saida_telemaco'] = $campos['dt_ult_saida_telemaco'] ?? null;
 
+            $json_data['qtde_estoque_deposito'] = $campos['qtde_estoque_deposito'] ?? null;
+            $json_data['dt_ult_saida_deposito'] = $campos['dt_ult_saida_deposito'] ?? null;
 
-            $json_data['qtde_estoque_total'] = $json_data['qtde_estoque_matriz'];
+
+            $json_data['qtde_estoque_total'] =
+                ((float)($json_data['qtde_estoque_matriz'] ?? 0)) +
+                ((float)($json_data['qtde_estoque_deposito'] ?? 0)) +
+                ((float)($json_data['qtde_estoque_acessorios'] ?? 0));
 
 
             // $json_data['ean'] = $campos['EAN'];
