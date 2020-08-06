@@ -319,14 +319,14 @@ class RelEstoque01Business
             $json_data['deficit_estoque_acessorios'] = isset($campos['deficit_estoque_acessorios']) ? (float)$campos['deficit_estoque_acessorios'] : null;
             $json_data['dt_ult_saida_acessorios'] = $campos['dt_ult_saida_acessorios'] ?? null;
 
-            $json_data['qtde_estoque_delpozo'] = $campos['qtde_estoque_delpozo'] ?? null;
-            $json_data['dt_ult_saida_delpozo'] = $campos['dt_ult_saida_delpozo'] ?? null;
+            $json_data['qtde_estoque_delpozo'] = $campos['qtde_estoque_delpozo-pg'] ?? null;
+            $json_data['dt_ult_saida_delpozo'] = $campos['dt_ult_saida_delpozo-pg'] ?? null;
 
             $json_data['qtde_estoque_telemaco'] = $campos['qtde_estoque_telemaco'] ?? null;
             $json_data['dt_ult_saida_telemaco'] = $campos['dt_ult_saida_telemaco'] ?? null;
 
-            $json_data['qtde_estoque_deposito'] = $campos['qtde_estoque_deposito'] ?? null;
-            $json_data['dt_ult_saida_deposito'] = $campos['dt_ult_saida_deposito'] ?? null;
+            $json_data['qtde_estoque_deposito'] = $campos['qtde_estoque_deposito-mtz'] ?? null;
+            $json_data['dt_ult_saida_deposito'] = $campos['dt_ult_saida_deposito-mtz'] ?? null;
 
 
             $json_data['qtde_estoque_total'] =
