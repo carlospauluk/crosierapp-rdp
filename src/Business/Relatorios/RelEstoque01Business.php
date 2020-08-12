@@ -33,6 +33,8 @@ class RelEstoque01Business
 
     private SyslogBusiness $syslog;
 
+    private static int $QTDE_CAMPOS = 30;
+
     private array $deptoIndefinido;
     private array $grupoIndefinido;
     private array $subgrupoIndefinido;
@@ -131,8 +133,8 @@ class RelEstoque01Business
                 $linha = $linha[-1] === '|' ? substr($linha, 0, -1) : $linha;
 
                 $campos = explode('|', $linha);
-                if (count($campos) !== 29) {
-                    $this->syslog->err('Qtde de campos difere de 29 para a linha "' . $linha . '" (qtde: ' . count($campos) . ')');
+                if (count($campos) !== self::$QTDE_CAMPOS) {
+                    $this->syslog->err('Qtde de campos difere de ' . self::$QTDE_CAMPOS . ' para a linha "' . $linha . '" (qtde: ' . count($campos) . ')');
                     continue;
                 }
 
@@ -148,35 +150,36 @@ class RelEstoque01Business
                 $codigo = $campos[0];
                 $filial = $campos[4];
 
-                $camposAgrupados[$codigo] = $camposAgrupados[$codigo] ??
-                    [
-                        'codigoProduto' => $codigo,
-                        'nome' => mb_convert_encoding($campos[1], 'ISO-8859-1', 'UTF-8'),
-                        'custoMedio' => $campos[2],
-                        'precoVenda' => $campos[3],
-                        'filial' => $filial,
-                        'qtdeMaxima' => $campos[6],
-                        'codigoFornecedor' => $campos[9],
-                        'nomeFornecedor' => mb_convert_encoding($campos[10], 'ISO-8859-1', 'UTF-8'),
-                        'recnum' => $campos[11],
-                        'codedi' => mb_convert_encoding($campos[12], 'ISO-8859-1', 'UTF-8'),
-                        'EAN' => $campos[13],
-                        'GENERO' => $campos[14],
-                        'CFOP_DENTRO' => $campos[15],
-                        'CFOP_FORA' => $campos[16],
-                        'UNIDADE' => $campos[17],
-                        'EAN_TRIB' => $campos[18],
-                        'ORIGEM' => $campos[19],
-                        'CST_ICMS' => $campos[20],
-                        'MODALIDADE_ICMS' => $campos[21],
-                        'ALIQUOTA_ICMS' => $campos[22],
-                        'CEST' => $campos[23],
-                        'CUSTO_MEDIO_ERP' => $campos[24],
-                        'PRECO_MEDIO_ERP' => $campos[25],
-                        'MARGEM_LIQUIDA_ERP' => $campos[26],
-                        'PIS' => $campos[27],
-                        'COFINS' => $campos[28],
-                    ];
+
+                $camposAgrupados[$codigo]['codigoProduto'] = $codigo;
+                $camposAgrupados[$codigo]['nome'] = mb_convert_encoding($campos[1], 'ISO-8859-1', 'UTF-8');
+                $camposAgrupados[$codigo]['custoMedio'] = $campos[2];
+                $camposAgrupados[$codigo]['precoVenda'] = $campos[3];
+                $camposAgrupados[$codigo]['filial'] = $filial;
+                $camposAgrupados[$codigo]['qtdeMaxima'] = $campos[6];
+                $camposAgrupados[$codigo]['codigoFornecedor'] = $campos[9];
+                $camposAgrupados[$codigo]['nomeFornecedor'] = mb_convert_encoding($campos[10], 'ISO-8859-1', 'UTF-8');
+                $camposAgrupados[$codigo]['recnum'] = $campos[11];
+                $camposAgrupados[$codigo]['codedi'] = mb_convert_encoding($campos[12], 'ISO-8859-1', 'UTF-8');
+
+                // $camposAgrupados[$codigo]['EAN'] = $campos[13];
+                $camposAgrupados[$codigo]['GENERO'] = $campos[14];
+                $camposAgrupados[$codigo]['CFOP_DENTRO'] = $campos[15];
+                $camposAgrupados[$codigo]['CFOP_FORA'] = $campos[16];
+                $camposAgrupados[$codigo]['UNIDADE'] = $campos[17];
+                $camposAgrupados[$codigo]['EAN_TRIB'] = $campos[18];
+                $camposAgrupados[$codigo]['ORIGEM'] = $campos[19];
+                $camposAgrupados[$codigo]['CST_ICMS'] = $campos[20];
+                $camposAgrupados[$codigo]['MODALIDADE_ICMS'] = $campos[21];
+                $camposAgrupados[$codigo]['ALIQUOTA_ICMS'] = $campos[22];
+                $camposAgrupados[$codigo]['CEST'] = $campos[23];
+                $camposAgrupados[$codigo]['CUSTO_MEDIO_ERP'] = $campos[24];
+                $camposAgrupados[$codigo]['PRECO_MEDIO_ERP'] = $campos[25];
+                $camposAgrupados[$codigo]['MARGEM_LIQUIDA_ERP'] = $campos[26];
+                $camposAgrupados[$codigo]['PIS'] = $campos[27];
+                $camposAgrupados[$codigo]['COFINS'] = $campos[28];
+                $camposAgrupados[$codigo]['NCM'] = $campos[29];
+
 
                 $camposAgrupados[$codigo]['qtde_estoque_min_' . strtolower($filial)] = $campos[5];
                 $camposAgrupados[$codigo]['qtde_estoque_' . strtolower($filial)] = $campos[7];
@@ -391,10 +394,7 @@ class RelEstoque01Business
         }
     }
 
-    /**
-     *
-     * @throws ViewException
-     */
+
     public function corrigirEstoquesProdutosComposicao()
     {
         $conn = $this->appConfigEntityHandler->getDoctrine()->getConnection();
