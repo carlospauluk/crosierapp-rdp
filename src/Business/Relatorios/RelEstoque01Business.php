@@ -354,6 +354,7 @@ class RelEstoque01Business
             $json_data['margem_liquida_erp'] = $campos['MARGEM_LIQUIDA_ERP'] ?? null;
             $json_data['pis'] = $campos['PIS'] ?? null;
             $json_data['cofins'] = $campos['COFINS'] ?? null;
+            $json_data['ncm'] = $campos['NCM'] ?? null;
 
 
             ksort($json_data);
