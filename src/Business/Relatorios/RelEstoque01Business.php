@@ -54,7 +54,6 @@ class RelEstoque01Business
         $this->appConfigEntityHandler = $appConfigEntityHandler;
         $this->syslog = $syslog->setApp('rdp')->setComponent(self::class);
         $this->produtoEntityHandler = $produtoEntityHandler;
-        $this->prepararCampos();
     }
 
     /**
@@ -62,14 +61,16 @@ class RelEstoque01Business
      */
     public function prepararCampos()
     {
-        try {
-            /** @var Connection $conn */
-            $conn = $this->doctrine->getConnection();
-            $this->deptoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_depto WHERE codigo = \'00\'');
-            $this->grupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_grupo WHERE codigo = \'00\' AND depto_id = :deptoId', ['deptoId' => $this->deptoIndefinido['id']]);
-            $this->subgrupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_subgrupo WHERE codigo = \'00\' AND grupo_id = :grupoId', ['grupoId' => $this->grupoIndefinido['id']]);
-        } catch (DBALException $e) {
-            throw new \RuntimeException('Erro ao prepararCampos()');
+        if (!$this->deptoIndefinido) {
+            try {
+                /** @var Connection $conn */
+                $conn = $this->doctrine->getConnection();
+                $this->deptoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_depto WHERE codigo = \'00\'');
+                $this->grupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_grupo WHERE codigo = \'00\' AND depto_id = :deptoId', ['deptoId' => $this->deptoIndefinido['id']]);
+                $this->subgrupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_subgrupo WHERE codigo = \'00\' AND grupo_id = :grupoId', ['grupoId' => $this->grupoIndefinido['id']]);
+            } catch (DBALException $e) {
+                throw new \RuntimeException('Erro ao prepararCampos()');
+            }
         }
     }
 
@@ -111,7 +112,7 @@ class RelEstoque01Business
      * @param string $arquivo
      * @return int
      */
-    public function processarArquivo(string $arquivo): int
+    private function processarArquivo(string $arquivo): int
     {
         $this->syslog->info('Iniciando processamento do arquivo ' . $arquivo);
         $pastaFila = $_SERVER['PASTA_UPLOAD_RELESTOQUE01'] . 'fila/';
@@ -227,6 +228,7 @@ class RelEstoque01Business
     public function handleNaEstProduto(array $campos, ?array $produto = null): bool
     {
         try {
+            $this->prepararCampos();
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
 
