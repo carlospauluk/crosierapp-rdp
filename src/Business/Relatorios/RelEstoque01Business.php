@@ -35,9 +35,9 @@ class RelEstoque01Business
 
     private static int $QTDE_CAMPOS = 30;
 
-    private array $deptoIndefinido;
-    private array $grupoIndefinido;
-    private array $subgrupoIndefinido;
+    private ?array $deptoIndefinido = null;
+    private ?array $grupoIndefinido = null;
+    private ?array $subgrupoIndefinido = null;
 
     /**
      * @param EntityManagerInterface $doctrine
