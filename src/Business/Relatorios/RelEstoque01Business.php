@@ -33,7 +33,7 @@ class RelEstoque01Business
 
     private SyslogBusiness $syslog;
 
-    private static int $QTDE_CAMPOS = 30;
+    private static int $QTDE_CAMPOS = 31;
 
     private ?array $deptoIndefinido = null;
     private ?array $grupoIndefinido = null;
@@ -180,6 +180,7 @@ class RelEstoque01Business
                 $camposAgrupados[$codigo]['PIS'] = $campos[27];
                 $camposAgrupados[$codigo]['COFINS'] = $campos[28];
                 $camposAgrupados[$codigo]['NCM'] = $campos[29];
+                $camposAgrupados[$codigo]['IPI'] = $campos[30];
 
 
                 $camposAgrupados[$codigo]['qtde_estoque_min_' . strtolower($filial)] = $campos[5];
@@ -357,6 +358,7 @@ class RelEstoque01Business
             $json_data['pis'] = $campos['PIS'] ?? null;
             $json_data['cofins'] = $campos['COFINS'] ?? null;
             $json_data['ncm'] = $campos['NCM'] ?? null;
+            $json_data['ipi'] = $campos['IPI'] ?? null;
 
 
             ksort($json_data);
