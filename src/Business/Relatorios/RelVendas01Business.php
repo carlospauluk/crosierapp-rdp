@@ -235,7 +235,7 @@ class RelVendas01Business
         $venda['dt_venda'] = $cabecalho['EMISSAO'];
 
         $venda['vendedor_id'] = 1; // 'NÃO IDENTIFICADO'
-        $venda['status'] = 'PV Finalizado';
+        $venda['status'] = 'PV FINALIZADO';
         $venda['subtotal'] = $cabecalho['TOTAL_VENDA_PV'];
         $venda['desconto'] = 0.0;
         $venda['valor_total'] = $cabecalho['TOTAL_VENDA_PV'];
