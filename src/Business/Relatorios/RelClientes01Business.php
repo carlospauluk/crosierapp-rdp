@@ -60,7 +60,8 @@ class RelClientes01Business
                     $this->processarArquivo($file);
                     $this->marcarDtHrAtualizacao();
                     $this->logger->info('Arquivo processado com sucesso.');
-                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCLIENTES01'] . 'ok/' . $file);
+                    @unlink( $_SERVER['PASTA_UPLOAD_RELCLIENTES01'] . 'ok/ultimo.gra');
+                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCLIENTES01'] . 'ok/ultimo.gra');
                     $this->logger->info('Arquivo movido para pasta "ok".');
                 } catch (\Exception $e) {
                     rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCLIENTES01'] . 'falha/' . $file);

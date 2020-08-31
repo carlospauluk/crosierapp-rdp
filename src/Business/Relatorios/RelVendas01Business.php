@@ -68,7 +68,8 @@ class RelVendas01Business
                     $this->processarArquivo($file);
                     $this->marcarDtHrAtualizacao();
                     $this->logger->info('Arquivo de vendas processado com sucesso.');
-                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELVENDAS01'] . 'ok/' . $file);
+                    @unlink($_SERVER['PASTA_UPLOAD_RELVENDAS01'] . 'ok/ultimo.gra');
+                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELVENDAS01'] . 'ok/ultimo.gra');
                     $this->logger->info('Arquivo movido para pasta "ok".');
                 } catch (\Exception $e) {
                     rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELVENDAS01'] . 'falha/' . $file);
@@ -295,7 +296,7 @@ class RelVendas01Business
             $vendaItem['ordem'] = $i + 1;
             $vendaItem['qtde'] = $item['QTDE'];
             $vendaItem['descricao'] = $produto['nome'] ?? '<<< PRODUTO SEM NOME >>>';
-            $vendaItem['preco_venda'] = bcdiv($item['TOTAL_PRECO_VENDA'], ($item['QTDE'] > 0) ? $item['QTDE'] :  1, 2);
+            $vendaItem['preco_venda'] = bcdiv($item['TOTAL_PRECO_VENDA'], ($item['QTDE'] > 0) ? $item['QTDE'] : 1, 2);
             $vendaItem['subtotal'] = bcmul($vendaItem['qtde'], $vendaItem['preco_venda'], 2);
             $vendaItem['desconto'] = 0.0;
             $vendaItem['total'] = $vendaItem['subtotal'];

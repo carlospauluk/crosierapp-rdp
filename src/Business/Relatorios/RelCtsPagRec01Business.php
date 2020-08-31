@@ -11,8 +11,8 @@ use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ConnectionException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  *
@@ -59,7 +59,8 @@ class RelCtsPagRec01Business
                     $this->processarArquivo($file);
                     $this->marcarDtHrAtualizacao();
                     $this->logger->info('Arquivo processado com sucesso.');
-                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCTSPAGREC01'] . 'ok/' . $file);
+                    @unlink($_SERVER['PASTA_UPLOAD_RELCTSPAGREC01'] . 'ok/ultimo.gra');
+                    rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCTSPAGREC01'] . 'ok/ultimo.gra');
                     $this->logger->info('Arquivo movido para pasta "ok".');
                     $q++;
                 } catch (\Exception $e) {
@@ -113,7 +114,6 @@ class RelCtsPagRec01Business
                 for ($c = 0; $c < $cMax; $c++) {
                     $campos[$c] = $campos[$c] !== '' ? "'" . trim(str_replace("'", "''", $campos[$c])) . "'" : 'null';
                 }
-
 
 
                 $sql = sprintf(
