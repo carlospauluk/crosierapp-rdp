@@ -230,6 +230,7 @@ class RelEstoque01Business
     {
         try {
             $this->prepararCampos();
+            $agora = (new \DateTime())->format('Y-m-d H:i:s');
             /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
 
@@ -258,8 +259,8 @@ class RelEstoque01Business
                     $dadosFornecedor = [];
                     $dadosFornecedor['nome'] = $campos['nomeFornecedor'];
                     $dadosFornecedor['documento'] = $campos['cpfcnpjFornecedor'] ?? null;
-                    $dadosFornecedor['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
-                    $dadosFornecedor['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+                    $dadosFornecedor['inserted'] = $agora;
+                    $dadosFornecedor['updated'] = $agora;
                     $dadosFornecedor['version'] = 0;
                     $dadosFornecedor['estabelecimento_id'] = 1;
                     $dadosFornecedor['user_inserted_id'] = 1;
@@ -281,7 +282,7 @@ class RelEstoque01Business
                 $produto['status'] = 'INATIVO';
                 $produto['composicao'] = 'N';
                 $produto['unidade_padrao_id'] = 1;
-                $produto['inserted'] = (new \DateTime())->format('Y-m-d H:i:s');
+                $produto['inserted'] = $agora;
 
                 $produto['version'] = 0;
                 $produto['estabelecimento_id'] = 1;
@@ -369,17 +370,35 @@ class RelEstoque01Business
                 $produto['json_data'] = null;
             }
 
-            $produto['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+            $produto['updated'] = $agora;
+
+            $produtoSaldo = [
+                'qtde' => $json_data['qtde_estoque_matriz'],
+                'updated' => $agora,
+                'user_updated_id' => 1,
+                'json_data' => json_encode(['venda_ecommerce' => true]) // necessário para habilitar o faturamento para a venda
+            ];
 
             if (!$updating) {
                 $this->syslog->info('handleNaEstProduto - inserindo novo produto');
                 $this->syslog->debug('handleNaEstProduto - ' . implode(',', $campos));
                 $conn->insert('est_produto', $produto);
                 $produto['id'] = $conn->lastInsertId();
+
+                $produtoSaldo['produto_id'] = $produto['id'];
+                $produtoSaldo['inserted'] = $agora;
+                $produtoSaldo['user_inserted_id'] = $agora;
+                $produtoSaldo['estabelecimento_id'] = 1;
+                $produtoSaldo['version'] = 0;
+
+                $conn->insert('est_produto_saldo', $produtoSaldo);
+
                 $this->syslog->info('handleNaEstProduto - produto inserido (id: ' . $produto['id'] . ')');
                 return true;
             } else {
                 $id = $produto['id'];
+                $produtoSaldo['produto_id'] = $id;
+                $conn->update('est_produto_saldo', $produtoSaldo, ['produto_id' => $id]);
                 if (strcmp($produto['json_data'], json_encode($json_data_ORIG)) !== 0) {
                     $this->syslog->info('handleNaEstProduto - produto com alterações no json_data. UPDATE...');
                     $this->syslog->debug('handleNaEstProduto - ' . implode(',', $campos));
