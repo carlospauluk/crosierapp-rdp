@@ -375,8 +375,12 @@ class RelEstoque01Business
 
             $produtoSaldo = [
                 'qtde' => $json_data['qtde_estoque_matriz'],
+                'inserted' => $agora,
                 'updated' => $agora,
+                'user_inserted_id' => 1,
                 'user_updated_id' => 1,
+                'estabelecimento_id' => 1,
+                'version' => 0,
                 'json_data' => json_encode(['venda_ecommerce' => true]) // necessário para habilitar o faturamento para a venda
             ];
 
@@ -386,20 +390,17 @@ class RelEstoque01Business
                 $conn->insert('est_produto', $produto);
                 $produto['id'] = $conn->lastInsertId();
 
-                $produtoSaldo['produto_id'] = $produto['id'];
-                $produtoSaldo['inserted'] = $agora;
-                $produtoSaldo['user_inserted_id'] = $agora;
-                $produtoSaldo['estabelecimento_id'] = 1;
-                $produtoSaldo['version'] = 0;
-
                 $conn->insert('est_produto_saldo', $produtoSaldo);
 
                 $this->syslog->info('handleNaEstProduto - produto inserido (id: ' . $produto['id'] . ')');
                 return true;
             } else {
                 $id = $produto['id'];
+
                 $produtoSaldo['produto_id'] = $id;
-                $conn->update('est_produto_saldo', $produtoSaldo, ['produto_id' => $id]);
+                $conn->delete('est_produto_saldo', ['produto_id' => $id]);
+                $conn->insert('est_produto_saldo', $produtoSaldo);
+                
                 if (strcmp($produto['json_data'], json_encode($json_data_ORIG)) !== 0) {
                     $this->syslog->info('handleNaEstProduto - produto com alterações no json_data. UPDATE...');
                     $this->syslog->debug('handleNaEstProduto - ' . implode(',', $campos));
