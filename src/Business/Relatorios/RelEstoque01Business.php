@@ -390,6 +390,7 @@ class RelEstoque01Business
                 $conn->insert('est_produto', $produto);
                 $produto['id'] = $conn->lastInsertId();
 
+                $conn->delete('est_produto_saldo', ['produto_id' => $produto['id']]);
                 $conn->insert('est_produto_saldo', $produtoSaldo);
 
                 $this->syslog->info('handleNaEstProduto - produto inserido (id: ' . $produto['id'] . ')');
@@ -400,7 +401,7 @@ class RelEstoque01Business
                 $produtoSaldo['produto_id'] = $id;
                 $conn->delete('est_produto_saldo', ['produto_id' => $id]);
                 $conn->insert('est_produto_saldo', $produtoSaldo);
-                
+
                 if (strcmp($produto['json_data'], json_encode($json_data_ORIG)) !== 0) {
                     $this->syslog->info('handleNaEstProduto - produto com alterações no json_data. UPDATE...');
                     $this->syslog->debug('handleNaEstProduto - ' . implode(',', $campos));
