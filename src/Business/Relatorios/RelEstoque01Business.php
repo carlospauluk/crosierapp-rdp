@@ -13,8 +13,7 @@ use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
 use CrosierSource\CrosierLibRadxBundle\Entity\Estoque\Produto;
 use CrosierSource\CrosierLibRadxBundle\EntityHandler\Estoque\ProdutoEntityHandler;
 use CrosierSource\CrosierLibRadxBundle\Repository\Estoque\ProdutoRepository;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -32,6 +31,8 @@ class RelEstoque01Business
     private ProdutoEntityHandler $produtoEntityHandler;
 
     private SyslogBusiness $syslog;
+
+    private array $produtosIds_reintegrarNaWebStorm = [];
 
     private static int $QTDE_CAMPOS = 31;
 
@@ -63,12 +64,11 @@ class RelEstoque01Business
     {
         if (!$this->deptoIndefinido) {
             try {
-                /** @var Connection $conn */
                 $conn = $this->doctrine->getConnection();
-                $this->deptoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_depto WHERE codigo = \'00\'');
-                $this->grupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_grupo WHERE codigo = \'00\' AND depto_id = :deptoId', ['deptoId' => $this->deptoIndefinido['id']]);
-                $this->subgrupoIndefinido = $conn->fetchAssoc('SELECT id, nome FROM est_subgrupo WHERE codigo = \'00\' AND grupo_id = :grupoId', ['grupoId' => $this->grupoIndefinido['id']]);
-            } catch (DBALException $e) {
+                $this->deptoIndefinido = $conn->fetchAssociative('SELECT id, nome FROM est_depto WHERE codigo = \'00\'');
+                $this->grupoIndefinido = $conn->fetchAssociative('SELECT id, nome FROM est_grupo WHERE codigo = \'00\' AND depto_id = :deptoId', ['deptoId' => $this->deptoIndefinido['id']]);
+                $this->subgrupoIndefinido = $conn->fetchAssociative('SELECT id, nome FROM est_subgrupo WHERE codigo = \'00\' AND grupo_id = :grupoId', ['grupoId' => $this->grupoIndefinido['id']]);
+            } catch (\Exception $e) {
                 throw new \RuntimeException('Erro ao prepararCampos()');
             }
         }
@@ -191,10 +191,9 @@ class RelEstoque01Business
 
             }
 
-            /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
 
-            $rProdutos = $conn->fetchAll('SELECT * FROM est_produto WHERE composicao = \'N\'');
+            $rProdutos = $conn->fetchAllAssociative('SELECT * FROM est_produto WHERE composicao = \'N\'');
             $produtos = [];
             foreach ($rProdutos as $rProduto) {
                 $rProdutoJsonData = json_decode($rProduto['json_data'], true);
@@ -232,7 +231,6 @@ class RelEstoque01Business
         try {
             $this->prepararCampos();
             $agora = (new \DateTime())->format('Y-m-d H:i:s');
-            /** @var Connection $conn */
             $conn = $this->doctrine->getConnection();
 
             $updating = true;
@@ -254,7 +252,7 @@ class RelEstoque01Business
                 $json_data['subgrupo_nome'] = 'INDEFINIDO';
                 $json_data['erp_codigo'] = $campos['codigoProduto'];
 
-                $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE json_data->>"$.codigo" = ?', [$campos['codigoFornecedor']]);
+                $fornecedor = $conn->fetchAssociative('SELECT * FROM est_fornecedor WHERE json_data->>"$.codigo" = ?', [$campos['codigoFornecedor']]);
                 if (!$fornecedor) {
                     unset($dadosFornecedor, $fornecedor);
                     $dadosFornecedor = [];
@@ -272,7 +270,7 @@ class RelEstoque01Business
 
                     $conn->insert('est_fornecedor', $dadosFornecedor);
                     $fornecedorId = $conn->lastInsertId();
-                    $fornecedor = $conn->fetchAssoc('SELECT * FROM est_fornecedor WHERE id = ?', [$fornecedorId]);
+                    $fornecedor = $conn->fetchAssociative('SELECT * FROM est_fornecedor WHERE id = ?', [$fornecedorId]);
                 }
 
                 $produto['fornecedor_id'] = $fornecedor['id'];
@@ -387,6 +385,7 @@ class RelEstoque01Business
             if (!$updating) {
                 $this->syslog->info('handleNaEstProduto - inserindo novo produto');
                 $this->syslog->debug('handleNaEstProduto - ' . implode(',', $campos));
+
                 $conn->insert('est_produto', $produto);
                 $produto['id'] = $conn->lastInsertId();
 
@@ -404,9 +403,9 @@ class RelEstoque01Business
 
                 if (strcmp($produto['json_data'], json_encode($json_data_ORIG)) !== 0) {
                     $this->syslog->info('handleNaEstProduto - produto com alterações no json_data. UPDATE...');
-                    $this->syslog->debug('handleNaEstProduto - ' . implode(',', $campos));
-                    // somente o campo json_data está sendo atualizado
+                    // para não sobreescrever outras alterações que possam ter sido feitas no Crosier, somente o campo json_data está sendo atualizado
                     $conn->update('est_produto', ['json_data' => $produto['json_data'], 'updated' => $produto['updated']], ['id' => $id]);
+
                     $this->syslog->info('handleNaEstProduto - UPDATE OK (id: ' . $produto['id'] . ')');
                     return true;
                 } else {
@@ -414,32 +413,38 @@ class RelEstoque01Business
                     return false;
                 }
             }
-        } catch (\Throwable | DBALException $e) {
+        } catch (\Throwable $e) {
             $this->syslog->err('Erro ao handleNaEstProduto');
             $this->syslog->err($e->getTraceAsString());
             return false;
         }
     }
 
-
+    /**
+     * @throws ViewException
+     */
     public function corrigirEstoquesProdutosComposicao()
     {
-        $conn = $this->appConfigEntityHandler->getDoctrine()->getConnection();
-        $rProdutosComposicao = $conn->fetchAll('SELECT id FROM est_produto WHERE composicao = \'S\'');
-        $this->syslog->info('Corrigindo estoques para ' . count($rProdutosComposicao) . ' produto(s) em composição');
-
-        /** @var ProdutoRepository $repoProduto */
-        $repoProduto = $this->appConfigEntityHandler->getDoctrine()->getRepository(Produto::class);
-
-        foreach ($rProdutosComposicao as $rProdutoComposicao) {
-            /** @var Produto $produtoComposicao */
-            $produtoComposicao = $repoProduto->find($rProdutoComposicao['id']);
-            try {
-                $this->produtoEntityHandler->save($produtoComposicao);
-            } catch (\Exception $e) {
-                $this->syslog->err('Erro ao salvar produtoComposicao', $e->getTraceAsString());
-                continue;
+        try {
+            $conn = $this->appConfigEntityHandler->getDoctrine()->getConnection();
+            $rProdutosComposicao = $conn->fetchAllAssociative('SELECT id FROM est_produto WHERE composicao = \'S\'');
+            $this->syslog->info('Corrigindo estoques para ' . count($rProdutosComposicao) . ' produto(s) em composição');
+            /** @var ProdutoRepository $repoProduto */
+            $repoProduto = $this->appConfigEntityHandler->getDoctrine()->getRepository(Produto::class);
+            foreach ($rProdutosComposicao as $rProdutoComposicao) {
+                /** @var Produto $produtoComposicao */
+                $produtoComposicao = $repoProduto->find($rProdutoComposicao['id']);
+                try {
+                    $this->produtoEntityHandler->save($produtoComposicao);
+                } catch (\Exception $e) {
+                    $this->syslog->err('Erro ao salvar produtoComposicao', $e->getTraceAsString());
+                    continue;
+                }
             }
+        } catch (Exception $e) {
+            $errMsg = 'Erro ao corrigirEstoquesProdutosComposicao()';
+            $this->syslog->err($errMsg, $e->getTraceAsString());
+            throw new ViewException('Erro ao corrigirEstoquesProdutosComposicao()');
         }
     }
 
