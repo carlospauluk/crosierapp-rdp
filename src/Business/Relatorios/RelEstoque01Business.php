@@ -10,6 +10,7 @@ use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
+use CrosierSource\CrosierLibRadxBundle\Business\ECommerce\IntegradorWebStorm;
 use CrosierSource\CrosierLibRadxBundle\Entity\Estoque\Produto;
 use CrosierSource\CrosierLibRadxBundle\EntityHandler\Estoque\ProdutoEntityHandler;
 use CrosierSource\CrosierLibRadxBundle\Repository\Estoque\ProdutoRepository;
@@ -32,6 +33,9 @@ class RelEstoque01Business
 
     private SyslogBusiness $syslog;
 
+    private IntegradorWebStorm $integradorWebStorm;
+
+    // marca quais produtos foram alterados e envia para o integrador de estoques/preços da webstorm
     private array $produtosIds_reintegrarNaWebStorm = [];
 
     private static int $QTDE_CAMPOS = 31;
@@ -45,16 +49,19 @@ class RelEstoque01Business
      * @param AppConfigEntityHandler $appConfigEntityHandler
      * @param ProdutoEntityHandler $produtoEntityHandler
      * @param SyslogBusiness $syslog
+     * @param IntegradorWebStorm $integradorWebStorm
      */
     public function __construct(EntityManagerInterface $doctrine,
                                 AppConfigEntityHandler $appConfigEntityHandler,
                                 ProdutoEntityHandler $produtoEntityHandler,
-                                SyslogBusiness $syslog)
+                                SyslogBusiness $syslog,
+                                IntegradorWebStorm $integradorWebStorm)
     {
         $this->doctrine = $doctrine;
         $this->appConfigEntityHandler = $appConfigEntityHandler;
         $this->syslog = $syslog->setApp('rdp')->setComponent(self::class);
         $this->produtoEntityHandler = $produtoEntityHandler;
+        $this->integradorWebStorm = $integradorWebStorm;
     }
 
     /**
@@ -209,6 +216,12 @@ class RelEstoque01Business
                     $naoAlterados++;
                 }
             }
+
+            if (count($this->produtosIds_reintegrarNaWebStorm) > 0) {
+                $this->syslog->info('Enviando produtos alterados para integração na webstorm', implode(',', $this->produtosIds_reintegrarNaWebStorm));
+                $this->integradorWebStorm->atualizaEstoqueEPrecos($this->produtosIds_reintegrarNaWebStorm);
+            }
+
             $this->syslog->info('Total de mudanças: ' . $mudancas);
             $this->syslog->info('Total não alterados: ' . $naoAlterados);
             return $mudancas;
@@ -406,6 +419,7 @@ class RelEstoque01Business
                     // para não sobreescrever outras alterações que possam ter sido feitas no Crosier, somente o campo json_data está sendo atualizado
                     $conn->update('est_produto', ['json_data' => $produto['json_data'], 'updated' => $produto['updated']], ['id' => $id]);
 
+                    $this->produtosIds_reintegrarNaWebStorm[] = $id;
                     $this->syslog->info('handleNaEstProduto - UPDATE OK (id: ' . $produto['id'] . ')');
                     return true;
                 } else {
