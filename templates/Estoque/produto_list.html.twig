@@ -256,6 +256,8 @@
                         <th scope="col">% Preench</th>
                         <th scope="col">Qtde Imagens</th>
                         <th scope="col">Estoque Total</th>
+                        <th scope="col">Margem L</th>
+                        <th scope="col">P Venda</th>
                         <th scope="col">Dt Integr <br/>E-commerce</th>
                         <th scope="col"></th>
                     </tr>
@@ -296,6 +298,12 @@
                             <td class="text-center">{{ e.jsonData.qtde_imagens|default('') }}</td>
                             <td class="text-center">
                                 {{ e.jsonData.qtde_estoque_total|default('') }}
+                            </td>
+                            <td class="text-right">
+                                {{ e.jsonData.margem_liquida_erp|default(0)|number_format(2,',','.') }}%
+                            </td>
+                            <td class="text-right">
+                                R$ {{ e.jsonData.preco_tabela|default(0)|number_format(2,',','.') }}
                             </td>
                             <td class="text-center">{{ e.jsonData.ecommerce_dt_integr|default(false) ? e.jsonData.ecommerce_dt_integr|date('d/m/Y H:i:s') : 'Não Integrado' }}</td>
 
