@@ -18,9 +18,7 @@ use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- *
- *
- * @package App\Business\Relatorios
+ * @author Carlos Eduardo Pauluk
  */
 class RelEstoque01Business
 {
@@ -385,7 +383,7 @@ class RelEstoque01Business
             $produto['updated'] = $agora;
 
             $produtoSaldo = [
-                'qtde' => $json_data['qtde_estoque_matriz'],
+                'qtde' => $json_data['qtde_estoque_matriz'] ?? 0,
                 'inserted' => $agora,
                 'updated' => $agora,
                 'user_inserted_id' => 1,
@@ -403,6 +401,7 @@ class RelEstoque01Business
                 $produto['id'] = $conn->lastInsertId();
 
                 $conn->delete('est_produto_saldo', ['produto_id' => $produto['id']]);
+                $produtoSaldo['produto_id'] = $produto['id'];
                 $conn->insert('est_produto_saldo', $produtoSaldo);
 
                 $this->syslog->info('handleNaEstProduto - produto inserido (id: ' . $produto['id'] . ')');

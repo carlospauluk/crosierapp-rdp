@@ -10,8 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Class PedidoCompraBusiness
- * @package App\Business\Estoque
+ * @author Carlos Eduardo Pauluk
  */
 class PedidoCompraBusiness
 {
@@ -46,9 +45,9 @@ class PedidoCompraBusiness
     {
         $sql = 'SELECT SUM(json_data->>"$.qtde_minima" - json_data->>"$.qtde_estoque_acessorios") as deficit FROM est_produto WHERE qtde_minima > 0 AND json_data->>"$.qtde_estoque_acessorios" < json_data->>"$.qtde_minima" ORDER BY deficit DESC';
 
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
-        $results = $conn->fetchAll($sql);
+        $results = $conn->fetchAllAssociative($sql);
 
         $filiais = ['MATRIZ', 'ACESSORIOS'];
 
@@ -93,7 +92,7 @@ class PedidoCompraBusiness
             $sql .= ' AND p.json_data->>"$.deficit_estoque_' . strtolower($filial) . '" ' . $compar . ' 0';
         }
         $sql .= ' ORDER BY p.json_data->>"$.deficit_estoque" LIMIT 0,500';
-        $rProdutos = $this->doctrine->getConnection()->fetchAll($sql, $params);
+        $rProdutos = $this->doctrine->getConnection()->fetchAllAssociative($sql, $params);
         $produtos = [];
         foreach ($rProdutos as $r) {
             $r['jsonData'] = json_decode($r['json_data'], true);
@@ -133,7 +132,7 @@ class PedidoCompraBusiness
         $sql .= ' ORDER BY total DESC';
 
 
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
 
         $params = [
@@ -142,7 +141,7 @@ class PedidoCompraBusiness
             'nomeFornec' => $nomeFornec
         ];
 
-        return $conn->fetchAll($sql, $params);
+        return $conn->fetchAllAssociative($sql, $params);
 
     }
 
@@ -163,7 +162,7 @@ class PedidoCompraBusiness
                     FROM rdp_rel_compfor01
                      WHERE cod_prod = :codProd AND dt_movto BETWEEN :dtIni AND :dtFim ORDER BY dt_movto';
 
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
 
         $params = [
@@ -172,7 +171,7 @@ class PedidoCompraBusiness
             'codProd' => $codProd
         ];
 
-        return $conn->fetchAll($sql, $params);
+        return $conn->fetchAllAssociative($sql, $params);
     }
 
 }

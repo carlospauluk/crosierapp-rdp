@@ -417,14 +417,14 @@ class VendaAuxController extends BaseController
      */
     public function listPreVendaItens(int $pv): Response
     {
-        /** @var Connection $conn */
+
         $conn = $this->getDoctrine()->getConnection();
 
-        $venda = $conn->fetchAssoc('SELECT * FROM ven_venda WHERE json_data->>"$.prevenda_ekt" = :pv', ['pv' => $pv]);
+        $venda = $conn->fetchAssociative('SELECT * FROM ven_venda WHERE json_data->>"$.prevenda_ekt" = :pv', ['pv' => $pv]);
 
         $venda['json_data'] = json_decode($venda['json_data'], true);
 
-        $itens = $conn->fetchAll('SELECT * FROM ven_venda_item WHERE venda_id = :venda_id', ['venda_id' => $venda['id']]);
+        $itens = $conn->fetchAllAssociative('SELECT * FROM ven_venda_item WHERE venda_id = :venda_id', ['venda_id' => $venda['id']]);
 
         foreach ($itens as $item) {
             $item['json_data'] = json_decode($item['json_data'], true);

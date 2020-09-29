@@ -9,14 +9,11 @@ use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibRadxBundle\Entity\CRM\Cliente;
-use CrosierSource\CrosierLibRadxBundle\EntityHandler\CRM\ClienteEntityHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- *
- *
- * @package App\Business\Relatorios
+ * @author Carlos Eduardo Pauluk
  */
 class RelClientes01Business
 {
@@ -36,12 +33,10 @@ class RelClientes01Business
      */
     public function __construct(EntityManagerInterface $doctrine,
                                 LoggerInterface $logger,
-                                AppConfigEntityHandler $appConfigEntityHandler,
-                                ClienteEntityHandler $clienteEntityHandler)
+                                AppConfigEntityHandler $appConfigEntityHandler)
     {
         $this->doctrine = $doctrine;
         $this->appConfigEntityHandler = $appConfigEntityHandler;
-        $this->clienteEntityHandler = $clienteEntityHandler;
         $this->logger = $logger;
     }
 
@@ -60,7 +55,7 @@ class RelClientes01Business
                     $this->processarArquivo($file);
                     $this->marcarDtHrAtualizacao();
                     $this->logger->info('Arquivo processado com sucesso.');
-                    @unlink( $_SERVER['PASTA_UPLOAD_RELCLIENTES01'] . 'ok/ultimo.gra');
+                    @unlink($_SERVER['PASTA_UPLOAD_RELCLIENTES01'] . 'ok/ultimo.gra');
                     rename($pastaFila . $file, $_SERVER['PASTA_UPLOAD_RELCLIENTES01'] . 'ok/ultimo.gra');
                     $this->logger->info('Arquivo movido para pasta "ok".');
                 } catch (\Exception $e) {
@@ -410,16 +405,21 @@ class RelClientes01Business
 
     /**
      * Retorna todos os clientes na crm_cliente indexados pelo CODIGO EKT
+     * @throws ViewException
      */
     private function findAllCrmCliente()
     {
-        $todos = $this->doctrine->getConnection()->fetchAll('SELECT * FROM crm_cliente');
-        $this->todosNaCrmCliente = [];
-        foreach ($todos as $r) {
-            $jsonData = json_decode($r['json_data'], true);
-            if (isset($jsonData['codigo'])) {
-                $this->todosNaCrmCliente[$jsonData['codigo']] = $r;
+        try {
+            $todos = $this->doctrine->getConnection()->fetchAllAssociative('SELECT * FROM crm_cliente');
+            $this->todosNaCrmCliente = [];
+            foreach ($todos as $r) {
+                $jsonData = json_decode($r['json_data'], true);
+                if (isset($jsonData['codigo'])) {
+                    $this->todosNaCrmCliente[$jsonData['codigo']] = $r;
+                }
             }
+        } catch (\Throwable $e) {
+            throw new ViewException('Erro ao findAllCrmCliente()');
         }
     }
 

@@ -15,9 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- *
- *
- * @package App\Business\Relatorios
+ * @author Carlos Eduardo Pauluk
  */
 class RelCtsPagRec01Business
 {
@@ -83,7 +81,7 @@ class RelCtsPagRec01Business
         $conteudo = file_get_contents($pastaFila . $arquivo);
         $linhas = explode(PHP_EOL, $conteudo);
         $totalRegistros = count($linhas);
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
 
         $conn->beginTransaction();

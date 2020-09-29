@@ -122,10 +122,10 @@ class ImagensCatalogoController extends BaseController
 
             /** @var ProdutoRepository $repoProduto */
             $repoProduto = $this->getDoctrine()->getRepository(Produto::class);
-            /** @var Connection $conn */
+
             $conn = $this->getDoctrine()->getConnection();
             $limit = (int)($request->get('limit') ?? 500);
-            $todos = $conn->fetchAll('SELECT id, json_data->>"$.recnum" as recnum FROM est_produto WHERE json_data->>"$.recnum" IS NOT NULL AND id NOT IN (' . implode(',', $ids) . ') ORDER BY id LIMIT ' . $limit);
+            $todos = $conn->fetchAllAssociative('SELECT id, json_data->>"$.recnum" as recnum FROM est_produto WHERE json_data->>"$.recnum" IS NOT NULL AND id NOT IN (' . implode(',', $ids) . ') ORDER BY id LIMIT ' . $limit);
             $client = new Client();
             $this->getLogger()->error('SOH ATIVANDO O LOG');
             foreach ($todos as $r) {

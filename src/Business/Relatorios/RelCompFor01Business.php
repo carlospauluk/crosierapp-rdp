@@ -8,16 +8,12 @@ use CrosierSource\CrosierLibBaseBundle\EntityHandler\Config\AppConfigEntityHandl
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ConnectionException;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- *
- *
- * @package App\Business\Relatorios
+ * @author Carlos Eduardo Pauluk
  */
 class RelCompFor01Business
 {
@@ -78,7 +74,7 @@ class RelCompFor01Business
         $conteudo = file_get_contents($pastaFila . $arquivo);
         $linhas = explode(PHP_EOL, $conteudo);
         $totalRegistros = count($linhas);
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
 
         $conn->beginTransaction();
@@ -136,9 +132,9 @@ class RelCompFor01Business
                 );
 
                 try {
-                    $t += $conn->executeUpdate($sql);
+                    $t += $conn->executeStatement($sql);
                     $this->logger->info($t . ' inseridos');
-                } catch (UniqueConstraintViolationException $e) {
+                } catch (\Throwable $e) {
                     $this->logger->info('Registro já existente para a linha "' . $linha . '"');
                     $this->logger->info('Continuando.');
                 }

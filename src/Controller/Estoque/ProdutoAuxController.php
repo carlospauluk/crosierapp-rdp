@@ -241,29 +241,29 @@ class ProdutoAuxController extends FormListController
     {
         $hoje = (new \DateTime())->format('d/m/Y');
 
-        $deptos = $conn->fetchAll('SELECT distinct(json_data->>"$.depto_nome") as deptoNome FROM est_produto ORDER BY json_data->>"$.depto_nome"');
+        $deptos = $conn->fetchAllAssociative('SELECT distinct(json_data->>"$.depto_nome") as deptoNome FROM est_produto ORDER BY json_data->>"$.depto_nome"');
 
         foreach ($deptos as $depto) {
-            $qtde = $conn->fetchAssoc('SELECT count(*) as qtde FROM est_produto WHERE json_data->>"$.depto_nome" = :depto_nome', ['depto_nome' => $depto['deptoNome']]);
+            $qtde = $conn->fetchAssociative('SELECT count(*) as qtde FROM est_produto WHERE json_data->>"$.depto_nome" = :depto_nome', ['depto_nome' => $depto['deptoNome']]);
             $params['deptos'][$depto['deptoNome']] = $qtde['qtde'];
         }
 
-        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 0 e 10%\' as msg, 0 as i, 10 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0 AND 0.10');
-        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 11 e 20%\' as msg, 11 as i, 20 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.11 AND 0.20');
-        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 21 e 30%\' as msg, 21 as i, 30 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.21 AND 0.30');
-        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 31 e 40%\' as msg, 31 as i, 40 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.31 AND 0.40');
-        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 41 e 50%\' as msg, 41 as i, 50 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.41 AND 0.50');
-        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 51 e 60%\' as msg, 51 as i, 60 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.51 AND 0.60');
-        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 61 e 70%\' as msg, 61 as i, 70 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.61 AND 0.70');
-        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 71 e 80%\' as msg, 71 as i, 80 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.71 AND 0.80');
-        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 81 e 90%\' as msg, 81 as i, 90 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.81 AND 0.90');
-        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'Entre 91 e 99%\' as msg, 91 as i, 99 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.91 AND 0.99');
-        $params['porcentPreench'][] = $conn->fetchAssoc('SELECT \'100%\' as msg, 100 as i, 100 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" = 1');
+        $params['porcentPreench'][] = $conn->fetchAssociative('SELECT \'Entre 0 e 10%\' as msg, 0 as i, 10 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0 AND 0.10');
+        $params['porcentPreench'][] = $conn->fetchAssociative('SELECT \'Entre 11 e 20%\' as msg, 11 as i, 20 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.11 AND 0.20');
+        $params['porcentPreench'][] = $conn->fetchAssociative('SELECT \'Entre 21 e 30%\' as msg, 21 as i, 30 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.21 AND 0.30');
+        $params['porcentPreench'][] = $conn->fetchAssociative('SELECT \'Entre 31 e 40%\' as msg, 31 as i, 40 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.31 AND 0.40');
+        $params['porcentPreench'][] = $conn->fetchAssociative('SELECT \'Entre 41 e 50%\' as msg, 41 as i, 50 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.41 AND 0.50');
+        $params['porcentPreench'][] = $conn->fetchAssociative('SELECT \'Entre 51 e 60%\' as msg, 51 as i, 60 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.51 AND 0.60');
+        $params['porcentPreench'][] = $conn->fetchAssociative('SELECT \'Entre 61 e 70%\' as msg, 61 as i, 70 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.61 AND 0.70');
+        $params['porcentPreench'][] = $conn->fetchAssociative('SELECT \'Entre 71 e 80%\' as msg, 71 as i, 80 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.71 AND 0.80');
+        $params['porcentPreench'][] = $conn->fetchAssociative('SELECT \'Entre 81 e 90%\' as msg, 81 as i, 90 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.81 AND 0.90');
+        $params['porcentPreench'][] = $conn->fetchAssociative('SELECT \'Entre 91 e 99%\' as msg, 91 as i, 99 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" BETWEEN 0.91 AND 0.99');
+        $params['porcentPreench'][] = $conn->fetchAssociative('SELECT \'100%\' as msg, 100 as i, 100 as f, count(*) as qtde FROM est_produto WHERE ifnull(json_data->>"$.porcent_preench",\'null\') != \'null\' AND json_data->>"$.porcent_preench" = 1');
 
-        $qtdeProdutosComTitulo = $conn->fetchAssoc('SELECT count(*) as qtde FROM est_produto WHERE json_data->>"$.titulo" != \'null\' AND trim(json_data->>"$.titulo") != \'\'');
+        $qtdeProdutosComTitulo = $conn->fetchAssociative('SELECT count(*) as qtde FROM est_produto WHERE json_data->>"$.titulo" != \'null\' AND trim(json_data->>"$.titulo") != \'\'');
         $params['qtdeProdutosComTitulo'] = $qtdeProdutosComTitulo['qtde'];
 
-        $qtdeProdutosComTituloESemFoto = $conn->fetchAssoc('SELECT count(*) as qtde FROM est_produto WHERE json_data->>"$.titulo" != \'null\' AND trim(json_data->>"$.titulo") != \'\' AND IFNULL(json_data->>"$.qtde_imagens", 0) = 0');
+        $qtdeProdutosComTituloESemFoto = $conn->fetchAssociative('SELECT count(*) as qtde FROM est_produto WHERE json_data->>"$.titulo" != \'null\' AND trim(json_data->>"$.titulo") != \'\' AND IFNULL(json_data->>"$.qtde_imagens", 0) = 0');
         $params['qtdeProdutosComTituloESemFoto'] = $qtdeProdutosComTituloESemFoto['qtde'];
 
         $params['hoje'] = $hoje;

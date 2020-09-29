@@ -13,9 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- *
- *
- * @package App\Business\Relatorios
+ * @author Carlos Eduardo Pauluk
  */
 class RelCompras01Business
 {
@@ -81,7 +79,7 @@ class RelCompras01Business
         $conteudo = file_get_contents($pastaFila . $arquivo);
         $linhas = explode(PHP_EOL, $conteudo);
         $totalRegistros = count($linhas);
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
 
         $t = 0;
@@ -134,7 +132,7 @@ class RelCompras01Business
                 $this->logger->info('camposAgrupados: ' . str_pad($i, 9, '0', STR_PAD_LEFT) . '/' . $totalRegistros);
             }
 
-            $rPedidosCompra = $conn->fetchAll(
+            $rPedidosCompra = $conn->fetchAllAssociative(
                 'select p.id, p.fornecedor_id, p.total, p.json_data, count(*) as qtde_itens from est_pedidocompra p left join est_pedidocompra_item i on p.id = i.pedidocompra_id group by p.id');
             $pedidosCompra = [];
             foreach ($rPedidosCompra as $rPedidoCompra) {
@@ -183,14 +181,14 @@ class RelCompras01Business
      */
     private function handlePedidoCompra(array $dadosEkt): void
     {
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
 
         $cabecalho = $dadosEkt[0];
 
         $pedidoCompra = [];
 
-        $fornecedor = $conn->fetchAssoc('SELECT id FROM est_fornecedor WHERE documento = ?', [$cabecalho['CNPJ_FORNEC']]);
+        $fornecedor = $conn->fetchAssociative('SELECT id FROM est_fornecedor WHERE documento = ?', [$cabecalho['CNPJ_FORNEC']]);
         if (!$fornecedor) {
             $dadosFornecedor = [];
             $dadosFornecedor['documento'] = $cabecalho['CNPJ_FORNEC'];
@@ -292,9 +290,9 @@ class RelCompras01Business
      */
     private function buildProdutosArray()
     {
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
-        $rProdutos = $conn->fetchAll('SELECT *, json_data->>"$.erp_codigo" as erp_codigo FROM est_produto');
+        $rProdutos = $conn->fetchAllAssociative('SELECT *, json_data->>"$.erp_codigo" as erp_codigo FROM est_produto');
 
         $this->produtos = [];
         foreach ($rProdutos as $rProduto) {

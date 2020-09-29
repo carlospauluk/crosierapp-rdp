@@ -9,15 +9,11 @@ use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibRadxBundle\EntityHandler\Vendas\VendaEntityHandler;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- *
- *
- * @package App\Business\Relatorios
+ * @author Carlos Eduardo Pauluk
  */
 class RelVendas01Business
 {
@@ -89,7 +85,7 @@ class RelVendas01Business
         $conteudo = file_get_contents($pastaFila . $arquivo);
         $linhas = explode(PHP_EOL, $conteudo);
         $totalRegistros = count($linhas) - 2;
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
 
         $t = 0;
@@ -156,7 +152,7 @@ class RelVendas01Business
                 $this->logger->info('camposAgrupados: ' . str_pad($i, 9, '0', STR_PAD_LEFT) . '/' . $totalRegistros);
             }
 
-            $rVenVendas = $conn->fetchAll('select v.id, v.cliente_id, v.valor_total, v.json_data, count(*) as qtde_itens from ven_venda v left join ven_venda_item i on v.id = i.venda_id group by v.id');
+            $rVenVendas = $conn->fetchAllAssociative('select v.id, v.cliente_id, v.valor_total, v.json_data, count(*) as qtde_itens from ven_venda v left join ven_venda_item i on v.id = i.venda_id group by v.id');
             $venVendas = [];
             foreach ($rVenVendas as $rVenVenda) {
                 $jsonData = json_decode($rVenVenda['json_data'], true);
@@ -199,18 +195,17 @@ class RelVendas01Business
 
     /**
      * @param array $dadosVendaEkt
-     * @throws \Doctrine\DBAL\DBALException
      */
     private function handleVenda(array $dadosVendaEkt): void
     {
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
 
         $cabecalho = $dadosVendaEkt[0];
 
         $venda = [];
 
-        $cliente = $conn->fetchAssoc('SELECT id FROM crm_cliente WHERE documento = ?', [$cabecalho['CNPJCLI']]);
+        $cliente = $conn->fetchAssociative('SELECT id FROM crm_cliente WHERE documento = ?', [$cabecalho['CNPJCLI']]);
         if (!$cliente) {
 
             try {
@@ -226,7 +221,7 @@ class RelVendas01Business
                 $dadosCliente['user_updated_id'] = 1;
                 $conn->insert('crm_cliente', $dadosCliente);
                 $cliente['id'] = $conn->lastInsertId();
-            } catch (DBALException $e) {
+            } catch (\Throwable $e) {
                 $this->logger->error('Erro ao salvar o cliente');
             }
         }
@@ -338,16 +333,20 @@ class RelVendas01Business
 
     /**
      * Constrói o array/cachê dos produtos
+     * @throws ViewException
      */
     private function buildProdutosArray()
     {
-        /** @var Connection $conn */
-        $conn = $this->doctrine->getConnection();
-        $rProdutos = $conn->fetchAll('SELECT *, json_data->>"$.erp_codigo" as erp_codigo FROM est_produto');
 
-        $this->produtos = [];
-        foreach ($rProdutos as $rProduto) {
-            $this->produtos[$rProduto['erp_codigo']] = $rProduto;
+        try {
+            $conn = $this->doctrine->getConnection();
+            $rProdutos = $conn->fetchAllAssociative('SELECT *, json_data->>"$.erp_codigo" as erp_codigo FROM est_produto');
+            $this->produtos = [];
+            foreach ($rProdutos as $rProduto) {
+                $this->produtos[$rProduto['erp_codigo']] = $rProduto;
+            }
+        } catch (\Throwable $e) {
+            throw new ViewException('Erro ao buildProdutosArray()');
         }
     }
 

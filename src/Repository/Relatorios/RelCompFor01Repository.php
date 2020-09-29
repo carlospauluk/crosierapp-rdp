@@ -38,7 +38,7 @@ class RelCompFor01Repository
 
         $sql = 'SELECT * FROM (SELECT nome_fornec, sum(total) as total_compras FROM rdp_rel_compfor01 WHERE dt_movto BETWEEN :dtIni and :dtFim GROUP BY nome_fornec) a WHERE total_compras > 0  ORDER BY total_compras';
 
-        return $this->conn->fetchAll($sql, [
+        return $this->conn->fetchAllAssociative($sql, [
             'dtIni' => $dtIni->format('Y-m-d'),
             'dtFim' => $dtFim->format('Y-m-d'),
         ]);
@@ -75,7 +75,7 @@ class RelCompFor01Repository
 
         $sql .= ' ORDER BY total DESC';
 
-        return $this->conn->fetchAll($sql, [
+        return $this->conn->fetchAllAssociative($sql, [
             'dtIni' => $dtIni->format('Y-m-d'),
             'dtFim' => $dtFim->format('Y-m-d'),
             'nomeFornec' => $nomeFornec,
@@ -100,7 +100,7 @@ class RelCompFor01Repository
                     FROM rdp_rel_compfor01
                      WHERE cod_prod = :codProd AND dt_movto BETWEEN :dtIni AND :dtFim ORDER BY dt_movto';
 
-        return $this->conn->fetchAll($sql, [
+        return $this->conn->fetchAllAssociative($sql, [
             'dtIni' => $dtIni->format('Y-m-d'),
             'dtFim' => $dtFim->format('Y-m-d'),
             'codProd' => $codProd,
@@ -118,7 +118,7 @@ class RelCompFor01Repository
     {
         $sql = 'SELECT desc_prod FROM rdp_rel_compfor01 WHERE cod_prod = :codigo GROUP BY cod_prod, desc_prod';
 
-        return $this->conn->fetchAssoc($sql, [
+        return $this->conn->fetchAssociative($sql, [
             'codigo' => $codigo,
         ])['desc_prod'];
     }

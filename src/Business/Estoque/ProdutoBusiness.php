@@ -9,7 +9,6 @@ use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -22,8 +21,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 /**
  * Controller auxiliar ao ProdutoController
  *
- *
- * @package App\Controller\Estoque
+ * @author Carlos Eduardo Pauluk
  */
 class ProdutoBusiness
 {
@@ -61,12 +59,12 @@ class ProdutoBusiness
     private function gerarDadosParaArquivo(bool $apenasProdutosComTitulo): array
     {
         try {
-            /** @var Connection $conn */
+
             $conn = $this->doctrine->getConnection();
 
             $sqlTitulo = $apenasProdutosComTitulo ? 'AND IFNULL(p.json_data->>"$.titulo",\'null\') != \'null\'' : '';
 
-            $produtos = $conn->fetchAll('SELECT p.* FROM est_produto p WHERE true ' . $sqlTitulo . ' ORDER BY id');
+            $produtos = $conn->fetchAllAssociative('SELECT p.* FROM est_produto p WHERE true ' . $sqlTitulo . ' ORDER BY id');
 
             $titulos[] = 'Atualizado';
             $titulos[] = 'Código';
@@ -137,7 +135,7 @@ class ProdutoBusiness
                 ]
             )->getValor(), true);
 
-            $rUnidades = $conn->fetchAll('SELECT id, label FROM est_unidade');
+            $rUnidades = $conn->fetchAllAssociative('SELECT id, label FROM est_unidade');
             $unidades = [];
             foreach ($rUnidades as $rUnidade) {
                 $unidades[$rUnidade['id']] = $rUnidade['label'];
@@ -324,14 +322,14 @@ class ProdutoBusiness
                         SUM(json_data->>"$.qtde_estoque_matriz" * json_data->>"$.preco_custo") as total_custo_medio ' .
                 'FROM est_produto';
             $conn = $this->doctrine->getConnection();
-            $totalMatriz = $conn->fetchAssoc($sql);
+            $totalMatriz = $conn->fetchAssociative($sql);
             $sql = 'SELECT 
                         SUM(json_data->>"$.qtde_estoque_acessorios") as total_qtde_atual, 
                         SUM(json_data->>"$.qtde_estoque_acessorios" * json_data->>"$.preco_tabela") as total_venda, 
                         SUM(json_data->>"$.qtde_estoque_acessorios" * json_data->>"$.preco_custo") as total_custo_medio ' .
                 'FROM est_produto';
             $conn = $this->doctrine->getConnection();
-            $totalAcessorios = $conn->fetchAssoc($sql);
+            $totalAcessorios = $conn->fetchAssociative($sql);
             $r = [
                 [
                     'desc_filial' => 'MATRIZ',
@@ -357,7 +355,7 @@ class ProdutoBusiness
     {
         $conn = $this->doctrine->getConnection();
         $sql = 'SELECT * FROM est_produto WHERE json_data->>"$.erp_codigo" = :codigo';
-        return $conn->fetchAssoc($sql, ['codigo' => $codigo]);
+        return $conn->fetchAssociative($sql, ['codigo' => $codigo]);
     }
 
 
@@ -377,7 +375,7 @@ class ProdutoBusiness
             'where montadora is not null and montadora != \'\' and montadora != \'NULL\' order by montadora';
 
         $conn = $this->doctrine->getConnection();
-        $rDistinctMontadora = $conn->fetchAll($sql);
+        $rDistinctMontadora = $conn->fetchAllAssociative($sql);
 
         $montadoras = [];
         foreach ($rDistinctMontadora as $rdMontadoras) {
@@ -491,7 +489,7 @@ class ProdutoBusiness
                 ) a where ano is not null and ano != \'\' order by ano COLLATE utf8mb4_swedish_ci';
 
                 $conn = $this->doctrine->getConnection();
-                $rAnos = $conn->fetchAll($sql_anos, ['montadora' => '%' . $montadora . '%']);
+                $rAnos = $conn->fetchAllAssociative($sql_anos, ['montadora' => '%' . $montadora . '%']);
 
                 return $rAnos;
             });
@@ -523,7 +521,7 @@ class ProdutoBusiness
 
 
                 $conn = $this->doctrine->getConnection();
-                $rModelos = $conn->fetchAll($sql_modelos, ['montadora' => '%' . $montadora . '%', 'ano' => '%' . $ano . '%']);
+                $rModelos = $conn->fetchAllAssociative($sql_modelos, ['montadora' => '%' . $montadora . '%', 'ano' => '%' . $ano . '%']);
 
                 return $rModelos;
             });

@@ -6,7 +6,6 @@ namespace App\Repository\Vendas;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\FilterRepository;
 use CrosierSource\CrosierLibRadxBundle\Entity\Vendas\Venda;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\NonUniqueResultException;
 
@@ -52,10 +51,10 @@ class VendaRepository extends FilterRepository
     /**
      * @param $pv
      * @param $mesano
-     * @return array
+     * @return null|array
      * @throws \Exception
      */
-    public function findByPVAndMesAno($pv, $mesano): array
+    public function findByPVAndMesAno($pv, $mesano): ?array
     {
         $ql = "SELECT v FROM CrosierSource\CrosierLibRadxBundle\Entity\Vendas\Venda v WHERE v.mesano = :mesano AND v.pv = :pv";
         $query = $this->getEntityManager()->createQuery($ql);
@@ -119,7 +118,7 @@ class VendaRepository extends FilterRepository
         }
 
         $total = $this->totalVendasPor($dtIni, $dtFim, $lojas, $grupos);
-        $results = $this->getEntityManager()->getConnection()->fetchAll($sql, $params);
+        $results = $this->getEntityManager()->getConnection()->fetchAllAssociative($sql, $params);
 
         foreach ($results as $k => $r) {
             if ($total > 0) {
@@ -162,7 +161,7 @@ class VendaRepository extends FilterRepository
             if ($lojas) {
                 $params['lojas'] = $lojas;
             }
-            return $this->getEntityManager()->getConnection()->fetchAssoc($sqlTotal, $params)['total_venda'];
+            return $this->getEntityManager()->getConnection()->fetchAssociative($sqlTotal, $params)['total_venda'];
         } catch (DBALException | \Throwable $e) {
             throw new ViewException('Erro ao calcular total');
         }
@@ -225,9 +224,9 @@ class VendaRepository extends FilterRepository
         if ($lojas) {
             $params['lojas'] = $lojas;
         }
-        /** @var Connection $conn */
+
         $conn = $this->getEntityManager()->getConnection();
-        return $conn->fetchAll($sql, $params);
+        return $conn->fetchAllAssociative($sql, $params);
     }
 
     /**
@@ -284,9 +283,9 @@ class VendaRepository extends FilterRepository
         if ($lojas) {
             $params['lojas'] = $lojas;
         }
-        /** @var Connection $conn */
+
         $conn = $this->getEntityManager()->getConnection();
-        $dados = $conn->fetchAll($sql, $params);
+        $dados = $conn->fetchAllAssociative($sql, $params);
 
         $margemLiquidaGeral = ($this->totalMargemLiquida($dtIni, $dtFim, $lojas, $grupos)['margem_liquida'] ?? 0.0) * 100.0;
 
@@ -340,9 +339,9 @@ class VendaRepository extends FilterRepository
         if ($lojas) {
             $params['lojas'] = $lojas;
         }
-        /** @var Connection $conn */
+
         $conn = $this->getEntityManager()->getConnection();
-        return $conn->fetchAssoc($sql, $params);
+        return $conn->fetchAssociative($sql, $params);
     }
 
 
@@ -368,9 +367,9 @@ class VendaRepository extends FilterRepository
             'dtFim' => $dtFim->format('Y-m-d'),
         ];
 
-        /** @var Connection $conn */
+
         $conn = $this->getEntityManager()->getConnection();
-        $r = $conn->fetchAssoc($sql, $params);
+        $r = $conn->fetchAssociative($sql, $params);
 
         return $r['fornecedor_nome'] ?? null;
 
@@ -383,9 +382,9 @@ class VendaRepository extends FilterRepository
     public function getFornecedores(): array
     {
         $sql = 'SELECT fornecedor_nome FROM ven_venda_item GROUP BY fornecedor_codigo, fornecedor_nome ORDER BY fornecedor_nome';
-        /** @var Connection $conn */
+
         $conn = $this->getEntityManager()->getConnection();
-        $r = $conn->fetchAll($sql);
+        $r = $conn->fetchAllAssociative($sql);
         $arr = [];
         foreach ($r as $item) {
             $e['id'] = $item['fornecedor_nome'];
@@ -401,9 +400,9 @@ class VendaRepository extends FilterRepository
     public function getGrupos(): array
     {
         $sql = 'SELECT distinct(json_data->>"$.grupo") as grupo FROM ven_venda ORDER BY json_data->>"$.grupo"';
-        /** @var Connection $conn */
+
         $conn = $this->getEntityManager()->getConnection();
-        $r = $conn->fetchAll($sql);
+        $r = $conn->fetchAllAssociative($sql);
         $arr = [];
         foreach ($r as $item) {
             $e['id'] = $item['grupo'];
@@ -420,9 +419,9 @@ class VendaRepository extends FilterRepository
     public function getLojas(): array
     {
         $sql = 'SELECT distinct(json_data->>"$.loja") as loja FROM ven_venda ORDER BY json_data->>"$.loja"';
-        /** @var Connection $conn */
+
         $conn = $this->getEntityManager()->getConnection();
-        $r = $conn->fetchAll($sql);
+        $r = $conn->fetchAllAssociative($sql);
         $arr = [];
         foreach ($r as $item) {
             $e['id'] = $item['loja'];
@@ -440,9 +439,9 @@ class VendaRepository extends FilterRepository
     public function getVendedores(): array
     {
         $sql = 'SELECT CONCAT(vendedor_codigo, \' - \', vendedor_nome) as vendedor FROM ven_venda GROUP BY vendedor_codigo, vendedor_nome ORDER BY vendedor_nome';
-        /** @var Connection $conn */
+
         $conn = $this->getEntityManager()->getConnection();
-        $r = $conn->fetchAll($sql);
+        $r = $conn->fetchAllAssociative($sql);
         $arr = [];
         foreach ($r as $item) {
             $e['id'] = $item['vendedor'];
@@ -504,9 +503,9 @@ class VendaRepository extends FilterRepository
             $params['lojas'] = $lojas;
         }
 
-        /** @var Connection $conn */
+
         $conn = $this->getEntityManager()->getConnection();
-        return $conn->fetchAll($sql, $params);
+        return $conn->fetchAllAssociative($sql, $params);
     }
 
     /**
@@ -564,9 +563,9 @@ class VendaRepository extends FilterRepository
             $params['lojas'] = $lojas;
         }
 
-        /** @var Connection $conn */
+
         $conn = $this->getEntityManager()->getConnection();
-        return $conn->fetchAll($sql, $params);
+        return $conn->fetchAllAssociative($sql, $params);
     }
 
     /**
@@ -575,9 +574,9 @@ class VendaRepository extends FilterRepository
     public function findLojas()
     {
         $sql = 'select distinct(json_data->>"$.loja") as loja from ven_venda';
-        /** @var Connection $conn */
+
         $conn = $this->getEntityManager()->getConnection();
-        return $conn->fetchAll($sql);
+        return $conn->fetchAllAssociative($sql);
     }
 
     /**
@@ -586,9 +585,9 @@ class VendaRepository extends FilterRepository
     public function findGrupos()
     {
         $sql = 'select distinct(json_data->>"$.grupo") as grupo from ven_venda';
-        /** @var Connection $conn */
+
         $conn = $this->getEntityManager()->getConnection();
-        return $conn->fetchAll($sql);
+        return $conn->fetchAllAssociative($sql);
     }
 
 

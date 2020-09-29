@@ -4,15 +4,12 @@ namespace App\Business\Vendas;
 
 
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Repository para a entidade Venda.
  *
  * @author Carlos Eduardo Pauluk
- *
  */
 class VendaRepositoryBusiness
 {
@@ -56,10 +53,10 @@ class VendaRepositoryBusiness
     /**
      * @param $pv
      * @param $mesano
-     * @return array
+     * @return null|array
      * @throws \Exception
      */
-    public function findByPVAndMesAno($pv, $mesano): array
+    public function findByPVAndMesAno($pv, $mesano): ?array
     {
         $ql = "SELECT v FROM CrosierSource\CrosierLibRadxBundle\Entity\Vendas\Venda v WHERE v.mesano = :mesano AND v.pv = :pv";
         $query = $this->doctrine->createQuery($ql);
@@ -101,40 +98,42 @@ class VendaRepositoryBusiness
      */
     public function totalVendasPorFornecedor(\DateTime $dtIni = null, \DateTime $dtFim = null, ?string $lojas = null, ?string $grupos = null)
     {
-        $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
-        $dtIni->setTime(0, 0, 0, 0);
-        $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
-        $dtFim->setTime(23, 59, 59, 99999);
 
 
-        $sql = 'SELECT i.fornecedor_nome, sum(i.preco_venda * i.qtde) as total_venda FROM ven_venda_item i, ven_venda v WHERE i.fornecedor_nome IS NOT NULL AND v.id = i.venda_id AND v.dt_nota BETWEEN :dtIni and :dtFim ';
-        $sql .= $grupos ? 'AND v.json_data->>"$.grupo" IN (:grupos) ' : '';
-        $sql .= $lojas ? 'AND v.json_data->>"$.loja" IN (:lojas) ' : '';
-        $sql .= ' GROUP BY i.fornecedor_nome ORDER BY total_venda DESC';
-
-
-        $params['dtIni'] = $dtIni->format('Y-m-d');
-        $params['dtFim'] = $dtFim->format('Y-m-d');
-        if ($grupos) {
-            $params['grupos'] = $grupos;
-        }
-        if ($lojas) {
-            $params['lojas'] = $lojas;
-        }
-
-        $total = $this->totalVendasPor($dtIni, $dtFim, $lojas, $grupos);
-        $results = $this->doctrine->getConnection()->fetchAll($sql, $params);
-
-        foreach ($results as $k => $r) {
-            if ($total > 0) {
-                $results[$k]['participacao'] = bcmul(bcdiv($r['total_venda'], $total, 6), 100, 4);
-            } else {
-                $results[$k]['participacao'] = 0;
+        try {
+            $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
+            $dtIni->setTime(0, 0, 0, 0);
+            $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
+            $dtFim->setTime(23, 59, 59, 99999);
+            $sql = 'SELECT i.fornecedor_nome, sum(i.preco_venda * i.qtde) as total_venda FROM ven_venda_item i, ven_venda v WHERE i.fornecedor_nome IS NOT NULL AND v.id = i.venda_id AND v.dt_nota BETWEEN :dtIni and :dtFim ';
+            $sql .= $grupos ? 'AND v.json_data->>"$.grupo" IN (:grupos) ' : '';
+            $sql .= $lojas ? 'AND v.json_data->>"$.loja" IN (:lojas) ' : '';
+            $sql .= ' GROUP BY i.fornecedor_nome ORDER BY total_venda DESC';
+            $params['dtIni'] = $dtIni->format('Y-m-d');
+            $params['dtFim'] = $dtFim->format('Y-m-d');
+            if ($grupos) {
+                $params['grupos'] = $grupos;
             }
+            if ($lojas) {
+                $params['lojas'] = $lojas;
+            }
+            $total = $this->totalVendasPor($dtIni, $dtFim, $lojas, $grupos);
+            $results = $this->doctrine->getConnection()->fetchAllAssociative($sql, $params);
+            foreach ($results as $k => $r) {
+                if ($total > 0) {
+                    $results[$k]['participacao'] = bcmul(bcdiv($r['total_venda'], $total, 6), 100, 4);
+                } else {
+                    $results[$k]['participacao'] = 0;
+                }
+            }
+            return $results;
+        } catch (\Throwable $e) {
+            $errMsg = 'Erro ao totalVendasPorFornecedor()';
+            if ($e instanceof ViewException) {
+                $errMsg = $e->getMessage();
+            }
+            throw new ViewException($errMsg);
         }
-
-
-        return $results;
     }
 
 
@@ -166,8 +165,8 @@ class VendaRepositoryBusiness
             if ($lojas) {
                 $params['lojas'] = $lojas;
             }
-            return $this->doctrine->getConnection()->fetchAssoc($sqlTotal, $params)['total_venda'];
-        } catch (DBALException | \Throwable $e) {
+            return $this->doctrine->getConnection()->fetchAssociative($sqlTotal, $params)['total_venda'];
+        } catch (\Throwable $e) {
             throw new ViewException('Erro ao calcular total');
         }
     }
@@ -229,9 +228,9 @@ class VendaRepositoryBusiness
         if ($lojas) {
             $params['lojas'] = is_array($lojas) ? implode(',', $lojas) : $lojas;
         }
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
-        return $conn->fetchAll($sql, $params);
+        return $conn->fetchAllAssociative($sql, $params);
     }
 
     /**
@@ -242,7 +241,6 @@ class VendaRepositoryBusiness
      * @param string|null $lojas
      * @param string|null $grupos
      * @return mixed
-     * @throws DBALException
      */
     public function totalVendasPorVendedor(\DateTime $dtIni = null, \DateTime $dtFim = null, ?string $lojas = null, ?string $grupos = null)
     {
@@ -287,9 +285,9 @@ class VendaRepositoryBusiness
         if ($lojas) {
             $params['lojas'] = is_array($lojas) ? implode(',', $lojas) : $lojas;
         }
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
-        $dados = $conn->fetchAll($sql, $params);
+        $dados = $conn->fetchAllAssociative($sql, $params);
 
         $margemLiquidaGeral = ($this->totalMargemLiquida($dtIni, $dtFim, $lojas, $grupos)['margem_liquida'] ?? 0.0) * 100.0;
 
@@ -304,7 +302,6 @@ class VendaRepositoryBusiness
      * @param string|null $lojas
      * @param string|null $grupos
      * @return mixed
-     * @throws DBALException
      */
     public function totalMargemLiquida(\DateTime $dtIni = null, \DateTime $dtFim = null, ?string $lojas = null, ?string $grupos = null)
     {
@@ -342,9 +339,9 @@ class VendaRepositoryBusiness
         if ($lojas) {
             $params['lojas'] = is_array($lojas) ? implode(',', $lojas) : $lojas;
         }
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
-        return $conn->fetchAssoc($sql, $params);
+        return $conn->fetchAssociative($sql, $params);
     }
 
 
@@ -352,30 +349,30 @@ class VendaRepositoryBusiness
      * @param \DateTime|null $dtIni
      * @param \DateTime|null $dtFim
      * @return mixed
-     * @throws DBALException
+     * @throws ViewException
      */
     public function getNomeFornecedorMaisVendido(\DateTime $dtIni, \DateTime $dtFim): ?string
     {
-        $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
-        $dtIni->setTime(0, 0, 0, 0);
-        $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
-        $dtFim->setTime(23, 59, 59, 99999);
 
-        $sql = 'SELECT fornecedor_nome, sum(valor_total) as tpv
-                    FROM ven_venda
-                     WHERE dt_nota BETWEEN :dtIni AND :dtFim GROUP BY fornecedor_nome ORDER BY tpv LIMIT 1';
 
-        $params = [
-            'dtIni' => $dtIni->format('Y-m-d'),
-            'dtFim' => $dtFim->format('Y-m-d'),
-        ];
-
-        /** @var Connection $conn */
-        $conn = $this->doctrine->getConnection();
-        $r = $conn->fetchAssoc($sql, $params);
-
-        return $r['fornecedor_nome'] ?? null;
-
+        try {
+            $dtIni = $dtIni ?? \DateTime::createFromFormat('d/m/Y', '01/01/0000');
+            $dtIni->setTime(0, 0, 0, 0);
+            $dtFim = $dtFim ?? \DateTime::createFromFormat('d/m/Y', '01/01/9999');
+            $dtFim->setTime(23, 59, 59, 99999);
+            $sql = 'SELECT fornecedor_nome, sum(valor_total) as tpv
+                        FROM ven_venda
+                         WHERE dt_nota BETWEEN :dtIni AND :dtFim GROUP BY fornecedor_nome ORDER BY tpv LIMIT 1';
+            $params = [
+                'dtIni' => $dtIni->format('Y-m-d'),
+                'dtFim' => $dtFim->format('Y-m-d'),
+            ];
+            $conn = $this->doctrine->getConnection();
+            $r = $conn->fetchAssociative($sql, $params);
+            return $r['fornecedor_nome'] ?? null;
+        } catch (\Throwable $e) {
+            throw new ViewException('Erro ao getNomeFornecedorMaisVendido()');
+        }
     }
 
 
@@ -384,17 +381,20 @@ class VendaRepositoryBusiness
      */
     public function getFornecedores(): array
     {
-        $sql = 'SELECT fornecedor_nome FROM ven_venda_item GROUP BY fornecedor_codigo, fornecedor_nome ORDER BY fornecedor_nome';
-        /** @var Connection $conn */
-        $conn = $this->doctrine->getConnection();
-        $r = $conn->fetchAll($sql);
-        $arr = [];
-        foreach ($r as $item) {
-            $e['id'] = $item['fornecedor_nome'];
-            $e['text'] = $item['fornecedor_nome'];
-            $arr[] = $e;
+        try {
+            $sql = 'SELECT fornecedor_nome FROM ven_venda_item GROUP BY fornecedor_codigo, fornecedor_nome ORDER BY fornecedor_nome';
+            $conn = $this->doctrine->getConnection();
+            $r = $conn->fetchAllAssociative($sql);
+            $arr = [];
+            foreach ($r as $item) {
+                $e['id'] = $item['fornecedor_nome'];
+                $e['text'] = $item['fornecedor_nome'];
+                $arr[] = $e;
+            }
+            return $arr;
+        } catch (\Throwable $e) {
+            throw new ViewException('Erro ao getFornecedores()');
         }
-        return $arr;
     }
 
     /**
@@ -403,9 +403,9 @@ class VendaRepositoryBusiness
     public function getGrupos(): array
     {
         $sql = 'SELECT distinct(json_data->>"$.grupo") as grupo FROM ven_venda ORDER BY json_data->>"$.grupo"';
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
-        $r = $conn->fetchAll($sql);
+        $r = $conn->fetchAllAssociative($sql);
         $arr = [];
         foreach ($r as $item) {
             $e['id'] = $item['grupo'];
@@ -422,9 +422,9 @@ class VendaRepositoryBusiness
     public function getLojas(): array
     {
         $sql = 'SELECT distinct(json_data->>"$.loja") as loja FROM ven_venda ORDER BY json_data->>"$.loja"';
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
-        $r = $conn->fetchAll($sql);
+        $r = $conn->fetchAllAssociative($sql);
         $arr = [];
         foreach ($r as $item) {
             $e['id'] = $item['loja'];
@@ -442,9 +442,9 @@ class VendaRepositoryBusiness
     public function getVendedores(): array
     {
         $sql = 'SELECT CONCAT(vendedor_codigo, \' - \', vendedor_nome) as vendedor FROM ven_venda GROUP BY vendedor_codigo, vendedor_nome ORDER BY vendedor_nome';
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
-        $r = $conn->fetchAll($sql);
+        $r = $conn->fetchAllAssociative($sql);
         $arr = [];
         foreach ($r as $item) {
             $e['id'] = $item['vendedor'];
@@ -506,9 +506,9 @@ class VendaRepositoryBusiness
             $params['lojas'] = is_array($lojas) ? implode(',', $lojas) : $lojas;
         }
 
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
-        return $conn->fetchAll($sql, $params);
+        return $conn->fetchAllAssociative($sql, $params);
     }
 
     /**
@@ -566,9 +566,9 @@ class VendaRepositoryBusiness
             $params['lojas'] = is_array($lojas) ? implode(',', $lojas) : $lojas;
         }
 
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
-        return $conn->fetchAll($sql, $params);
+        return $conn->fetchAllAssociative($sql, $params);
     }
 
     /**
@@ -577,9 +577,9 @@ class VendaRepositoryBusiness
     public function findLojas()
     {
         $sql = 'select distinct(json_data->>"$.loja") as loja from ven_venda';
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
-        return $conn->fetchAll($sql);
+        return $conn->fetchAllAssociative($sql);
     }
 
     /**
@@ -588,9 +588,9 @@ class VendaRepositoryBusiness
     public function findGrupos()
     {
         $sql = 'select distinct(json_data->>"$.grupo") as grupo from ven_venda';
-        /** @var Connection $conn */
+
         $conn = $this->doctrine->getConnection();
-        return $conn->fetchAll($sql);
+        return $conn->fetchAllAssociative($sql);
     }
 
 
