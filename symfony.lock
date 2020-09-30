@@ -87,6 +87,9 @@
     "dompdf/dompdf": {
         "version": "v0.8.3"
     },
+    "econea/nusoap": {
+        "version": "v0.9.10"
+    },
     "egulias/email-validator": {
         "version": "2.1.13"
     },
