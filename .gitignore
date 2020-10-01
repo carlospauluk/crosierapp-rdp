@@ -51,3 +51,4 @@ yarn-error.log
 /assets/static/fos_js_routes.json
 /src/Entity/uppercaseFields.json
 
+/src/.preload.php
