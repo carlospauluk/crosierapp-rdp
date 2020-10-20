@@ -201,8 +201,12 @@ class ProdutoBusiness
                 $r[] = $atributosProduto['peso'] ?? '';
                 $r[] = $atributosProduto['qtde_imagens'] ?? '';
                 if (isset($atributosProduto['ecommerce_dt_integr'])) {
-                    $ecommerce_dt_integr = DateTimeUtils::parseDateStr($atributosProduto['ecommerce_dt_integr'])->format('d/m/Y H:i:s');
-                    $r[] = $ecommerce_dt_integr;
+                    try {
+                        $ecommerce_dt_integr = DateTimeUtils::parseDateStr($atributosProduto['ecommerce_dt_integr'])->format('d/m/Y H:i:s');
+                        $r[] = $ecommerce_dt_integr;
+                    } catch (\Throwable $e) {
+                        $r[] = '';
+                    }
                 } else {
                     $r[] = '';
                 }
