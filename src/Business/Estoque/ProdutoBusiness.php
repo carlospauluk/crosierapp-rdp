@@ -200,7 +200,7 @@ class ProdutoBusiness
                 $r[] = $atributosProduto['dimensoes_C'] ?? '';
                 $r[] = $atributosProduto['peso'] ?? '';
                 $r[] = $atributosProduto['qtde_imagens'] ?? '';
-                $r[] = $atributosProduto['integr_ecommerce'] ?? '';
+                $r[] = $atributosProduto['ecommerce_dt_integr'] ?? 'n/d';
                 $r[] = $atributosProduto['erp_codigo'];
                 $r[] = $atributosProduto['ncm'];
                 $r[] = $atributosProduto['preco_custo'] ?? '';
