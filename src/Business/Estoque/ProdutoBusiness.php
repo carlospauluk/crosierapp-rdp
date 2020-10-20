@@ -200,7 +200,12 @@ class ProdutoBusiness
                 $r[] = $atributosProduto['dimensoes_C'] ?? '';
                 $r[] = $atributosProduto['peso'] ?? '';
                 $r[] = $atributosProduto['qtde_imagens'] ?? '';
-                $r[] = $atributosProduto['ecommerce_dt_integr'] ?? 'n/d';
+                if (isset($atributosProduto['ecommerce_dt_integr'])) {
+                    $ecommerce_dt_integr = DateTimeUtils::parseDateStr($atributosProduto['ecommerce_dt_integr'])->format('d/m/Y H:i:s');
+                    $r[] = $ecommerce_dt_integr;
+                } else {
+                    $r[] = '';
+                }
                 $r[] = $atributosProduto['erp_codigo'];
                 $r[] = $atributosProduto['ncm'];
                 $r[] = $atributosProduto['preco_custo'] ?? '';
