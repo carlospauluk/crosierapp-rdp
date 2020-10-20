@@ -9,7 +9,6 @@ use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Repository\Config\AppConfigRepository;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\StringUtils\StringUtils;
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -64,7 +63,7 @@ class ProdutoBusiness
 
             $sqlTitulo = $apenasProdutosComTitulo ? 'AND IFNULL(p.json_data->>"$.titulo",\'null\') != \'null\'' : '';
 
-            $produtos = $conn->fetchAllAssociative('SELECT p.* FROM est_produto p WHERE true ' . $sqlTitulo . ' ORDER BY id');
+            $produtos = $conn->fetchAllAssociative('SELECT p.*, f.documento as fornecedor_documento, f.nome as fornecedor_nome FROM est_produto p, est_fornecedor f WHERE p.fornecedor_id = f.id ' . $sqlTitulo . ' ORDER BY id LIMIT 10');
 
             $titulos[] = 'Atualizado';
             $titulos[] = 'Código';
@@ -80,14 +79,18 @@ class ProdutoBusiness
             $titulos[] = 'Preço Site';
             $titulos[] = 'Preço Atacado';
             $titulos[] = 'Preço Acessórios ';
+
+            $titulos[] = 'Descrição';
             $titulos[] = 'Características';
             $titulos[] = 'Especificações Técnicas';
             $titulos[] = 'Itens Inclusos';
+            $titulos[] = 'Compatível com';
+
             $titulos[] = 'EAN';
             $titulos[] = 'Referência';
             $titulos[] = 'Marca';
             $titulos[] = 'Vídeo';
-            $titulos[] = 'Compatível com';
+
             $titulos[] = 'Ano';
             $titulos[] = 'Montadora';
             $titulos[] = 'Modelos';
@@ -172,19 +175,23 @@ class ProdutoBusiness
                 $r[] = $atributosProduto['depto_codigo'] . ' - ' . $atributosProduto['depto_nome'];
                 $r[] = $atributosProduto['grupo_codigo'] . ' - ' . $atributosProduto['grupo_nome'];
                 $r[] = $atributosProduto['subgrupo_codigo'] . ' - ' . $atributosProduto['subgrupo_nome'];
-                $r[] = $atributosProduto['fornecedor_nome'];
+                $r[] = StringUtils::mascararCnpjCpf($produto['fornecedor_documento']) . ' - ' . $produto['fornecedor_nome'];
                 $r[] = $atributosProduto['preco_tabela'] ?? '';
                 $r[] = $atributosProduto['preco_site'] ?? '';
                 $r[] = $atributosProduto['preco_atacado'] ?? '';
                 $r[] = $atributosProduto['preco_acessorios'] ?? '';
+
+                $r[] = $atributosProduto['descricao_produto'] ? 'Sim' : 'Não';
                 $r[] = $atributosProduto['caracteristicas'] ? 'Sim' : 'Não';
-                $r[] = ($atributosProduto['especif_tec'] ?? null) ? 'Sim' : 'Não';
-                $r[] = ($atributosProduto['itens_inclusos'] ?? null) ? 'Sim' : 'Não';
+                $r[] = $atributosProduto['especif_tec'] ? 'Sim' : 'Não';
+                $r[] = $atributosProduto['itens_inclusos'] ? 'Sim' : 'Não';
+                $r[] = $atributosProduto['compativel_com'] ? 'Sim' : 'Não';
+
                 $r[] = $atributosProduto['ean'];
                 $r[] = $atributosProduto['referencia'];
                 $r[] = $atributosProduto['marca'] ?? '';
                 $r[] = $atributosProduto['video_url'] ?? '';
-                $r[] = ($atributosProduto['compativel_com'] ?? null) ? 'Sim' : 'Não';
+
                 $r[] = $atributosProduto['ano'] ?? '';
                 $r[] = $atributosProduto['montadora'] ?? '';
                 $r[] = $atributosProduto['modelos'] ?? '';
@@ -354,7 +361,7 @@ class ProdutoBusiness
                 ],
             ];
             return $r;
-        } catch (DBALException $e) {
+        } catch (\Throwable $e) {
             throw new ViewException('Erro ao gerar totalEstoquePorFilial()');
         }
     }
@@ -548,6 +555,177 @@ class ProdutoBusiness
         $cache = new FilesystemAdapter($_SERVER['CROSIERAPP_ID'] . '.cache', 0, $_SERVER['CROSIER_SESSIONS_FOLDER']);
 
         $cache->reset();
+    }
+
+
+    /**
+     * Gera os dados tanto para Excel quanto para CSV.
+     *
+     * @param string $arquivo
+     * @return int[]
+     * @throws ViewException
+     */
+    public function lerExcelProdutos(string $arquivo): array
+    {
+        try {
+            $inputFileType = \PhpOffice\PhpSpreadsheet\IOFactory::identify($arquivo);
+            $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($inputFileType);
+            $spreadsheet = $reader->load($arquivo);
+
+            $worksheet = $spreadsheet->getActiveSheet();
+            $planilha = [];
+            foreach ($worksheet->getRowIterator() as $k => $row) {
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(FALSE); // This loops through all cells,
+                $cells = [];
+                foreach ($cellIterator as $cell) {
+                    $cells[] = $cell->getValue();
+                }
+                $planilha[] = $cells;
+                if ($k > 65000) {
+                    throw new ViewException('Erro ao ler planilha (k>65000)');
+                }
+            }
+
+
+            $conn = $this->doctrine->getConnection();
+
+            $rUnidades = $conn->fetchAllAssociative('SELECT id, label FROM est_unidade');
+            $unidades = [];
+            foreach ($rUnidades as $rUnidade) {
+                $unidades[$rUnidade['label']] = $rUnidade['id'];
+            }
+
+            $rSubgrupos = $conn->fetchAllAssociative('SELECT 
+                json_data->>"$.depto_id" as depto_id, 
+                json_data->>"$.depto_codigo" as depto_codigo, 
+                json_data->>"$.depto_nome" as depto_nome,
+                grupo_id,
+                json_data->>"$.grupo_codigo" as grupo_codigo, 
+                json_data->>"$.grupo_nome" as grupo_nome,
+                id as subgrupo_id, 
+                codigo as subgrupo_codigo, 
+                nome as subgrupo_nome FROM est_subgrupo');
+            $subgrupos = [];
+            foreach ($rSubgrupos as $rSubgrupo) {
+                $chave = $rSubgrupo['depto_codigo'] . ' - ' . $rSubgrupo['depto_nome'] . '---' .
+                    $rSubgrupo['grupo_codigo'] . ' - ' . $rSubgrupo['grupo_nome'] . '---' .
+                    $rSubgrupo['subgrupo_codigo'] . ' - ' . $rSubgrupo['subgrupo_nome'];
+                $subgrupos[md5($chave)] = $rSubgrupo;
+            }
+
+            $rFornecedores = $conn->fetchAllAssociative('SELECT id, documento, nome FROM est_fornecedor');
+            $fornecedores = [];
+            foreach ($rFornecedores as $rFornecedor) {
+                $fornecedores[md5(StringUtils::mascararCnpjCpf($rFornecedor['documento']) . ' - ' . $rFornecedor['nome'])] = $rFornecedor['id'];
+            }
+
+            $alterados = 0;
+            $naoAlterados = 0;
+
+            foreach ($planilha as $k => $linha) {
+                if ($k === 0) continue;
+                if (!is_int($linha[1])) continue;
+                $produto = $conn->fetchAssociative('SELECT * FROM est_produto WHERE id = :produtoId', ['produtoId' => $linha[1]]);
+                if (!$produto) {
+                    throw new ViewException('Produto não encontrado para o id ' . $linha[1]);
+                }
+
+                $produto_orig = $conn->fetchAssociative('SELECT * FROM est_produto WHERE id = :produtoId', ['produtoId' => $linha[1]]);
+                $produto_jsonData_orig = json_decode($produto_orig['json_data'], true);
+                ksort($produto_jsonData_orig);
+                $produto_orig['json_data'] = json_encode($produto_jsonData_orig);
+
+                $produto_jsonData = json_decode($produto['json_data'], true);
+
+                $produto['unidade_padrao_id'] = $unidades[$linha[2]];
+                $produto_jsonData['titulo'] = $linha[5];
+                $chaveDeptoGrupoSubgrupo = $linha[6] . '---' . $linha[7] . '---' . $linha[8];
+                $subgrupo = $subgrupos[md5($chaveDeptoGrupoSubgrupo)];
+                $produto['depto_id'] = $subgrupo['depto_id'];
+                $produto['grupo_id'] = $subgrupo['grupo_id'];
+                $produto['subgrupo_id'] = $subgrupo['subgrupo_id'];
+                $produto['fornecedor_id'] = $fornecedores[md5($linha[9])];
+
+                if (!in_array($linha[14], ['Sim', 'Não'], true)) {
+                    $produto_jsonData['descricao_produto'] = $linha[14];
+                }
+                if (!in_array($linha[15], ['Sim', 'Não'], true)) {
+                    $produto_jsonData['caracteristicas'] = $linha[15];
+                }
+                if (!in_array($linha[16], ['Sim', 'Não'], true)) {
+                    $produto_jsonData['especif_tec'] = $linha[16];
+                }
+                if (!in_array($linha[17], ['Sim', 'Não'], true)) {
+                    $produto_jsonData['itens_inclusos'] = $linha[17];
+                }
+                if (!in_array($linha[18], ['Sim', 'Não'], true)) {
+                    $produto_jsonData['compativel_com'] = $linha[18];
+                }
+
+                $produto_jsonData['ean'] = $linha[19];
+                $produto_jsonData['referencia'] = $linha[20];
+                $produto_jsonData['marca'] = $linha[21];
+
+                $produto_jsonData['ano'] = $linha[23];
+                $produto_jsonData['montadora'] = $linha[24];
+                $produto_jsonData['modelos'] = $linha[25];
+
+                $produto_jsonData['ano_2'] = $linha[26];
+                $produto_jsonData['montadora_2'] = $linha[27];
+                $produto_jsonData['modelos_2'] = $linha[28];
+
+                $produto_jsonData['ano_3'] = $linha[29];
+                $produto_jsonData['montadora_3'] = $linha[30];
+                $produto_jsonData['modelos_3'] = $linha[31];
+
+                $produto['status'] = $linha[32] === 'ATIVO' ? 'ATIVO' : 'INATIVO';
+
+                $produto_jsonData['dimensoes'] = $linha[33] . '|' . $linha[34] . $linha[35]; // A|L|C
+                $produto_jsonData['peso'] = $linha[36];
+
+                ksort($produto_jsonData);
+
+                $produto_jsonData_orig = json_encode($produto_jsonData_orig);
+
+                $produto['json_data'] = json_encode($produto_jsonData);
+
+                // Verifica se houve alterações
+                if (strcmp(json_encode($produto), json_encode($produto_orig)) !== 0) {
+                    $id = $produto['id'];
+
+                    // unset nos campos "VIRTUAL GENERATED"
+                    unset(
+                        $produto['id'],
+                        $produto['depto_nome'],
+                        $produto['titulo'],
+                        $produto['qtde_estoque_matriz'],
+                        $produto['qtde_estoque_min_matriz'],
+                        $produto['deficit_estoque_matriz'],
+                        $produto['dt_ult_saida_acessorios'],
+                        $produto['qtde_estoque_acessorios'],
+                        $produto['qtde_estoque_min_acessorios'],
+                        $produto['deficit_estoque_acessorios'],
+                        $produto['qtde_estoque_total'],
+                        $produto['porcent_preench'],
+                        $produto['qtde_imagens'],
+                        $produto['dt_ult_saida_matriz'],
+                        $produto['ecommerce_dt_integr']);
+
+                    $produto['updated'] = (new \DateTime())->format('Y-m-d H:i:s');
+                    $conn->update('est_produto', $produto, ['id' => $id]);
+                    $alterados++;
+                } else {
+                    $naoAlterados++;
+                }
+            }
+            return ['ALTERADOS' => $alterados, 'NAO_ALTERADOS' => $naoAlterados];
+
+        } catch (\Throwable $e) {
+            $this->logger->error('Erro ao ler arquivo xlsx');
+            $this->logger->error($e->getMessage());
+            throw new ViewException('Erro ao ler arquivo xlsx');
+        }
     }
 
 }

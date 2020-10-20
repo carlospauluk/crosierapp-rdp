@@ -76,6 +76,29 @@ class ProdutoAuxController extends FormListController
 
     /**
      *
+     * @Route("/est/produto/importarExcel/", name="est_produto_importarExcel")
+     * @param Request $request
+     * @return Response
+     * @IsGranted("ROLE_ESTOQUE", statusCode=403)
+     */
+    public function importarExcel(Request $request): Response
+    {
+        $params = [];
+        try {
+            if ($request->files->get('arquivo')) {
+                $r = $this->produtoBusiness->lerExcelProdutos($request->files->get('arquivo'));
+                $this->addFlash('success', $r['ALTERADOS'] . ' produto(s) alterado(s) e ' . $r['NAO_ALTERADOS'] . ' produto(s) não alterado(s)');
+            }
+
+
+        } catch (ViewException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+        return $this->doRender('Estoque/excelProdutos_importar.html.twig', $params);
+    }
+
+    /**
+     *
      * @Route("/est/produto/exportarCSV/", name="est_produto_exportarCSV")
      * @param Request $request
      * @return Response
@@ -199,7 +222,6 @@ class ProdutoAuxController extends FormListController
                 $this->addFlash('warn', 'Retornando apenas ' . $params['limit'] . ' registros de um total de ' . $totalRegistros . '. Utilize os filtros!');
             }
         };
-
 
 
         return $this->doListSimpl($request, $params, $fnGetFilterDatas, $fnHandleDadosList);

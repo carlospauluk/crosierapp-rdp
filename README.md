@@ -1,2 +1,3 @@
-# crosierapp-helloworld
-Projeto de exemplo para um CrosierApp
+# crosierapp-rdp
+
+Módulo do Crosier para a plataforma web da Rodoponta.
