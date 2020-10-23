@@ -63,7 +63,7 @@ class ProdutoBusiness
 
             $sqlTitulo = $apenasProdutosComTitulo ? 'AND IFNULL(p.json_data->>"$.titulo",\'null\') != \'null\'' : '';
 
-            $produtos = $conn->fetchAllAssociative('SELECT p.*, f.documento as fornecedor_documento, f.nome as fornecedor_nome FROM est_produto p, est_fornecedor f WHERE p.fornecedor_id = f.id ' . $sqlTitulo . ' ORDER BY id LIMIT 10');
+            $produtos = $conn->fetchAllAssociative('SELECT p.*, f.documento as fornecedor_documento, f.nome as fornecedor_nome FROM est_produto p, est_fornecedor f WHERE p.fornecedor_id = f.id ' . $sqlTitulo . ' ORDER BY id');
 
             $titulos[] = 'Atualizado';
             $titulos[] = 'Código';
