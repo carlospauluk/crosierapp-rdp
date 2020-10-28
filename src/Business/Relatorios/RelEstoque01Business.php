@@ -97,6 +97,7 @@ class RelEstoque01Business
             if (!in_array($file, array('.', '..')) && !is_dir($pastaFila . $file)) {
                 try {
                     $this->processarArquivo($file);
+
                     $this->corrigirEstoquesProdutosComposicao();
                     $this->marcarDtHrAtualizacao();
                     $this->syslog->info('Arquivo processado com sucesso.');
@@ -445,16 +446,27 @@ class RelEstoque01Business
             /** @var ProdutoRepository $repoProduto */
             $repoProduto = $this->appConfigEntityHandler->getDoctrine()->getRepository(Produto::class);
             foreach ($rProdutosComposicao as $rProdutoComposicao) {
-                /** @var Produto $produtoComposicao */
-                $produtoComposicao = $repoProduto->find($rProdutoComposicao['id']);
-                try {
-                    $this->produtoEntityHandler->save($produtoComposicao);
-                } catch (\Exception $e) {
-                    $this->syslog->err('Erro ao salvar produtoComposicao', $e->getTraceAsString());
-                    continue;
+                /** @var Produto $produto */
+                $produto = $repoProduto->find($rProdutoComposicao['id']);
+
+                $valorTotal = 0.0;
+                $menorQtdeDisponivel = null;
+
+                foreach ($produto->composicoes as $itemComposicao) {
+                    $itemComposicao->qtdeEmEstoque = $itemComposicao->produtoFilho->jsonData['qtde_estoque_total'] ?? 0.0; // save
+                    $valorTotal = bcadd($valorTotal, $itemComposicao->getTotalComposicao(), 2);
+
+                    $qtdeDisponivel = $itemComposicao->qtdeEmEstoque >= $itemComposicao->qtde ? bcdiv($itemComposicao->qtdeEmEstoque, $itemComposicao->qtde, 0) : 0;
+                    $menorQtdeDisponivel = ($menorQtdeDisponivel !== null && $menorQtdeDisponivel < $qtdeDisponivel) ? $menorQtdeDisponivel : $qtdeDisponivel;
                 }
+
+                $produto->jsonData['preco_tabela'] = $valorTotal;
+                $produto->jsonData['preco_site'] = $valorTotal;
+                $produto->jsonData['qtde_estoque_total'] = $menorQtdeDisponivel;
+
+                $conn->update('est_produto', ['json_data' => json_encode($produto->jsonData)], ['id' => $produto->getId()]);
             }
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             $errMsg = 'Erro ao corrigirEstoquesProdutosComposicao()';
             $this->syslog->err($errMsg, $e->getTraceAsString());
             throw new ViewException('Erro ao corrigirEstoquesProdutosComposicao()');
