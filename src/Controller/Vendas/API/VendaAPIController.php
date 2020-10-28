@@ -6,6 +6,7 @@ use CrosierSource\CrosierLibBaseBundle\Business\Config\SyslogBusiness;
 use CrosierSource\CrosierLibBaseBundle\Exception\ViewException;
 use CrosierSource\CrosierLibBaseBundle\Utils\DateTimeUtils\DateTimeUtils;
 use CrosierSource\CrosierLibBaseBundle\Utils\RepositoryUtils\FilterData;
+use CrosierSource\CrosierLibRadxBundle\Entity\Estoque\ProdutoComposicao;
 use CrosierSource\CrosierLibRadxBundle\Entity\Vendas\Venda;
 use CrosierSource\CrosierLibRadxBundle\Entity\Vendas\VendaItem;
 use CrosierSource\CrosierLibRadxBundle\Entity\Vendas\VendaPagto;
@@ -144,9 +145,29 @@ class VendaAPIController extends AbstractController
                 $r[] = '<obs>' . ($venda->jsonData['obs'] ?? '') . '</obs>';
 
                 $r[] = '<itens>';
-                /** @var VendaItem $item */
-                foreach ($venda->itens as $item) {
 
+
+                $itensNaNota = [];
+                /** @var VendaItem $vendaItem */
+                foreach ($venda->itens as $vendaItem) {
+                    if ($vendaItem->produto->composicao === 'S') {
+                        /** @var ProdutoComposicao $produtoComposicao */
+                        foreach ($vendaItem->produto->composicoes as $produtoComposicao) {
+                            $mockItem = new VendaItem();
+                            $mockItem->produto = $produtoComposicao->produtoFilho;
+                            $mockItem->qtde = bcmul($vendaItem->qtde, $produtoComposicao->qtde, 3);
+                            $mockItem->precoVenda = $produtoComposicao->precoComposicao;
+                            $mockItem->total = bcmul($mockItem->qtde, $mockItem->precoVenda, 2);
+                            $itensNaNota[] = $mockItem;
+                        }
+                    } else {
+                        $itensNaNota[] = $vendaItem;
+                    }
+                }
+
+
+                /** @var VendaItem $vendaItem */
+                foreach ($itensNaNota as $item) {
                     $r[] = '  <item>';
                     $r[] = '    <erp_codigo>' . ($item->produto->jsonData['erp_codigo'] ?? '') . '</erp_codigo>';
                     $r[] = '    <produto_nome>' . mb_strtoupper($item->produto->nome ?? $item->descricao) . '</produto_nome>';
